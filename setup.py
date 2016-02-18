@@ -74,7 +74,7 @@ setup(
 	packages = find_packages(exclude=['test', 'example', 'benchmark']),
 	include_package_data = True,
 	package_data = {'': ['README.rst', 'LICENSE.txt']},
-	namespace_packages = ['marrow', 'mongo'],
+	namespace_packages = ['marrow', 'marrow.mongo'],
 	
 	# ## Dependency Declaration
 	
