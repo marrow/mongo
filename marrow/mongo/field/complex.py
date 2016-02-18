@@ -1,6 +1,6 @@
 # encoding: utf-8
 
-from ..core.field import Field
+from ..core.field import Attribute, Field
 
 
 class Embed(Field):

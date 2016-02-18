@@ -8,5 +8,3 @@ from marrow.schema import Container, Attribute
 
 class Document(Container):
 	__foreign__ = 'object'
-
-	

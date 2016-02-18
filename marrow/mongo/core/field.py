@@ -4,7 +4,7 @@ from copy import deepcopy
 from itertools import chain
 
 from marrow.schema import Container, Attribute
-from marrow.schema.transform import BaseTransform
+#from marrow.schema.transform import BaseTransform
 
 # from .util import py, str
 
@@ -32,12 +32,12 @@ class Field(Attribute):
 	__allowed_operators__ = set()
 	__disallowed_operators__ = set()
 	
-	choices = Attribute(defualt=None)
+	choices = Attribute(default=None)
 	required = Attribute(default=False)  # Must have value assigned; None and an empty string are values.
 	nullable = Attribute(default=False)  # If True, will store None.  If False, will store non-None default, or not store.
 	
-	transformer = Attribute(default=BaseTransform)
-	validator = Attribute(default=)
+	transformer = Attribute(default=None)  # BaseTransform
+	validator = Attribute(default=None)
 	translated = Attribute(default=False)  # If truthy this field should be stored in the per-language subdocument.
 	generated = Attribute(default=False)  # If truthy attempt to access and store resulting variable when instantiated.
 	
@@ -210,7 +210,7 @@ class Field(Attribute):
 		if __debug__ and __complex_safety_check(self, {'$all', '#array'}):  # Optimize this away in production.
 			raise NotImplementedError("{self.__class__.__name__} does not allow $all comparison.".format(self=self))
 		
-		return Op(self, 'in', [self.transformer.foreign(value, self) for i, value in enumerate(other))
+		return Op(self, 'in', [self.transformer.foreign(value, self) for i, value in enumerate(other)])
 	
 	def match(self, q):
 		"""Selects documents if element in the array field matches all the specified conditions.

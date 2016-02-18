@@ -2,7 +2,8 @@
 
 from bson import ObjectId as oid
 from bson.code import Code
-from ..core.field import Field
+from ..core.field import Attribute, Field
+
 
 try:
 	unicode
