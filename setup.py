@@ -79,6 +79,7 @@ setup(
 	# ## Dependency Declaration
 	
 	install_requires = [
+			'marrow.schema',  # Declarative Schema
 			'pymongo>=3.2',  # We require modern API.
 		],
 	
