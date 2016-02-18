@@ -106,60 +106,60 @@ WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGE
 COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-.. |ghwatch| image:: https://img.shields.io/github/watchers/marrow/cinje.svg?style=social&label=Watch
-    :target: https://github.com/marrow/cinje/subscription
+.. |ghwatch| image:: https://img.shields.io/github/watchers/marrow/mongo.svg?style=social&label=Watch
+    :target: https://github.com/marrow/mongo/subscription
     :alt: Subscribe to project activity on Github.
 
-.. |ghstar| image:: https://img.shields.io/github/stars/marrow/cinje.svg?style=social&label=Star
-    :target: https://github.com/marrow/cinje/subscription
+.. |ghstar| image:: https://img.shields.io/github/stars/marrow/mongo.svg?style=social&label=Star
+    :target: https://github.com/marrow/mongo/subscription
     :alt: Star this project on Github.
 
-.. |ghfork| image:: https://img.shields.io/github/forks/marrow/cinje.svg?style=social&label=Fork
-    :target: https://github.com/marrow/cinje/fork
+.. |ghfork| image:: https://img.shields.io/github/forks/marrow/mongo.svg?style=social&label=Fork
+    :target: https://github.com/marrow/mongo/fork
     :alt: Fork this project on Github.
 
-.. |masterstatus| image:: http://img.shields.io/travis/marrow/cinje/master.svg?style=flat
-    :target: https://travis-ci.org/marrow/cinje/branches
+.. |masterstatus| image:: http://img.shields.io/travis/marrow/mongo/master.svg?style=flat
+    :target: https://travis-ci.org/marrow/mongo/branches
     :alt: Release build status.
 
-.. |mastercover| image:: http://img.shields.io/codecov/c/github/marrow/cinje/master.svg?style=flat
-    :target: https://codecov.io/github/marrow/cinje?branch=master
+.. |mastercover| image:: http://img.shields.io/codecov/c/github/marrow/mongo/master.svg?style=flat
+    :target: https://codecov.io/github/marrow/mongo?branch=master
     :alt: Release test coverage.
 
-.. |masterreq| image:: https://img.shields.io/requires/github/marrow/cinje.svg
-    :target: https://requires.io/github/marrow/cinje/requirements/?branch=master
+.. |masterreq| image:: https://img.shields.io/requires/github/marrow/mongo.svg
+    :target: https://requires.io/github/marrow/mongo/requirements/?branch=master
     :alt: Status of release dependencies.
 
-.. |developstatus| image:: http://img.shields.io/travis/marrow/cinje/develop.svg?style=flat
-    :target: https://travis-ci.org/marrow/cinje/branches
+.. |developstatus| image:: http://img.shields.io/travis/marrow/mongo/develop.svg?style=flat
+    :target: https://travis-ci.org/marrow/mongo/branches
     :alt: Development build status.
 
-.. |developcover| image:: http://img.shields.io/codecov/c/github/marrow/cinje/develop.svg?style=flat
-    :target: https://codecov.io/github/marrow/cinje?branch=develop
+.. |developcover| image:: http://img.shields.io/codecov/c/github/marrow/mongo/develop.svg?style=flat
+    :target: https://codecov.io/github/marrow/mongo?branch=develop
     :alt: Development test coverage.
 
-.. |developreq| image:: https://img.shields.io/requires/github/marrow/cinje.svg
-    :target: https://requires.io/github/marrow/cinje/requirements/?branch=develop
+.. |developreq| image:: https://img.shields.io/requires/github/marrow/mongo.svg
+    :target: https://requires.io/github/marrow/mongo/requirements/?branch=develop
     :alt: Status of development dependencies.
 
-.. |issuecount| image:: http://img.shields.io/github/issues-raw/marrow/cinje.svg?style=flat
-    :target: https://github.com/marrow/cinje/issues
+.. |issuecount| image:: http://img.shields.io/github/issues-raw/marrow/mongo.svg?style=flat
+    :target: https://github.com/marrow/mongo/issues
     :alt: Github Issues
 
-.. |ghsince| image:: https://img.shields.io/github/commits-since/marrow/cinje/1.0.svg
-    :target: https://github.com/marrow/cinje/commits/develop
+.. |ghsince| image:: https://img.shields.io/github/commits-since/marrow/mongo/1.0.svg
+    :target: https://github.com/marrow/mongo/commits/develop
     :alt: Changes since last release.
 
-.. |ghtag| image:: https://img.shields.io/github/tag/marrow/cinje.svg
-    :target: https://github.com/marrow/cinje/tree/1.0
+.. |ghtag| image:: https://img.shields.io/github/tag/marrow/mongo.svg
+    :target: https://github.com/marrow/mongo/tree/1.0.0
     :alt: Latest Github tagged release.
 
-.. |latestversion| image:: http://img.shields.io/pypi/v/cinje.svg?style=flat
-    :target: https://pypi.python.org/pypi/cinje
+.. |latestversion| image:: http://img.shields.io/pypi/v/marrow.mongo.svg?style=flat
+    :target: https://pypi.python.org/pypi/marrow.mongo
     :alt: Latest released version.
 
-.. |downloads| image:: http://img.shields.io/pypi/dw/cinje.svg?style=flat
-    :target: https://pypi.python.org/pypi/cinje
+.. |downloads| image:: http://img.shields.io/pypi/dw/marrow.mongo.svg?style=flat
+    :target: https://pypi.python.org/pypi/marrow.mongo
     :alt: Downloads per week.
 
 .. |cake| image:: http://img.shields.io/badge/cake-lie-1b87fb.svg?style=flat
