@@ -36,6 +36,9 @@ def uncapped(request, connection):
 def capped(request, connection):
 	db = connection.get_default_database()
 	
+	if tuple((int(i) for i in connection.server_info()['version'][:3].split('.'))) < (3, 2):
+		pytest.xfail("Test expected to fail on MongoDB versions prior to 3.2.")
+	
 	db.drop_collection('test_capped')
 	db.create_collection(
 			'test_capped',
