@@ -86,12 +86,12 @@ class TestCappedQueries(object):
 		assert len(result) == capped.count()
 		assert 0.4 < delta < 0.6
 	
-	@pytest.xfail(not __debug__, reason="Development-time diagnostics unavailable in production.")
+	@pytest.mark.xfail(run=__debug__, reason="Development-time diagnostics unavailable in production.")
 	def test_capped_trap(self, uncapped):
 		with pytest.raises(TypeError):
 			list(tail(uncapped))
 	
-	@pytest.xfail(not __debug__, reason="Development-time diagnostics unavailable in production.")
+	@pytest.mark.xfail(run=__debug__, reason="Development-time diagnostics unavailable in production.")
 	def test_empty_trap(self, capped):
 		with pytest.raises(ValueError):
 			list(tail(capped))
