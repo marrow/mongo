@@ -6,6 +6,28 @@ from __future__ import unicode_literals
 
 # ## Imports
 
+# These are confirmed as being required.  Notes made to usage in this library for each import.
+
+# : marrow.mongo.core.query
+from collections import Mapping, MutableMapping
+from itertools import chain
+from copy import deepcopy
+
+# : marrow.mongo.core.query
+from marrow.schema import Container, Attribute
+from marrow.schema.compat import py2, odict, unicode as str
+
+# : marrow.mongo.core.query
+SENTINEL = object()  # Singleton value to detect unassigned values.
+
+
+
+
+
+
+
+# Unconfirmed, legacy from cinje clone.
+
 import sys
 
 from codecs import iterencode
@@ -19,6 +41,9 @@ try:  # pragma: no cover
 	from html.parser import HTMLParser
 except ImportError:  # pragma: no cover
 	from HTMLParser import HTMLParser
+
+
+from marrow.schema.compat import native, str as bytes
 
 
 # ## Python Cross-Compatibility
@@ -38,8 +63,6 @@ try:  # Python 2
 	except:  # pragma: no cover
 		from StringIO import StringIO  # This never really happens.  Still, nice to be defensive.
 	
-	bytes = str
-	str = unicode
 	py = 2
 	reduce = reduce
 
@@ -47,8 +70,6 @@ except:  # Python 3
 	from io import StringIO
 	
 	stringy = str
-	bytes = bytes
-	str = str
 	py = 3
 
 # There are some additional complications for the Pypy runtime.
@@ -58,3 +79,6 @@ try:
 	pypy = True
 except ImportError:
 	pypy = False
+
+
+
