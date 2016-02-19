@@ -29,6 +29,13 @@ env:
   - PYTHONOPTIMIZE=
   - PYTHONOPTIMIZE=2
 
+matrix:
+  exclude:
+    - python: pypy
+      env: PYTHONOPTIMIZE=2
+    - python: pypy3
+      env: PYTHONOPTIMIZE=2
+
 install: travis_retry .travis/install.sh
 
 script: tox
