@@ -2,10 +2,12 @@
 
 """Utilities relating to use and managemnet of capped collections."""
 
+from time import time
+
 from pymongo.cursor import CursorType
 
 
-def tail(collection, filter=None, projection=None, limit=None, timeout=None, limit=None, aggregate=False):
+def tail(collection, filter=None, projection=None, limit=0, timeout=None, aggregate=False):
 	"""A generator which will block and yield entries as they are added to a capped collection.
 	
 	Only use this on capped collections; behaviour is undefined against non-tailable cursors. Accepts a timeout as an
@@ -32,20 +34,15 @@ def tail(collection, filter=None, projection=None, limit=None, timeout=None, lim
 		if not collection.count():
 			raise ValueError("Cowardly refusing to tail an empty collection.")
 	
-	# Prepare the initial query.
-	filter = filter.copy()  # We mutate the query a bit.
+	cursor = collection.find(filter, projection, limit=limit, cursor_type=CursorType.TAILABLE_AWAIT)
 	
 	if timeout:
 		if aggregate:  # Total query time not to exceed `timeout` seconds.
-			modifiers = {'$maxTimeMS': int(timeout * 1000)}  # TODO: Test exit cases.
+			cursor = cursor.max_time_ms(int(timeout * 1000)).max_await_time_ms(int(timeout * 1000))
 		else:  # Individual wait time not to exceed `timeout` seconds.
-			modifiers = {'$maxAwaitTimeMS': int(timeout * 1000)}  # TODO: Test exit cases.
+			cursor = cursor.max_await_time_ms(int(timeout * 1000))
 	
-	# Construct a cursor with our required options.
-	cursor = collection.find(filter, projection, limit=limit, cursor_type=CursorType.TAILABLE_AWAIT, modifiers=modifiers)
-	
-	while cursor.alive():  # We may potentially need to track the last _id and such, depending on the above TODOs.
-		yield cursor.next()
+	return cursor
 
 
 def _patch():
@@ -54,7 +51,7 @@ def _patch():
 	While not nessicarily recommended, you can use this to inject `tail` as a method into Collection, making it generally accessible.
 	"""
 	
-	if not __debug__:
+	if not __debug__:  # pragma: no cover
 		import warnings
 		warnings.warn("A catgirl has died.", ImportWarning)
 	

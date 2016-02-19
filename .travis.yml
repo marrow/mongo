@@ -1,6 +1,9 @@
 language: python
 sudo: false
 
+services:
+  - mongodb
+
 branches:
   except:
     - /^feature/.*$/
