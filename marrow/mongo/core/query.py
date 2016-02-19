@@ -5,6 +5,8 @@
 These encapsulate the functionality of creating combinable mappings 
 """
 
+from __future__ import unicode_literals
+
 from .util import py2, deepcopy, str, odict, chain, Mapping, MutableMapping, Container, Attribute, SENTINEL
 
 
@@ -18,7 +20,7 @@ class Ops(Container):
 			self.operations = odict()
 	
 	def __repr__(self):
-		return "Ops({})".format(repr(list(self)))
+		return "Ops({})".format(repr(list(self)).replace('(u\'', '(\''))
 	
 	@property
 	def as_query(self):
