@@ -3,9 +3,10 @@
 from __future__ import unicode_literals
 
 import pytest
+import operator
 
-from marrow.mongo.core.query import Op, Ops
-from marrow.mongo.core.util import py2
+from marrow.mongo.core.query import Op, Ops, Queryable
+from marrow.mongo.core.util import py2, str
 
 
 @pytest.fixture
@@ -16,6 +17,24 @@ def empty_ops(request):
 @pytest.fixture
 def single_ops(request):
 	return Ops({'roll': 27})
+
+
+
+class MockQueryable(Queryable):
+	__foreign__ = 'string'
+	
+	def __str__(self):
+		return "field_name"
+	
+	__unicode__ = __str__
+	
+	class transformer(object):
+		@classmethod
+		def foreign(self, value, context=None):
+			return value
+
+
+mock_queryable = MockQueryable()
 
 
 class TestOpsMapping(object):
@@ -237,3 +256,73 @@ class TestOperationsCombination(object):
 		
 		comb = comb | Ops({'bar': 'baz'})
 		assert comb.as_query == {'$or': [{'roll': 27}, {'foo': 42}, {'bar': 'baz'}]}
+
+
+class TestQueryable(object):
+	operators = [
+			(operator.lt, '$lt', 27, {'field_name': {'$lt': 27}}),
+			(operator.le, '$lte', 27, {'field_name': {'$lte': 27}}),
+			(operator.eq, '$eq', "hOI!", {'field_name': 'hOI!'}),
+			(operator.ne, '$ne', "hOI!", {'field_name': {'$ne': 'hOI!'}}),
+			(operator.ge, '$gte', 27, {'field_name': {'$gte': 27}}),
+			(operator.gt, '$gt', 27, {'field_name': {'$gt': 27}}),
+		]
+	
+	singletons = [
+			(operator.neg, '$exists', {'field_name': {'$exists': 0}}),
+			(operator.pos, '$exists', {'field_name': {'$exists': 1}}),
+			(Queryable.of_type, '$type', {'field_name': {'$type': 'string'}}),
+		]
+	
+	advanced = [
+			(Queryable.any, '$in', [1, 2, 3], {'field_name': {'$in': [1, 2, 3]}}),
+			(Queryable.none, '$nin', [1, 2, 3], {'field_name': {'$nin': [1, 2, 3]}}),
+			(Queryable.all, '$all', [1, 2, 3], {'field_name': {'$all': [1, 2, 3]}}),
+			(Queryable.match, '$elemMatch', {'name': "Bob"}, {'field_name': {'$elemMatch': {'name': 'Bob'}}}),
+			(Queryable.size, '$size', 42, {'field_name': {'$size': 42}}),
+			(Queryable.of_type, '$type', "double", {'field_name': {'$type': 'double'}}),
+		]
+	
+	def do_operator(self, operator, query, value, result):
+		op = operator(mock_queryable, value)
+		assert isinstance(op, Op)
+		assert op.operation == query[1:]
+		assert op.as_query == result
+		
+		if __debug__:
+			a = MockQueryable()
+			a.__disallowed_operators__ = {query}
+			
+			try:
+				operator(a, value)
+			except NotImplementedError as e:
+				assert query in str(e)
+	
+	def do_singleton(self, operator, query, result):
+		op = operator(mock_queryable)
+		assert isinstance(op, Op)
+		assert op.operation == query[1:]
+		assert op.as_query == result
+	
+	# This hides the names of the tests.  Ugh.
+	#def test_generated_operation_tests(self):
+	#	for expectation in self.expectations:
+	#		yield (self.do, ) + expectation
+	
+	def test_operator_lt(self): self.do_operator(*self.operators[0])
+	def test_operator_lte(self): self.do_operator(*self.operators[1])
+	def test_operator_eq(self): self.do_operator(*self.operators[2])
+	def test_operator_ne(self): self.do_operator(*self.operators[3])
+	def test_operator_gte(self): self.do_operator(*self.operators[4])
+	def test_operator_gt(self): self.do_operator(*self.operators[5])
+	
+	def test_operator_neg(self): self.do_singleton(*self.singletons[0])
+	def test_operator_pos(self): self.do_singleton(*self.singletons[1])
+	
+	def test_operator_any(self): self.do_operator(*self.advanced[0])
+	def test_operator_none(self): self.do_operator(*self.advanced[1])
+	def test_operator_all(self): self.do_operator(*self.advanced[2])
+	def test_operator_match(self): self.do_operator(*self.advanced[3])
+	def test_operator_size(self): self.do_operator(*self.advanced[4])
+	def test_operator_type(self): self.do_operator(*self.advanced[5])
+	def test_operator_type_assumed(self): self.do_singleton(*self.singletons[2])

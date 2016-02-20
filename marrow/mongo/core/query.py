@@ -11,8 +11,8 @@ from .util import py2, deepcopy, str, odict, chain, Mapping, MutableMapping, Con
 
 
 if __debug__:
-	__simple_safety_check = lambda s, o: (s.__allowed_operators__ and o not in s.__allowed_operators__) or o in self.__disallowed_operators__
-	__complex_safety_check = lambda s, o: (s.__allowed_operators__ and not s.__allowed_operators__.intersection(o)) or self.__disallowed_operators__.intersection(o)
+	_Queryable__simple_safety_check = lambda s, o: (s.__allowed_operators__ and o not in s.__allowed_operators__) or o in s.__disallowed_operators__
+	_Queryable__complex_safety_check = lambda s, o: (s.__allowed_operators__ and not s.__allowed_operators__.intersection(o)) or s.__disallowed_operators__.intersection(o)
 
 
 class Ops(Container):
@@ -228,7 +228,7 @@ class Queryable(object):
 		Documentation: https://docs.mongodb.org/manual/reference/operator/query/gt/#op._S_gt
 		"""
 		if __debug__ and __complex_safety_check(self, {'$gt', '#rel'}):  # Optimize this away in production.
-			raise NotImplementedError("{self.__class__.__name__} does not allow $eq comparison.".format(self=self))
+			raise NotImplementedError("{self.__class__.__name__} does not allow $gt comparison.".format(self=self))
 		
 		return Op(self, 'gt', self.transformer.foreign(other, self))
 	
@@ -240,6 +240,9 @@ class Queryable(object):
 		Comparison operator: {$gte: value}
 		Documentation: https://docs.mongodb.org/manual/reference/operator/query/gte/#op._S_gte
 		"""
+		if __debug__ and __complex_safety_check(self, {'$gte', '#rel'}):  # Optimize this away in production.
+			raise NotImplementedError("{self.__class__.__name__} does not allow $gte comparison.".format(self=self))
+		
 		return Op(self, 'gte', self.transformer.foreign(other, self))
 	
 	def __lt__(self, other):
@@ -250,6 +253,9 @@ class Queryable(object):
 		Comparison operator: {$lt: value}
 		Documentation: https://docs.mongodb.org/manual/reference/operator/query/lt/#op._S_lt
 		"""
+		if __debug__ and __complex_safety_check(self, {'$lt', '#rel'}):  # Optimize this away in production.
+			raise NotImplementedError("{self.__class__.__name__} does not allow $lt comparison.".format(self=self))
+		
 		return Op(self, 'lt', self.transformer.foreign(other, self))
 	
 	def __le__(self, other):
@@ -260,6 +266,9 @@ class Queryable(object):
 		Comparison operator: {$lte: value}
 		Documentation: https://docs.mongodb.org/manual/reference/operator/query/lte/#op._S_lte
 		"""
+		if __debug__ and __complex_safety_check(self, {'$lte', '#rel'}):  # Optimize this away in production.
+			raise NotImplementedError("{self.__class__.__name__} does not allow $lte comparison.".format(self=self))
+		
 		return Op(self, 'lte', self.transformer.foreign(other, self))
 	
 	def __ne__(self, other):
@@ -270,6 +279,9 @@ class Queryable(object):
 		Comparison operator: {$ne: value}
 		Documentation: https://docs.mongodb.org/manual/reference/operator/query/ne/#op._S_ne
 		"""
+		if __debug__ and __complex_safety_check(self, {'$ne', '$eq'}):  # Optimize this away in production.
+			raise NotImplementedError("{self.__class__.__name__} does not allow $ne comparison.".format(self=self))
+		
 		return Op(self, 'ne', self.transformer.foreign(other, self))
 	
 	def any(self, *args):
@@ -282,6 +294,9 @@ class Queryable(object):
 		Comparison operator: {$in: value}
 		Documentation: https://docs.mongodb.org/manual/reference/operator/query/in/#op._S_in
 		"""
+		if __debug__ and __complex_safety_check(self, {'$in', '$eq'}):  # Optimize this away in production.
+			raise NotImplementedError("{self.__class__.__name__} does not allow $in comparison.".format(self=self))
+		
 		other = args if len(args) > 1 else args[0]
 		
 		return Op(self, 'in', [self.transformer.foreign(value, self) for i, value in enumerate(other)])
@@ -322,7 +337,7 @@ class Queryable(object):
 		if __debug__ and __complex_safety_check(self, {'$all', '#array'}):  # Optimize this away in production.
 			raise NotImplementedError("{self.__class__.__name__} does not allow $all comparison.".format(self=self))
 		
-		return Op(self, 'in', [self.transformer.foreign(value, self) for i, value in enumerate(other)])
+		return Op(self, 'all', [self.transformer.foreign(value, self) for i, value in enumerate(other)])
 	
 	def match(self, q):
 		"""Selects documents if element in the array field matches all the specified conditions.
@@ -333,7 +348,7 @@ class Queryable(object):
 		Documentation: https://docs.mongodb.org/manual/reference/operator/query/elemMatch/#op._S_elemMatch
 		"""
 		if __debug__ and __complex_safety_check(self, {'$elemMatch', '#document'}):  # Optimize this away in production.
-			raise NotImplementedError("{self.__class__.__name__} does not allow $eq comparison.".format(self=self))
+			raise NotImplementedError("{self.__class__.__name__} does not allow $elemMatch comparison.".format(self=self))
 		
 		if hasattr(q, 'as_query'):
 			q = q.as_query
@@ -386,17 +401,7 @@ class Queryable(object):
 		Documentation: https://docs.mongodb.org/manual/reference/operator/query/type/#op._S_type
 		"""
 		
-		candidates = set()
-		
-		if not args:
-			if isinstance(self.__foreign__, (list, tuple)):
-				candidates.update(self.__foreign__)
-			else:
-				candidates.add(self.__foreign__)
-		else:
-			candidates.update(getattr(i, '__foreign__', i) for i in args)
-		
-		# TODO
-		
-		if not isinstance(args[0], (list, tuple)):
+		if args:
 			return Op(self, 'type', args[0])
+		
+		return Op(self, 'type', self.__foreign__)
