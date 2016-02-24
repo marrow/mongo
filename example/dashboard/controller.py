@@ -16,6 +16,11 @@ class InvoiceStats:
 		self._collection = context.mongo.invoices.with_options(read_preference=ReadPreference.SECONDARY)
 	
 	def last(self, duration):
+		"""Count of valid invoices during period.
+		
+		/invoice/last/<period>
+		"""
+		
 		collection = self._collection
 		duration, label = dur(duration)
 		
@@ -39,8 +44,8 @@ class InvoiceStats:
 		current, previous = daterange(duration, Invoice.state not in self.INVALID_STATES)
 		
 		return difference(
-				sum(collection, current.as_query, 'total.total'),
-				sum(collection, previous.as_query, 'total.total')
+				sum(collection, current.as_query, Invoice.total.total),
+				sum(collection, previous.as_query, Invoice.total.total)
 				label.format("Revenue")
 			)
 
