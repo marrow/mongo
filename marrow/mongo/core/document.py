@@ -1,6 +1,6 @@
 # encoding: utf-8
 
-from copy import deepcopy
+from collections import OrderedDict as odict, MutableMapping
 from itertools import chain
 
 from marrow.schema import Container, Attribute
