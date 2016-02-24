@@ -5,7 +5,7 @@ from __future__ import unicode_literals
 import pytest
 import operator
 
-from marrow.mongo.core.query import Op, Ops, Queryable
+from marrow.mongo.query import Op, Ops, Queryable
 from marrow.mongo.core.util import py2, str
 
 

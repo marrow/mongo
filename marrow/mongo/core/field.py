@@ -5,25 +5,12 @@ from itertools import chain
 
 from marrow.schema import Container, Attribute
 from ..query import Queryable
-from .util import py2, Container, Attribute
-#from marrow.schema.transform import BaseTransform
-
-# from .util import py, str
-
+from .util import py2, Container, Attribute, adjust_attribute_sequence
+from marrow.schema.transform import BaseTransform
+from marrow.schema.validate import Validator
 
 
-
-
-def adjust_attribute_sequence(amount=10000, *fields):
-	def adjust_inner(cls):
-		for field in fields:
-			getattr(cls, field).__sequence__ += amount  # Move this to the back of the bus.
-		return cls
-	return adjust_inner
-
-
-
-@adjust_attribute_sequence(1000, 'transformer', 'translated', 'generated')
+@adjust_attribute_sequence(1000, 'transformer', 'validator', 'translated', 'generated')
 class Field(Attribute, Queryable):
 	# Possible values include a literal operator, or one of:
 	#  * #rel -- allow/prevent all relative comparison such as $gt, $gte, $lt, etc.
@@ -36,8 +23,8 @@ class Field(Attribute, Queryable):
 	required = Attribute(default=False)  # Must have value assigned; None and an empty string are values.
 	nullable = Attribute(default=False)  # If True, will store None.  If False, will store non-None default, or not store.
 	
-	transformer = Attribute(default=None)  # BaseTransform
-	validator = Attribute(default=None)  # BaseValidator
+	transformer = Attribute(default=BaseTransform())
+	validator = Attribute(default=Validator())
 	translated = Attribute(default=False)  # If truthy this field should be stored in the per-language subdocument.
 	generated = Attribute(default=False)  # If truthy attempt to access and store resulting variable when instantiated.
 	

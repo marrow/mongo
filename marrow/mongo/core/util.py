@@ -21,9 +21,17 @@ from marrow.schema.compat import py2, odict, unicode as str
 SENTINEL = object()  # Singleton value to detect unassigned values.
 
 
-
-
-
+# : marrow.mongo.core.document
+# : marrow.mongo.core.field
+def adjust_attribute_sequence(amount=10000, *fields):
+	"""Move marrow.schema fields around to control positional instantiation order."""
+	
+	def adjust_inner(cls):
+		for field in fields:
+			getattr(cls, field).__sequence__ += amount  # Move this to the back of the bus.
+		return cls
+	
+	return adjust_inner
 
 
 # Unconfirmed, legacy from cinje clone.

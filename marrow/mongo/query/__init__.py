@@ -7,7 +7,7 @@ These encapsulate the functionality of creating combinable mappings
 
 from __future__ import unicode_literals
 
-from .util import py2, deepcopy, str, odict, chain, Mapping, MutableMapping, Container, Attribute, SENTINEL
+from ..core.util import py2, deepcopy, str, odict, chain, Mapping, MutableMapping, Container, Attribute, SENTINEL
 
 
 if __debug__:
