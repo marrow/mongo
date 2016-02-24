@@ -4,8 +4,8 @@ from copy import deepcopy
 from itertools import chain
 
 from marrow.schema import Container, Attribute
+from ..query import Queryable
 from .util import py2, Container, Attribute
-from .query import Queryable
 #from marrow.schema.transform import BaseTransform
 
 # from .util import py, str
