@@ -355,6 +355,21 @@ class Queryable(object):
 		
 		return Op(self, 'elemMatch', q)
 	
+	def range(self, gte, lt):
+		"""Matches values that are between a minimum and maximum value, semi-inclusive.
+		
+			Document.field.range(4, 12)
+		
+		This will find documents with a field whose value is greater than or equal to 4, and less than 12.
+		
+		Comparison operator: {$gte: gte, $lt: lt}
+		"""
+		if __debug__ and __simple_safety_check(self, '#range'):  # Optimize this away in production; diagnosic aide.
+			raise NotImplementedError("{self.__class__.__name__} does not allow range comparison.".format(self=self))
+			
+			return Op(self, 'gte', self.transformer.foreign(other, gte)) & \
+					Op(self, 'lt', self.transformer.foreign(other, lt))
+	
 	def size(self, value):
 		"""Selects documents if the array field is a specified size.
 		
