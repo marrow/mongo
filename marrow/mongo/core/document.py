@@ -14,6 +14,12 @@ class Document(Container):
 	__foreign__ = 'object'
 	
 	@classmethod
+	def bind(cls, collection):
+		collection = collection.with_options(codec_options=CodecOptions(document_class=cls))
+		
+		return Element('Bound' + cls.__name__, (cls, ), dict(_collection=collection))
+	
+	@classmethod
 	def from_mongo(cls, doc):
 		if '_cls' in doc:
 			cls = load(doc['_cls'])
