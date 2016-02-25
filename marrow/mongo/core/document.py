@@ -3,15 +3,25 @@
 from collections import OrderedDict as odict, MutableMapping
 from itertools import chain
 
-from marrow.schema import Container, Attribute
+from marrow.package.loader import load
+from marrow.schema import Element, Container, Attribute
 
 from .util import py2, SENTINEL, adjust_attribute_sequence
-
 
 
 class Document(Container):
 	__store__ = odict
 	__foreign__ = 'object'
+	
+	@classmethod
+	def from_mongo(cls, doc):
+		if '_cls' in doc:
+			cls = load(doc['_cls'])
+		
+		instance = cls()
+		instance.__data__ = instance.__store__(doc)
+		
+		return instance
 	
 	# Mapping Protocol
 	
