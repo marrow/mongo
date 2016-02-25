@@ -140,6 +140,8 @@ UPDATE_SUFFIX_MAP = {
 
 def _process_arguments(Document, prefixes, suffixes, arguments):
 	for name, value in arguments.items():
+		# TODO: Rearrange this a bit to allow for automatic detection of method-based querying.
+		# That'd need the Field instance to expose safe operations, but save much of the above hard-coding.
 		nname, _, suffix = name.rpartition('__')
 		if suffix in suffixes:
 			name = nname
