@@ -10,6 +10,7 @@ from .util import py2, SENTINEL, adjust_attribute_sequence
 
 
 class Document(Container):
+	__store__ = odict
 	__foreign__ = 'object'
 	
 	# Mapping Protocol
