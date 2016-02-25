@@ -78,7 +78,7 @@ class Ops(Container):
 		del self.operations[name]
 	
 	def __iter__(self):
-		return iter(self.operations.items())
+		return iter(self.operations.keys())
 	
 	def __len__(self):
 		return len(self.operations)
