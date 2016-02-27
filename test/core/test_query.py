@@ -6,7 +6,7 @@ import pytest
 import operator
 
 from marrow.mongo.query import Op, Ops, Queryable
-from marrow.mongo.core.util import py2, str
+from marrow.mongo.core.util import py2, str, odict
 
 
 @pytest.fixture
@@ -326,3 +326,16 @@ class TestQueryable(object):
 	def test_operator_size(self): self.do_operator(*self.advanced[4])
 	def test_operator_type(self): self.do_operator(*self.advanced[5])
 	def test_operator_type_assumed(self): self.do_singleton(*self.singletons[2])
+	
+	def test_operator_range(self):
+		op = Queryable.range(mock_queryable, 5, 11)
+		assert isinstance(op, Ops)
+		
+		assert op.as_query == odict({'field_name': odict([('$gte', 5), ('$lt', 11)])})
+		
+		if __debug__:
+			a = MockQueryable()
+			a.__disallowed_operators__ = {'#range'}
+			
+			with pytest.raises(NotImplementedError):
+				Queryable.range(a, 5, 11)

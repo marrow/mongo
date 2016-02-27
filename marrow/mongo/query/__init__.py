@@ -366,9 +366,8 @@ class Queryable(object):
 		"""
 		if __debug__ and __simple_safety_check(self, '#range'):  # Optimize this away in production; diagnosic aide.
 			raise NotImplementedError("{self.__class__.__name__} does not allow range comparison.".format(self=self))
-			
-			return Op(self, 'gte', self.transformer.foreign(other, gte)) & \
-					Op(self, 'lt', self.transformer.foreign(other, lt))
+		
+		return Ops((self >= gte).as_query) & Ops((self < lt).as_query)
 	
 	def size(self, value):
 		"""Selects documents if the array field is a specified size.
