@@ -25,7 +25,7 @@ class Ops(Container):
 			self.operations = odict()
 	
 	def __repr__(self):
-		return "Ops({})".format(repr(list(self)).replace("(u'", "('").replace("', u'", "', '"))
+		return "Ops({})".format(repr(list(self.items())).replace("(u'", "('").replace("', u'", "', '"))
 	
 	@property
 	def as_query(self):
