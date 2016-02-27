@@ -48,7 +48,8 @@ def tail(collection, filter=None, projection=None, limit=0, timeout=None, aggreg
 def _patch():
 	"""Patch pymongo's Collection object to add a tail method.
 	
-	While not nessicarily recommended, you can use this to inject `tail` as a method into Collection, making it generally accessible.
+	While not nessicarily recommended, you can use this to inject `tail` as a method into Collection, making it
+	generally accessible.
 	"""
 	
 	if not __debug__:  # pragma: no cover
