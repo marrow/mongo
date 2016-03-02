@@ -21,94 +21,87 @@ class TestDocumentMapping(object):
 		with pytest.raises(KeyError):
 			doc['foo']
 		
-		assert single_ops['roll'] == 27
+		assert doc['age'] == 27
 	
-	def test_setitem(self, empty_ops):
-		assert repr(empty_ops) == "Ops([])"
-		empty_ops['meaning'] = 42
-		assert repr(empty_ops) == "Ops([('meaning', 42)])"
+	def test_setitem(self, doc):
+		assert len(doc) == 2
+		doc['meaning'] = 42
+		assert len(doc) == 3
 	
-	def test_delitem(self, empty_ops, single_ops):
+	def test_delitem(self, doc):
 		with pytest.raises(KeyError):
-			del empty_ops['roll']
+			del doc['roll']
 		
-		assert repr(single_ops) == "Ops([('roll', 27)])"
-		del single_ops['roll']
-		assert repr(single_ops) == "Ops([])"
+		assert len(doc) == 2
+		del doc['name']
+		assert len(doc) == 1
 	
-	def test_length(self, empty_ops, single_ops):
-		assert len(empty_ops) == 0
-		assert len(single_ops) == 1
+	def test_length(self, doc):
+		assert len(doc) == 2
 	
-	def test_keys(self, empty_ops, single_ops):
-		assert list(empty_ops.keys()) == []
-		assert list(single_ops.keys()) == ['roll']
+	def test_keys(self, doc):
+		assert list(doc.keys()) == ['name', 'age']
 	
-	def test_items(self, empty_ops, single_ops):
-		assert list(empty_ops.items()) == []
-		assert list(single_ops.items()) == [('roll', 27)]
+	def test_items(self, doc):
+		assert list(doc.items()) == [('name', "Alice"), ('age', 27)]
 	
-	def test_values(self, empty_ops, single_ops):
-		assert list(empty_ops.values()) == []
-		assert list(single_ops.values()) == [27]
+	def test_values(self, doc):
+		assert list(doc.values()) == ["Alice", 27]
 	
-	def test_contains(self, single_ops):
-		assert 'foo' not in single_ops
-		assert 'roll' in single_ops
+	def test_contains(self, doc):
+		assert 'foo' not in doc
+		assert 'name' in doc
 	
-	def test_equality_inequality(self, empty_ops, single_ops):
-		assert empty_ops == {}
-		assert empty_ops != {'roll': 27}
-		assert single_ops != {}
-		assert single_ops == {'roll': 27}
+	def test_equality_inequality(self, doc):
+		assert doc != {}
+		assert doc == {'name': "Alice", 'age': 27}
 	
-	def test_get(self, single_ops):
-		assert single_ops.get('foo') is None
-		assert single_ops.get('foo', 42) == 42
-		assert single_ops.get('roll') == 27
+	def test_get(self, doc):
+		assert doc.get('foo') is None
+		assert doc.get('foo', 42) == 42
+		assert doc.get('age') == 27
 	
-	def test_clear(self, single_ops):
-		assert len(single_ops.operations) == 1
-		single_ops.clear()
-		assert len(single_ops.operations) == 0
+	def test_clear(self, doc):
+		assert len(doc.__data__) == 2
+		doc.clear()
+		assert len(doc.__data__) == 0
 	
-	def test_pop(self, single_ops):
-		assert len(single_ops.operations) == 1
+	def test_pop(self, doc):
+		assert len(doc.__data__) == 2
 		
 		with pytest.raises(KeyError):
-			single_ops.pop('foo')
+			doc.pop('foo')
 		
-		assert single_ops.pop('foo', 42) == 42
-		assert len(single_ops.operations) == 1
+		assert doc.pop('foo', 42) == 42
+		assert len(doc.__data__) == 2
 		
-		assert single_ops.pop('roll') == 27
-		assert len(single_ops.operations) == 0
+		assert doc.pop('age') == 27
+		assert len(doc.__data__) == 1
 	
-	def test_popitem(self, single_ops):
-		assert len(single_ops.operations) == 1
-		assert single_ops.popitem() == ('roll', 27)
-		assert len(single_ops.operations) == 0
+	def test_popitem(self, doc):
+		assert len(doc.__data__) == 2
+		assert doc.popitem() == ('age', 27)
+		assert len(doc.__data__) == 1
+		
+		doc.popitem()
 		
 		with pytest.raises(KeyError):
-			single_ops.popitem()
+			doc.popitem()
 	
-	def test_update(self, empty_ops, single_ops):
-		assert len(empty_ops.operations) == 0
-		empty_ops.update(name="Bob Dole")
-		assert len(empty_ops.operations) == 1
-		assert repr(empty_ops) == "Ops([('name', 'Bob Dole')])"
+	def test_update(self, doc):
+		assert len(doc.__data__) == 2
+		doc.update(name="Bob Dole")
+		assert len(doc.__data__) == 2
+		assert doc.name == "Bob Dole"
 		
-		assert len(single_ops.operations) == 1
-		assert repr(single_ops) == "Ops([('roll', 27)])"
-		single_ops.update([('name', "Bob Dole")])
-		assert len(single_ops.operations) == 2
-		assert repr(single_ops) in ("Ops([('roll', 27), ('name', 'Bob Dole')])", "Ops([('name', 'Bob Dole'), ('roll', 27)])")
+		doc.update([('bob', "Bob Dole")])
+		assert len(doc.__data__) == 3
 	
-	def test_setdefault(self, empty_ops):
-		assert len(empty_ops.operations) == 0
-		empty_ops.setdefault('fnord', 42)
-		assert len(empty_ops.operations) == 1
-		assert empty_ops.operations['fnord'] == 42
-		empty_ops.setdefault('fnord', 27)
-		assert len(empty_ops.operations) == 1
-		assert empty_ops.operations['fnord'] == 42
+	def test_setdefault(self, doc):
+		assert len(doc.__data__) == 2
+		doc.setdefault('fnord', 42)
+		assert len(doc.__data__) == 3
+		assert doc.__data__['fnord'] == 42
+		doc.setdefault('fnord', 27)
+		assert len(doc.__data__) == 3
+		assert doc.__data__['fnord'] == 42
