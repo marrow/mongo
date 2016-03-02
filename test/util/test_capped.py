@@ -56,7 +56,7 @@ _PRIORITY = (-2, -1, 0, 1, 2)
 
 
 def gen_log_entries(collection, count=100):
-	collection.insert({'message': 'first'})  # To avoid immediate exit of the tail.
+	collection.insert({'message': 'first'})  # To avoid immediate exit of the tail.ddddd
 	
 	for i in range(count-2):
 		sleep(0.02)  # If we go too fast, the test might not be able to keep up.
@@ -101,7 +101,7 @@ class TestCappedQueries(object):
 		
 		capped.insert({})
 		
-		assert len(list(capped.tail())) == 1
+		assert len(list(capped.tail(timeout=0.25))) == 1
 	
 	'''
 	def test_long_iteration(self):
