@@ -2,7 +2,7 @@
 
 import pytest
 
-from marrow.mongo.core.document import *
+from marrow.mongo.core.document import Document
 from marrow.mongo.field.base import Field
 
 
