@@ -1,6 +1,8 @@
 # encoding: utf-8
 
-from ..core.field import Attribute, Field
+from marrow.schema import Attribute
+
+from ..core import Field
 
 
 class Embed(Field):

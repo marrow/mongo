@@ -1,17 +1,27 @@
 # encoding: utf-8
 
+from pymongo.common import CodecOptions
 from collections import OrderedDict as odict, MutableMapping
-from itertools import chain
 
 from marrow.package.loader import load
-from marrow.schema import Element, Container, Attribute
+from marrow.schema import Element, Container, Attributes
 
-from .util import py2, SENTINEL, adjust_attribute_sequence
+from .field import Field
+from ..util import SENTINEL
+from ..util.compat import py3
 
 
 class Document(Container):
 	__store__ = odict
 	__foreign__ = 'object'
+	__fields__ = Attributes(only=Field)
+	
+	def __init__(self, *args, **kw):
+		fields = self.__fields__ = self.__fields__
+		super(Document, self).__init__(*args, **kw)
+		for name, field in fields.items():
+			if field.generated:
+				getattr(self, name)
 	
 	@classmethod
 	def bind(cls, collection):
@@ -44,19 +54,9 @@ class Document(Container):
 		return iter(self.__data__.keys())
 	
 	def __len__(self):
-		return len(self.__data__)
+		return len(getattr(self, '__data__', {}))
 	
-	if py2:
-		def keys(self):
-			return self.__data__.iterkeys()
-		
-		def items(self):
-			return self.__data__.iteritems()
-		
-		def values(self):
-			return self.__data__.itervalues()
-	
-	else:
+	if py3:
 		def keys(self):
 			return self.__data__.keys()
 		
@@ -65,6 +65,16 @@ class Document(Container):
 		
 		def values(self):
 			return self.__data__.values()
+	
+	else:
+		def keys(self):
+			return self.__data__.iterkeys()
+		
+		def items(self):
+			return self.__data__.iteritems()
+		
+		def values(self):
+			return self.__data__.itervalues()
 	
 	def __contains__(self, key):
 		return key in self.__data__

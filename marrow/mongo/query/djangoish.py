@@ -45,10 +45,9 @@ from __future__ import unicode_literals
 import operator
 
 from collections import deque
-from functools import partial
 
-from ..core.util import str
-from . import Op, Ops
+from ..util.compat import unicode
+from . import Ops
 
 
 def _deferred_method(name, _named=None, **kw):
@@ -163,9 +162,9 @@ def _process_arguments(Document, prefixes, suffixes, arguments):
 		
 		while parts:
 			if path:  # TODO: As per above note, this _should_ go after retrieval and str(current) instead.
-				path += '.' + str(parts[0])
+				path += '.' + unicode(parts[0])
 			else:
-				path = str(parts[0])
+				path = unicode(parts[0])
 			current = getattr(current, parts.popleft())
 		
 		yield prefixes.get(prefix, None), suffixes.get(suffix, None), path, current, value

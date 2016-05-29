@@ -2,7 +2,7 @@
 
 from bson.int64 import Int64
 
-from ..core.field import Field
+from ..core import Field
 
 
 class Number(Field):

@@ -2,7 +2,9 @@
 
 from bson import ObjectId as oid
 from bson.code import Code
-from ..core.field import Attribute, Field
+from marrow.schema import Attribute
+
+from ..core import Field
 
 
 try:

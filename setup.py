@@ -66,6 +66,7 @@ setup(
 			"Programming Language :: Python :: 2",
 			"Programming Language :: Python :: 2.7",
 			"Programming Language :: Python :: 3",
+			"Programming Language :: Python :: 3.2",
 			"Programming Language :: Python :: 3.3",
 			"Programming Language :: Python :: 3.4",
 			"Programming Language :: Python :: 3.5",
@@ -75,10 +76,10 @@ setup(
 			"Topic :: Utilities"
 		],
 	
-	packages = find_packages(exclude=['test', 'example', 'benchmark']),
+	packages = find_packages(exclude=['test', 'example', 'benchmark', 'htmlcov']),
 	include_package_data = True,
 	package_data = {'': ['README.rst', 'LICENSE.txt']},
-	namespace_packages = ['marrow', 'marrow.mongo', 'marrow.mongo.field'],
+	namespace_packages = ['marrow', 'marrow.mongo', 'marrow.mongo.field', 'web', 'web.db'],
 	
 	# ## Dependency Declaration
 	
@@ -97,6 +98,9 @@ setup(
 	# ## Plugin Registration
 	
 	entry_points = {
+				'web.db': [
+						'mongodb = web.db.mongo:MongoDBConnection',
+					],
 				'marrow.mongo.field': [
 						'Field = marrow.mongo.core.field:Field',
 						'String = marrow.mongo.field.base:String',

@@ -1,13 +1,13 @@
 # encoding: utf-8
 
-from copy import deepcopy
-from itertools import chain
-
-from marrow.schema import Container, Attribute
-from ..query import Queryable
-from .util import py2, Container, Attribute, adjust_attribute_sequence
+from inspect import isroutine
+from marrow.schema import Attribute
 from marrow.schema.transform import BaseTransform
 from marrow.schema.validate import Validator
+
+from ..query import Queryable
+from ..util import adjust_attribute_sequence
+from ..util.compat import py3
 
 
 @adjust_attribute_sequence(1000, 'transformer', 'validator', 'translated', 'generated')
@@ -51,7 +51,7 @@ class Field(Attribute, Queryable):
 		else:
 			# Process and optionally store the default value.
 			value = default() if isroutine(default) else default
-			if self.assign:
+			if self.generated:
 				self.__set__(obj, value)
 			return value
 		
@@ -75,9 +75,9 @@ class Field(Attribute, Queryable):
 	
 	# Other Python Protocols
 	
-	def __str__(self):
+	def __unicode__(self):
 		return self.__name__
 	
-	if py2:
-		__unicode__ = __str__
-		del __str__
+	if py3:
+		__str__ = __unicode__
+		del __unicode__

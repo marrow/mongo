@@ -7,12 +7,19 @@ These encapsulate the functionality of creating combinable mappings
 
 from __future__ import unicode_literals
 
-from ..core.util import py2, deepcopy, str, odict, chain, Mapping, MutableMapping, Container, Attribute, SENTINEL
+from itertools import chain
+from copy import deepcopy
+from collections import Mapping, MutableMapping
+from marrow.schema import Container, Attribute
+from marrow.schema.compat import odict
+
+from ..util import SENTINEL
+from ..util.compat import py3, unicode
 
 
 if __debug__:
-	_Queryable__simple_safety_check = lambda s, o: (s.__allowed_operators__ and o not in s.__allowed_operators__) or o in s.__disallowed_operators__
-	_Queryable__complex_safety_check = lambda s, o: (s.__allowed_operators__ and not s.__allowed_operators__.intersection(o)) or s.__disallowed_operators__.intersection(o)
+	_simple_safety_check = lambda s, o: (s.__allowed_operators__ and o not in s.__allowed_operators__) or o in s.__disallowed_operators__
+	_complex_safety_check = lambda s, o: (s.__allowed_operators__ and not s.__allowed_operators__.intersection(o)) or s.__disallowed_operators__.intersection(o)
 
 
 class Ops(Container):
@@ -83,17 +90,7 @@ class Ops(Container):
 	def __len__(self):
 		return len(self.operations)
 	
-	if py2:
-		def keys(self):
-			return self.operations.iterkeys()
-		
-		def items(self):
-			return self.operations.iteritems()
-		
-		def values(self):
-			return self.operations.itervalues()
-	
-	else:
+	if py3:
 		def keys(self):
 			return self.operations.keys()
 		
@@ -102,6 +99,16 @@ class Ops(Container):
 		
 		def values(self):
 			return self.operations.values()
+	
+	else:
+		def keys(self):
+			return self.operations.iterkeys()
+		
+		def items(self):
+			return self.operations.iteritems()
+		
+		def values(self):
+			return self.operations.itervalues()
 	
 	def __contains__(self, key):
 		return key in self.operations
@@ -179,14 +186,14 @@ class Op(Container):
 				return value
 			
 			if self.value is SENTINEL:
-				return {str(self.field): {'$exists': 1}}
+				return {unicode(self.field): {'$exists': 1}}
 			
-			return {str(self.field): value}
+			return {unicode(self.field): value}
 		
 		if not self.field:
-			return {'$' + str(self.operation): value}
+			return {'$' + unicode(self.operation): value}
 		
-		return {str(self.field): {'$' + str(self.operation): value}}
+		return {unicode(self.field): {'$' + unicode(self.operation): value}}
 
 
 class Queryable(object):
@@ -214,7 +221,7 @@ class Queryable(object):
 		Comparison operator: {$eq: value}
 		Documentation: https://docs.mongodb.org/manual/reference/operator/query/eq/#op._S_eq
 		"""
-		if __debug__ and __simple_safety_check(self, '$eq'):  # Optimize this away in production; diagnosic aide.
+		if __debug__ and _simple_safety_check(self, '$eq'):  # Optimize this away in production; diagnosic aide.
 			raise NotImplementedError("{self.__class__.__name__} does not allow $eq comparison.".format(self=self))
 			
 		return Op(self, 'eq', self.transformer.foreign(other, self))
@@ -227,7 +234,7 @@ class Queryable(object):
 		Comparison operator: {$gt: value}
 		Documentation: https://docs.mongodb.org/manual/reference/operator/query/gt/#op._S_gt
 		"""
-		if __debug__ and __complex_safety_check(self, {'$gt', '#rel'}):  # Optimize this away in production.
+		if __debug__ and _complex_safety_check(self, {'$gt', '#rel'}):  # Optimize this away in production.
 			raise NotImplementedError("{self.__class__.__name__} does not allow $gt comparison.".format(self=self))
 		
 		return Op(self, 'gt', self.transformer.foreign(other, self))
@@ -240,7 +247,7 @@ class Queryable(object):
 		Comparison operator: {$gte: value}
 		Documentation: https://docs.mongodb.org/manual/reference/operator/query/gte/#op._S_gte
 		"""
-		if __debug__ and __complex_safety_check(self, {'$gte', '#rel'}):  # Optimize this away in production.
+		if __debug__ and _complex_safety_check(self, {'$gte', '#rel'}):  # Optimize this away in production.
 			raise NotImplementedError("{self.__class__.__name__} does not allow $gte comparison.".format(self=self))
 		
 		return Op(self, 'gte', self.transformer.foreign(other, self))
@@ -253,7 +260,7 @@ class Queryable(object):
 		Comparison operator: {$lt: value}
 		Documentation: https://docs.mongodb.org/manual/reference/operator/query/lt/#op._S_lt
 		"""
-		if __debug__ and __complex_safety_check(self, {'$lt', '#rel'}):  # Optimize this away in production.
+		if __debug__ and _complex_safety_check(self, {'$lt', '#rel'}):  # Optimize this away in production.
 			raise NotImplementedError("{self.__class__.__name__} does not allow $lt comparison.".format(self=self))
 		
 		return Op(self, 'lt', self.transformer.foreign(other, self))
@@ -266,7 +273,7 @@ class Queryable(object):
 		Comparison operator: {$lte: value}
 		Documentation: https://docs.mongodb.org/manual/reference/operator/query/lte/#op._S_lte
 		"""
-		if __debug__ and __complex_safety_check(self, {'$lte', '#rel'}):  # Optimize this away in production.
+		if __debug__ and _complex_safety_check(self, {'$lte', '#rel'}):  # Optimize this away in production.
 			raise NotImplementedError("{self.__class__.__name__} does not allow $lte comparison.".format(self=self))
 		
 		return Op(self, 'lte', self.transformer.foreign(other, self))
@@ -279,7 +286,7 @@ class Queryable(object):
 		Comparison operator: {$ne: value}
 		Documentation: https://docs.mongodb.org/manual/reference/operator/query/ne/#op._S_ne
 		"""
-		if __debug__ and __complex_safety_check(self, {'$ne', '$eq'}):  # Optimize this away in production.
+		if __debug__ and _complex_safety_check(self, {'$ne', '$eq'}):  # Optimize this away in production.
 			raise NotImplementedError("{self.__class__.__name__} does not allow $ne comparison.".format(self=self))
 		
 		return Op(self, 'ne', self.transformer.foreign(other, self))
@@ -294,7 +301,7 @@ class Queryable(object):
 		Comparison operator: {$in: value}
 		Documentation: https://docs.mongodb.org/manual/reference/operator/query/in/#op._S_in
 		"""
-		if __debug__ and __complex_safety_check(self, {'$in', '$eq'}):  # Optimize this away in production.
+		if __debug__ and _complex_safety_check(self, {'$in', '$eq'}):  # Optimize this away in production.
 			raise NotImplementedError("{self.__class__.__name__} does not allow $in comparison.".format(self=self))
 		
 		other = args if len(args) > 1 else args[0]
@@ -334,7 +341,7 @@ class Queryable(object):
 		Array operator: {$all: value}
 		Documentation: https://docs.mongodb.org/manual/reference/operator/query/all/#op._S_all
 		"""
-		if __debug__ and __complex_safety_check(self, {'$all', '#array'}):  # Optimize this away in production.
+		if __debug__ and _complex_safety_check(self, {'$all', '#array'}):  # Optimize this away in production.
 			raise NotImplementedError("{self.__class__.__name__} does not allow $all comparison.".format(self=self))
 		
 		return Op(self, 'all', [self.transformer.foreign(value, self) for i, value in enumerate(other)])
@@ -347,7 +354,7 @@ class Queryable(object):
 		Array operator: {$elemMatch: value}
 		Documentation: https://docs.mongodb.org/manual/reference/operator/query/elemMatch/#op._S_elemMatch
 		"""
-		if __debug__ and __complex_safety_check(self, {'$elemMatch', '#document'}):  # Optimize this away in production.
+		if __debug__ and _complex_safety_check(self, {'$elemMatch', '#document'}):  # Optimize this away in production.
 			raise NotImplementedError("{self.__class__.__name__} does not allow $elemMatch comparison.".format(self=self))
 		
 		if hasattr(q, 'as_query'):
@@ -364,7 +371,7 @@ class Queryable(object):
 		
 		Comparison operator: {$gte: gte, $lt: lt}
 		"""
-		if __debug__ and __simple_safety_check(self, '#range'):  # Optimize this away in production; diagnosic aide.
+		if __debug__ and _simple_safety_check(self, '#range'):  # Optimize this away in production; diagnosic aide.
 			raise NotImplementedError("{self.__class__.__name__} does not allow range comparison.".format(self=self))
 		
 		return Ops((self >= gte).as_query) & Ops((self < lt).as_query)
@@ -377,7 +384,7 @@ class Queryable(object):
 		Array operator: {$size: value}
 		Documentation: https://docs.mongodb.org/manual/reference/operator/query/size/#op._S_size
 		"""
-		if __debug__ and __complex_safety_check(self, {'$size', '#array'}):  # Optimize this away in production.
+		if __debug__ and _complex_safety_check(self, {'$size', '#array'}):  # Optimize this away in production.
 			raise NotImplementedError("{self.__class__.__name__} does not allow $size comparison.".format(self=self))
 		
 		return Op(self, 'size', int(value))
