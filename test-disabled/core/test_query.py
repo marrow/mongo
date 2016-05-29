@@ -4,9 +4,10 @@ from __future__ import unicode_literals
 
 import pytest
 import operator
+from collections import OrderedDict as odict
 
 from marrow.mongo.query import Op, Ops, Queryable
-from marrow.mongo.core.util import py2, str, odict
+from marrow.mongo.util.compat import py3, str
 
 
 @pytest.fixture
@@ -141,18 +142,18 @@ class TestOperationBasics(object):
 		assert repr(Op(value=27)) == "Op(27)"
 		
 		assert Op(None, 'eq', '42').as_query == "42"
-		assert repr(Op(None, 'eq', '42')) == ("Op(u'42')" if py2 else "Op('42')")
+		assert repr(Op(None, 'eq', '42')) == ("Op('42')" if py3 else "Op(u'42')")
 	
 	def test_key_exists(self):
 		assert Op('field').as_query == {'field': {'$exists': 1}}
-		assert repr(Op('field')) == ("Op({u'field': {u'$exists': 1}})" if py2 else "Op({'field': {'$exists': 1}})")
+		assert repr(Op('field')) == ("Op({'field': {'$exists': 1}})" if py3 else "Op({u'field': {u'$exists': 1}})")
 	
 	def test_key_equals(self):
 		assert Op('field', value=27).as_query == {'field': 27}
-		assert repr(Op('field', value=27)) == ("Op({u'field': 27})" if py2 else "Op({'field': 27})")
+		assert repr(Op('field', value=27)) == ("Op({'field': 27})" if py3 else "Op({u'field': 27})")
 		
 		assert Op('field', 'eq', '42').as_query == {'field': '42'}
-		assert repr(Op('field', 'eq', '42')) == ("Op({u'field': u'42'})" if py2 else "Op({'field': '42'})")
+		assert repr(Op('field', 'eq', '42')) == ("Op({'field': '42'})" if py3 else "Op({u'field': '42'})")
 	
 	def test_bare_operation(self):
 		assert Op(operation='operation').as_query == {'$operation': None}
@@ -168,7 +169,7 @@ class TestOperationBasics(object):
 		assert repr(op2) == "Op(27)"
 		
 		op3 = op2.clone(field='field')
-		assert repr(op3) == "Op({u'field': 27})" if py2 else "Op({'field': 27})"
+		assert repr(op3) == "Op({'field': 27})" if py3 else "Op({u'field': 27})"
 		
 		assert op1 is not op2
 		assert op2 is not op3
