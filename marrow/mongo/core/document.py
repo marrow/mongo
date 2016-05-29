@@ -15,6 +15,7 @@ class Document(Container):
 	__store__ = odict
 	__foreign__ = 'object'
 	__fields__ = Attributes(only=Field)
+	__fields__.__sequence__ = 20000
 	
 	def __init__(self, *args, **kw):
 		fields = self.__fields__ = self.__fields__
