@@ -42,10 +42,10 @@ class Binary(Field):
 class ObjectId(Field):
 	__foreign__ = 'objectId'
 	
-	generate = Attribute(default=False)
+	default = Attribute(default=lambda: oid())
 	
 	def to_foreign(self, obj, name, value):
-		if value is None and self.generate:
+		if value is None and self.generated:
 			value = oid()
 			
 			if name and name[0] not in ('#', '$'):
