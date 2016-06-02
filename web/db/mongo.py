@@ -14,7 +14,7 @@ _safe_uri_replace = re.compile(r'(\w+)://(\w+):(?P<password>[^@]+)@')
 
 
 class MongoDBConnection(object):
-	__slots__ = ('uri', 'config', 'client', 'db')
+	__slots__ = ('__name__', 'uri', 'config', 'client', 'db')
 	
 	provides = {'mongodb'}
 	
@@ -25,10 +25,9 @@ class MongoDBConnection(object):
 		self.config = config
 	
 	def start(self, context):
-		log.info("Connecting to MongoDB database.", extra=dict(
+		log.info("Connecting context.db." + self.__name__ + " to MongoDB database.", extra=dict(
 				uri = _safe_uri_replace.sub(r'\1://\2@', self.uri),
 				config = self.config,
-				name = self.__name__,
 			))
 		
 		client = self.client = MongoClient(self.uri, **self.config)
@@ -38,5 +37,5 @@ class MongoDBConnection(object):
 		except ConfigurationError:
 			db = self.db = None
 		
-		context.db[__name__] = db if db is not None else client
+		context.db[self.__name__] = db if db is not None else client
 
