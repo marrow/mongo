@@ -23,6 +23,7 @@ class Field(Attribute, Queryable):
 	required = Attribute(default=False)  # Must have value assigned; None and an empty string are values.
 	nullable = Attribute(default=False)  # If True, will store None.  If False, will store non-None default, or not store.
 	
+	project = Attribute(default=None)
 	transformer = Attribute(default=BaseTransform())
 	validator = Attribute(default=Validator())
 	translated = Attribute(default=False)  # If truthy this field should be stored in the per-language subdocument.

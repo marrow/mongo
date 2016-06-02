@@ -26,9 +26,7 @@ class Document(Container):
 	
 	@classmethod
 	def bind(cls, collection):
-		collection = collection.with_options(codec_options=CodecOptions(document_class=cls))
-		
-		return Element('Bound' + cls.__name__, (cls, ), dict(_collection=collection))
+		return collection.with_options(codec_options=CodecOptions(document_class=cls))
 	
 	@classmethod
 	def from_mongo(cls, doc):
