@@ -26,6 +26,7 @@ class Document(Container):
 	
 	@classmethod
 	def bind(cls, collection):
+		# WARNING: Do not use this. It's unintentionally recursive, thus wrong.
 		return collection.with_options(codec_options=CodecOptions(document_class=cls))
 	
 	@classmethod
@@ -37,6 +38,17 @@ class Document(Container):
 		instance.__data__ = instance.__store__(doc)
 		
 		return instance
+	
+	@property
+	def as_rest(self):
+		"""Prepare a REST API-safe version of this document.
+		
+		This, or your overridden version in subclasses, must return a value that `json.dumps` can process, with the
+		assistance of PyMongo's `bson.json_util` extended encoding. For details on the latter bit, see:
+		
+		https://docs.mongodb.com/manual/reference/mongodb-extended-json/
+		"""
+		return self  # We're sufficiently dictionary-like to pass muster.
 	
 	# Mapping Protocol
 	

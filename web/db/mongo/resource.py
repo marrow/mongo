@@ -7,6 +7,8 @@ log = __import__('logging').getLogger(__name__)
 
 
 class MongoDBResource(object):
+	__dispatch__ = 'resource'
+	
 	def __init__(self, context, collection=None, record=None):
 		self._ctx = context
 		self._collection = collection

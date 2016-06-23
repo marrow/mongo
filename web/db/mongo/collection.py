@@ -55,14 +55,16 @@ class MongoDBCollection(object):
 		"""
 		identifier = identifier.strip()
 		
-		if self.__pk__ == '_id' and len(identifier) == 12:
+		if self.__pk__ == '_id' and len(identifier) == 24:
 			# Attempt to automatically cast ObjectIds.
 			try:
 				identifier = ObjectId(identifier)
 			except:
 				pass  # Continue as-is with the original value.
 		
-		record = self.__model__.find_one({'_id': identifier})
+		query = {'_id': identifier}
+		query = self._filter(query)
+		record = self.__model__.find_one(query)
 		
 		if not record:
 			raise KeyError()
@@ -72,6 +74,30 @@ class MongoDBCollection(object):
 		
 		return record
 	
+	def _filter(self, query, **kw):
+		"""Populate and return a MongoDB filter document (query) for use in listings.
+		
+		You would generally override this in your subclass to implement basic query filtering, security, etc. Because
+		this query is used to populate the listing (GET), it is also applied to attempts to fetch contained resources.
+		
+		Keyword arguments are those passed as query string parameters to the GET. No arguments can be given in the
+		fetch-a-record case.
+		
+		This is a cooperative process, remember to call `super()`!
+		"""
+		return query
+	
+	def _process(self, document):
+		"""Allow for mutation of the outgoing document.
+		
+		Used during search result processing, it might be a better idea to put your own code in a custom
+		`Document.as_rest` override for most processing; this is intended primarily for manipulation that requires
+		the request context.
+		
+		This is a cooperative process, remember to call `super()`!
+		"""
+		return document
+	
 	def get(self, q=None, sort: sort_order = [('_id', DESCENDING)], more=None, **kw) -> 'json':
 		"""Search a collection for records.
 		
@@ -80,7 +106,7 @@ class MongoDBCollection(object):
 		* `q` - An optional full text search.
 		* `sort` - An optional comma-separated list of fields in Djanglish format. Prefix with a `-` to reverse.
 		* `more` - The point to continue loading records from.
-		* Additional keyword arguments are translated into a Djanglish query.
+		* Additional keyword arguments are translated into a Djanglish query by the default _filter implementation.
 		
 		Extensive support for HTTP and querying features:
 		
@@ -94,17 +120,18 @@ class MongoDBCollection(object):
 			exclude.add('_id')
 			query[self.__pk__] = {'$gt': ObjectId(more)}
 		
+		self._filter(query, **kw)
+		
 		results = self.__model__.find(query)
 		total = results.count()
 		results = list(results[:25])
 		resp = self._ctx.response
 		
 		def adulterate(result):
-			if not resp.last_modified or result['_id'].generation_time > resp.last_modified:
-				resp.last_modified = result['_id'].generation_time
-			
+			# Since we're using REST, identify resources by their URI.
 			result['$uri'] = self._ctx.request.relative_url(str(result['_id']))
 			del result['_id']
+			
 			return result
 		
 		response = {
@@ -112,6 +139,8 @@ class MongoDBCollection(object):
 				'$count': total,
 				'$sort': ((f if d == ASCENDING else ('-' + f)) for f, d in sort),
 			}
+		
+		
 		
 		if query:
 			response['$query'] = query
