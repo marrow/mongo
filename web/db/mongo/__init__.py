@@ -27,7 +27,7 @@ class MongoDBConnection(object):
 	this extension adapts 
 	"""
 	
-	__slots__ = ('__name__', 'uri', 'config', 'client', 'db')
+	__slots__ = ('__name__', 'uri', 'config', 'client', 'db', 'alias')
 	
 	provides = {'mongodb'}
 	
