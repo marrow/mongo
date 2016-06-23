@@ -91,6 +91,7 @@ setup(
 	
 	extras_require = dict(
 			development = tests_require,
+			scripting = ['javascripthon<1.0'],  # Allow map/reduce functions and "stored functions" to be Python.
 		),
 	
 	tests_require = tests_require,
