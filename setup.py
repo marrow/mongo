@@ -84,14 +84,15 @@ setup(
 	# ## Dependency Declaration
 	
 	install_requires = [
-			'marrow.schema>=1.2.0,<2.0.0',  # Declarative Schema
-			'marrow.package>=1.1.0,<2.0.0',  # Plugin Discovery, Loading
+			'marrow.schema>=1.2.0,<2.0.0',  # Declarative schema support.
+			'marrow.package>=1.1.0,<2.0.0',  # Plugin discovery and loading.
 			'pymongo>=3.2',  # We require modern API.
 		],
 	
 	extras_require = dict(
 			development = tests_require,
 			scripting = ['javascripthon<1.0'],  # Allow map/reduce functions and "stored functions" to be Python.
+			logger = ['pytz', 'tzlocal'],  # Timezone support to store log times in UTC like a sane person.
 		),
 	
 	tests_require = tests_require,
