@@ -74,9 +74,9 @@ class JSONFormatter(logging.Formatter):
 	
 	def __init__(self, highlight=None, **kwargs):
 		if __debug__:
-			format = '%(asctime)s\t%(levelname)s\t%(name)s:%(funcName)s:%(lineno)s\t%(message)s'
+			format = "{created:0.0f}\t{levelname}\t{name}:{funcName}:{lineno}\t{message}"
 		else:
-			format = '%(levelname)s %(name)s:%(funcName)s:%(lineno)s %(message)s'
+			format = "{levelname} {name}:{funcName}:{lineno} {message}"
 		super(JSONFormatter, self).__init__(format, style='{')
 		self.highlight = (__debug__ if highlight is None else highlight) and _highlight
 	
@@ -105,11 +105,24 @@ class JSONFormatter(logging.Formatter):
 		return ''
 	
 	def format(self, record):
-		formatted = logging.Formatter.format(self, record)
+		try:
+			record.message = record.getMessage()
+		except Exception as e:
+			record.message = "Something exploded trying to calcualte this message: " + repr(e)
+		
+		try:
+			formatted = super(JSONFormatter, self).formatMessage(record)
+		except Exception as e:
+			formatted = "Something exploded trying to format this message: " + repr(e)
+		
+		try:
 		json = self.jsonify(
 				record,
 				separators = (',', ': ') if __debug__ else (',', ':'),
 			)
+		except Exception as e:
+			formatted = "JSON calculation failed: " + repr(e)
+			json = None
 		
 		if json:
 			if self.highlight:
