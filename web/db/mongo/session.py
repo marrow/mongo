@@ -5,7 +5,7 @@
 from web.core.util import lazy
 
 from marrow.mongo.core import Document
-from marrow.mongo.field.base import ObjectId
+from marrow.mongo.field.base import ObjectId, oid
 
 log = __import__('logging').getLogger(__name__)
 
@@ -50,7 +50,7 @@ class SessionExtension(object):
 				log.debug("Querying for session record.")
 				log.debug(key)
 
-			result = context.db.default[self._collection].find_one({"_id": key})
+			result = context.db.default[self._collection].find_one({"_id": oid(key)})
 			if result is not None:
 				return self._Document.from_mongo(result)
 
