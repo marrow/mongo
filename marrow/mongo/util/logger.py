@@ -72,13 +72,14 @@ class JSONFormatter(logging.Formatter):
 		'stack_info',
 	}
 	
-	def __init__(self, highlight=None, **kwargs):
+	def __init__(self, highlight=None, indent=False, **kwargs):
 		if __debug__:
 			format = "{created:0.0f}\t{levelname}\t{name}:{funcName}:{lineno}\t{message}"
 		else:
 			format = "{levelname} {name}:{funcName}:{lineno} {message}"
 		super(JSONFormatter, self).__init__(format, style='{')
-		self.highlight = (__debug__ if highlight is None else highlight) and _highlight
+		self.highlight = (__debug__ if highlight is None else highlight) and _highlight is not None
+		self.indent = indent
 	
 	def _default(self, value):
 		try:
@@ -116,9 +117,10 @@ class JSONFormatter(logging.Formatter):
 			formatted = "Something exploded trying to format this message: " + repr(e)
 		
 		try:
-		json = self.jsonify(
+			json = self.jsonify(
 				record,
-				separators = (',', ': ') if __debug__ else (',', ':'),
+				separators = (',', ': ') if __debug__ else (', ', ':'),
+				indent = "\t" if self.indent else None,
 			)
 		except Exception as e:
 			formatted = "JSON calculation failed: " + repr(e)
