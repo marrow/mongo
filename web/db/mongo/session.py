@@ -4,21 +4,14 @@
 
 from web.core.util import lazy
 
+from marrow.mongo.core import Document
+from marrow.mongo.field.base import ObjectId
+
 log = __import__('logging').getLogger(__name__)
 
-import string
-import random
-def id_generator(size=32, chars=string.ascii_uppercase + string.digits):
-	return ''.join(random.choice(chars) for _ in range(size))
 
-
-class Session(object):
-	def __init__(self):
-		self._id = id_generator()
-		self._new = True
-
-	def touch(self):
-		self._new = False
+class Session(Document):
+	id = ObjectId('_id', required=True, generated=False, default=None)
 
 class SessionExtension(object):
 	"""Manage client sessions using data stored in a database
@@ -30,16 +23,17 @@ class SessionExtension(object):
 	needs = {'request', 'db'}
 
 
-	def __init__(self, **config):
+	def __init__(self, Document=Session, collection='session', **config):
 		"""Configure settings
 
 		Such as domain, ttl, cookie name, etc
 		"""
 
-		self._sessions = {}
+		self._Document = Document
+		self._collection = collection
 		self._cookie_name = 'user_session'
-		self._max_age = 360
 		self._http_only = True
+		self._max_age = 360
 		self._path = '/'
 		pass
 
@@ -52,9 +46,15 @@ class SessionExtension(object):
 
 		if(self._cookie_name in context.request.cookies):
 			key = context.request.cookies[self._cookie_name]
-			if(key in self._sessions):
-				return self._sessions[key]
-		return Session()
+			if __debug__:
+				log.debug("Querying for session record.")
+				log.debug(key)
+
+			result = context.db.default[self._collection].find_one({"_id": key})
+			if result is not None:
+				return self._Document.from_mongo(result)
+
+		return self._Document()
 
 	def start(self, context):
 		context.session = lazy(self.get_session, 'session')
@@ -65,20 +65,26 @@ class SessionExtension(object):
 		Determine if a session was created this request and set the cookie header if so
 		"""
 
-		if 'session' not in context.__dict__ or context.session._new == False:
+		log.debug('executing after')
+		log.debug(context.session.id)
+		if 'session' not in context.__dict__ or context.session.id is not None:
 			return
 
 		if __debug__:
 			log.debug("Created new session, setting cookie")
 
+		context.db.default[self._collection].insert_one(context.session)
+		if context.session.id is None:
+			return
+
+		id = str(context.session.id)
 		context.response.set_cookie(
 				httponly = self._http_only,
 				max_age = self._max_age,
 				name = self._cookie_name,
 				path = self._path,
-				value = context.session._id,
+				value = id,
 			)
-		context.session.touch()
 
 	def done(self, context):
 		"""Save session data after request cycle
@@ -93,4 +99,4 @@ class SessionExtension(object):
 			log.debug('Session accessed, saving data')
 
 		# TODO: Store in db
-		self._sessions[context.session._id] = context.session
+		# self._sessions[context.session._id] = context.session
