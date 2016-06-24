@@ -74,7 +74,7 @@ class JSONFormatter(logging.Formatter):
 	
 	def __init__(self, highlight=None, indent=False, **kwargs):
 		if __debug__:
-			format = "{created:0.0f}\t{levelname}\t{name}:{funcName}:{lineno}\t{message}"
+			format = "{created}\t{levelname}\t{name}:{funcName}:{lineno}\t{message}"
 		else:
 			format = "{levelname} {name}:{funcName}:{lineno} {message}"
 		super(JSONFormatter, self).__init__(format, style='{')
