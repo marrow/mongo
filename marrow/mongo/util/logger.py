@@ -27,7 +27,7 @@ Example configuration:
 		},
 	'formatters': {
 			'json': {
-					'()': 'web.contentment.util.JSONFormatter',
+					'()': 'marrow.mongo.util.logger.JSONFormatter',
 				}
 		},
 }
@@ -74,9 +74,9 @@ class JSONFormatter(logging.Formatter):
 	
 	def __init__(self, highlight=None, **kwargs):
 		if __debug__:
-			kwargs.setdefault('format', '%(asctime)s\t%(levelname)s\t%(name)s:%(funcName)s:%(lineno)s\t%(message)s')
+			kwargs['format'] = '%(asctime)s\t%(levelname)s\t%(name)s:%(funcName)s:%(lineno)s\t%(message)s'
 		else:
-			kwargs.setdefault('format', '%(levelname)s %(name)s:%(funcName)s:%(lineno)s %(message)s')
+			kwargs['format'] = '%(levelname)s %(name)s:%(funcName)s:%(lineno)s %(message)s'
 		super(JSONFormatter, self).__init__(**kwargs)
 		self.highlight = (__debug__ if highlight is None else highlight) and _highlight
 	
@@ -108,7 +108,6 @@ class JSONFormatter(logging.Formatter):
 		formatted = logging.Formatter.format(self, record)
 		json = self.jsonify(
 				record,
-				indent = '\t' if __debug__ else '',
 				separators = (',', ': ') if __debug__ else (',', ':'),
 			)
 		
