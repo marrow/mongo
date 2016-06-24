@@ -119,7 +119,7 @@ class JSONFormatter(logging.Formatter):
 		try:
 			json = self.jsonify(
 				record,
-				separators = (',', ': ') if __debug__ else (', ', ':'),
+				separators = (', ' if not self.indent else ',', ': ') if __debug__ else (',', ':'),
 				indent = "\t" if self.indent else None,
 			)
 		except Exception as e:
