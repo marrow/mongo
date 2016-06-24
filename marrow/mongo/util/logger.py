@@ -74,10 +74,10 @@ class JSONFormatter(logging.Formatter):
 	
 	def __init__(self, highlight=None, **kwargs):
 		if __debug__:
-			kwargs['format'] = '%(asctime)s\t%(levelname)s\t%(name)s:%(funcName)s:%(lineno)s\t%(message)s'
+			format = '%(asctime)s\t%(levelname)s\t%(name)s:%(funcName)s:%(lineno)s\t%(message)s'
 		else:
-			kwargs['format'] = '%(levelname)s %(name)s:%(funcName)s:%(lineno)s %(message)s'
-		super(JSONFormatter, self).__init__(**kwargs)
+			format = '%(levelname)s %(name)s:%(funcName)s:%(lineno)s %(message)s'
+		super(JSONFormatter, self).__init__(format, style='{')
 		self.highlight = (__debug__ if highlight is None else highlight) and _highlight
 	
 	def _default(self, value):
