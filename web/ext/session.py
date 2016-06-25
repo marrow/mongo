@@ -101,7 +101,7 @@ class SessionExtension(object):
 
 		log.debug("Accessing session group")
 
-		return ctx.session._promote("SessionGroup")
+		return context.session._promote("SessionGroup")
 
 	def start(self, context):
 		context.session = ContextGroup(**{name: lazy(value.get_session, name) for name, value in self.engines.items()})
