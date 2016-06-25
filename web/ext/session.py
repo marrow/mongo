@@ -1,9 +1,8 @@
 # encoding: utf-8
 
-"""Session handling extension using mongo db storage."""
+"""Session handling extension using session engines."""
 
 from web.core.util import lazy
-
 from web.core.context import Context, ContextGroup
 
 log = __import__('logging').getLogger(__name__)
@@ -13,13 +12,14 @@ import os, base64
 from functools import partial
 
 # Probably want something more secure than this, but I didn't want to add any dependencies
-def generate_session_id(num_bytes=16):
+def generate_session_id(num_bytes=24):
 	"""Generates random string which is then base64 encoded
 
 	* `num_bytes` -- the number of bytes this random string should consist of
 	"""
 
 	return base64.b64encode(os.urandom(num_bytes))
+
 
 class MemorySessionEngine(object):
 	def __init__(self, **config):
@@ -32,9 +32,11 @@ class MemorySessionEngine(object):
 		* `instance` -- the SessionGroup instance that this engine instance is an attribute of.
 		"""
 
-		# Attempting to access the `instance` itself could result in a recursion loop if this storage engine is the
-		# default, as this function will be called again when accessing either no attribute or an invalid attribute on the
-		# `SessionGroup`. Instead, information should be grabbed from `instance._ctx`, which is the `RequestContext`.
+		# Attempting to access the `instance` itself could result in a recursion loop if this session engine is the
+		# default, as this function will be called again when accessing either no attribute or an invalid attribute on
+		# the `SessionGroup`. Instead, information should be grabbed from `instance._ctx`, which is the
+		# `RequestContext`.
+
 		context = session_group._ctx
 		if(context.session._id not in self._sessions):
 			self._sessions[context.session._id] = Context()
@@ -45,10 +47,11 @@ class MemorySessionEngine(object):
 
 		return self._sessions[context.session._id]
 
-class SessionExtension(object):
-	"""Manage client sessions using storage engines
 
-	This extension stores session data in session storage engines and handles the session cookie
+class SessionExtension(object):
+	"""Manage client sessions using session engines
+
+	This extension stores session data in session session engines and handles the session cookie
 	"""
 
 	__slots__ = ('engines', 'uses', 'needs', 'provides', '_cookie')
@@ -61,11 +64,11 @@ class SessionExtension(object):
 
 		Current settings consist of the following:
 		* `engines` -- either `None`, which will setup a default `MemorySessionEngine`, or a `dict` of
-		 	SessionStorageEngines. This setting is used to tell the `SessionExtension` which storage engines to use. This
+		 	session engines. This setting is used to tell the `SessionExtension` which session engines to use. This
 			setting should contain at least one entry with the key `default`
 		* `cookie' -- either `None` or a `dict`. This is used to tell the `SessionExtension` which settings to use
-			for the browser cookie. possible options are 'name' - `str`, 'max_age' - `int`, 'http_only' - `True` or `False`,
-			and `str` 'path'
+			for the browser cookie. possible options are 'name' - `str`, 'max_age' - `int`, 'http_only' - `True` or
+			`False`, and `str` 'path'
 		"""
 
 		conf = self._configure(**config)
@@ -76,6 +79,7 @@ class SessionExtension(object):
 		self.needs = set(self._needs)
 		self.provides = set(self._provides)
 
+		# Gather all the dependency information from Session Engines
 		for name, engine in self.engines.items():
 			if engine is None: continue
 			engine.__name__ = name  # Inform the engine what its name is.
@@ -123,7 +127,7 @@ class SessionExtension(object):
 		if(self._cookie['name'] in context.request.cookies):
 			print('what')
 			id = context.request.cookies[self._cookie['name']]
-			# TODO: check if any storage engines have this key, if not generate a new one
+			# TODO: check if any session engines have this key, if not generate a new one
 			# otherwise use this key
 		else:
 			id = generate_session_id()
@@ -137,7 +141,7 @@ class SessionExtension(object):
 		context.session = ContextGroup(**{name: lazy(value.get_session, name) for name, value in self.engines.items()})
 		context.session['_id'] = lazy(self.get_session_id, '_id')
 
-		self._handle_event('start', context, True)
+		self._handle_event('start', context=context, overrides=True)
 
 	def prepare(self, context):
 		"""Set the _ctx attribute for access in lazy functions and promote the ContextGroup"""
@@ -149,7 +153,7 @@ class SessionExtension(object):
 		# Must promote the ContextGroup so that the lazy wrapped function calls operate properly
 		context.session = context.session._promote('SessionGroup')
 
-		self._handle_event('prepare', context)
+		self._handle_event('prepare', context=context)
 
 
 	def after(self, context):
@@ -160,7 +164,7 @@ class SessionExtension(object):
 			return
 
 		# engines could have made a new storage even if the id is old
-		self._handle_event('after', context)
+		self._handle_event('after', context=context)
 
 		# if the session id has just been generated this request, we need to set the cookie
 		if '_new' not in context.session.__dict__:
@@ -176,21 +180,24 @@ class SessionExtension(object):
 			)
 
 
-	def _handle_event(self, event, override = False, *args, **kw):
+	def _handle_event(self, event, *args, **kw):
 		"""Send a signal event to all session engines
 
 		* `event` -- the signal to run on all session engines
-		* `override` -- if False then the event will only be run on session engines that have been accessed during this
-			request. If True then the event will attempt to run on all session engines, regardless of if they have been
-			accessed or not.
+		* `event` -- the RequestContext for the current request
 		* `*args` -- additional args passed on to session engine callbacks
-		* `**kwargs` -- additional kwargs passed on to session engine callbacks
+		* `**kwargs` -- additional kwargs passed on to session engine callbacks, if it contains `overrides` and that
+			value is True, events will be run on session engines regardless of whether they have been accessed during
+			this request or not, otherwise only engines that have been accessed during this request will have events
+			run. If there is no kwarg for context, all engines will have the event run regardless
 		"""
+		override = kw.get('overrides', False)
+		context = kw.get('context', None)
 
 		# In a typical scenario these callbacks will only happen if the specific session engine was accessed
 		for engine in self.engines.values():
 			if engine is not None and hasattr(engine, event):
-				if override or engine.__name__ in context.session.__dict__:
+				if override or context is None or engine.__name__ in context.session.__dict__:
 					getattr(engine, event)(*args, **kw)
 
 	def __getattr__(self, name):
