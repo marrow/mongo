@@ -31,11 +31,19 @@ class MongoSessionEngine(object):
 		return self._Document()
 
 	def after(self, context):
-		# If this is being called that means context.session.mongo has been previously accessed, which means it's valid
+		"""Insert the session document if it was created during this request"""
+		# This is only called when the mongo session has been accessed, so we can skip those checks
+
 		if context.session.mongo.id is not None: return
+
+		if __debug__:
+			log.debug("Storing new session document")
 
 		context.db.default[self._collection].insert_one(context.session.mongo)
 
 	def done(self, context):
+		"""Save the session document if it has been modified during this request"""
+
 		# determine whether or not to save document
-		pass
+		if __debug__:
+			log.debug("Updating session document")
