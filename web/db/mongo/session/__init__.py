@@ -10,31 +10,29 @@ log = __import__('logging').getLogger(__name__)
 
 
 import os, base64
+from functools import partial
 
 # Probably want something more secure than this, but I didn't want to add any dependencies
 def generate_session_id(num_bytes=16):
 	"""Generates a n byte session id"""
-    return base64.b64encode(os.urandom(num_bytes))
+	return base64.b64encode(os.urandom(num_bytes))
 
 class MemorySessionStorage(object):
 	def __init__(self, **config):
 		self._sessions = {}
 
 	def get_session(self, context):
-		pass
+		if(context.session.id not in self._sessions):
+			self.sessions[context.session.id] = Context()
 
-	def start(self, context):
-		pass
 
-	def prepare(self, context):
-		pass
+		log.debug("Accessing memory session")
+		log.debug(context.session.id)
 
-	def __get__(self, instance, type=None):
-		"""???"""
-		pass
+		return self.sessions[context.session.id]
 
 class SessionExtension(object):
-	"""Manage client sessions using data stored in a database
+	"""Manage client sessions using storage engines
 
 	This extension stores session data in session storage engines and handles the session cookie
 	"""
@@ -50,9 +48,9 @@ class SessionExtension(object):
 		Such as domain, ttl, cookie name, etc
 		"""
 
-		config = self._configure(config)
-		self.engines = set(config.engines)
-		self._cookie = config.cookie
+		conf = self._configure(**config)
+		self.engines = conf['engines']
+		self._cookie = conf['cookie']
 
 		self.uses = set()
 		self.needs = set(self._needs)
@@ -65,10 +63,11 @@ class SessionExtension(object):
 			self.needs.update(getattr(engine, 'needs', ()))
 			self.provides.update(getattr(engine, 'provides', ()))
 
-	def _configure(self, config):
+	def _configure(self, **config):
 		config = config or dict()
 
 		if 'engines' not in config: config['engines'] = {'default': MemorySessionStorage()}
+		# TODO: Check that there is a default
 
 		if 'cookie' not in config: config['cookie'] = {}
 
@@ -87,43 +86,36 @@ class SessionExtension(object):
 			cookie['path'] = '/'
 
 		#Probably want a way to have any params beyond those listed above go into **kwargs on response.set_cookie
-
 		return config
 
 	def get_session_group(self, context):
-		"""This is probably NOT how this will be done, just trying to get a minimum viable product."""
 		if(self._cookie.name in context.request.cookies):
 			key = context.request.cookies[self._cookie.name]
 			# TODO: check if any storage engines have this key, if not generate a new one
-			context.session_id = key
+			# otherwise use this key
+			context.session['id'] = key
 		else:
-			context.session_id = generate_session_id()
+			context.session['id'] = generate_session_id()
+			context.session['_new'] = True
+
+
+		log.debug("Accessing session group")
 
 		return ctx.session._promote("SessionGroup")
 
 	def start(self, context):
-		context.session = ContextGroup(**self.engines)
-		self._handle_event('start', context)
+		context.session = ContextGroup(**{name: lazy(value.get_session, name) for name, value in self.engines.items()})
 
 	def prepare(self, context):
+		log.debug("Preparing session group")
 		context.session = lazy(self.get_session_group, 'session')
-		context.session['_ctx'] = context
-		self._handle_event('prepare', context)
-
-	def _handle_event(self, event, *args, **kw):
-		for engine in self.engines.values():
-			if engine is not None and hasattr(engine, event):
-				getattr(engine, event)(*args, **kw)
-
 
 	def after(self, context):
-		if 'session_id' not in context.__dict__
+		if 'id' not in context.session.__dict__:
 			return
 
-		if(self._cookie.name in context.request.cookies):
-			key = context.request.cookies[self._cookie.name]
-			if(key == context.session_id)
-				return
+		if _new in context.session.__dict__:
+			return
 
 		context.response.set_cookie(
 				httponly = self._cookie.http_only,
@@ -133,12 +125,3 @@ class SessionExtension(object):
 				secure = self._cookie.secure,
 				value = context.session_id,
 			)
-
-		self._handle_event('after', context)
-
-
-	def __getattr__(self, name):
-		if name not in ('stop', 'graceful', 'dispatch', 'before', 'done', 'interactive', 'inspect'):
-			raise AttributeError()
-
-		return partial(self._handle_event, name)
