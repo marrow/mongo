@@ -5,7 +5,7 @@
 from web.core.util import lazy
 
 from marrow.mongo.core import Document
-from marrow.mongo.field.base import ObjectId, String
+from marrow.mongo.field.base import ObjectId, String, Binary
 
 log = __import__('logging').getLogger(__name__)
 
@@ -24,8 +24,9 @@ class MongoSessionEngine(object):
 	def get_session(self, session_group):
 		context = session_group._ctx
 		sess_id = session_group._id
+
 		if __debug__:
-			log.debug("Querying for session record.")
+			log.debug("Searching for session: "+str(sess_id))
 
 		result = context.db.default[self._collection].find_one({"session_id": sess_id})
 		if result is not None:

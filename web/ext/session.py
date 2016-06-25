@@ -18,7 +18,7 @@ def generate_session_id(num_bytes=24):
 	* `num_bytes` -- the number of bytes this random string should consist of
 	"""
 
-	return base64.b64encode(os.urandom(num_bytes))
+	return str(base64.b64encode(os.urandom(num_bytes)).decode('utf-8'))
 
 
 class MemorySessionEngine(object):
@@ -125,12 +125,15 @@ class SessionExtension(object):
 
 		# Check if the browser sent a session cookie
 		if(self._cookie['name'] in context.request.cookies):
-			print('what')
 			id = context.request.cookies[self._cookie['name']]
+			if __debug__:
+				log.debug("Retreived cookie session id: "+str(id))
 			# TODO: check if any session engines have this key, if not generate a new one
 			# otherwise use this key
 		else:
 			id = generate_session_id()
+			if __debug__:
+				log.debug("Generated new session key: "+str(id))
 			session_group['_new'] = True
 
 		return id
