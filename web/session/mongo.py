@@ -10,14 +10,14 @@ from marrow.mongo.field.base import ObjectId, String, Binary
 log = __import__('logging').getLogger(__name__)
 
 
-class MongoSession(Document):
+class MongoSessionStorage(Document):
 	id = ObjectId('_id', required=True, generated=False, default=None)
 	session_id = String()
 
-class MongoSessionEngine(object):
+class MongoSession(object):
 	needs = {'mongodb'}
 
-	def __init__(self, Document=MongoSession, collection='session', **config):
+	def __init__(self, Document=MongoSessionStorage, collection='session', **config):
 		self._Document = Document
 		self._collection = collection
 
