@@ -24,10 +24,10 @@ exec(open(os.path.join("marrow", "mongo", "core", "release.py")).read())
 class PyTest(TestCommand):
 	def finalize_options(self):
 		TestCommand.finalize_options(self)
-
+		
 		self.test_args = []
 		self.test_suite = True
-
+	
 	def run_tests(self):
 		import pytest
 		sys.exit(pytest.main(self.test_args))
@@ -47,14 +47,14 @@ tests_require = ['coverage' + ('<4' if py32 else ''), 'pytest', 'pytest-cov', 'p
 setup(
 	name = "marrow.mongo",
 	version = version,
-
+	
 	description = description,
 	long_description = codecs.open(os.path.join(here, 'README.rst'), 'r', 'utf8').read(),
 	url = url,
-
+	
 	author = author.name,
 	author_email = author.email,
-
+	
 	license = 'MIT',
 	keywords = '',
 	classifiers = [
@@ -75,30 +75,30 @@ setup(
 			"Topic :: Software Development :: Libraries :: Python Modules",
 			"Topic :: Utilities"
 		],
-
+	
 	packages = find_packages(exclude=['test', 'example', 'benchmark', 'htmlcov']),
 	include_package_data = True,
 	package_data = {'': ['README.rst', 'LICENSE.txt']},
 	namespace_packages = ['marrow', 'marrow.mongo', 'marrow.mongo.field', 'web', 'web.db'],
-
+	
 	# ## Dependency Declaration
-
+	
 	install_requires = [
 			'marrow.schema>=1.2.0,<2.0.0',  # Declarative schema support.
 			'marrow.package>=1.1.0,<2.0.0',  # Plugin discovery and loading.
 			'pymongo>=3.2',  # We require modern API.
 		],
-
+	
 	extras_require = dict(
 			development = tests_require,
 			scripting = ['javascripthon<1.0'],  # Allow map/reduce functions and "stored functions" to be Python.
 			logger = ['pytz', 'tzlocal'],  # Timezone support to store log times in UTC like a sane person.
 		),
-
+	
 	tests_require = tests_require,
-
+	
 	# ## Plugin Registration
-
+	
 	entry_points = {
 				'web.db': [
 						'mongodb = web.db.mongo:MongoDBConnection',
@@ -126,7 +126,7 @@ setup(
 						'mongo = web.session.mongo:MongoSession',
 					],
 			},
-
+	
 	zip_safe = False,
 	cmdclass = dict(
 			test = PyTest,
