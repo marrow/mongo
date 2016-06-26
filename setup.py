@@ -24,7 +24,7 @@ exec(open(os.path.join("marrow", "mongo", "core", "release.py")).read())
 class PyTest(TestCommand):
 	def finalize_options(self):
 		TestCommand.finalize_options(self)
-		
+	
 		self.test_args = []
 		self.test_suite = True
 	
@@ -120,7 +120,11 @@ setup(
 						'Double = marrow.mongo.field.number:Double',
 						'Integer = marrow.mongo.field.number:Integer',
 						'Long = marrow.mongo.field.number:Long',
-					]
+					],
+				# #### WebCore Session Engines
+				'web.session': [
+						'mongo = web.session.mongo:MongoSession',
+					],
 			},
 	
 	zip_safe = False,
