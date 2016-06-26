@@ -24,7 +24,7 @@ exec(open(os.path.join("marrow", "mongo", "core", "release.py")).read())
 class PyTest(TestCommand):
 	def finalize_options(self):
 		TestCommand.finalize_options(self)
-		
+	
 		self.test_args = []
 		self.test_suite = True
 	
