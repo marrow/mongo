@@ -17,39 +17,40 @@ class MongoSessionStorage(Document):
 class MongoSession(object):
 	needs = {'mongodb'}
 
-	def __init__(self, Document=MongoSessionStorage, collection='session', **config):
+	def __init__(self, Document=MongoSessionStorage, collection='session', expire=None, **config):
 		self._Document = Document
 		self._collection = collection
+		self._expire = expire
 
-	def get_session(self, session_group):
+	def is_valid(self, context, sid):
+		return context.db.default[self._collection].find_one({"session_id": sid}) is not None
+
+	def invalidate(self, context, sid):
+		# not sure what the return value should be yet
+		return context.db.default[self._collection].delete_one({"session_id": sid}) == 1
+
+	def load(self, context, sid):
 		context = session_group._ctx
-		sess_id = session_group._id
 
 		if __debug__:
-			log.debug("Searching for session: "+str(sess_id))
+			log.debug("Searching for session: "+str(sid))
 
-		result = context.db.default[self._collection].find_one({"session_id": sess_id})
+		result = context.db.default[self._collection].find_one({"session_id": sid})
 		if result is not None:
 			return self._Document.from_mongo(result)
 
 		doc = self._Document()
-		doc.session_id = sess_id
+		doc.session_id = sid
 		return doc
 
-	def after(self, context):
-		"""Insert the session document if it was created during this request"""
-		# This is only called when the mongo session has been accessed, so we can skip those checks
-
-		if context.session[self.__name__].id is not None: return
+	def persist(self, context, sid, session):
+		"""Update or insert the session document into the configured collection"""
 
 		if __debug__:
-			log.debug("Storing new session document")
+			log.debug("Persisting session document")
 
-		context.db.default[self._collection].insert_one(context.session[self.__name__])
+		if(session.id is None)
+			context.db.default[self._collection].insert_one(context.session[self.__name__])
+			return
 
-	def done(self, context):
-		"""Save the session document if it has been modified during this request"""
-
-		# determine whether or not to save document
-		if __debug__:
-			log.debug("Updating session document")
+		# TODO: Update existing record
