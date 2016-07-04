@@ -18,6 +18,7 @@ if sys.version_info < (2, 7):
 elif sys.version_info > (3, 0) and sys.version_info < (3, 2):
 	raise SystemExit("Python 3.2 or later is required.")
 
+version = description = url = author = ''  # Actually loaded on the next line; be quiet, linter.
 exec(open(os.path.join("marrow", "mongo", "core", "release.py")).read())
 
 
@@ -79,7 +80,7 @@ setup(
 	packages = find_packages(exclude=['test', 'example', 'benchmark', 'htmlcov']),
 	include_package_data = True,
 	package_data = {'': ['README.rst', 'LICENSE.txt']},
-	namespace_packages = ['marrow', 'marrow.mongo', 'marrow.mongo.field', 'web', 'web.db'],
+	namespace_packages = ['marrow', 'marrow.mongo', 'marrow.mongo.field', 'web', 'web.db', 'web.session'],
 	
 	# ## Dependency Declaration
 	
@@ -87,12 +88,13 @@ setup(
 			'marrow.schema>=1.2.0,<2.0.0',  # Declarative schema support.
 			'marrow.package>=1.1.0,<2.0.0',  # Plugin discovery and loading.
 			'pymongo>=3.2',  # We require modern API.
+			'pytz',  # Timezone support.
 		],
 	
 	extras_require = dict(
 			development = tests_require,
 			scripting = ['javascripthon<1.0'],  # Allow map/reduce functions and "stored functions" to be Python.
-			logger = ['pytz', 'tzlocal'],  # Timezone support to store log times in UTC like a sane person.
+			logger = ['tzlocal'],  # Timezone support to store log times in UTC like a sane person.
 		),
 	
 	tests_require = tests_require,
@@ -100,11 +102,12 @@ setup(
 	# ## Plugin Registration
 	
 	entry_points = {
-				'web.db': [
-						'mongodb = web.db.mongo:MongoDBConnection',
+				# ### Marrow Mongo Lookups
+				'marrow.mongo.document': [  # Document classes registered by name.
+						'Document = marrow.mongo.core:Document',
 					],
-				'marrow.mongo.field': [
-						'Field = marrow.mongo.core.field:Field',
+				'marrow.mongo.field': [  # Field classes registered by (optionaly namespaced) name.
+						'Field = marrow.mongo.core:Field',
 						'String = marrow.mongo.field.base:String',
 						'Array = marrow.mongo.field.base:Array',
 						'Binary = marrow.mongo.field.base:Binary',
@@ -121,8 +124,11 @@ setup(
 						'Integer = marrow.mongo.field.number:Integer',
 						'Long = marrow.mongo.field.number:Long',
 					],
-				# #### WebCore Session Engines
-				'web.session': [
+				# ### WebCore Extensions
+				'web.db': [  # Database Connector
+						'mongodb = web.db.mongo:MongoDBConnection',
+					],
+				'web.session': [  # Session Engine
 						'mongo = web.session.mongo:MongoSession',
 					],
 			},
