@@ -1,22 +1,66 @@
 # encoding: utf-8
 
 from bson import ObjectId as oid
+from collections import Iterable
+
 from marrow.schema import Attribute
 from marrow.schema.transform import BaseTransform
 from marrow.package.canonical import name
-from marrow.package.loader import traverse
+from marrow.package.loader import traverse, load
 
 from ..core import Document, Field
 from ..util import adjust_attribute_sequence
 from ..util.compat import str, unicode
 
 
+class EmbedTransform(BaseTransform):
+	def native(self, value, field):
+		if not isinstance(value, Document):
+			kinds = list(field.kinds)
+			if len(kinds) == 1:
+				value = kinds[0].from_mongo(value)
+			else:
+				value = Document.from_mongo(value)
+		
+		return value
+	
+	def foreign(self, value, field):
+		kinds = list(field.kinds)
+		if not isinstance(value, Document):
+			if len(kinds) != 1:
+				raise ValueError("Ambigouous assignment, assign an instance of: " + \
+						", ".join(kind.__name__ for kind in kinds))
+			
+			value = kinds[0](**value)  # Assuming a mapping.
+		
+		if '_cls' not in value and len(kinds) != 1:
+			value['_cls'] = name(value.__class__)
+		
+		return value
 
-@adjust_attribute_sequence(-1000, 'kind')  # Allow 'kind' to be passed positionally first.
+
 class Embed(Field):
 	kind = Attribute(default=None)  # The Document class (or set of allowable) to use when unpacking.
+	transformer = Attribute(default=EmbedTransform())  # Change the default transformer to ours.
 	
 	__foreign__ = 'object'
+	
+	def __init__(self, *kinds, **kw):
+		kw['kind'] = kinds
+		super(Embed, self).__init__(**kw)
+	
+	@property
+	def kinds(self):
+		values = self.kind
+		
+		if not isinstance(values, Iterable):
+			values = (values, )
+		
+		for value in values:
+			if isinstance(value, (str, unicode)):
+				value = load(value, 'marrow.mongo.document')
+			
+			yield value
 
 
 
