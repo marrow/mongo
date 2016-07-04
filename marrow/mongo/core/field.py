@@ -1,6 +1,5 @@
 # encoding: utf-8
 
-from inspect import isroutine
 from weakref import proxy
 
 from marrow.schema import Attribute
@@ -20,6 +19,7 @@ class Field(Attribute, Queryable):
 	#  * #document -- allow/prevent all document-related comparison such as $elemMatch.
 	__allowed_operators__ = set()
 	__disallowed_operators__ = set()
+	__document__ = None  # If we're assigned to a Document, this gets populated with a weak reference proxy.
 	
 	# Inherits from Attribute: (name is usually, but not always the first positional parameter)
 	# name - The database-side name of the field, stored as __name__, defaulting to the attribute name assigned to.
@@ -51,6 +51,7 @@ class Field(Attribute, Queryable):
 				self.default = None
 	
 	def __fixup__(self, document):
+		"""Called after an instance of our Field class is assigned to a Document."""
 		self.__document__ = proxy(document)
 	
 	# Descriptor Protocol
@@ -65,6 +66,10 @@ class Field(Attribute, Queryable):
 		# TODO: Translated field proxy?
 		
 		result = super(Field, self).__get__(obj, cls)
+		
+		if result is None:  # Discussion: pass through to the transformer?
+			return None
+		
 		return self.transformer.native(result, self)
 	
 	def __set__(self, obj, value):
@@ -78,7 +83,8 @@ class Field(Attribute, Queryable):
 				except AttributeError:
 					pass
 		
-		value = self.transformer.foreign(value, self)
+		if value is not None:
+			value = self.transformer.foreign(value, self)
 		
 		super(Field, self).__set__(obj, value)
 	
