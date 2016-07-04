@@ -28,6 +28,7 @@ class Field(Attribute, Queryable):
 	choices = Attribute(default=None)  # The permitted set of values; may be static or a dynamic callback.
 	required = Attribute(default=False)  # Must have value assigned; None and an empty string are values.
 	nullable = Attribute(default=False)  # If True, will store None.  If False, will store non-None default, or not store.
+	exclusive = Attribute(default=None)  # The set of other fields that must not be set for this field to be settable.
 	
 	transformer = Attribute(default=BaseTransform())  # A Transformer class to use when loading/saving values.
 	validator = Attribute(default=Validator())  # The Validator class to use when validating values.
@@ -68,6 +69,14 @@ class Field(Attribute, Queryable):
 	
 	def __set__(self, obj, value):
 		"""Executed when assigning a value to a DataAttribute instance attribute."""
+		
+		if self.exclusive:
+			for other in self.exclusive:
+				try:
+					if getattr(obj, other, None) is not None:
+						raise AttributeError("Can not assign to " + self.__name__ + " if " + other + " has a value.")
+				except AttributeError:
+					pass
 		
 		value = self.transformer.foreign(value, self)
 		
