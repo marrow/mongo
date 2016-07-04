@@ -12,7 +12,7 @@ will always "win".
 Since the built-in fields follow the `marrow.mongo.field` plugin protocol the core fields are themselves made
 available this way.
 
-	from marrow.mongo import String, 
+	from marrow.mongo import String, ...
 """
 
 from __future__ import unicode_literals
@@ -20,30 +20,30 @@ from __future__ import unicode_literals
 import imp
 import sys
 
-from marrow import mongo as TOP_LEVEL  # TODO: Move into function to isolate scope.
 from marrow.package.host import PluginManager
 
 
 
-class FieldRegistry(PluginManager):
+class Registry(PluginManager):
+	def __init__(self, top_level, namespace=None):
+		self.top_level = top_level
+		super(Registry, self).__init__(namespace or top_level.replace(':', '.'))
+	
 	def register(self, name, plugin):
-		from marrow import mongo as TOP_LEVEL
+		parent, _, module = self.top_level.partition(':')
+		TOP_LEVEL = getattr(__import__(parent, fromlist=(module,)), module)
 		
-		super(FieldRegistry, self).register(name, plugin)
+		super(Registry, self).register(name, plugin)
 		namespace, name = name.partition('.') if '.' in name else ('', name)
 		
 		if name not in TOP_LEVEL.__dict__:
 			TOP_LEVEL.__dict__[name] = plugin
 		
 		if namespace not in TOP_LEVEL.__dict__:
-			namespace = TOP_LEVEL.__dict__[namespace] = sys.modules['marrow.mongo.' + namespace] = \
+			TOP_LEVEL.__dict__[namespace] = sys.modules['marrow.mongo.field.' + namespace] = namespace = \
 					imp.new_module(namespace)
 		else:
 			namespace = TOP_LEVEL.__dict__[namespace]
 		
-		
-
-
-
-
+		namespace.__dict__[name] = plugin
 
