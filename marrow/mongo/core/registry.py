@@ -1,6 +1,6 @@
 # encoding: utf-8
 
-"""This is the Field registry.
+"""This is the Field (and Document) registry.
 
 It's scary, scary code, but basically you just import fields from the marrow.mongo namespace directly.
 
@@ -12,7 +12,7 @@ will always "win".
 Since the built-in fields follow the `marrow.mongo.field` plugin protocol the core fields are themselves made
 available this way.
 
-	from marrow.mongo import String, ...
+	from marrow.mongo import Document, String, ...
 """
 
 from __future__ import unicode_literals
@@ -21,7 +21,6 @@ import imp
 import sys
 
 from marrow.package.host import PluginManager
-
 
 
 class Registry(PluginManager):

@@ -81,6 +81,7 @@ class Date(Field):
 	__foreign__ = 'date'
 	
 	now = Attribute(default=False)
+	autoupdate = Attribute(default=False)
 
 
 class Regex(String):

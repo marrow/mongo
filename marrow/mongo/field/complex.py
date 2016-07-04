@@ -47,6 +47,18 @@ class Embed(Field):
 	
 	def __init__(self, *kinds, **kw):
 		kw['kind'] = kinds
+		
+		if kw.get('assign', False) and 'default' not in kw:
+			if len(kinds) != 1:
+				raise ValueError("If auto-assignment is selected, must specify only one allowed kind.")
+			
+			def embed_default():
+				if isinstance(kinds[0], (str, unicode)):
+					return load(kinds[0], 'marrow.mongo.document')
+				return kinds[0]
+			
+			kw['default'] = embed_default
+		
 		super(Embed, self).__init__(**kw)
 	
 	@property
@@ -107,6 +119,7 @@ class Reference(Field):
 	kind = Attribute(default=None)  # One or more foreign model references, a string, Document subclass, or set of.
 	concrete = Attribute(default=False)  # If truthy, will store a DBRef instead of ObjectId.
 	cache = Attribute(default=None)  # Attributes to preserve from the referenced object at the reference level.
+	reverse = Attribute(default=None)  # What to assign as a reverse accessor?
 	
 	__foreign__ = {'objectId', 'dbPointer', 'object'}  # We store a simple reference, or deep reference, or object.
 

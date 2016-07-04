@@ -11,6 +11,6 @@ from .registry import Registry
 
 __all__ = ['__version__', 'Field', 'Index', 'Document']
 
-_field_registry = Registry('marrow.mongo:field')
-_document_registry = Registry('marrow.mongo:document')
+_field_registry = Registry('marrow:mongo', 'marrow.mongo.field')
+_document_registry = Registry('marrow:mongo', 'marrow.mongo.document')
 
