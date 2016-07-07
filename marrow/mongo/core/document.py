@@ -3,8 +3,9 @@
 from pytz import utc
 from bson.binary import STANDARD
 from bson.codec_options import CodecOptions
+from bson.json_util import dumps, loads
 from pymongo.read_preferences import ReadPreference
-from collections import OrderedDict as odict, MutableMapping
+from collections import OrderedDict as dict, MutableMapping
 
 from marrow.package.loader import load
 from marrow.schema import Container, Attributes
@@ -16,27 +17,34 @@ from ..util.compat import py3
 
 
 class Document(Container):
+	"""A MongoDB document definition."""
+	
 	# Note: These may be dynamic based on content; always access from an instance where possible.
-	__store__ = odict  # Internally, this is the representation used for the Python side of communication.
+	__store__ = dict  # For fields, this may be a bson type like Binary, or Code.
 	__foreign__ = {'object'}  # The representation for the database side of things, ref: $type
 	
-	_bound = False
-	__collection__ = None
-	__read_preference__ = ReadPreference.PRIMARY
+	__bound__ = False  # Has this class been "attached" to a live MongoDB connection?
+	__collection__ = None  # The name of the collection to "attach" to using bind().
+	__read_preference__ = ReadPreference.PRIMARY  # Default read preference to assign when binding.
 	
-	__projected__ = None
-	__fields__ = Attributes(only=Field)
+	__projected__ = None  # The set of fields used during projection, to identify fields which are not loaded.
+	__fields__ = Attributes(only=Field)  # An ordered mapping of field names to their respective Field instance.
 	__fields__.__sequence__ = 20000
-	__indexes__ = Attributes(only=Index)
+	__indexes__ = Attributes(only=Index)  # An ordered mapping of index names to their respective Index instance.
 	__indexes__.__sequence__ = 20001
 	
 	def __init__(self, *args, **kw):
-		"""Construct a new MongoDB Document."""
-		fields = self.__fields__ = self.__fields__  # This stores the result of lazy evaluation.
+		"""Construct a new MongoDB Document instance.
+		
+		Utilizing Marrow Schema, arguments may be passed positionally (in definition order) or by keyword, or using a
+		mixture of the two. Any fields marked for automatic assignment will be automatically accessed to trigger such
+		assignment.
+		"""
+		
 		super(Document, self).__init__(*args, **kw)
 		
 		# Trigger assignment of default values.
-		for name, field in fields.items():
+		for name, field in self.__fields__.items():
 			if field.assign:
 				getattr(self, name)
 	
@@ -69,7 +77,7 @@ class Document(Container):
 		
 		collection = collection.with_options(
 				codec_options = CodecOptions(
-						document_class = odict,
+						document_class = dict,
 						tz_aware = True,
 						uuid_representation = STANDARD,
 						tzinfo = utc,
@@ -79,7 +87,7 @@ class Document(Container):
 				write_concern = None,  # TODO: Class-level configuration.
 			)
 		
-		cls._bound = True
+		cls.__bound__ = True
 		cls.__collection__ = collection
 		
 		return cls
@@ -113,14 +121,30 @@ class Document(Container):
 	
 	@classmethod
 	def from_mongo(cls, doc, projected=None):
-		if '_cls' in doc:
-			cls = load(doc['_cls'], 'marrow.mongo.model')
+		"""Convert data coming in from the MongoDB wire driver into a Document instance."""
+		
+		if '_cls' in doc:  # Instantiate any specific class mentioned in the data.
+			cls = load(doc['_cls'], 'marrow.mongo.document')
 		
 		instance = cls()
 		instance.__data__ = instance.__store__(doc)
-		instance.__loaded__ = projected
+		instance.__loaded__ = set(projected) if projected else None
 		
 		return instance
+	
+	def to_mongo(self):
+		"""Convert data going back into the MongoDB wire driver. This is a no-op, just pass the instance instead."""
+		return self
+	
+	@classmethod
+	def from_json(cls, json):
+		"""Convert JSON data into a Document instance."""
+		deserialized = loads(json)
+		return cls.from_mongo(deserialized)
+	
+	def to_json(self, *args, **kw):
+		"""Convert our Document instance back into JSON data. Additional arguments are passed through."""
+		return dumps(self, *args, **kw)
 	
 	@property
 	def as_rest(self):
