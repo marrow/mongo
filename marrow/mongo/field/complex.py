@@ -109,10 +109,19 @@ class ReferenceTransform(BaseTransform):
 			
 			for i in field.cache:
 				store[field.__document__._get_mongo_name_for(i)] = traverse(cache, i)
+		
+		return store
 	
 	def native(self, value, field):
 		"""Transform the MongoDB value into a Marrow Mongo value."""
-		pass
+		
+		kinds = field.kind if isinstance(field.kind, (list, tuple, set)) else (field.kind, )
+		kinds = [(load(i, 'marrow.mongo.document') if isinstance(i, (str, unicode)) else i) for i in kinds]
+		
+		if isinstance(value, oid):
+			return value
+		
+		return kinds[0].from_mongo(value, value.keys())
 
 
 @adjust_attribute_sequence(-1000, 'kind')  # Allow 'kind' to be passed positionally first.
