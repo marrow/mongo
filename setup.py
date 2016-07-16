@@ -119,6 +119,7 @@ setup(
 						'Timestamp = marrow.mongo.field.base:Timestamp',
 						'Embed = marrow.mongo.field.complex:Embed',
 						'Reference = marrow.mongo.field.complex:Reference',
+						'PluginReference = marrow.mongo.field.complex:PluginReference',
 						'Number = marrow.mongo.field.number:Number',
 						'Double = marrow.mongo.field.number:Double',
 						'Integer = marrow.mongo.field.number:Integer',

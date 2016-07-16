@@ -2,6 +2,7 @@
 
 from bson import ObjectId as oid
 from collections import Iterable
+from pkg_resources import iter_entry_points
 
 from marrow.schema import Attribute
 from marrow.schema.transform import BaseTransform
@@ -120,6 +121,73 @@ class Reference(Field):
 	concrete = Attribute(default=False)  # If truthy, will store a DBRef instead of ObjectId.
 	cache = Attribute(default=None)  # Attributes to preserve from the referenced object at the reference level.
 	reverse = Attribute(default=None)  # What to assign as a reverse accessor?
+	transformer = Attribute(default=ReferenceTransform())  # Change the default transformer to ours.
 	
 	__foreign__ = {'objectId', 'dbPointer', 'object'}  # We store a simple reference, or deep reference, or object.
+
+
+class PluginReferenceTransform(BaseTransform):
+	def foreign(self, value, field):
+		"""Transform to a MongoDB-safe value."""
+		
+		try:
+			namespace = field.namespace
+		
+		except AttributeError:
+			namespace = None
+			
+			if __debug__:
+				names = {}
+				plugins = {}
+		
+		else:
+			if __debug__:
+				names = {i.name: i.load() for i in iter_entry_points(namespace)}
+				plugins = {j: i for i, j in names.items()}
+		
+		try:
+			explicit = field.explicit
+		except AttributeError:
+			explicit = not bool(namespace)
+		
+		if isinstance(value, (str, unicode)):
+			if ':' in value:
+				if not explicit:
+					raise ValueError("Explicit object references not allowed.")
+				
+			elif __debug__ and namespace and value not in names:
+				raise ValueError('Unknown plugin "' + value + '" for namespace "' + namespace + '".')
+			
+			return value
+		
+		if __debug__ and namespace and not explicit and value not in plugins:
+			raise ValueError(repr(value) + ' object is not a known plugin for namespace "' + namespace + '".')
+		
+		return plugins.get(value, name(value))
+	
+	def native(self, value, field):
+		"""Transform the MongoDB value into a Marrow Mongo value."""
+		
+		try:
+			namespace = field.namespace
+		except AttributeError:
+			namespace = None
+		
+		return load(value, namespace) if namespace else load(value)
+
+
+@adjust_attribute_sequence(-1000, 'namespace')  # Allow the namespace to be defined first.
+class PluginReference(Field):
+	"""A Python object reference.
+	
+	Generally, for safety sake, you want this to come from a list of available plugins in a given namespace. If a
+	namespace is given, the default for `explicit` will be `False`.  If `explicit` is `True` (or no namespace is
+	defined) object assignments and literal paths will be allowed.
+	"""
+	
+	namespace = Attribute()  # The plugin namespace to use when loading.
+	explicit = Attribute()  # Allow explicit, non-plugin references.
+	transformer = Attribute(default=PluginReferenceTransform())  # Change the default transformer to ours.
+	
+	__foreign__ = {'string'}
 

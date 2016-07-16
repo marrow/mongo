@@ -45,14 +45,6 @@ class ObjectId(Field):
 	default = Attribute(default=lambda: oid())
 	
 	def to_foreign(self, obj, name, value):
-		if value is None and self.generated:
-			value = oid()
-			
-			if name and name[0] not in ('#', '$'):
-				setattr(obj, name, value)
-			
-			return value
-		
 		return oid(value)
 
 
