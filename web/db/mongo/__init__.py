@@ -6,10 +6,12 @@ import re
 
 from pymongo import MongoClient
 from pymongo.errors import ConfigurationError
+from gridfs.grid_file import GridOut
 
 from .model import Model
 from .resource import MongoDBResource
 from .collection import MongoDBCollection
+from .grid import render_grid_file
 
 
 __all__ = ['Model', 'MongoDBResource', 'MongoDBCollection', 'MongoDBConnection']
@@ -68,6 +70,9 @@ class MongoDBConnection(object):
 			pass  # Log extra details about the connection here.
 		
 		context.db[name] = db if db is not None else client
+		
+		if GridOut not in context.view:  # Register the GridFS handler if not already present.
+			context.view.register(GridOut, render_grid_file)
 	
 	def stop(self, context):
 		self.client.close()
