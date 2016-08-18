@@ -29,21 +29,25 @@ class MongoDBConnection(object):
 	this extension adapts 
 	"""
 	
-	__slots__ = ('__name__', 'uri', 'config', 'client', 'db', 'alias')
+	__slots__ = ('__name__', 'uri', 'config', 'client', 'db', 'alias', 'minimum')
 	
 	provides = {'mongodb'}
 	
-	def __init__(self, uri, alias=None, **config):
+	def __init__(self, uri, alias=None, minimum_version=None, **config):
 		"""Prepare MongoDB client configuration.
 		
 		The only required configuration option (passed positionally or by keyword) is `uri`, specifying the host to
-		connect to and optionally client credentials (username, password), default database, and additional options.
+		connect to and optionally client credentials (username, password), default database, optional minimum server
+		version defined as a version tuple, and additional options.  The minimum version will be checked immeiately
+		upon startup.
+		
 		Extraneous keyword arguments will be stored and passed through to the `MongoClient` class instantiated on
 		startup.
 		"""
 		self.uri = uri
 		self.client = None
 		self.db = None
+		self.minimum = minimum_version
 		self.alias = alias
 		
 		# Configure a few of our own defaults here, usually because we compare the value somewhere.
@@ -60,6 +64,11 @@ class MongoDBConnection(object):
 			))
 		
 		client = self.client = MongoClient(self.uri, **self.config)
+		
+		if self.minimum:
+			version = tuple(client.server_info()['version'].split('.'))
+			if version < self.minimum:
+				raise RuntimeError("Unsupported MongoDB server version: " + ".".join(version))
 		
 		try:
 			db = self.db = client.get_default_database()
