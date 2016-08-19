@@ -45,6 +45,7 @@ class Ops(Container):
 	
 	def __and__(self, other):
 		operations = deepcopy(self.operations)
+		extra = {k: self.__data__[k] for k in self.__attributes__ if k != 'operations'}
 		
 		if isinstance(other, Op):
 			other = self.__class__(operations=other.as_query)
@@ -61,18 +62,19 @@ class Ops(Container):
 				
 				operations[k].update(v)
 		
-		return self.__class__(operations=operations)
+		return self.__class__(operations=operations, **extra)
 	
 	def __or__(self, other):
 		operations = deepcopy(self.operations)
+		extra = {k: self.__data__[k] for k in self.__attributes__ if k != 'operations'}
 		
 		if isinstance(other, Op):
-			other = self.__class__(operations=other.as_query)
+			other = self.__class__(operations=other.as_query, **extra)
 		
 		if len(operations) == 1 and '$or' in operations:
 			# Update existing $or.
 			operations['$or'].append(other)
-			return self.__class__(operations=operations)
+			return self.__class__(operations=operations, **extra)
 		
 		return self.__class__(operations={'$or': [operations, other]})
 	
