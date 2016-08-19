@@ -32,7 +32,10 @@ class Ops(Container):
 			self.operations = odict()
 	
 	def __repr__(self):
-		return "Ops({})".format(repr(list(self.items())).replace("(u'", "('").replace("', u'", "', '"))
+		return "{}({})".format(
+				self.__class__.__name__,
+				repr(list(self.items())).replace("(u'", "('").replace("', u'", "', '")
+			)
 	
 	@property
 	def as_query(self):
@@ -44,7 +47,7 @@ class Ops(Container):
 		operations = deepcopy(self.operations)
 		
 		if isinstance(other, Op):
-			other = Ops(operations=other.as_query)
+			other = self.__class__(operations=other.as_query)
 		
 		for k, v in getattr(other, 'operations', []).items():
 			if k not in operations:
@@ -58,20 +61,20 @@ class Ops(Container):
 				
 				operations[k].update(v)
 		
-		return Ops(operations=operations)
+		return self.__class__(operations=operations)
 	
 	def __or__(self, other):
 		operations = deepcopy(self.operations)
 		
 		if isinstance(other, Op):
-			other = Ops(operations=other.as_query)
+			other = self.__class__(operations=other.as_query)
 		
 		if len(operations) == 1 and '$or' in operations:
 			# Update existing $or.
 			operations['$or'].append(other)
-			return Ops(operations=operations)
+			return self.__class__(operations=operations)
 		
-		return Ops(operations={'$or': [operations, other]})
+		return self.__class__(operations={'$or': [operations, other]})
 	
 	# Mapping Protocol
 	
