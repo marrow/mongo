@@ -45,7 +45,7 @@ class Ops(Container):
 	
 	def __and__(self, other):
 		operations = deepcopy(self.operations)
-		extra = {k: self.__data__[k] for k in self.__attributes__ if k != 'operations'}
+		extra = {k: self.__data__[k] for k in self.__data__ if k != 'operations'}
 		
 		if isinstance(other, Op):
 			other = self.__class__(operations=other.as_query)
@@ -66,7 +66,7 @@ class Ops(Container):
 	
 	def __or__(self, other):
 		operations = deepcopy(self.operations)
-		extra = {k: self.__data__[k] for k in self.__attributes__ if k != 'operations'}
+		extra = {k: self.__data__[k] for k in self.__data__ if k != 'operations'}
 		
 		if isinstance(other, Op):
 			other = self.__class__(operations=other.as_query, **extra)
