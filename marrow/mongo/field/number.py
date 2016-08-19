@@ -1,6 +1,7 @@
 # encoding: utf-8
 
 from bson.int64 import Int64
+from decimal import Decimal
 
 from ..core import Field
 
@@ -36,4 +37,15 @@ class Long(Number):
 	
 	def to_foreign(self, obj, name, value):
 		return Int64(int(value))
+
+
+class Decimal(Number):
+	"""A 128-bit IEEE 754-2008 deimal floating point number.
+	
+	Note: this is only compatible with MongoDB 3.4 and compatible, updated driver that exposes Decimal support.
+	"""
+	__foreign__ = 'decimal'
+	
+	def to_foreign(self, obj, name, value):
+		return Decimal(value)
 
