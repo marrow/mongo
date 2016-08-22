@@ -47,10 +47,9 @@ class Ops(Container):
 		operations = deepcopy(self.operations)
 		extra = {k: self.__data__[k] for k in self.__data__ if k != 'operations'}
 		
-		if isinstance(other, Op):
-			other = self.__class__(operations=other.as_query)
+		other = self.__class__(operations=other.as_query if isinstance(other, Op) else other)
 		
-		for k, v in getattr(other, 'operations', []).items():
+		for k, v in getattr(other, 'operations', {}).items():
 			if k not in operations:
 				operations[k] = v
 			else:
@@ -68,15 +67,14 @@ class Ops(Container):
 		operations = deepcopy(self.operations)
 		extra = {k: self.__data__[k] for k in self.__data__ if k != 'operations'}
 		
-		if isinstance(other, Op):
-			other = self.__class__(operations=other.as_query, **extra)
+		other = other.as_query if hasattr(other, 'as_query') else other
 		
 		if len(operations) == 1 and '$or' in operations:
 			# Update existing $or.
 			operations['$or'].append(other)
 			return self.__class__(operations=operations, **extra)
 		
-		return self.__class__(operations={'$or': [operations, other]})
+		return self.__class__(operations={'$or': [operations, other]}, **extra)
 	
 	# Mapping Protocol
 	
