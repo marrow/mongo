@@ -40,7 +40,7 @@ py2 = sys.version_info < (3,)
 py26 = sys.version_info < (2, 7)
 py32 = sys.version_info > (3,) and sys.version_info < (3, 3)
 
-tests_require = ['coverage' + ('<4' if py32 else ''), 'pytest', 'pytest-cov', 'pytest-spec', 'pytest-flakes']
+tests_require = ['coverage' + ('<4' if py32 else ''), 'pytest', 'pytest-cov', 'pytest-flakes']
 
 
 # # Entry Point
