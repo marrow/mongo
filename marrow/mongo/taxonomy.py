@@ -7,9 +7,10 @@ from contextlib import contextmanager
 from marrow.package.loader import traverse
 from marrow.package.canonical import name as name_
 from marrow.schema import Attribute
-from marrow.mongo.query import Ops
 
-if __debug__:
+from .query import Ops
+
+if __debug__:  # In development, we track how long certain operations take and log this at the DEBUG level.
 	from time import time
 
 
@@ -17,14 +18,23 @@ log = __import__('logging').getLogger(__name__)
 
 
 class Taxonomy(Ops):
-	"""A factory for marrow.mongo queries relating to, and routines for manipulating taxonomic structure.
+	"""A factory for queries relating to, and routines for manipulating taxonomic structure.
 	
-	There are a few fields this Ops specializaion maintains for you:
+	This maintains an acyclic directed graph (tree) structure for you using an API inspired by the jQuery DOM
+	traversal and manipulation APIs. Some attempt is made to group these methods into logical sections, but there's a
+	surprising amount of code in here. Coalesced paths are provided for convienent lookup, but not used for general
+	querying beyond the `nearest` lookup. The `parent` reference and `ancestors` list are used for general queries.
+	
+	The following are fields this Ops specializaion maintains for you:
 	
 	* `ancestors` - An array of sub-documents storing cached data about all ancestors.
 	* `parent` - An ObjectID reference to the immediate parent of the document.
 	* `path` - The coalesced path to the document, UNIX-style. No leading slash? It's detached.
 	* `index` - The position of the document within its parent.
+	
+	Documents missing the `ancestors` and `parent` fields, and containing a `path` not beginning ith `/` are in a
+	"detached" state. They may have descendants attached to them. The true root node of the graph should have a `name`
+	of `/` in order for path coalescing to work correctly.
 	"""
 	
 	CACHE = ('_id', 'name')  # You can override this in your own specialization to record more about ancestors.
@@ -37,6 +47,8 @@ class Taxonomy(Ops):
 	@property
 	@contextmanager  # _ordered
 	def _ordered(self):
+		"""Prepare an ordered bulk operation as a context manager to centralize logging and error handling."""
+		
 		ops = self.collection.initialize_ordered_bulk_op()
 		
 		if __debug__:
@@ -67,6 +79,7 @@ class Taxonomy(Ops):
 	@property
 	@contextmanager  # _unordered
 	def _unordered(self):
+		"""Prepare an unordered bulk operation as a context manager to centralize logging and error handling"""
 		ops = self.collection.initialize_unordered_bulk_op()
 		
 		if __debug__:
@@ -95,13 +108,20 @@ class Taxonomy(Ops):
 			log.debug("Unordered bulk operation complete.", extra=dict(result, duration=duration))
 	
 	def _project(self, fields):
+		"""Construct a simplified MongoDB projection based on the provided iterable of field names."""
+		
 		if fields:
 			projection = {'_id': 0}
 			projection.update((field, 1) for field in fields)
 			return projection
 	
 	def _target(self, target):
-		"""Resolve a target reference."""
+		"""Resolve a target reference.
+		
+		This will transform a Taxonomy query into one selecting the same elements by ID, wraps bare ObjectId in a
+		Taxonomy selecting for it, or, given an unsaved document, will save that document then provide a Taxonomy
+		selecting for it.
+		"""
 		
 		if isinstance(target, Taxonomy):  # Documents to attach as selected by Taxonomy.
 			return target
@@ -115,7 +135,10 @@ class Taxonomy(Ops):
 		return self.id(self.collection.insert_one(target).inserted_id)
 	
 	def _move_target(self, target):
-		"""Resolve a target reference and ensure it is detached, ready for attachment."""
+		"""Resolve a target reference and ensure it is detached, ready for attachment.
+		
+		Identical to `_target` in semantics, but returns both a Taxonomy instance and count of affected items.
+		"""
 		
 		if isinstance(target, Taxonomy):  # Documents to attach as selected by Taxonomy.
 			target = target.detach()
