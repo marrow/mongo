@@ -7,10 +7,10 @@ These encapsulate the functionality of creating combinable mappings
 
 from __future__ import unicode_literals
 
-from itertools import chain
 from copy import deepcopy
 from collections import Mapping, MutableMapping
-from marrow.schema import Container, Attribute
+from pytz import utc
+from bson.codec_options import CodecOptions
 from marrow.schema.compat import odict
 
 from ..util import SENTINEL
@@ -22,19 +22,25 @@ if __debug__:
 	_complex_safety_check = lambda s, o: (s.__allowed_operators__ and not s.__allowed_operators__.intersection(o)) or s.__disallowed_operators__.intersection(o)
 
 
-class Ops(Container):
-	operations = Attribute(default=None)
+class Ops(object):
+	__slots__ = ('operations', 'collection', 'document')
 	
-	def __init__(self, *args, **kw):
-		super(Ops, self).__init__(*args, **kw)
-		
-		if self.operations is None:
-			self.operations = odict()
+	def __init__(self, operations=None, collection=None, document=None):
+		self.operations = operations or odict()
+		self.collection = collection
+		self.document = document
 	
-	def __repr__(self):
-		return "{}({})".format(
+	def bind(self, collection):
+		self.collection = collection.with_options(CodecOptions(document_class=odict, tz_aware=True, tzinfo=utc))
+		return self
+	
+	def __repr__(self, extra=None):
+		return "{}({}{}{}{})".format(
 				self.__class__.__name__,
-				repr(list(self.items())).replace("(u'", "('").replace("', u'", "', '")
+				self.operations,
+				", collection={}".format() if self.collection else "",
+				", document={}".format() if self.document else "",
+				extra or ""
 			)
 	
 	@property
@@ -47,7 +53,7 @@ class Ops(Container):
 		operations = deepcopy(self.operations)
 		extra = {k: self.__data__[k] for k in self.__data__ if k != 'operations'}
 		
-		other = self.__class__(operations=other.as_query if isinstance(other, Op) else other)
+		other = self.__class__(operations=other.as_query if hasattr(other, 'as_query') else other)
 		
 		for k, v in getattr(other, 'operations', {}).items():
 			if k not in operations:
@@ -147,58 +153,6 @@ class Ops(Container):
 MutableMapping.register(Ops)  # Metaclass conflict if we subclass.
 
 
-class Op(Container):
-	field = Attribute(default=None)
-	operation = Attribute(default=None)
-	value = Attribute(default=SENTINEL)
-	
-	def __repr__(self):
-		return "Op({})".format(repr(self.as_query))
-	
-	def clone(self, **kw):
-		arguments = dict(field=self.field, operation=self.operation, value=self.value)
-		arguments.update(kw)
-		return self.__class__(**arguments)
-	
-	# Logical Query Selectors
-	# https://docs.mongodb.org/manual/reference/operator/query/#logical
-	
-	def __or__(self, other):
-		return Op(None, 'or', [self, other])
-	
-	def __and__(self, other):
-		if getattr(other, 'field', None) is None or self.field is None:
-			return Op(None, 'and', [self, other])
-		
-		return Ops(odict(chain(self.as_query.items(), other.as_query.items())))
-	
-	def __invert__(self): # not
-		return Op(None, 'not', self)
-	
-	@property
-	def as_query(self):
-		value = getattr(self.value, 'as_query', self.value)
-		if value is SENTINEL:
-			value = None
-		
-		if isinstance(value, list):
-			value = [getattr(i, 'as_query', i) for i in value]
-		
-		if not self.operation or self.operation == 'eq':
-			if not self.field:
-				return value
-			
-			if self.value is SENTINEL:
-				return {unicode(self.field): {'$exists': 1}}
-			
-			return {unicode(self.field): value}
-		
-		if not self.field:
-			return {'$' + unicode(self.operation): value}
-		
-		return {unicode(self.field): {'$' + unicode(self.operation): value}}
-
-
 class Queryable(object):
 	"""A convienent mix-in which adds the ability to generate Op instances during comparison.
 	
@@ -226,8 +180,8 @@ class Queryable(object):
 		"""
 		if __debug__ and _simple_safety_check(self, '$eq'):  # Optimize this away in production; diagnosic aide.
 			raise NotImplementedError("{self.__class__.__name__} does not allow $eq comparison.".format(self=self))
-			
-		return Op(self, 'eq', self.transformer.foreign(other, self))
+		
+		return Ops({unicode(self.field): self.transformer.foreign(other, self)})
 	
 	def __gt__(self, other):
 		"""Matches values that are greater than a specified value.
@@ -240,7 +194,7 @@ class Queryable(object):
 		if __debug__ and _complex_safety_check(self, {'$gt', '#rel'}):  # Optimize this away in production.
 			raise NotImplementedError("{self.__class__.__name__} does not allow $gt comparison.".format(self=self))
 		
-		return Op(self, 'gt', self.transformer.foreign(other, self))
+		return Ops({unicode(self.field): {'$gt': self.transformer.foreign(other, self)}})
 	
 	def __ge__(self, other):
 		"""Matches values that are greater than or equal to a specified value.
@@ -253,7 +207,7 @@ class Queryable(object):
 		if __debug__ and _complex_safety_check(self, {'$gte', '#rel'}):  # Optimize this away in production.
 			raise NotImplementedError("{self.__class__.__name__} does not allow $gte comparison.".format(self=self))
 		
-		return Op(self, 'gte', self.transformer.foreign(other, self))
+		return Ops({unicode(self.field): {'$gte': self.transformer.foreign(other, self)}})
 	
 	def __lt__(self, other):
 		"""Matches values that are less than or equal to a specified value.
@@ -266,7 +220,7 @@ class Queryable(object):
 		if __debug__ and _complex_safety_check(self, {'$lt', '#rel'}):  # Optimize this away in production.
 			raise NotImplementedError("{self.__class__.__name__} does not allow $lt comparison.".format(self=self))
 		
-		return Op(self, 'lt', self.transformer.foreign(other, self))
+		return Ops({unicode(self.field): {'$lt': self.transformer.foreign(other, self)}})
 	
 	def __le__(self, other):
 		"""Matches values that are less than or equal to a specified value.
@@ -279,7 +233,7 @@ class Queryable(object):
 		if __debug__ and _complex_safety_check(self, {'$lte', '#rel'}):  # Optimize this away in production.
 			raise NotImplementedError("{self.__class__.__name__} does not allow $lte comparison.".format(self=self))
 		
-		return Op(self, 'lte', self.transformer.foreign(other, self))
+		return Ops({unicode(self.field): {'$lte': self.transformer.foreign(other, self)}})
 	
 	def __ne__(self, other):
 		"""Matches all values that are not equal to a specified value.
@@ -292,7 +246,7 @@ class Queryable(object):
 		if __debug__ and _complex_safety_check(self, {'$ne', '$eq'}):  # Optimize this away in production.
 			raise NotImplementedError("{self.__class__.__name__} does not allow $ne comparison.".format(self=self))
 		
-		return Op(self, 'ne', self.transformer.foreign(other, self))
+		return Ops({unicode(self.field): {'$ne': self.transformer.foreign(other, self)}})
 	
 	def any(self, *args):
 		"""Matches any of the values specified in an array.
@@ -309,7 +263,7 @@ class Queryable(object):
 		
 		other = args if len(args) > 1 else args[0]
 		
-		return Op(self, 'in', [self.transformer.foreign(value, self) for i, value in enumerate(other)])
+		return Ops({unicode(self.field): {'$in': (self.transformer.foreign(value, self) for value in other)}})
 	
 	def none(self, other):
 		"""Matches none of the values specified in an array.
@@ -319,18 +273,18 @@ class Queryable(object):
 		Comparison operator: {$nin: value}
 		Documentation: https://docs.mongodb.org/manual/reference/operator/query/nin/#op._S_nin
 		"""
-		return Op(self, 'nin', [self.transformer.foreign(value, self) for i, value in enumerate(other)])
+		return Ops({unicode(self.field): {'$nin': (self.transformer.foreign(value, self) for value in other)}})
 	
 	# Logical Query Selectors
 	# https://docs.mongodb.org/manual/reference/operator/query/#logical
 	
-	def __or__(self, other):
+	def __or__(self, other):  # TODO: Decide what to do when the developer does this.
 		raise NotImplementedError()
 	
-	def __and__(self, other):
+	def __and__(self, other):  # TODO: Decide what to do when the developer does this.
 		raise NotImplementedError()
 	
-	def __invert__(self):
+	def __invert__(self):  # TODO: Decide what to do when the developer does this.
 		raise NotImplementedError()
 	
 	# Array Query Selectors
@@ -347,7 +301,7 @@ class Queryable(object):
 		if __debug__ and _complex_safety_check(self, {'$all', '#array'}):  # Optimize this away in production.
 			raise NotImplementedError("{self.__class__.__name__} does not allow $all comparison.".format(self=self))
 		
-		return Op(self, 'all', [self.transformer.foreign(value, self) for i, value in enumerate(other)])
+		return Ops({unicode(self.field): {'$all': (self.transformer.foreign(value, self) for value in other)}})
 	
 	def match(self, q):
 		"""Selects documents if element in the array field matches all the specified conditions.
@@ -363,7 +317,7 @@ class Queryable(object):
 		if hasattr(q, 'as_query'):
 			q = q.as_query
 		
-		return Op(self, 'elemMatch', q)
+		return Ops({unicode(self.field): {'$elemMatch': q}})
 	
 	def range(self, gte, lt):
 		"""Matches values that are between a minimum and maximum value, semi-inclusive.
@@ -377,7 +331,7 @@ class Queryable(object):
 		if __debug__ and _simple_safety_check(self, '#range'):  # Optimize this away in production; diagnosic aide.
 			raise NotImplementedError("{self.__class__.__name__} does not allow range comparison.".format(self=self))
 		
-		return Ops((self >= gte).as_query) & Ops((self < lt).as_query)
+		return (self >= gte) & (self < lt)
 	
 	def size(self, value):
 		"""Selects documents if the array field is a specified size.
@@ -390,7 +344,7 @@ class Queryable(object):
 		if __debug__ and _complex_safety_check(self, {'$size', '#array'}):  # Optimize this away in production.
 			raise NotImplementedError("{self.__class__.__name__} does not allow $size comparison.".format(self=self))
 		
-		return Op(self, 'size', int(value))
+		return Ops({unicode(self.field): {'$size': int(value)}})
 	
 	# Element Query Selectors
 	# https://docs.mongodb.org/manual/reference/operator/query/#element
@@ -403,7 +357,7 @@ class Queryable(object):
 		Element operator: {$exists: false}
 		Documentation: https://docs.mongodb.org/manual/reference/operator/query/exists/#op._S_exists
 		"""
-		return Op(self, 'exists', 0)
+		return Ops({unicode(self.field): {'$exists': False}})
 	
 	def __pos__(self):
 		"""Matches documents that have the specified field.
@@ -413,9 +367,9 @@ class Queryable(object):
 		Element operator: {$exists: true}
 		Documentation: https://docs.mongodb.org/manual/reference/operator/query/exists/#op._S_exists
 		"""
-		return Op(self, 'exists', 1)
+		return Ops({unicode(self.field): {'$exists': True}})
 	
-	def of_type(self, *args):
+	def of_type(self, *kinds):
 		"""Selects documents if a field is of the correct type.
 		
 			Document.field.of_type()
@@ -425,7 +379,7 @@ class Queryable(object):
 		Documentation: https://docs.mongodb.org/manual/reference/operator/query/type/#op._S_type
 		"""
 		
-		if args:
-			return Op(self, 'type', args[0])
+		foreign = set(kinds) if kinds else self.__foreign__
 		
-		return Op(self, 'type', self.__foreign__)
+		return Ops({unicode(self.field): {'$type': foreign}})
+
