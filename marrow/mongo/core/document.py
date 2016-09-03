@@ -9,6 +9,7 @@ from collections import OrderedDict as dict, MutableMapping
 
 from marrow.package.loader import load
 from marrow.schema import Container, Attributes
+from marrow.schema.compat import odict
 
 from .field import Field
 from .index import Index
@@ -17,10 +18,20 @@ from ..util.compat import py3
 
 
 class Document(Container):
-	"""A MongoDB document definition."""
+	"""A MongoDB document definition.
+	
+	This is the top-level class your own document schemas should subclass. They may also subclass eachother; field
+	declaration order is preserved, with subclass fields coming after those provided by the parent class(es). Any
+	fields redefined will have their original position preserved.
+	
+	Documents may be bound to a PyMongo `Collection` instance, allowing for easier identification of where a document
+	has been loaded from, and to allow reloading and loading of previously un-projected data. This is not meant to
+	implement a full Active Record pattern; no `save` method or similar is provided. (You are free to add one
+	yourself, of course!)
+	"""
 	
 	# Note: These may be dynamic based on content; always access from an instance where possible.
-	__store__ = dict  # For fields, this may be a bson type like Binary, or Code.
+	__store__ = odict  # For fields, this may be a bson type like Binary, or Code.
 	__foreign__ = {'object'}  # The representation for the database side of things, ref: $type
 	
 	__bound__ = False  # Has this class been "attached" to a live MongoDB connection?
