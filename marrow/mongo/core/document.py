@@ -5,16 +5,16 @@ from bson.binary import STANDARD
 from bson.codec_options import CodecOptions
 from bson.json_util import dumps, loads
 from pymongo.read_preferences import ReadPreference
+from pymongo.read_concern import ReadConcern
+from pymongo.write_concern import WriteConcern
 from collections import OrderedDict as dict, MutableMapping
 
 from marrow.package.loader import load
 from marrow.schema import Container, Attributes
-from marrow.schema.compat import odict
 
 from .field import Field
 from .index import Index
 from ..util import SENTINEL
-from ..util.compat import py3
 
 
 class Document(Container):
@@ -31,12 +31,14 @@ class Document(Container):
 	"""
 	
 	# Note: These may be dynamic based on content; always access from an instance where possible.
-	__store__ = odict  # For fields, this may be a bson type like Binary, or Code.
+	__store__ = dict  # For fields, this may be a bson type like Binary, or Code.
 	__foreign__ = {'object'}  # The representation for the database side of things, ref: $type
 	
 	__bound__ = False  # Has this class been "attached" to a live MongoDB connection?
 	__collection__ = None  # The name of the collection to "attach" to using bind().
 	__read_preference__ = ReadPreference.PRIMARY  # Default read preference to assign when binding.
+	__read_concern__ = ReadConcern()  # Default read concern.
+	__write_concern__ = WriteConcern(w=1)  # Default write concern.
 	
 	__projected__ = None  # The set of fields used during projection, to identify fields which are not loaded.
 	__fields__ = Attributes(only=Field)  # An ordered mapping of field names to their respective Field instance.
@@ -52,9 +54,15 @@ class Document(Container):
 		assignment.
 		"""
 		
+		prepare_defaults = kw.pop('_prepare_defaults', True)
+		
 		super(Document, self).__init__(*args, **kw)
 		
-		# Trigger assignment of default values.
+		if prepare_defaults:
+			self._prepare_defaults()
+	
+	def _prepare_defaults(self):
+		"""Trigger assignment of default values."""
 		for name, field in self.__fields__.items():
 			if field.assign:
 				getattr(self, name)
@@ -88,13 +96,13 @@ class Document(Container):
 		
 		collection = collection.with_options(
 				codec_options = CodecOptions(
-						document_class = dict,
+						document_class = cls.__store__,
 						tz_aware = True,
 						uuid_representation = STANDARD,
 						tzinfo = utc,
 					),
 				read_preference = cls.__read_preference__,
-				read_concern = None,  # TODO: Class-level configuration.
+				read_concern = cls.__read_concern__,
 				write_concern = None,  # TODO: Class-level configuration.
 			)
 		
@@ -109,6 +117,8 @@ class Document(Container):
 		
 		This is the reverse of the process on individual Field._get_mongo_name, which walks up to the root document.
 		"""
+		
+		raise NotImplementedError("Much work needs to be done here.")
 		
 		current = cls
 		
@@ -137,15 +147,12 @@ class Document(Container):
 		if '_cls' in doc:  # Instantiate any specific class mentioned in the data.
 			cls = load(doc['_cls'], 'marrow.mongo.document')
 		
-		instance = cls()
+		instance = cls(_prepare_defaults=False)
 		instance.__data__ = instance.__store__(doc)
+		instance._prepare_defaults()
 		instance.__loaded__ = set(projected) if projected else None
 		
 		return instance
-	
-	def to_mongo(self):
-		"""Convert data going back into the MongoDB wire driver. This is a no-op, just pass the instance instead."""
-		return self
 	
 	@classmethod
 	def from_json(cls, json):
@@ -171,68 +178,75 @@ class Document(Container):
 	# Mapping Protocol
 	
 	def __getitem__(self, name):
+		"""Retrieve data from the backing store."""
 		return self.__data__[name]
 	
 	def __setitem__(self, name, value):
+		"""Assign data directly to the backing store."""
 		self.__data__[name] = value
 	
 	def __delitem__(self, name):
+		"""Unset a value from the backing store."""
 		del self.__data__[name]
 	
 	def __iter__(self):
+		"""Iterate the names of the values assigned to our backing store."""
 		return iter(self.__data__.keys())
 	
 	def __len__(self):
+		"""Retrieve the size of the backing store."""
 		return len(getattr(self, '__data__', {}))
 	
-	if py3:
-		def keys(self):
-			return self.__data__.keys()
-		
-		def items(self):
-			return self.__data__.items()
-		
-		def values(self):
-			return self.__data__.values()
+	def keys(self):
+		"""Iterate the keys assigned to the backing store."""
+		return self.__data__.iterkeys()
 	
-	else:
-		def keys(self):
-			return self.__data__.iterkeys()
-		
-		def items(self):
-			return self.__data__.iteritems()
-		
-		def values(self):
-			return self.__data__.itervalues()
+	def items(self):
+		"""Iterate 2-tuple pairs of (key, value) from the backing store."""
+		return self.__data__.iteritems()
+	
+	def values(self):
+		"""Iterate the values within the backing store."""
+		return self.__data__.itervalues()
 	
 	def __contains__(self, key):
+		"""Determine if the given key is present in the backing store."""
 		return key in self.__data__
 	
 	def __eq__(self, other):
+		"""Equality comparison between the backing store and other value."""
 		return self.__data__ == other
 	
 	def __ne__(self, other):
+		"""Inverse equality comparison between the backing store and other value."""
 		return self.__data__ != other
 	
 	def get(self, key, default=None):
+		"""Retrieve a value from the backing store with a default value."""
 		return self.__data__.get(key, default)
 	
 	def clear(self):
+		"""Empty the backing store of data."""
 		self.__data__.clear()
 	
 	def pop(self, name, default=SENTINEL):
+		"""Retrieve and remove a value from the backing store, optionally with a default."""
+		
 		if default is SENTINEL:
 			return self.__data__.pop(name)
 		
 		return self.__data__.pop(name, default)
 	
 	def popitem(self):
+		"""Pop an item 2-tuple off the backing store."""
 		return self.__data__.popitem()
 	
 	def update(self, *args, **kw):
+		"""Update the backing store directly."""
 		self.__data__.update(*args, **kw)
 	
 	def setdefault(self, key, value=None):
+		"""Set a value in the backing store if no value is currently present."""
 		return self.__data__.setdefault(key, value)
 
 
