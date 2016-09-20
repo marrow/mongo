@@ -4,6 +4,8 @@
 
 import re
 
+from webob import request
+from bson import json_util
 from pymongo import MongoClient
 from pymongo.errors import ConfigurationError
 from gridfs.grid_file import GridOut
@@ -57,6 +59,8 @@ class MongoDBConnection(object):
 	
 	def start(self, context):
 		name = self.alias or self.__name__  # Either we were configured with an explicit name, or the DB ext infers.
+		
+		request.json = json_util
 		
 		log.info("Connecting context.db.{name} to MongoDB database.".format(name=name), extra=dict(
 				uri = _safe_uri_replace.sub(r'\1://\2@', self.uri),
