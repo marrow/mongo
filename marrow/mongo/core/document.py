@@ -40,7 +40,8 @@ class Document(Container):
 	__read_concern__ = ReadConcern()  # Default read concern.
 	__write_concern__ = WriteConcern(w=1)  # Default write concern.
 	
-	__projected__ = None  # The set of fields used during projection, to identify fields which are not loaded.
+	__projection__ = None  # The set of fields used during projection, to identify fields which are not loaded.
+	__validation__ = None  # The MongoDB Validation document matching these records.
 	__fields__ = Attributes(only=Field)  # An ordered mapping of field names to their respective Field instance.
 	__fields__.__sequence__ = 20000
 	__indexes__ = Attributes(only=Index)  # An ordered mapping of index names to their respective Index instance.
@@ -60,6 +61,52 @@ class Document(Container):
 		
 		if prepare_defaults:
 			self._prepare_defaults()
+	
+	@classmethod
+	def _get_default_projection(cls):
+		projected = []
+		omitted = []
+		neutral = []
+		
+		for name, field in cls.__fields__.items():
+			project = field.project
+			if project is None:
+				neutral.append(name)
+			elif project:
+				projected.append(name)
+			else:
+				omitted.append(name)
+		
+		if not projected and not omitted:
+			# No preferences specified.
+			return None
+			
+		elif not projected and omitted:
+			# No positive inclusions given, but negative ones were.
+			projected = neutral
+		
+		return {name: True for name in projected}
+	
+	@classmethod
+	def _get_validation_document(cls):
+		document = cls.__store__()
+		
+		for name, field in cls.__fields__.items():
+			if not hasattr(field, '_contribute_validation'):
+				continue
+			
+			# This lets the method apply global adjustments, or simply return them to be namespaced in the document.
+			result = field._contribute_validation(document)
+			if result:
+				document[field.__name__].setdefault(cls.__store__())
+				document[field.__name__].update(result)  # TODO: This needs to be more complex.
+		
+		return document
+	
+	@classmethod
+	def __attributed__(cls):
+		cls.__projection__ = cls._get_default_projection()
+		cls.__validation__ = cls._get_validation_document()
 	
 	def _prepare_defaults(self):
 		"""Trigger assignment of default values."""
@@ -199,15 +246,15 @@ class Document(Container):
 	
 	def keys(self):
 		"""Iterate the keys assigned to the backing store."""
-		return self.__data__.iterkeys()
+		return self.__data__.keys()
 	
 	def items(self):
 		"""Iterate 2-tuple pairs of (key, value) from the backing store."""
-		return self.__data__.iteritems()
+		return self.__data__.items()
 	
 	def values(self):
 		"""Iterate the values within the backing store."""
-		return self.__data__.itervalues()
+		return self.__data__.values()
 	
 	def __contains__(self, key):
 		"""Determine if the given key is present in the backing store."""
