@@ -14,10 +14,10 @@ class MongoDBResource(object):
 		self._collection = collection
 		self._record = record
 	
-	def get(self) -> 'json':
+	def get(self):
 		return self._record
 	
-	def delete(self) -> 'json':
+	def delete(self):
 		coll = self._collection
 		pk = coll.__pk__
 		result = coll.__model__.delete_one({pk: self._record[pk]})
