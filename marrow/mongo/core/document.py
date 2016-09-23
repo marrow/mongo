@@ -191,6 +191,9 @@ class Document(Container):
 	def from_mongo(cls, doc, projected=None):
 		"""Convert data coming in from the MongoDB wire driver into a Document instance."""
 		
+		if isinstance(doc, Document):
+			return doc
+		
 		if '_cls' in doc:  # Instantiate any specific class mentioned in the data.
 			cls = load(doc['_cls'], 'marrow.mongo.document')
 		

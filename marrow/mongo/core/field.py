@@ -39,6 +39,26 @@ class Field(Attribute, Queryable):
 	read = Attribute(default=True)  # Read predicate, either  a boolean or a callable returning a boolean.
 	write = Attribute(default=True)  # Write predicate, either a boolean or callable returning a boolean.
 	
+	# Security Predicate Handling
+	
+	def is_readable(self, context=None):
+		if callable(self.read):
+			if context:
+				return self.read(context, self)
+			else:
+				return self.read(self)
+		
+		return bool(self.read)
+	
+	def is_writeable(self, context=None):
+		if callable(self.write):
+			if context:
+				return self.write(context, self)
+			else:
+				return self.write(self)
+		
+		return bool(self.write)
+
 	# Marrow Schema Interfaces
 	
 	def __init__(self, *args, **kw):

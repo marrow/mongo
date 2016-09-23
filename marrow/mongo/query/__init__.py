@@ -43,6 +43,9 @@ class Ops(object):
 				extra or ""
 			)
 	
+	def copy(self):
+		return self.operations.copy()
+	
 	@property
 	def as_query(self):
 		return self.operations
@@ -272,7 +275,7 @@ class Queryable(object):
 		
 		other = args if len(args) > 1 else args[0]
 		
-		return Ops({unicode(self): {'$in': (self.transformer.foreign(value, self) for value in other)}})
+		return Ops({unicode(self): {'$in': [self.transformer.foreign(value, self) for value in other]}})
 	
 	def none(self, other):
 		"""Matches none of the values specified in an array.
@@ -282,7 +285,7 @@ class Queryable(object):
 		Comparison operator: {$nin: value}
 		Documentation: https://docs.mongodb.org/manual/reference/operator/query/nin/#op._S_nin
 		"""
-		return Ops({unicode(self): {'$nin': (self.transformer.foreign(value, self) for value in other)}})
+		return Ops({unicode(self): {'$nin': [self.transformer.foreign(value, self) for value in other]}})
 	
 	# Logical Query Selectors
 	# https://docs.mongodb.org/manual/reference/operator/query/#logical
@@ -295,6 +298,16 @@ class Queryable(object):
 	
 	def __invert__(self):  # TODO: Decide what to do when the developer does this.
 		raise NotImplementedError()
+	
+	# Evaluation Query Operators
+	def re(self, *parts):
+		"""Matches string values against a regular expression compiled of individual parts.
+		
+			Document.field.re(r'^', variable_part, r'\.')
+		
+		Regex operator: {$regex: value}
+		Documentation: https://docs.mongodb.com/manual/reference/operator/query/regex/
+		"""
 	
 	# Array Query Selectors
 	# https://docs.mongodb.org/manual/reference/operator/query/#array
@@ -310,7 +323,7 @@ class Queryable(object):
 		if __debug__ and _complex_safety_check(self, {'$all', '#array'}):  # Optimize this away in production.
 			raise NotImplementedError("{self.__class__.__name__} does not allow $all comparison.".format(self=self))
 		
-		return Ops({unicode(self): {'$all': (self.transformer.foreign(value, self) for value in other)}})
+		return Ops({unicode(self): {'$all': [self.transformer.foreign(value, self) for value in other]}})
 	
 	def match(self, q):
 		"""Selects documents if element in the array field matches all the specified conditions.
