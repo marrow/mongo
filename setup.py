@@ -80,7 +80,7 @@ setup(
 	packages = find_packages(exclude=['test', 'example', 'benchmark', 'htmlcov']),
 	include_package_data = True,
 	package_data = {'': ['README.rst', 'LICENSE.txt']},
-	namespace_packages = ['marrow', 'marrow.mongo', 'marrow.mongo.field', 'web', 'web.db', 'web.session'],
+	namespace_packages = ['marrow', 'marrow.mongo', 'marrow.mongo.field', 'web', 'web.session'],
 	
 	# ## Dependency Declaration
 	
