@@ -126,9 +126,6 @@ setup(
 						'Long = marrow.mongo.field.number:Long',
 					],
 				# ### WebCore Extensions
-				'web.db': [  # Database Connector
-						'mongodb = web.db.mongo:MongoDBConnection',
-					],
 				'web.session': [  # Session Engine
 						'mongo = web.session.mongo:MongoSession',
 					],
