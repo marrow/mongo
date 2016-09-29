@@ -4,8 +4,8 @@
 
 from web.core.util import lazy
 
-from marrow.mongo.core import Document
-from marrow.mongo.field.base import ObjectId, String, Binary
+from .core import Document
+from .field.base import ObjectId, String, Binary
 
 log = __import__('logging').getLogger(__name__)
 

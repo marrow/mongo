@@ -8,7 +8,7 @@ from bson import ObjectId
 from bson.json_util import loads
 from pymongo import ASCENDING, DESCENDING
 
-from marrow.mongo.query.djangoish import F
+from .query.djangoish import F
 from .resource import MongoDBResource
 
 
