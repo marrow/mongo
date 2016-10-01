@@ -164,6 +164,7 @@ class MongoFormatter(logging.Formatter):
 		
 		if record.exc_info is not None:
 			document['exception'] = dict(
+					cls = record.exc_info[0].__name__,
 					message = str(record.exc_info[1]),
 					trace = self.formatException(record.exc_info)
 				)
