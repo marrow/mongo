@@ -137,7 +137,7 @@ class JSONFormatter(logging.Formatter):
 
 class MongoFormatter(logging.Formatter):
 	def format(self, record):
-		time = datetime.fromtimestamp(record.created),
+		time = datetime.datetime.fromtimestamp(record.created)
 		time = LOCAL_TZ.localize(time).astimezone(utc)
 		
 		document = dict(
@@ -180,7 +180,7 @@ class MongoFormatter(logging.Formatter):
 
 class MongoHandler(logging.Handler):
 	def __init__(self, uri, collection, level=logging.NOTSET, quiet=False):
-		logging.Handler.__init__(level)
+		logging.Handler.__init__(self, level=level)
 		
 		if quiet:
 			self.lock = None  # We don't require I/O locking if we aren't touching stderr.
@@ -197,12 +197,13 @@ class MongoHandler(logging.Handler):
 			document = self.format(record)
 		except:
 			self.handleError(record)
+			return
 		
 		try:
 			result = self.collection.insert_one(document)
 		except:
 			self.handleError(record)
+			return
 		
 		document['_id'] = result.inserted_id
-		if self.quiet: return
 
