@@ -10,8 +10,6 @@ try:
 except ImportError:
 	from setuptools import setup, find_packages
 
-from setuptools.command.test import test as TestCommand
-
 
 if sys.version_info < (2, 7):
 	raise SystemExit("Python 2.7 or later is required.")
@@ -21,26 +19,18 @@ elif sys.version_info > (3, 0) and sys.version_info < (3, 2):
 version = description = url = author = ''  # Actually loaded on the next line; be quiet, linter.
 exec(open(os.path.join("marrow", "mongo", "core", "release.py")).read())
 
-
-class PyTest(TestCommand):
-	def finalize_options(self):
-		TestCommand.finalize_options(self)
-	
-		self.test_args = []
-		self.test_suite = True
-	
-	def run_tests(self):
-		import pytest
-		sys.exit(pytest.main(self.test_args))
-
-
 here = os.path.abspath(os.path.dirname(__file__))
 
 py2 = sys.version_info < (3,)
 py26 = sys.version_info < (2, 7)
 py32 = sys.version_info > (3,) and sys.version_info < (3, 3)
 
-tests_require = ['coverage' + ('<4' if py32 else ''), 'pytest', 'pytest-cov', 'pytest-flakes']
+tests_require = [
+		'pytest',  # test collector and extensible runner
+		'pytest-cov',  # coverage reporting
+		'pytest-flakes',  # syntax validation
+		'pytest-capturelog',  # log capture
+	]
 
 
 # # Entry Point
@@ -48,14 +38,11 @@ tests_require = ['coverage' + ('<4' if py32 else ''), 'pytest', 'pytest-cov', 'p
 setup(
 	name = "marrow.mongo",
 	version = version,
-	
 	description = description,
 	long_description = codecs.open(os.path.join(here, 'README.rst'), 'r', 'utf8').read(),
 	url = url,
-	
 	author = author.name,
 	author_email = author.email,
-	
 	license = 'MIT',
 	keywords = '',
 	classifiers = [
@@ -83,6 +70,10 @@ setup(
 	namespace_packages = ['marrow', 'marrow.mongo', 'marrow.mongo.field', 'web', 'web.session'],
 	
 	# ## Dependency Declaration
+	
+	setup_requires = [
+			'pytest-runner',
+		] if {'pytest', 'test', 'ptr'}.intersection(sys.argv) else [],
 	
 	install_requires = [
 			'marrow.schema>=1.2.0,<2.0.0',  # Declarative schema support.
@@ -130,9 +121,4 @@ setup(
 						'mongo = web.session.mongo:MongoSession',
 					],
 			},
-	
-	zip_safe = False,
-	cmdclass = dict(
-			test = PyTest,
-		)
 )

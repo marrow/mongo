@@ -1,5 +1,6 @@
 language: python
 sudo: false
+cache: pip
 
 addons:
   apt:
@@ -10,35 +11,27 @@ addons:
       - mongodb-org-server
       - mongodb-org-shell
 
-services:
-  - mongodb
-
 branches:
   except:
-    - /^feature/.*$/
+      - /^[^/]+/.+$/
 
 python:
-  - pypy
-  - pypy3
   - "2.7"
+  - "pypy"
+  - "pypy3"
   - "3.3"
   - "3.4"
   - "3.5"
 
-env:
-  - PYTHONOPTIMIZE=
-  - PYTHONOPTIMIZE=2
+install:
+  - travis_retry pip install --upgrade setuptools pip pytest pytest-cov codecov
+  - pip install -e '.[development]'
 
-matrix:
-  exclude:
-    - python: pypy
-      env: PYTHONOPTIMIZE=2
-    - python: pypy3
-      env: PYTHONOPTIMIZE=2
+script:
+    python setup.py test
 
-install: travis_retry .travis/install.sh
-
-script: tox
+after_script:
+    bash <(curl -s https://codecov.io/bash)
 
 notifications:
   irc:
