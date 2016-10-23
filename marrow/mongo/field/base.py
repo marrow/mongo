@@ -3,6 +3,7 @@
 from bson import ObjectId as oid
 from bson.code import Code
 from marrow.schema import Attribute
+from marrow.schema.transform import BaseTransform
 
 from ..core import Field
 
@@ -42,7 +43,15 @@ class Binary(Field):
 class ObjectId(Field):
 	__foreign__ = 'objectId'
 	
+	class ObjectIdTransform(BaseTransform):
+		def foreign(self, value, context=None):
+			if not isinstance(value, oid):
+				value = oid(str(value))
+			
+			return value
+	
 	default = Attribute(default=lambda: oid())
+	transformer = Attribute(default=ObjectIdTransform())
 	
 	def to_foreign(self, obj, name, value):
 		return oid(value)

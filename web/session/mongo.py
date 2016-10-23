@@ -72,7 +72,7 @@ class MongoSession(object):
 		result = docs.find_one(D.id == session._id)
 		
 		if not result:
-			result = {'_id': oid(session._id)}
+			result = {'_id': oid(str(session._id))}
 		
 		result = session[self.name] = D.from_mongo(result)
 		
