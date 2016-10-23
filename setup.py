@@ -83,7 +83,7 @@ setup(
 		],
 	
 	extras_require = dict(
-			development = tests_require,
+			development = tests_require + ['pre-commit'],  # Development-time dependencies.
 			scripting = ['javascripthon<1.0'],  # Allow map/reduce functions and "stored functions" to be Python.
 			logger = ['tzlocal'],  # Timezone support to store log times in UTC like a sane person.
 		),
