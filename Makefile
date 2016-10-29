@@ -26,5 +26,5 @@ release:
 
 ${PROJECT}.egg-info/PKG-INFO: setup.py setup.cfg marrow/mongo/core/release.py
 	@mkdir -p ${VIRTUAL_ENV}/lib/pip-cache
-	pip install --cache-dir "${VIRTUAL_ENV}/lib/pip-cache" -e ".[${USE}]"
+	pip install --cache-dir "${VIRTUAL_ENV}/lib/pip-cache" -Ue ".[${USE}]"
 
