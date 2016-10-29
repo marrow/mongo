@@ -84,9 +84,10 @@ class Date(Field):
 
 class TTL(Date):
 	"""A specialized Date field used to store dates in the future by timedelta from now."""
+	
 	__foreign__ = 'date'
 	
-	def to_foreign(self, value, context=None):
+	def to_foreign(self, obj, name, value):
 		if not value:
 			return None
 		

@@ -16,7 +16,7 @@ class FieldTransform(BaseTransform):
 		field, document = context
 		
 		if hasattr(field, 'to_foreign'):
-			return field.to_foreign(document, self.__name__, value)
+			return field.to_foreign(document, field.__name__, value)
 		
 		return value
 	
@@ -24,7 +24,7 @@ class FieldTransform(BaseTransform):
 		field, document = context
 		
 		if hasattr(field, 'to_native'):
-			return field.to_native(document, self.__name__, value)
+			return field.to_native(document, field.__name__, value)
 		
 		return value
 
