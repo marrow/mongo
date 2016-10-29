@@ -32,7 +32,7 @@ class _HasKinds(Field):
 			yield value
 
 
-class Embed(Field, _HasKinds):
+class Embed(_HasKinds, Field):
 	__foreign__ = 'object'
 	
 	def __init__(self, *kinds, **kw):
@@ -83,7 +83,7 @@ class Embed(Field, _HasKinds):
 		return value
 
 
-class Reference(Field, _HasKinds):
+class Reference(_HasKinds, Field):
 	concrete = Attribute(default=False)  # If truthy, will store a DBRef instead of ObjectId.
 	cache = Attribute(default=None)  # Attributes to preserve from the referenced object at the reference level.
 	reverse = Attribute(default=None)  # What to assign as a reverse accessor?
