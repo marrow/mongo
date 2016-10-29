@@ -11,6 +11,24 @@ from ..util import adjust_attribute_sequence
 from ..util.compat import py3
 
 
+class FieldTransform(BaseTransform):
+	def foreign(self, value, context):
+		field, document = context
+		
+		if hasattr(field, 'to_foreign'):
+			return field.to_foreign(document, self.__name__, value)
+		
+		return value
+	
+	def native(self, value, context):
+		field, document = context
+		
+		if hasattr(field, 'to_native'):
+			return field.to_native(document, self.__name__, value)
+		
+		return value
+
+
 @adjust_attribute_sequence(1000, 'transformer', 'validator', 'translated', 'assign', 'project', 'read', 'write')
 class Field(Attribute, Queryable):
 	# Possible values include a literal operator, or one of:
@@ -30,7 +48,7 @@ class Field(Attribute, Queryable):
 	nullable = Attribute(default=False)  # If True, will store None.  If False, will store non-None default, or not store.
 	exclusive = Attribute(default=None)  # The set of other fields that must not be set for this field to be settable.
 	
-	transformer = Attribute(default=BaseTransform())  # A Transformer class to use when loading/saving values.
+	transformer = Attribute(default=FieldTransform())  # A Transformer class to use when loading/saving values.
 	validator = Attribute(default=Validator())  # The Validator class to use when validating values.
 	translated = Attribute(default=False)  # If truthy this field should be stored in the per-language subdocument.
 	assign = Attribute(default=False)  # If truthy attempt to access and store resulting variable when instantiated.
@@ -90,7 +108,7 @@ class Field(Attribute, Queryable):
 		if result is None:  # Discussion: pass through to the transformer?
 			return None
 		
-		return self.transformer.native(result, self)
+		return self.transformer.native(result, (self, obj))
 	
 	def __set__(self, obj, value):
 		"""Executed when assigning a value to a DataAttribute instance attribute."""
@@ -104,7 +122,7 @@ class Field(Attribute, Queryable):
 					pass
 		
 		if value is not None:
-			value = self.transformer.foreign(value, self)
+			value = self.transformer.foreign(value, (self, obj))
 		
 		super(Field, self).__set__(obj, value)
 	

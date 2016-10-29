@@ -5,8 +5,6 @@ from collections import Iterable
 from pkg_resources import iter_entry_points
 
 from marrow.schema import Attribute
-from marrow.schema.transform import BaseTransform
-from marrow.package.canonical import name
 from marrow.package.loader import traverse, load
 
 from ..core import Document, Field
@@ -14,36 +12,27 @@ from ..util import adjust_attribute_sequence
 from ..util.compat import str, unicode
 
 
-class EmbedTransform(BaseTransform):
-	def native(self, value, field):
-		if not isinstance(value, Document):
-			kinds = list(field.kinds)
-			if len(kinds) == 1:
-				value = kinds[0].from_mongo(value)
-			else:
-				value = Document.from_mongo(value)
-		
-		return value
+@adjust_attribute_sequence(-1000, 'kind')  # Allow 'kind' to be passed positionally first.
+class _HasKinds(Field):
+	"""A mix-in to provide an easily definable singular or plural set of document types."""
 	
-	def foreign(self, value, field):
-		kinds = list(field.kinds)
-		if not isinstance(value, Document):
-			if len(kinds) != 1:
-				raise ValueError("Ambigouous assignment, assign an instance of: " + \
-						", ".join(kind.__name__ for kind in kinds))
+	kind = Attribute(default=None)  # One or more foreign model references, a string, Document subclass, or set of.
+	
+	@property
+	def kinds(self):
+		values = self.kind
+		
+		if not isinstance(values, Iterable):
+			values = (values, )
+		
+		for value in values:
+			if isinstance(value, (str, unicode)):
+				value = load(value, 'marrow.mongo.document')
 			
-			value = kinds[0](**value)  # Assuming a mapping.
-		
-		if '_cls' not in value and len(kinds) != 1:
-			value['_cls'] = name(value.__class__)
-		
-		return value
+			yield value
 
 
-class Embed(Field):
-	kind = Attribute(default=None)  # The Document class (or set of allowable) to use when unpacking.
-	transformer = Attribute(default=EmbedTransform())  # Change the default transformer to ours.
-	
+class Embed(Field, _HasKinds):
 	__foreign__ = 'object'
 	
 	def __init__(self, *kinds, **kw):
@@ -62,23 +51,68 @@ class Embed(Field):
 		
 		super(Embed, self).__init__(**kw)
 	
-	@property
-	def kinds(self):
-		values = self.kind
+	def to_native(self, obj, name, value):
+		"""Transform the MongoDB value into a Marrow Mongo value."""
 		
-		if not isinstance(values, Iterable):
-			values = (values, )
-		
-		for value in values:
-			if isinstance(value, (str, unicode)):
-				value = load(value, 'marrow.mongo.document')
+		if not isinstance(value, Document):
+			kinds = list(self.kinds)
 			
-			yield value
+			if len(kinds) == 1:
+				value = kinds[0].from_mongo(value)
+			else:
+				value = Document.from_mongo(value)  # This handles _cls lookup.
+		
+		return value
+	
+	def to_foreign(self, obj, name, value):
+		"""Transform to a MongoDB-safe value."""
+		
+		kinds = list(self.kinds)
+		
+		if not isinstance(value, Document):
+			if len(kinds) != 1:
+				raise ValueError("Ambigouous assignment, assign an instance of: " + \
+						", ".join(kind.__name__ for kind in kinds))
+			
+			value = kinds[0](**value)
+			# DISCUSS: value.__data__.update(value) instead?
+		
+		if '_cls' not in value and len(kinds) != 1:
+			value['_cls'] = name(value.__class__)
+		
+		return value
 
 
-
-class ReferenceTransform(BaseTransform):
-	def foreign(self, value, field):
+class Reference(Field, _HasKinds):
+	concrete = Attribute(default=False)  # If truthy, will store a DBRef instead of ObjectId.
+	cache = Attribute(default=None)  # Attributes to preserve from the referenced object at the reference level.
+	reverse = Attribute(default=None)  # What to assign as a reverse accessor?
+	
+	@property
+	def __foreign__(self):
+		"""Advertise that we store a simple reference, or deep reference, or object, depending on configuration."""
+		
+		if not self.cache:
+			if self.concrete:
+				return 'dbPointer'
+			
+			return 'objectId'
+		
+		return 'object'
+	
+	def to_native(self, obj, name, value):
+		"""Transform the MongoDB value into a Marrow Mongo value."""
+		
+		# Identify the 
+		kinds = list(self.kinds)
+		
+		if isinstance(value, oid):
+			return value
+		
+		# Return a partially populated record based on our cached values.
+		return kinds[0].from_mongo(value, value.keys())
+	
+	def to_foreign(self, obj, name, value):
 		"""Transform to a MongoDB-safe value."""
 		
 		cache = None
@@ -96,51 +130,52 @@ class ReferenceTransform(BaseTransform):
 			except:
 				identifier = value
 		
-		if not cache and field.cache and not issubclass(field.kind, Document):
+		if not cache and self.cache and not issubclass(self.kind, Document):
 			raise ValueError("Passed an identifier (not a Document instance) when multiple document kinds registered.")
 		
-		if field.cache:
+		if self.cache:
 			raise NotImplementedError()
 			
 			if not cache:
 				raise NotImplementedError()  # TODO: Load values to cache.
 			
-			store = {'_id': identifier, '_cls': name(field.kind)}
+			store = {'_id': identifier, '_cls': name(self.kind)}
 			
-			for i in field.cache:
-				store[field.__document__._get_mongo_name_for(i)] = traverse(cache, i)
+			for i in self.cache:
+				store[self.__document__._get_mongo_name_for(i)] = traverse(cache, i)
 		
 		return store
+
+
+@adjust_attribute_sequence(-1000, 'namespace')  # Allow the namespace to be defined first.
+class PluginReference(Field):
+	"""A Python object reference.
 	
-	def native(self, value, field):
+	Generally, for safety sake, you want this to come from a list of available plugins in a given namespace. If a
+	namespace is given, the default for `explicit` will be `False`.  If `explicit` is `True` (or no namespace is
+	defined) object assignments and literal paths will be allowed.
+	"""
+	
+	namespace = Attribute()  # The plugin namespace to use when loading.
+	explicit = Attribute()  # Allow explicit, non-plugin references.
+	
+	__foreign__ = {'string'}
+	
+	def to_native(self, obj, name, value):
 		"""Transform the MongoDB value into a Marrow Mongo value."""
 		
-		kinds = field.kind if isinstance(field.kind, (list, tuple, set)) else (field.kind, )
-		kinds = [(load(i, 'marrow.mongo.document') if isinstance(i, (str, unicode)) else i) for i in kinds]
+		try:
+			namespace = self.namespace
+		except AttributeError:
+			namespace = None
 		
-		if isinstance(value, oid):
-			return value
-		
-		return kinds[0].from_mongo(value, value.keys())
-
-
-@adjust_attribute_sequence(-1000, 'kind')  # Allow 'kind' to be passed positionally first.
-class Reference(Field):
-	kind = Attribute(default=None)  # One or more foreign model references, a string, Document subclass, or set of.
-	concrete = Attribute(default=False)  # If truthy, will store a DBRef instead of ObjectId.
-	cache = Attribute(default=None)  # Attributes to preserve from the referenced object at the reference level.
-	reverse = Attribute(default=None)  # What to assign as a reverse accessor?
-	transformer = Attribute(default=ReferenceTransform())  # Change the default transformer to ours.
+		return load(value, namespace) if namespace else load(value)
 	
-	__foreign__ = {'objectId', 'dbPointer', 'object'}  # We store a simple reference, or deep reference, or object.
-
-
-class PluginReferenceTransform(BaseTransform):
-	def foreign(self, value, field):
+	def to_foreign(self, obj, name, value):
 		"""Transform to a MongoDB-safe value."""
 		
 		try:
-			namespace = field.namespace
+			namespace = self.namespace
 		
 		except AttributeError:
 			namespace = None
@@ -155,7 +190,7 @@ class PluginReferenceTransform(BaseTransform):
 				plugins = {j: i for i, j in names.items()}
 		
 		try:
-			explicit = field.explicit
+			explicit = self.explicit
 		except AttributeError:
 			explicit = not bool(namespace)
 		
@@ -173,30 +208,3 @@ class PluginReferenceTransform(BaseTransform):
 			raise ValueError(repr(value) + ' object is not a known plugin for namespace "' + namespace + '".')
 		
 		return plugins.get(value, name(value))
-	
-	def native(self, value, field):
-		"""Transform the MongoDB value into a Marrow Mongo value."""
-		
-		try:
-			namespace = field.namespace
-		except AttributeError:
-			namespace = None
-		
-		return load(value, namespace) if namespace else load(value)
-
-
-@adjust_attribute_sequence(-1000, 'namespace')  # Allow the namespace to be defined first.
-class PluginReference(Field):
-	"""A Python object reference.
-	
-	Generally, for safety sake, you want this to come from a list of available plugins in a given namespace. If a
-	namespace is given, the default for `explicit` will be `False`.  If `explicit` is `True` (or no namespace is
-	defined) object assignments and literal paths will be allowed.
-	"""
-	
-	namespace = Attribute()  # The plugin namespace to use when loading.
-	explicit = Attribute()  # Allow explicit, non-plugin references.
-	transformer = Attribute(default=PluginReferenceTransform())  # Change the default transformer to ours.
-	
-	__foreign__ = {'string'}
-

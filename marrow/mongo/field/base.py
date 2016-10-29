@@ -1,9 +1,9 @@
 # encoding: utf-8
 
+from datetime import datetime, timedelta
 from bson import ObjectId as oid
 from bson.code import Code
 from marrow.schema import Attribute
-from marrow.schema.transform import BaseTransform
 
 from ..core import Field
 
@@ -29,39 +29,34 @@ class Array(Field):
 	
 	__foreign__ = 'array'
 	
-	def to_foreign(self, obj, name, value):
+	def to_native(self, obj, name, value):
 		return [i for i in value]
 
 
 class Binary(Field):
 	__foreign__ = 'binData'
 	
-	def to_foriegn(self, obj, name, value):
+	def to_native(self, obj, name, value):
 		return bytes(value)
 
 
 class ObjectId(Field):
 	__foreign__ = 'objectId'
 	
-	class ObjectIdTransform(BaseTransform):
-		def foreign(self, value, context=None):
-			if not isinstance(value, oid):
-				value = oid(str(value))
-			
-			return value
-	
 	default = Attribute(default=lambda: oid())
-	transformer = Attribute(default=ObjectIdTransform())
 	
 	def to_foreign(self, obj, name, value):
-		return oid(value)
+		if isinstance(value, oid):
+			return value
+		
+		return oid(str(value))
 
 
 class Boolean(Field):
 	__foreign__ = 'bool'
 	
-	def to_native(self, obj, name, value):
-		if False and (value is None):
+	def to_foreign(self, obj, name, value):
+		if value is None:
 			return None
 		
 		try:
@@ -83,6 +78,29 @@ class Date(Field):
 	
 	now = Attribute(default=False)
 	autoupdate = Attribute(default=False)
+	
+	# TODO: use timeparser via context.locale to guess -- https://github.com/thomst/timeparser
+
+
+class TTL(Date):
+	"""A specialized Date field used to store dates in the future by timedelta from now."""
+	__foreign__ = 'date'
+	
+	def to_foreign(self, value, context=None):
+		if not value:
+			return None
+		
+		if isinstance(value, timedelta):
+			return datetime.utcnow() + value
+		
+		if isinstance(value, datetime):
+			return value
+		
+		if isinstance(value, int):  # TODO: abc.Number
+			return datetime.utcnow() + timedelta(days=value)
+		
+		# TODO: use timeparser via context.locale to guess -- https://github.com/thomst/timeparser
+		raise TypeError("Invalid TTL value: " + repr(value))
 
 
 class Regex(String):

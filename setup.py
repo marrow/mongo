@@ -105,6 +105,7 @@ setup(
 						'ObjectId = marrow.mongo.field.base:ObjectId',
 						'Boolean = marrow.mongo.field.base:Boolean',
 						'Date = marrow.mongo.field.base:Date',
+						'TTL = marrow.mongo.field.base:TTL',
 						'Regex = marrow.mongo.field.base:Regex',
 						'JavaScript = marrow.mongo.field.base:JavaScript',
 						'Timestamp = marrow.mongo.field.base:Timestamp',
