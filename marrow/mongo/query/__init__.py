@@ -193,7 +193,7 @@ class Queryable(object):
 		if __debug__ and _simple_safety_check(self, '$eq'):  # Optimize this away in production; diagnosic aide.
 			raise NotImplementedError("{self.__class__.__name__} does not allow $eq comparison.".format(self=self))
 		
-		return Ops({unicode(self): self.transformer.foreign(other, self)})
+		return Ops({unicode(self): self.transformer.foreign(other, (self, None))})
 	
 	def __gt__(self, other):
 		"""Matches values that are greater than a specified value.
@@ -206,7 +206,7 @@ class Queryable(object):
 		if __debug__ and _complex_safety_check(self, {'$gt', '#rel'}):  # Optimize this away in production.
 			raise NotImplementedError("{self.__class__.__name__} does not allow $gt comparison.".format(self=self))
 		
-		return Ops({unicode(self): {'$gt': self.transformer.foreign(other, self)}})
+		return Ops({unicode(self): {'$gt': self.transformer.foreign(other, (self, None))}})
 	
 	def __ge__(self, other):
 		"""Matches values that are greater than or equal to a specified value.
@@ -219,7 +219,7 @@ class Queryable(object):
 		if __debug__ and _complex_safety_check(self, {'$gte', '#rel'}):  # Optimize this away in production.
 			raise NotImplementedError("{self.__class__.__name__} does not allow $gte comparison.".format(self=self))
 		
-		return Ops({unicode(self): {'$gte': self.transformer.foreign(other, self)}})
+		return Ops({unicode(self): {'$gte': self.transformer.foreign(other, (self, None))}})
 	
 	def __lt__(self, other):
 		"""Matches values that are less than or equal to a specified value.
@@ -232,7 +232,7 @@ class Queryable(object):
 		if __debug__ and _complex_safety_check(self, {'$lt', '#rel'}):  # Optimize this away in production.
 			raise NotImplementedError("{self.__class__.__name__} does not allow $lt comparison.".format(self=self))
 		
-		return Ops({unicode(self): {'$lt': self.transformer.foreign(other, self)}})
+		return Ops({unicode(self): {'$lt': self.transformer.foreign(other, (self, None))}})
 	
 	def __le__(self, other):
 		"""Matches values that are less than or equal to a specified value.
@@ -245,7 +245,7 @@ class Queryable(object):
 		if __debug__ and _complex_safety_check(self, {'$lte', '#rel'}):  # Optimize this away in production.
 			raise NotImplementedError("{self.__class__.__name__} does not allow $lte comparison.".format(self=self))
 		
-		return Ops({unicode(self): {'$lte': self.transformer.foreign(other, self)}})
+		return Ops({unicode(self): {'$lte': self.transformer.foreign(other, (self, None))}})
 	
 	def __ne__(self, other):
 		"""Matches all values that are not equal to a specified value.
@@ -258,7 +258,7 @@ class Queryable(object):
 		if __debug__ and _complex_safety_check(self, {'$ne', '$eq'}):  # Optimize this away in production.
 			raise NotImplementedError("{self.__class__.__name__} does not allow $ne comparison.".format(self=self))
 		
-		return Ops({unicode(self): {'$ne': self.transformer.foreign(other, self)}})
+		return Ops({unicode(self): {'$ne': self.transformer.foreign(other, (self, None))}})
 	
 	def any(self, *args):
 		"""Matches any of the values specified in an array.
@@ -275,7 +275,7 @@ class Queryable(object):
 		
 		other = args if len(args) > 1 else args[0]
 		
-		return Ops({unicode(self): {'$in': [self.transformer.foreign(value, self) for value in other]}})
+		return Ops({unicode(self): {'$in': [self.transformer.foreign(value, (self, None)) for value in other]}})
 	
 	def none(self, other):
 		"""Matches none of the values specified in an array.
@@ -285,7 +285,7 @@ class Queryable(object):
 		Comparison operator: {$nin: value}
 		Documentation: https://docs.mongodb.org/manual/reference/operator/query/nin/#op._S_nin
 		"""
-		return Ops({unicode(self): {'$nin': [self.transformer.foreign(value, self) for value in other]}})
+		return Ops({unicode(self): {'$nin': [self.transformer.foreign(value, (self, None)) for value in other]}})
 	
 	# Logical Query Selectors
 	# https://docs.mongodb.org/manual/reference/operator/query/#logical
@@ -323,7 +323,7 @@ class Queryable(object):
 		if __debug__ and _complex_safety_check(self, {'$all', '#array'}):  # Optimize this away in production.
 			raise NotImplementedError("{self.__class__.__name__} does not allow $all comparison.".format(self=self))
 		
-		return Ops({unicode(self): {'$all': [self.transformer.foreign(value, self) for value in other]}})
+		return Ops({unicode(self): {'$all': [self.transformer.foreign(value, (self, None)) for value in other]}})
 	
 	def match(self, q):
 		"""Selects documents if element in the array field matches all the specified conditions.
@@ -404,4 +404,3 @@ class Queryable(object):
 		foreign = set(kinds) if kinds else self.__foreign__
 		
 		return Ops({unicode(self): {'$type': foreign}})
-
