@@ -192,6 +192,12 @@ class Q(object):
 		
 		raise AttributeError()
 	
+	def __unicode__(self):
+		return self._name
+	
+	if py3:
+		__str__ = __unicode__
+	
 	# Operation Building Blocks
 	
 	def _op(self, operation, other, *allowed):
@@ -212,22 +218,6 @@ class Q(object):
 	
 	# Comparison Query Selectors
 	# Documentation: https://docs.mongodb.org/manual/reference/operator/query/#comparison
-	
-	def _op(self, operation, other, *allowed):
-		if __debug__ and _complex_safety_check(self._field, {operation} & set(allowed)):  # Optimize this away in production.
-			raise NotImplementedError("{self.__class__.__name__} does not allow {op} comparison.".format(
-					self=self, op=operation))
-		
-		return Ops({self._name: {operation: self.transformer.foreign(other, (self._field, self._document))}})
-	
-	def _iop(self, operation, other, *allowed):
-		if __debug__ and _complex_safety_check(self._field, {operation} & set(allowed)):  # Optimize this away in production.
-			raise NotImplementedError("{self.__class__.__name__} does not allow {op} comparison.".format(
-					self=self, op=operation))
-		
-		other = other if len(other) > 1 else other[0]
-		
-		return Ops({self._name: {operation: [self.transformer.foreign(value, (self._field, self._document)) for value in other]}})
 	
 	def __eq__(self, other):
 		"""Matches values that are equal to the specified value.
@@ -309,7 +299,7 @@ class Q(object):
 		Documentation: https://docs.mongodb.org/manual/reference/operator/query/in/#op._S_in
 		"""
 		
-		return self._iop('$in', other, '$eq')
+		return self._iop('$in', args, '$eq')
 	
 	def none(self, *args):
 		"""Matches none of the values specified in an array.
@@ -320,7 +310,7 @@ class Q(object):
 		Documentation: https://docs.mongodb.org/manual/reference/operator/query/nin/#op._S_nin
 		"""
 		
-		return self._iop('$nin', other, '$eq')
+		return self._iop('$nin', args, '$eq')
 	
 	# Logical Query Selectors
 	# https://docs.mongodb.org/manual/reference/operator/query/#logical
@@ -358,7 +348,7 @@ class Q(object):
 		Documentation: https://docs.mongodb.org/manual/reference/operator/query/all/#op._S_all
 		"""
 		
-		return self._iop('$all', other, '#array')
+		return self._iop('$all', args, '#array')
 	
 	def match(self, q):
 		"""Selects documents if element in the array field matches all the specified conditions.
