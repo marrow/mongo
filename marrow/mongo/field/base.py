@@ -46,6 +46,12 @@ class ObjectId(Field):
 	default = Attribute(default=lambda: oid())
 	
 	def to_foreign(self, obj, name, value):
+		if value is None:
+			if self.required:
+				raise ValueError()
+			
+			return value
+		
 		if isinstance(value, oid):
 			return value
 		

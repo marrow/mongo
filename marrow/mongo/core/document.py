@@ -43,9 +43,7 @@ class Document(Container):
 	__projection__ = None  # The set of fields used during projection, to identify fields which are not loaded.
 	__validation__ = None  # The MongoDB Validation document matching these records.
 	__fields__ = Attributes(only=Field)  # An ordered mapping of field names to their respective Field instance.
-	__fields__.__sequence__ = 20000
 	__indexes__ = Attributes(only=Index)  # An ordered mapping of index names to their respective Index instance.
-	__indexes__.__sequence__ = 20001
 	
 	def __init__(self, *args, **kw):
 		"""Construct a new MongoDB Document instance.

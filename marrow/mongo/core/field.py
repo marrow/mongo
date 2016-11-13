@@ -6,7 +6,7 @@ from marrow.schema import Attribute
 from marrow.schema.transform import BaseTransform
 from marrow.schema.validate import Validator
 
-from ..query import Queryable
+from ..query import Q
 from ..util import adjust_attribute_sequence
 from ..util.compat import py3
 
@@ -30,7 +30,7 @@ class FieldTransform(BaseTransform):
 
 
 @adjust_attribute_sequence(1000, 'transformer', 'validator', 'translated', 'assign', 'project', 'read', 'write')
-class Field(Attribute, Queryable):
+class Field(Attribute):
 	# Possible values include a literal operator, or one of:
 	#  * #rel -- allow/prevent all relative comparison such as $gt, $gte, $lt, etc.
 	#  * #array -- allow/prevent all array-related compraison such as $all, $size, etc.
@@ -97,11 +97,9 @@ class Field(Attribute, Queryable):
 	def __get__(self, obj, cls=None):
 		"""Executed when retrieving a Field instance attribute."""
 		
-		# If this is class attribute (and not instance attribute) access, we return ourselves.
+		# If this is class attribute (and not instance attribute) access, we return a Queryable interface.
 		if obj is None:
-			return self
-		
-		# TODO: Translated field proxy?
+			return Q(self.__document__, self)
 		
 		result = super(Field, self).__get__(obj, cls)
 		
