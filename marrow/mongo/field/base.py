@@ -24,15 +24,6 @@ class String(Field):
 		return str(value)
 
 
-class Array(Field):
-	kind = Attribute(default=None)
-	
-	__foreign__ = 'array'
-	
-	def to_native(self, obj, name, value):
-		return [i for i in value]
-
-
 class Binary(Field):
 	__foreign__ = 'binData'
 	
@@ -67,7 +58,7 @@ class Boolean(Field):
 		
 		try:
 			value = value.lower()
-		except AttributeError():
+		except AttributeError:
 			return bool(value)
 		
 		if value in ('true', 't', 'yes', 'y', 'on', '1', True):

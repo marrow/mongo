@@ -100,7 +100,6 @@ setup(
 				'marrow.mongo.field': [  # Field classes registered by (optionaly namespaced) name.
 						'Field = marrow.mongo.core:Field',
 						'String = marrow.mongo.field.base:String',
-						'Array = marrow.mongo.field.base:Array',
 						'Binary = marrow.mongo.field.base:Binary',
 						'ObjectId = marrow.mongo.field.base:ObjectId',
 						'Boolean = marrow.mongo.field.base:Boolean',
@@ -109,6 +108,7 @@ setup(
 						'Regex = marrow.mongo.field.base:Regex',
 						'JavaScript = marrow.mongo.field.base:JavaScript',
 						'Timestamp = marrow.mongo.field.base:Timestamp',
+						'Array = marrow.mongo.field.complex:Array',
 						'Embed = marrow.mongo.field.complex:Embed',
 						'Reference = marrow.mongo.field.complex:Reference',
 						'PluginReference = marrow.mongo.field.complex:PluginReference',

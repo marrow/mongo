@@ -216,6 +216,14 @@ class Q(object):
 		
 		return Ops({self._name: {operation: [self.transformer.foreign(value, (self._field, self._document)) for value in other]}})
 	
+	# Matching Array Element
+	
+	@property
+	def S(self):
+		instance = self.__class__(self._document, self._field)
+		instance._name = self._name + '.' + '$'
+		return instance
+	
 	# Comparison Query Selectors
 	# Documentation: https://docs.mongodb.org/manual/reference/operator/query/#comparison
 	

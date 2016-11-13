@@ -32,6 +32,10 @@ class _HasKinds(Field):
 			yield value
 
 
+class Array(_HasKinds, Field):
+	__foreign__ = 'array'
+
+
 class Embed(_HasKinds, Field):
 	__foreign__ = 'object'
 	
