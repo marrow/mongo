@@ -306,7 +306,7 @@ class Q(object):
 	def none(self, *args):
 		"""Matches none of the values specified in an array.
 		
-			Document.field.none([2, 3, 5, 7, 11, 13, 17 19, 23, 29])
+			Document.field.none([2, 3, 5, 7, 11, 13, 17, 19, 23, 29])
 		
 		Comparison operator: {$nin: value}
 		Documentation: https://docs.mongodb.org/manual/reference/operator/query/nin/#op._S_nin
@@ -317,10 +317,34 @@ class Q(object):
 	# Logical Query Selectors
 	# https://docs.mongodb.org/manual/reference/operator/query/#logical
 	
-	def __or__(self, other):  # TODO: Decide what to do when the developer does this.
+	def __or__(self, other):
+		"""Allow the comparison of multiple fields against a single value.
+		
+		Binary "or" comparison: either field, or both, match the final expression.
+		
+			(Document.first & Document.second) == 27
+		"""
+		
 		raise NotImplementedError()
 	
 	def __and__(self, other):  # TODO: Decide what to do when the developer does this.
+		"""Allow the comparison of multiple fields against a single value.
+		
+		Binary "and" comparison: both fields must match the final expression.
+		
+			(Document.first | Document.second) == 42
+		"""
+		
+		raise NotImplementedError()
+	
+	def __xor__(self, other):
+		"""Allow the comparison of multiple fields against a single value.
+		
+		Binary "xor" comparison: the first field, or the second field, but not both must match the expression.
+		
+			(Document.first ^ Document.second) == 55
+		"""
+		
 		raise NotImplementedError()
 	
 	def __invert__(self):
