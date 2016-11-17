@@ -18,15 +18,10 @@ Introduction
 ============
 
 Marrow Mongo is a collection of small, focused utilities written to enhance use of the `PyMongo native MongoDB driver
-<http://api.mongodb.com/python/current/>`_ without the overhead, glacial update cycle, complexity, and head-space
+<http://api.mongodb.com/python/current/>`__ without the overhead, glacial update cycle, complexity, and head-space
 requirements of a full active record object document mapper. Additionally, it provides a very light-weight database
-connection plugin for the `WebCore web framework <https://github.com/marrow/WebCore>`_ and Python standard logging
+connection plugin for the `WebCore web framework <https://github.com/marrow/WebCore>`__ and Python standard logging
 adapter to emit logs to MongoDB.
-
-
-Rationale and Goals
--------------------
-
 
 
 Installation
@@ -38,8 +33,8 @@ Installing ``marrow.mongo`` is easy, just execute the following in a terminal::
 
 **Note:** We *strongly* recommend always using a container, virtualization, or sandboxing environment of some kind when
 developing using Python; installing things system-wide is yucky (for a variety of reasons) nine times out of ten.  We
-prefer light-weight `virtualenv <https://virtualenv.pypa.io/en/latest/virtualenv.html>`_, others prefer solutions as
-robust as `Vagrant <http://www.vagrantup.com>`_.
+prefer light-weight `virtualenv <https://virtualenv.pypa.io/en/latest/virtualenv.html>`__, others prefer solutions as
+robust as `Vagrant <http://www.vagrantup.com>`__.
 
 If you add ``marrow.mongo`` to the ``install_requires`` argument of the call to ``setup()`` in your application's
 ``setup.py`` file, marrow.mongo will be automatically installed and made available when your own application or
@@ -56,11 +51,11 @@ Development Version
 
     |developstatus| |developcover| |ghsince| |issuecount| |ghfork|
 
-Development takes place on `GitHub <https://github.com/>`_ in the
-`marrow.mongo <https://github.com/marrow/mongo/>`_ project.  Issue tracking, documentation, and downloads
+Development takes place on `GitHub <https://github.com/>`__ in the
+`marrow.mongo <https://github.com/marrow/mongo/>`__ project.  Issue tracking, documentation, and downloads
 are provided there.
 
-Installing the current development version requires `Git <http://git-scm.com/>`_, a distributed source code management
+Installing the current development version requires `Git <http://git-scm.com/>`__, a distributed source code management
 system.  If you have Git you can run the following to download and *link* the development version into your Python
 runtime::
 
@@ -73,12 +68,76 @@ You can then upgrade to the latest version at any time::
 
 If you would like to make changes and contribute them back to the project, fork the GitHub project, make your changes,
 and submit a pull request.  This process is beyond the scope of this documentation; for more information see
-`GitHub's documentation <http://help.github.com/>`_.
+`GitHub's documentation <http://help.github.com/>`__.
 
 
-Getting Started
-===============
+Documents
+=========
 
+This package utilizes the `Marrow Schema <https://github.com/marrow/schema>`__ declarative schema toolkit and extends
+it to encompass MongoDB data storage concerns. You define data models by importing classes describing the various
+components of a collection, such as ``Document``, ``ObjectId``, or ``String``, then compose them into a declarative
+class model. For example, if you wanted to define a simple user account model, you would begin by importing::
+
+    from marrow.mongo.core import Document, Index
+    from marrow.mongo.util import adjust_attribute_sequence
+    from marrow.mongo import ObjectId, String, Array
+
+One must always import ``Document`` from ``marrow.mongo.core`` prior to any import of registered fields from
+``marrow.mongo``. As a note, due to the magical nature of this plugin import registry, it may change in future feature
+releases. The old interface will be deprecated with a warning for one feature version first, however; pin your
+dependencies.
+
+
+Defining Documents
+------------------
+
+Now we can define our own ``Document`` subclass::
+
+    @adjust_attribute_sequence(id=10000)
+    class Account(Document):
+        id = ObjectId('_id', assign=True)
+        username = String(required=True)
+        name = String()
+        locale = String(default='en-CA-u-tz-cator-cu-CAD', assign=True)
+        
+        _username = Index('username', unique=True)
+
+Let's break that down a bit::
+
+    @adjust_attribute_sequence(id=10000)
+
+This changes the "sequence" for the named fields, adjusting where in the positional paramater list it shows up, and
+its order in the final ordere dictionary. In this case, it's not very useful to always specify the ID positionally
+frist, so we shift it to "the end".  Next::
+
+    class Account(Document):
+
+No surprises here, we subclass the Document class. This is required to utilize the metaclass that makes the
+declarative naming and order-presrving sequence generation work. We begin to define fields::
+
+    id = ObjectId('_id', assign=True)
+
+Marrow Mongo does not assume your documents contain IDs; there is no separation internally between top-level documents
+and "embedded documents", leaving the declaration of an ID up to you. You might not always wish to use an ObjectID,
+either; please see MongoDB's documentation for discussion of general modelling practices. The first positional
+parameter for most non-complex fields is the name of the MongoDB-side field. Underscores imply an attribute is
+"protected" in Python, so we remap it by assigning it to just ``id``.  The ``assign`` argument here ensures whenever a
+new ``Account`` is instantiated an ObjectID will be immediately generated and assigned.
+
+The remaining fields should contain no surprises::
+
+    username = String(required=True)
+    name = String()
+    locale = String(default='en-CA-u-tz-cator-cu-CAD', assign=True)
+
+Introduced here are ``required``, indicating that when generating the *validation document* for this document to
+ensure this field always has a value. This validation is not currently performed application-side. Also notable is the
+use of ``assign`` on a string field; this will assign the default value during instantiation.  Lastly::
+
+    _username = Index('username', unique=True)
+
+We define a unique index on the username to speed up any queries involving that record.
 
 
 Version History
