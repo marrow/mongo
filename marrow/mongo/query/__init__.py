@@ -166,16 +166,7 @@ MutableMapping.register(Ops)  # Metaclass conflict if we subclass.
 
 
 class Q(object):
-	"""A comparison proxy and Ops factory to help build nested inquiries.
-	
-	Assumes the following are populated:
-	
-	 * `self.__allowed_operators__` -- a set of allowed operators
-	 * `self.__disallowed_operators__` -- a blacklist set of operators
-	"""
-	
-	# _field.__allowed_operators__ = set()
-	# _field.__disallowed_operators__ = set()
+	"""A comparison proxy and Ops factory to help build nested inquiries."""
 	
 	def __init__(self, document, field, path=None):
 		self._document = document
@@ -191,6 +182,9 @@ class Q(object):
 				return self.__class__(self._document, kind.__fields__[name], self._name + '.')
 		
 		raise AttributeError()
+	
+	def __hash__(self):
+		return hash(self._name)
 	
 	def __unicode__(self):
 		return self._name
@@ -329,8 +323,14 @@ class Q(object):
 	def __and__(self, other):  # TODO: Decide what to do when the developer does this.
 		raise NotImplementedError()
 	
-	def __invert__(self):  # TODO: Decide what to do when the developer does this.
-		raise NotImplementedError()
+	def __invert__(self):
+		"""Return the fully qualified name of the current field reference, for use in custom dictionary construction.
+		
+		For example, when projecting:
+		
+			collection.find({}, {~Document.field: 1})
+		"""
+		return self._name
 	
 	# Evaluation Query Operators
 	def re(self, *parts):
