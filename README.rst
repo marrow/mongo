@@ -108,7 +108,7 @@ Let's break that down a bit::
     @adjust_attribute_sequence(id=10000)
 
 This changes the "sequence" for the named fields, adjusting where in the positional paramater list it shows up, and
-its order in the final ordere dictionary. In this case, it's not very useful to always specify the ID positionally
+its order in the final ordered dictionary. In this case, it's not very useful to always specify the ID positionally
 frist, so we shift it to "the end".  Next::
 
     class Account(Document):
@@ -137,7 +137,7 @@ use of ``assign`` on a string field; this will assign the default value during i
 
     _username = Index('username', unique=True)
 
-We define a unique index on the username to speed up any queries involving that record.
+We define a unique index on the username to speed up any queries involving that field.
 
 
 Version History
