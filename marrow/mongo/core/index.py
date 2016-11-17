@@ -57,6 +57,7 @@ class Index(Attribute):
 			
 			result.append((field, direction))
 	
+	@property
 	def as_mongo(self):
 		"""Perform the translation needed to return the arguments for `Collection.create_index`.
 		
@@ -75,4 +76,3 @@ class Index(Attribute):
 			)
 		
 		return fields, options
-

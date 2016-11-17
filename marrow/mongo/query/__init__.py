@@ -195,6 +195,8 @@ class Q(object):
 	# Operation Building Blocks
 	
 	def _op(self, operation, other, *allowed):
+		"""A basic operation operating on a single value."""
+		
 		if __debug__ and _complex_safety_check(self._field, {operation} & set(allowed)):  # Optimize this away in production.
 			raise NotImplementedError("{self.__class__.__name__} does not allow {op} comparison.".format(
 					self=self, op=operation))
@@ -202,6 +204,11 @@ class Q(object):
 		return Ops({self._name: {operation: self.transformer.foreign(other, (self._field, self._document))}})
 	
 	def _iop(self, operation, other, *allowed):
+		"""An iterative operation operating on multiple values.
+		
+		Consumes iterators to construct a concrete list at time of execution.
+		"""
+		
 		if __debug__ and _complex_safety_check(self._field, {operation} & set(allowed)):  # Optimize this away in production.
 			raise NotImplementedError("{self.__class__.__name__} does not allow {op} comparison.".format(
 					self=self, op=operation))
@@ -214,6 +221,12 @@ class Q(object):
 	
 	@property
 	def S(self):
+		"""Allow for the projection (and update) of nested values contained within the single match of an array.
+		
+		Projection operator: https://docs.mongodb.com/manual/reference/operator/projection/positional/#proj._S_
+		Array update operator: https://docs.mongodb.com/manual/reference/operator/update/positional/
+		"""
+		
 		instance = self.__class__(self._document, self._field)
 		instance._name = self._name + '.' + '$'
 		return instance
@@ -317,22 +330,24 @@ class Q(object):
 	# Logical Query Selectors
 	# https://docs.mongodb.org/manual/reference/operator/query/#logical
 	
-	def __or__(self, other):
-		"""Allow the comparison of multiple fields against a single value.
-		
-		Binary "or" comparison: either field, or both, match the final expression.
-		
-			(Document.first & Document.second) == 27
-		"""
-		
-		raise NotImplementedError()
+	# Multiple Field Participation
 	
 	def __and__(self, other):  # TODO: Decide what to do when the developer does this.
 		"""Allow the comparison of multiple fields against a single value.
 		
 		Binary "and" comparison: both fields must match the final expression.
 		
-			(Document.first | Document.second) == 42
+			(Document.first & Document.second) == 42
+		"""
+		
+		raise NotImplementedError()
+	
+	def __or__(self, other):
+		"""Allow the comparison of multiple fields against a single value.
+		
+		Binary "or" comparison: either field, or both, match the final expression.
+		
+			(Document.first | Document.second) == 27
 		"""
 		
 		raise NotImplementedError()
@@ -353,10 +368,15 @@ class Q(object):
 		For example, when projecting:
 		
 			collection.find({}, {~Document.field: 1})
+		
+		Will be obsolete and possibly re-tasked if and when pymongo is patched to allow string-like (or stringify)
+		keys.
 		"""
+		
 		return self._name
 	
 	# Evaluation Query Operators
+	
 	def re(self, *parts):
 		"""Matches string values against a regular expression compiled of individual parts.
 		
