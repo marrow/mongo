@@ -143,12 +143,13 @@ We define a unique index on the username to speed up any queries involving that 
 Instantiating Documents
 -----------------------
 
-With a document defined we can now begin populating data::
+With a document schema defined we can now begin populating data::
 
     alice = Account('amcgregor', "Alice Bevan-McGregor")
     print(alice.id)  # Already has an ID; this includes creation time.
 
-Assuming a ``pymongo`` collection is accessible by the variable name ``collection`` we can construct our index::
+Fields can also be populated through the use of keyword arguments named after the attribute to update. Assuming a
+``pymongo`` collection is accessible by the variable name ``collection`` we can construct our index::
 
     fields, options = Account._username.as_mongo
     collection.create_index(fields, **options)
