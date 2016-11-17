@@ -140,6 +140,34 @@ use of ``assign`` on a string field; this will assign the default value during i
 We define a unique index on the username to speed up any queries involving that field.
 
 
+Instantiating Documents
+-----------------------
+
+With a document defined we can now begin populating data::
+
+    alice = Account('amcgregor', "Alice Bevan-McGregor")
+    print(alice.id)  # Already has an ID; this includes creation time.
+
+Assuming a ``pymongo`` collection is accessible by the variable name ``collection`` we can construct our index::
+
+    fields, options = Account._username.as_mongo
+    collection.create_index(fields, **options)
+
+This requests the correct arguments to pass to ``create_index`` from the ``Index`` instance, which can be modified
+prior to use if needed. Index construction is a blocking operation unless the ``background`` flag is defined, so be
+careful. There is no need to run this pair of commands more than once unless the collection is dropped.
+
+Let's insert our record::
+
+    result = collection.insert_one(alice)
+    assert result.acknowledged and result.inserted_id == alice.id
+
+Yup, that's it. Instances of ``Document`` are directly usable in place of a dictionary argument to ``pymongo``
+methods. We then validate that the document we wanted inserted was, in fact, inserted. Using an assert in this way,
+this validation will not be run in production code run with the ``-O`` option passed (or ``PYTHONOPTIMIZE``
+environment variable set) in the invocation to Python.
+
+
 Version History
 ===============
 
