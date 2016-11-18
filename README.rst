@@ -80,7 +80,6 @@ components of a collection, such as ``Document``, ``ObjectId``, or ``String``, t
 class model. For example, if you wanted to define a simple user account model, you would begin by importing::
 
     from marrow.mongo.core import Document, Index
-    from marrow.mongo.util import adjust_attribute_sequence
     from marrow.mongo import ObjectId, String, Number, Array
 
 One must always import ``Document`` from ``marrow.mongo.core`` prior to any import of registered fields from
@@ -94,42 +93,23 @@ Defining Documents
 
 Now we can define our own ``Document`` subclass::
 
-    @adjust_attribute_sequence(id=10000)
     class Account(Document):
-        id = ObjectId('_id', assign=True)
-        
         username = String(required=True)
         name = String()
         locale = String(default='en-CA-u-tz-cator-cu-CAD', assign=True)
-        
         age = Number()
+        
+        id = ObjectId('_id', assign=True)
         tag = Array(String(), default=lambda: [], assign=True)
         
         _username = Index('username', unique=True)
 
-Let's break that down a bit::
-
-    @adjust_attribute_sequence(id=10000)
-
-This changes the "sequence" for the named fields, adjusting where in the positional paramater list it shows up, and
-its order in the final ordered dictionary. In this case, it's not very useful to always specify the ID positionally
-frist, so we shift it to "the end".  Next::
+Broken down::
 
     class Account(Document):
 
 No surprises here, we subclass the Document class. This is required to utilize the metaclass that makes the
 declarative naming and order-presrving sequence generation work. We begin to define fields::
-
-    id = ObjectId('_id', assign=True)
-
-Marrow Mongo does not assume your documents contain IDs; there is no separation internally between top-level documents
-and "embedded documents", leaving the declaration of an ID up to you. You might not always wish to use an ObjectID,
-either; please see MongoDB's documentation for discussion of general modelling practices. The first positional
-parameter for most non-complex fields is the name of the MongoDB-side field. Underscores imply an attribute is
-"protected" in Python, so we remap it by assigning it to just ``id``.  The ``assign`` argument here ensures whenever a
-new ``Account`` is instantiated an ObjectID will be immediately generated and assigned.
-
-There are a few more simple fields::
 
     username = String(required=True)
     name = String()
@@ -142,7 +122,18 @@ type of field::
 
     age = Number()
 
-This allows storage of any numeric value, either integer or floating point. Finally there is an array of tags::
+This allows storage of any numeric value, either integer or floating point. Now there is the record identifier::
+
+    id = ObjectId('_id', assign=True)
+
+Marrow Mongo does not assume your documents contain IDs; there is no separation internally between top-level documents
+and "embedded documents", leaving the declaration of an ID up to you. You might not always wish to use an ObjectID,
+either; please see MongoDB's documentation for discussion of general modelling practices. The first positional
+parameter for most non-complex fields is the name of the MongoDB-side field. Underscores imply an attribute is
+"protected" in Python, so we remap it by assigning it to just ``id``.  The ``assign`` argument here ensures whenever a
+new ``Account`` is instantiated an ObjectID will be immediately generated and assigned.
+
+Finally there is an array of tags::
 
     tag = Array(String(), default=lambda: [], assign=True)
 
@@ -162,18 +153,18 @@ Instantiating Documents
 
 With a document schema defined we can now begin populating data::
 
-    alice = Account('amcgregor', "Alice Bevan-McGregor")
-    print(alice.id)  # Already has an ID; this includes creation time.
+    alice = Account('amcgregor', "Alice Bevan-McGregor", age=27)
+    print(alice.id)  # Already has an ID.
+    print(alice.id.generation_time)  # This even includes the creation time.
 
-Fields can also be populated through the use of keyword arguments named after the attribute to update. Assuming a
-``pymongo`` collection is accessible by the variable name ``collection`` we can construct our index::
+As can be seen above construction accepts positional and keyword parameters. Fields will be filled, positionally, in
+the order they were defined, unless otherwise adjusted using the ``adjust_attribute_sequence`` decorator.
 
-    fields, options = Account._username.as_mongo
-    collection.create_index(fields, **options)
+Assuming a ``pymongo`` collection is accessible by the variable name ``collection`` we can construct our index::
 
-This requests the correct arguments to pass to ``create_index`` from the ``Index`` instance, which can be modified
-prior to use if needed. Index construction is a blocking operation unless the ``background`` flag is defined, so be
-careful. There is no need to run this pair of commands more than once unless the collection is dropped.
+    Account._username.create_index(collection)
+
+There is no need to run this command more than once unless the collection is dropped.
 
 Let's insert our record::
 

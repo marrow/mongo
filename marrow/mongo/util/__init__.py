@@ -10,6 +10,7 @@ def adjust_attribute_sequence(amount=10000, *fields):
 	def adjust_inner(cls):
 		for field in fields:
 			cls.__dict__[field].__sequence__ += amount  # Move this to the back of the bus.
+		
 		return cls
 	
 	return adjust_inner
