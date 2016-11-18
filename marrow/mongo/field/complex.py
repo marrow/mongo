@@ -146,7 +146,7 @@ class Reference(_HasKinds, Field):
 			store = {'_id': identifier, '_cls': name(self.kind)}
 			
 			for i in self.cache:
-				store[self.__document__._get_mongo_name_for(i)] = traverse(cache, i)
+				store[unicode(traverse(self.__document__, i, i))] = traverse(cache, i)
 		
 		return store
 

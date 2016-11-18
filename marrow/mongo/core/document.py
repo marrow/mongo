@@ -159,35 +159,6 @@ class Document(Container):
 		return cls
 	
 	@classmethod
-	def _get_mongo_name_for(cls, name):
-		"""Walk a string path (dot or double underscore separated) to find the MongoDB path to the attribute.
-		
-		This is the reverse of the process on individual Field._get_mongo_name, which walks up to the root document.
-		"""
-		
-		raise NotImplementedError("Much work needs to be done here.")
-		
-		current = cls
-		
-		if '__' in name:  # In case we're getting the name from a Django-style argument.
-			name = name.replace('__', '.')
-		
-		path = []
-		parts = name.split('.')
-		
-		while parts:
-			part = parts.pop(0)
-			
-			if getattr(current, 'translated', False) and (not path or path[0] != 'localized'):
-				path.insert(0, 'localized')  # We have a translated field on our hands...
-			
-			if hasattr(current, part):
-				current = getattr(current, part)
-				path.append(current.__name__)
-		
-		return '.'.join(path)
-	
-	@classmethod
 	def from_mongo(cls, doc, projected=None):
 		"""Convert data coming in from the MongoDB wire driver into a Document instance."""
 		
