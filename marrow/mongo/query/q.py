@@ -71,8 +71,14 @@ class Q(object):
 			raise AttributeError()
 		
 		for kind in self._field.kinds:
-			if name in kind.__fields__:
-				return self.__class__(self._document, kind.__fields__[name], self._name + '.')
+			if hasattr(kind, '__fields__'):
+				if name in kind.__fields__:
+					return self.__class__(self._document, kind.__fields__[name], self._name + '.')
+				
+			try:
+				return getattr(kind, name)
+			except AttributeError:
+				pass
 		
 		raise AttributeError()
 	
@@ -94,7 +100,7 @@ class Q(object):
 			raise NotImplementedError("{self.__class__.__name__} does not allow {op} comparison.".format(
 					self=self, op=operation))
 		
-		return Ops({self._name: {operation: self.transformer.foreign(other, (self._field, self._document))}})
+		return Ops({self._name: {operation: self._field.transformer.foreign(other, (self._field, self._document))}})
 	
 	def _iop(self, operation, other, *allowed):
 		"""An iterative operation operating on multiple values.
@@ -107,8 +113,9 @@ class Q(object):
 					self=self, op=operation))
 		
 		other = other if len(other) > 1 else other[0]
+		values = [self._field.transformer.foreign(value, (self._field, self._document)) for value in other]
 		
-		return Ops({self._name: {operation: [self.transformer.foreign(value, (self._field, self._document)) for value in other]}})
+		return Ops({self._name: {operation: values}})
 	
 	# Matching Array Element
 	
@@ -161,7 +168,7 @@ class Q(object):
 		Documentation: https://docs.mongodb.org/manual/reference/operator/query/gte/#op._S_gte
 		"""
 		
-		return self._op('$ge', other, '#rel')
+		return self._op('$gte', other, '#rel')
 	
 	def __lt__(self, other):
 		"""Matches values that are less than or equal to a specified value.
@@ -374,5 +381,11 @@ class Q(object):
 		"""
 		
 		foreign = set(kinds) if kinds else self._field.__foreign__
+		
+		if not foreign:
+			return Ops()
+		
+		if len(foreign) == 1:  # Simplify if the value is singular.
+			foreign, = foreign  # Unpack.
 		
 		return Ops({self._name: {'$type': foreign}})

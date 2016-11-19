@@ -38,6 +38,7 @@ class Field(Attribute):
 	__allowed_operators__ = set()
 	__disallowed_operators__ = set()
 	__document__ = None  # If we're assigned to a Document, this gets populated with a weak reference proxy.
+	__foreign__ = {}
 	
 	# Inherits from Attribute: (name is usually, but not always the first positional parameter)
 	# name - The database-side name of the field, stored as __name__, defaulting to the attribute name assigned to.

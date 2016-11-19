@@ -6,25 +6,28 @@ import pytest
 import operator
 from collections import OrderedDict as odict
 
-from marrow.mongo.core import Document, Field
-from marrow.mongo.query import Q
+from marrow.mongo.core import Document
+from marrow.mongo import String, Number, Array
+from marrow.mongo.query import Ops, Q
 from marrow.mongo.util.compat import py3, str
 
 
 class Sample(Document):
-	field = Field()
+	field = String('field_name')
+	number = Number('field_name')
+	array = Array(Number(), name='field_name')
 
 mock_queryable = Sample.field
 
 
 class TestQueryable(object):  # TODO: Properly use pytest fixtures for this...
 	operators = [
-			(operator.lt, '$lt', 27, {'field_name': {'$lt': 27}}),
-			(operator.le, '$lte', 27, {'field_name': {'$lte': 27}}),
+			(operator.lt, '$lt', 27, {'field_name': {'$lt': '27'}}),
+			(operator.le, '$lte', 27, {'field_name': {'$lte': '27'}}),
 			(operator.eq, '$eq', "hOI!", {'field_name': 'hOI!'}),
 			(operator.ne, '$ne', "hOI!", {'field_name': {'$ne': 'hOI!'}}),
-			(operator.ge, '$gte', 27, {'field_name': {'$gte': 27}}),
-			(operator.gt, '$gt', 27, {'field_name': {'$gt': 27}}),
+			(operator.ge, '$gte', 27, {'field_name': {'$gte': '27'}}),
+			(operator.gt, '$gt', 27, {'field_name': {'$gt': '27'}}),
 		]
 	
 	singletons = [
@@ -34,24 +37,22 @@ class TestQueryable(object):  # TODO: Properly use pytest fixtures for this...
 		]
 	
 	advanced = [
-			(Q.any, '$in', [1, 2, 3], {'field_name': {'$in': [1, 2, 3]}}),
-			(Q.none, '$nin', [1, 2, 3], {'field_name': {'$nin': [1, 2, 3]}}),
+			(Q.any, '$in', [1, 2, 3], {'field_name': {'$in': ['1', '2', '3']}}),
+			(Q.none, '$nin', [1, 2, 3], {'field_name': {'$nin': ['1', '2', '3']}}),
 			(Q.all, '$all', [1, 2, 3], {'field_name': {'$all': [1, 2, 3]}}),
 			(Q.match, '$elemMatch', {'name': "Bob"}, {'field_name': {'$elemMatch': {'name': 'Bob'}}}),
 			(Q.size, '$size', 42, {'field_name': {'$size': 42}}),
 			(Q.of_type, '$type', "double", {'field_name': {'$type': 'double'}}),
 		]
 	
-	def do_operator(self, operator, query, value, result):
+	def do_operator(self, operator, query, value, result, mock_queryable=mock_queryable):
 		op = operator(mock_queryable, value)
-		assert isinstance(op, Op)
-		assert op.operation == query[1:]
+		assert isinstance(op, Ops)
 		assert op.as_query == result
 	
 	def do_singleton(self, operator, query, result):
 		op = operator(mock_queryable)
-		assert isinstance(op, Op)
-		assert op.operation == query[1:]
+		assert isinstance(op, Ops)
 		assert op.as_query == result
 	
 	def test_operator_lt(self): self.do_operator(*self.operators[0])
@@ -66,7 +67,7 @@ class TestQueryable(object):  # TODO: Properly use pytest fixtures for this...
 	
 	def test_operator_any(self): self.do_operator(*self.advanced[0])
 	def test_operator_none(self): self.do_operator(*self.advanced[1])
-	def test_operator_all(self): self.do_operator(*self.advanced[2])
+	def test_operator_all(self): self.do_operator(*self.advanced[2], mock_queryable=Sample.array)
 	def test_operator_match(self): self.do_operator(*self.advanced[3])
 	def test_operator_size(self): self.do_operator(*self.advanced[4])
 	def test_operator_type(self): self.do_operator(*self.advanced[5])
@@ -76,4 +77,4 @@ class TestQueryable(object):  # TODO: Properly use pytest fixtures for this...
 		op = Q.range(mock_queryable, 5, 11)
 		assert isinstance(op, Ops)
 		
-		assert op.as_query == odict({'field_name': odict([('$gte', 5), ('$lt', 11)])})
+		assert op.as_query == odict({'field_name': dict([('$gte', '5'), ('$lt', '11')])})
