@@ -33,7 +33,7 @@ class Ops(object):
 	def __repr__(self, extra=None):
 		return "{}({}{}{}{})".format(
 				self.__class__.__name__,
-				self.operations,
+				repr([(i, j) for i, j in self.operations.items()]),
 				", collection={}".format() if self.collection else "",
 				", document={}".format() if self.document else "",
 				extra or ""
