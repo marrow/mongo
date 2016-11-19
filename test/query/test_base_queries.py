@@ -76,4 +76,3 @@ TRUTHY_CASES = [
 
 FALSY_CASES = [
 	]
-
