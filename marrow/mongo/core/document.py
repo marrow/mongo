@@ -88,25 +88,8 @@ class Document(Container):
 		return {name: True for name in projected}
 	
 	@classmethod
-	def _get_validation_document(cls):
-		document = cls.__store__()
-		
-		for name, field in cls.__fields__.items():
-			if not hasattr(field, '_contribute_validation'):
-				continue
-			
-			# This lets the method apply global adjustments, or simply return them to be namespaced in the document.
-			result = field._contribute_validation(document)
-			if result:
-				document[field.__name__].setdefault(cls.__store__())
-				document[field.__name__].update(result)  # TODO: This needs to be more complex.
-		
-		return document
-	
-	@classmethod
 	def __attributed__(cls):
 		cls.__projection__ = cls._get_default_projection()
-		cls.__validation__ = cls._get_validation_document()
 	
 	def _prepare_defaults(self):
 		"""Trigger assignment of default values."""
