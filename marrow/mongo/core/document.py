@@ -196,6 +196,10 @@ class Document(Container):
 		"""Iterate 2-tuple pairs of (key, value) from the backing store."""
 		return self.__data__.items()
 	
+	def iteritems(self):
+		"""Python 2 interation, as per items."""
+		return self.__data__.items()
+	
 	def values(self):
 		"""Iterate the values within the backing store."""
 		return self.__data__.values()
