@@ -30,13 +30,21 @@ class TestOpsMapping(object):
 	def test_setitem(self, empty_ops):
 		assert repr(empty_ops) == "Ops([])"
 		empty_ops['meaning'] = 42
-		assert repr(empty_ops) == "Ops([('meaning', 42)])"
+		
+		if py3:
+			assert repr(empty_ops) == "Ops([('meaning', 42)])"
+		else:
+			assert repr(empty_ops) == "Ops([(u'meaning', 42)])"
 	
 	def test_delitem(self, empty_ops, single_ops):
 		with pytest.raises(KeyError):
 			del empty_ops['roll']
 		
-		assert repr(single_ops) == "Ops([('roll', 27)])"
+		if py3:
+			assert repr(single_ops) == "Ops([('roll', 27)])"
+		else:
+			assert repr(single_ops) == "Ops([(u'roll', 27)])"
+		
 		del single_ops['roll']
 		assert repr(single_ops) == "Ops([])"
 	
@@ -100,13 +108,26 @@ class TestOpsMapping(object):
 		assert len(empty_ops.operations) == 0
 		empty_ops.update(name="Bob Dole")
 		assert len(empty_ops.operations) == 1
-		assert repr(empty_ops) == "Ops([('name', 'Bob Dole')])"
+		
+		if py3:
+			assert repr(empty_ops) == "Ops([('name', 'Bob Dole')])"
+		else:
+			assert repr(empty_ops) == "Ops([('name', u'Bob Dole')])"
 		
 		assert len(single_ops.operations) == 1
-		assert repr(single_ops) == "Ops([('roll', 27)])"
+		
+		if py3:
+			assert repr(single_ops) == "Ops([('roll', 27)])"
+		else:
+			assert repr(single_ops) == "Ops([(u'roll', 27)])"
+		
 		single_ops.update([('name', "Bob Dole")])
 		assert len(single_ops.operations) == 2
-		assert repr(single_ops) in ("Ops([('roll', 27), ('name', 'Bob Dole')])", "Ops([('name', 'Bob Dole'), ('roll', 27)])")
+		
+		if py3:
+			assert repr(single_ops) in ("Ops([('roll', 27), ('name', 'Bob Dole')])", "Ops([('name', 'Bob Dole'), ('roll', 27)])")
+		else:
+			assert repr(single_ops) in ("Ops([(u'roll', 27), (u'name', u'Bob Dole')])", "Ops([(u'name', u'Bob Dole'), (u'roll', 27)])")
 	
 	def test_setdefault(self, empty_ops):
 		assert len(empty_ops.operations) == 0
