@@ -1,5 +1,7 @@
 # encoding: utf-8
 
+from marrow.package.loader import load
+
 
 SENTINEL = object()  # Singleton value to detect unassigned values.
 
@@ -14,3 +16,15 @@ def adjust_attribute_sequence(amount=10000, *fields):
 		return cls
 	
 	return adjust_inner
+
+
+class Registry(object):
+	def __init__(self, namespace):
+		self._namespace = namespace
+	
+	def __getattr__(self, name):
+		self.__dict__[name] = load(name, self._namespace)
+		return self.__dict__[name]
+	
+	def __getitem__(self, name):
+		return load(name, self._namespace)

@@ -1,1 +1,4 @@
-__import__('pkg_resources').declare_namespace(__name__)
+from .util import Registry
+
+document = Registry('marrow.mongo.document')
+field = Registry('marrow.mongo.field')
