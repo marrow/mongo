@@ -9,7 +9,7 @@ from marrow.mongo.util import SENTINEL
 
 class Person(Document):
 	name = Field()
-	age = Field()
+	age = Field(default=42, assign=True)
 
 
 @pytest.fixture
@@ -43,6 +43,9 @@ class TestDocumentMutableMapping(object):
 		assert len(doc) == 2
 		del doc['name']
 		assert len(doc) == 1
+	
+	def test_iteration(self, doc):
+		assert list(iter(doc)) == ['name', 'age']
 	
 	def test_length(self, doc):
 		"""It is possible to get the number of keys in the stored data."""

@@ -15,6 +15,7 @@ from marrow.schema import Container, Attributes
 from .field import Field
 from .index import Index
 from ..util import SENTINEL
+from ..util.compat import unicode
 
 
 class Document(Container):
@@ -64,18 +65,19 @@ class Document(Container):
 	
 	@classmethod
 	def _get_default_projection(cls):
-		projected = []
-		omitted = []
-		neutral = []
+		"""Construct the default projection document."""
+		
+		projected = []  # The fields explicitly requested for inclusion.
+		neutral = []  # Fields returning neutral (None) status.
+		omitted = False  # Have any fields been explicitly omitted?
 		
 		for name, field in cls.__fields__.items():
-			project = field.project
-			if project is None:
+			if field.project is None:
 				neutral.append(name)
-			elif project:
+			elif field.project:
 				projected.append(name)
 			else:
-				omitted.append(name)
+				omitted = True
 		
 		if not projected and not omitted:
 			# No preferences specified.
@@ -89,6 +91,8 @@ class Document(Container):
 	
 	@classmethod
 	def __attributed__(cls):
+		"""Executed after each new subclass is constructed."""
+		
 		cls.__projection__ = cls._get_default_projection()
 	
 	def _prepare_defaults(self):
@@ -96,23 +100,6 @@ class Document(Container):
 		for name, field in self.__fields__.items():
 			if field.assign:
 				getattr(self, name)
-	
-	@property
-	def __field_names__(self):
-		"""Generate the name of the fields defined on the current document.
-		
-		This is a dynamic property because this represents actual data-defined fields, not schema-defined.
-		"""
-		names = tuple(self.__fields__)
-		
-		# These are explicit field names, returned regardless of presence in the actual data.
-		for name in names:  # Python 2 deprecation note: yield from
-			yield name
-		
-		# These are aditional fields present in the underlying document.
-		for name in self.__data__:
-			if name in names: continue  # Skip documented fields.
-			yield name
 	
 	@classmethod
 	def bind(cls, db=None, collection=None):
