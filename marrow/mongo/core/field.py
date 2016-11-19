@@ -7,7 +7,7 @@ from marrow.schema.transform import BaseTransform
 from marrow.schema.validate import Validator
 
 from ..query import Q
-from ..util import adjust_attribute_sequence
+from ..util import adjust_attribute_sequence, SENTINEL
 from ..util.compat import py3
 
 
@@ -56,6 +56,40 @@ class Field(Attribute):
 	project = Attribute(default=None)  # Predicate to indicate inclusion in the default projection.
 	read = Attribute(default=True)  # Read predicate, either  a boolean or a callable returning a boolean.
 	write = Attribute(default=True)  # Write predicate, either a boolean or callable returning a boolean.
+	
+	def __repr__(self):
+		fields = []
+		
+		for field in self.__attributes__.values():
+			name = field.__name__
+			
+			if name in ['__name__']:
+				continue
+			
+			if name not in self.__data__:
+				continue
+			
+			default = getattr(field, 'default', SENTINEL)
+			value = self.__data__[name]
+			
+			if value == default or value is default:
+				continue
+			
+			fields.append((field.__name__, value))
+		
+		if fields:
+			fields = ", ".join("{}={!r}".format(field, value) for field, value in fields)
+			fields = ', ' + fields
+		else:
+			fields = ""
+		
+		name = getattr(self, '__name__', '<anonymous>')
+		
+		return "{self.__class__.__name__}('{name}'{fields})".format(
+				self = self,
+				name = name,
+				fields = fields
+			)
 	
 	# Security Predicate Handling
 	
