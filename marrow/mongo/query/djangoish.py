@@ -5,8 +5,8 @@
 # Small test script for paste into ipython:
 
 from pymongo import *
-from marrow.mongo.core.document import Document
-from marrow.mongo.field.base import Field
+from marrow.mongo import Document
+from marrow.mongo.field import Field
 from marrow.mongo.query.djangoish import F
 
 class Bar(Document):

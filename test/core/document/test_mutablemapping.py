@@ -3,8 +3,7 @@
 import pytest
 
 from marrow.schema.compat import odict
-from marrow.mongo.core.document import Document
-from marrow.mongo.field.base import Field
+from marrow.mongo import Document, Field
 from marrow.mongo.util import SENTINEL
 
 

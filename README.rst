@@ -79,8 +79,8 @@ it to encompass MongoDB data storage concerns. You define data models by importi
 components of a collection, such as ``Document``, ``ObjectId``, or ``String``, then compose them into a declarative
 class model. For example, if you wanted to define a simple user account model, you would begin by importing::
 
-    from marrow.mongo.core import Document, Index
-    from marrow.mongo import ObjectId, String, Number, Array
+    from marrow.mongo import Index, Document
+    from marrow.mongo.field import ObjectId, String, Number, Array
 
 One must always import ``Document`` from ``marrow.mongo.core`` prior to any import of registered fields from
 ``marrow.mongo``. As a note, due to the magical nature of this plugin import registry, it may change in future feature

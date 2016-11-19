@@ -3,7 +3,7 @@
 from bson.int64 import Int64
 from decimal import Decimal as dec
 
-from ..core import Field
+from . import Field
 
 
 class Number(Field):

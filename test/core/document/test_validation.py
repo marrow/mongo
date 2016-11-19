@@ -1,5 +1,5 @@
-from marrow.mongo.core import Document
-from marrow.mongo import String, Array, Binary, ObjectId, Boolean, Date
+from marrow.mongo import Document
+from marrow.mongo.field import String, Array, Binary, ObjectId, Boolean, Date
 
 
 class StringDocument(Document):

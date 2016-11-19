@@ -19,6 +19,8 @@ def adjust_attribute_sequence(amount=10000, *fields):
 
 
 class Registry(object):
+	__path__ = []
+	
 	def __init__(self, namespace):
 		self._namespace = namespace
 	

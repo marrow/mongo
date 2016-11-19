@@ -7,9 +7,9 @@ from pkg_resources import iter_entry_points
 from marrow.schema import Attribute
 from marrow.package.loader import traverse, load
 
-from ..core import Document, Field
-from ..util import adjust_attribute_sequence
-from ..util.compat import str, unicode
+from .. import Document, Field
+from ...util import adjust_attribute_sequence
+from ...util.compat import str, unicode
 
 
 @adjust_attribute_sequence(-1000, 'kind')  # Allow 'kind' to be passed positionally first.

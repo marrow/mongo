@@ -3,8 +3,9 @@
 """Session handling extension using mongo db storage."""
 
 from bson import ObjectId as oid
-from marrow.mongo.core import Document
-from marrow.mongo import ObjectId, Date
+from marrow.mongo import Document
+from marrow.mongo.document import ObjectId, Date
+
 
 log = __import__('logging').getLogger(__name__)
 
@@ -87,4 +88,3 @@ class MongoSession(object):
 		document = context.session[self.name]
 		
 		docs.replace_one(D.id == document.id, document, True)
-

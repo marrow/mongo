@@ -1,8 +1,8 @@
 # encoding: utf-8
 
 
-from marrow.mongo.core import Document, Field
-from marrow.mongo import ObjectId, String, Embed
+from marrow.mongo.document import Document
+from marrow.mongo.field import ObjectId, String, Embed
 
 
 class Sample(Document):

@@ -6,8 +6,8 @@ import pytest
 import operator
 from collections import OrderedDict as odict
 
-from marrow.mongo.core import Document
-from marrow.mongo import String, Number, Array
+from marrow.mongo import Document
+from marrow.mongo.field import String, Number, Array
 from marrow.mongo.query import Ops, Q
 from marrow.mongo.util.compat import py3, str
 

@@ -1,9 +1,8 @@
 # encoding: utf-8
 
 from pymongo import MongoClient
-from marrow.mongo.core import Document, Index
-from marrow.mongo.util import adjust_attribute_sequence
-from marrow.mongo import ObjectId, String, Number, Array
+from marrow.mongo import Document, Index
+from marrow.mongo.field import ObjectId, String, Number, Array
 
 
 collection = MongoClient().test.collection

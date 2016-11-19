@@ -5,8 +5,8 @@ from __future__ import unicode_literals
 from bson import ObjectId as oid
 from datetime import datetime, timedelta
 
-from marrow.mongo.field.base import ObjectId
-from marrow.mongo.core.util import str
+from marrow.mongo.field import ObjectId
+from marrow.mongo.util.compat import str
 
 
 pk = ObjectId(name='_id')
@@ -41,7 +41,7 @@ def enum(name, *choices):
 def sum(collection, filter, field):
 	return list(collection.aggregate([
 			{'$match': filter},
-			{'$project': {_id: 0, _key: "$" + str(field)}}
+			{'$project': {_id: 0, _key: "$" + str(field)}},
 			{'$group': {
 				'_id': 1,
 				'_sum': {'$sum': '$_key'}
