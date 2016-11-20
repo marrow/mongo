@@ -98,7 +98,7 @@ setup(
 						'Document = marrow.mongo.core:Document',
 					],
 				'marrow.mongo.field': [  # Field classes registered by (optionaly namespaced) name.
-						'Field = marrow.mongo.core:Field',
+						'Field = marrow.mongo.core.field:Field',
 						'String = marrow.mongo.core.field.base:String',
 						'Binary = marrow.mongo.core.field.base:Binary',
 						'ObjectId = marrow.mongo.core.field.base:ObjectId',

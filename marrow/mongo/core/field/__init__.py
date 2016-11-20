@@ -2,6 +2,7 @@
 
 from weakref import proxy
 
+from marrow.package.loader import traverse
 from marrow.schema import Attribute
 from marrow.schema.transform import BaseTransform
 from marrow.schema.validate import Validator
@@ -31,10 +32,11 @@ class FieldTransform(BaseTransform):
 
 @adjust_attribute_sequence(1000, 'transformer', 'validator', 'translated', 'assign', 'project', 'read', 'write')
 class Field(Attribute):
-	# Possible values include a literal operator, or one of:
+	# Possible values for operators include any literal $-prefixed operator, or one of:
 	#  * #rel -- allow/prevent all relative comparison such as $gt, $gte, $lt, etc.
 	#  * #array -- allow/prevent all array-related compraison such as $all, $size, etc.
 	#  * #document -- allow/prevent all document-related comparison such as $elemMatch.
+	#  * #geo -- allow/prevent geographic query operators
 	__allowed_operators__ = set()
 	__disallowed_operators__ = set()
 	__document__ = None  # If we're assigned to a Document, this gets populated with a weak reference proxy.
@@ -73,10 +75,8 @@ class Field(Attribute):
 			default = getattr(field, 'default', SENTINEL)
 			value = self.__data__[name]
 			
-			if value == default or value is default:
-				continue
-			
-			fields.append((field.__name__, value))
+			if value != default:
+				fields.append((field.__name__, value))
 		
 		if fields:
 			fields = ", ".join("{}={!r}".format(field, value) for field, value in fields)
@@ -148,11 +148,13 @@ class Field(Attribute):
 		
 		if self.exclusive:
 			for other in self.exclusive:
-				try:
-					if getattr(obj, other, None) is not None:
-						raise AttributeError("Can not assign to " + self.__name__ + " if " + other + " has a value.")
-				except AttributeError:
+				try:  # Handle this with kid gloves, just in case.
+					ovalue = traverse(obj, other, None)
+				except LookupError:  # pragma: no cover
 					pass
+				
+				if ovalue is not None:
+					raise AttributeError("Can not assign to " + self.__name__ + " if " + other + " has a value.")
 		
 		if value is not None:
 			value = self.transformer.foreign(value, (self, obj))
