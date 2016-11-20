@@ -26,10 +26,6 @@ class Ops(object):
 		self.collection = collection
 		self.document = document
 	
-	def bind(self, collection):
-		self.collection = collection.with_options(CodecOptions(document_class=odict, tz_aware=True, tzinfo=utc))
-		return self
-	
 	def __repr__(self, extra=None):
 		return "{}({}{}{}{})".format(
 				self.__class__.__name__,
@@ -38,9 +34,6 @@ class Ops(object):
 				", document={}".format() if self.document else "",
 				extra or ""
 			)
-	
-	def copy(self):
-		return self.operations.copy()
 	
 	@property
 	def as_query(self):

@@ -20,6 +20,10 @@ def single_ops(request):
 	return Ops({'roll': 27})
 
 
+def test_ops_iteration(single_ops):
+	assert list(iter(single_ops)) == ['roll']
+
+
 class TestOpsMapping(object):
 	def test_getitem(self, empty_ops, single_ops):
 		with pytest.raises(KeyError):
