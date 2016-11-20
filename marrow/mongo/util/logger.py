@@ -207,4 +207,3 @@ class MongoHandler(logging.Handler):
 			return
 		
 		document['_id'] = result.inserted_id
-

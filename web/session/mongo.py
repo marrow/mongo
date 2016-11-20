@@ -4,7 +4,7 @@
 
 from bson import ObjectId as oid
 from marrow.mongo import Document
-from marrow.mongo.document import ObjectId, Date
+from marrow.mongo.field import ObjectId, Date
 
 
 log = __import__('logging').getLogger(__name__)
