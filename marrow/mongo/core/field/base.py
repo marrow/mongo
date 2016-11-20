@@ -19,6 +19,7 @@ except:
 
 class String(Field):
 	__foreign__ = 'string'
+	__disallowed_operators__ = {'#array'}
 	
 	def to_foreign(self, obj, name, value):
 		return str(value)
@@ -26,6 +27,7 @@ class String(Field):
 
 class Binary(Field):
 	__foreign__ = 'binData'
+	__disallowed_operators__ = {'#array'}
 	
 	def to_native(self, obj, name, value):
 		return bytes(value)
@@ -33,6 +35,7 @@ class Binary(Field):
 
 class ObjectId(Field):
 	__foreign__ = 'objectId'
+	__disallowed_operators__ = {'#array'}
 	
 	default = Attribute(default=lambda: oid())
 	
@@ -51,6 +54,7 @@ class ObjectId(Field):
 
 class Boolean(Field):
 	__foreign__ = 'bool'
+	__disallowed_operators__ = {'#array'}
 	
 	def to_foreign(self, obj, name, value):
 		if value is None:
@@ -72,6 +76,7 @@ class Boolean(Field):
 
 class Date(Field):
 	__foreign__ = 'date'
+	__disallowed_operators__ = {'#array'}
 	
 	now = Attribute(default=False)
 	autoupdate = Attribute(default=False)
@@ -83,6 +88,7 @@ class TTL(Date):
 	"""A specialized Date field used to store dates in the future by timedelta from now."""
 	
 	__foreign__ = 'date'
+	__disallowed_operators__ = {'#array'}
 	
 	def to_foreign(self, obj, name, value):
 		if not value:
@@ -103,9 +109,12 @@ class TTL(Date):
 
 class Regex(String):
 	__foreign__ = 'regex'
+	__disallowed_operators__ = {'#array'}
 
 
 class JavaScript(String):
+	__disallowed_operators__ = {'#array'}
+	
 	scope = Attribute(default=None)
 	
 	def to_foreign(self, obj, name, value):
@@ -124,3 +133,4 @@ class JavaScript(String):
 
 class Timestamp(Field):
 	__foreign__ = 'timestamp'
+	__disallowed_operators__ = {'#array'}

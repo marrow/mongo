@@ -8,6 +8,7 @@ from . import Field
 
 class Number(Field):
 	__foreign__ = 'number'
+	__disallowed_operators__ = {'#array'}
 	
 	def to_foreign(self, obj, name, value):
 		try:

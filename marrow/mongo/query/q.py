@@ -7,6 +7,7 @@ For internal construction only.
 
 from __future__ import unicode_literals
 
+import re
 from copy import deepcopy
 from collections import Mapping, MutableMapping
 from pytz import utc
@@ -68,7 +69,7 @@ class Q(object):
 	
 	def __getattr__(self, name):
 		if not hasattr(self._field, 'kinds'):
-			raise AttributeError()
+			return getattr(self._field, name)
 		
 		for kind in self._field.kinds:
 			if hasattr(kind, '__fields__'):
@@ -82,9 +83,6 @@ class Q(object):
 		
 		raise AttributeError()
 	
-	def __hash__(self):
-		return hash(self._name)
-	
 	def __unicode__(self):
 		return self._name
 	
@@ -96,9 +94,9 @@ class Q(object):
 	def _op(self, operation, other, *allowed):
 		"""A basic operation operating on a single value."""
 		
-		if __debug__ and _complex_safety_check(self._field, {operation} & set(allowed)):  # Optimize this away in production.
-			raise NotImplementedError("{self.__class__.__name__} does not allow {op} comparison.".format(
-					self=self, op=operation))
+		# Optimize this away in production; diagnosic aide.
+		if __debug__ and _complex_safety_check(self._field, {operation} & set(allowed)):  # pragma: no cover
+			raise NotImplementedError("{self!r} does not allow {op} comparison.".format(self=self, op=operation))
 		
 		return Ops({self._name: {operation: self._field.transformer.foreign(other, (self._field, self._document))}})
 	
@@ -108,8 +106,9 @@ class Q(object):
 		Consumes iterators to construct a concrete list at time of execution.
 		"""
 		
-		if __debug__ and _complex_safety_check(self._field, {operation} & set(allowed)):  # Optimize this away in production.
-			raise NotImplementedError("{self.__class__.__name__} does not allow {op} comparison.".format(
+		# Optimize this away in production; diagnosic aide.
+		if __debug__ and _complex_safety_check(self._field, {operation} & set(allowed)):  # pragma: no cover
+			raise NotImplementedError("{self!r} does not allow {op} comparison.".format(
 					self=self, op=operation))
 		
 		other = other if len(other) > 1 else other[0]
@@ -143,8 +142,9 @@ class Q(object):
 		Documentation: https://docs.mongodb.org/manual/reference/operator/query/eq/#op._S_eq
 		"""
 		
-		if __debug__ and _simple_safety_check(self._field, '$eq'):  # Optimize this away in production; diagnosic aide.
-			raise NotImplementedError("{self.__class__.__name__} does not allow $eq comparison.".format(self=self))
+		# Optimize this away in production; diagnosic aide.
+		if __debug__ and _simple_safety_check(self._field, '$eq'):  # pragma: no cover
+			raise NotImplementedError("{self!r} does not allow $eq comparison.".format(self=self))
 		
 		return Ops({self._name: self._field.transformer.foreign(other, (self._field, self._document))})
 	
@@ -232,35 +232,35 @@ class Q(object):
 	
 	# Multiple Field Participation
 	
-	def __and__(self, other):  # TODO: Decide what to do when the developer does this.
-		"""Allow the comparison of multiple fields against a single value.
+	def __and__(self, other):
+		"""Allow the comparison of multiple fields against a single value. (Not implemented yet.)
 		
 		Binary "and" comparison: both fields must match the final expression.
 		
 			(Document.first & Document.second) == 42
 		"""
 		
-		raise NotImplementedError()
+		raise NotImplementedError()  # pragma: no cover
 	
 	def __or__(self, other):
-		"""Allow the comparison of multiple fields against a single value.
+		"""Allow the comparison of multiple fields against a single value. (Not implemented yet.)
 		
 		Binary "or" comparison: either field, or both, match the final expression.
 		
 			(Document.first | Document.second) == 27
 		"""
 		
-		raise NotImplementedError()
+		raise NotImplementedError()  # pragma: no cover
 	
 	def __xor__(self, other):
-		"""Allow the comparison of multiple fields against a single value.
+		"""Allow the comparison of multiple fields against a single value. (Not implemented yet.)
 		
 		Binary "xor" comparison: the first field, or the second field, but not both must match the expression.
 		
 			(Document.first ^ Document.second) == 55
 		"""
 		
-		raise NotImplementedError()
+		raise NotImplementedError()  # pragma: no cover
 	
 	def __invert__(self):
 		"""Return the fully qualified name of the current field reference, for use in custom dictionary construction.
@@ -270,7 +270,7 @@ class Q(object):
 			collection.find({}, {~Document.field: 1})
 		
 		Will be obsolete and possibly re-tasked if and when pymongo is patched to allow string-like (or stringify)
-		keys.
+		keys. (That would allow simple `{Document.field: 1}` given we make ourselves hashable.)
 		"""
 		
 		return self._name
@@ -286,7 +286,7 @@ class Q(object):
 		Documentation: https://docs.mongodb.com/manual/reference/operator/query/regex/
 		"""
 		
-		raise NotImplementedError()
+		return Ops({self._name: {'$re': ''.join(parts)}})
 	
 	# Array Query Selectors
 	# https://docs.mongodb.org/manual/reference/operator/query/#array
@@ -310,8 +310,10 @@ class Q(object):
 		Array operator: {$elemMatch: value}
 		Documentation: https://docs.mongodb.org/manual/reference/operator/query/elemMatch/#op._S_elemMatch
 		"""
-		if __debug__ and _complex_safety_check(self._field, {'$elemMatch', '#document'}):  # Optimize this away in production.
-			raise NotImplementedError("{self.__class__.__name__} does not allow $elemMatch comparison.".format(self=self))
+		
+		# Optimize this away in production; diagnosic aide.
+		if __debug__ and _complex_safety_check(self._field, {'$elemMatch', '#document'}):  # pragma: no cover
+			raise NotImplementedError("{self!r} does not allow $elemMatch comparison.".format(self=self))
 		
 		if hasattr(q, 'as_query'):
 			q = q.as_query
@@ -327,8 +329,10 @@ class Q(object):
 		
 		Comparison operator: {$gte: gte, $lt: lt}
 		"""
-		if __debug__ and _simple_safety_check(self._field, '#range'):  # Optimize this away in production; diagnosic aide.
-			raise NotImplementedError("{self.__class__.__name__} does not allow range comparison.".format(self=self))
+		
+		# Optimize this away in production; diagnosic aide.
+		if __debug__ and _simple_safety_check(self._field, '$eq'):  # pragma: no cover
+			raise NotImplementedError("{self!r} does not allow range comparison.".format(self=self))
 		
 		return (self >= gte) & (self < lt)
 	
@@ -340,8 +344,10 @@ class Q(object):
 		Array operator: {$size: value}
 		Documentation: https://docs.mongodb.org/manual/reference/operator/query/size/#op._S_size
 		"""
-		if __debug__ and _complex_safety_check(self._field, {'$size', '#array'}):  # Optimize this away in production.
-			raise NotImplementedError("{self.__class__.__name__} does not allow $size comparison.".format(self=self))
+		
+		# Optimize this away in production; diagnosic aide.
+		if __debug__ and _complex_safety_check(self._field, {'$size', '#array'}):  # pragma: no cover
+			raise NotImplementedError("{self!r} does not allow $size comparison.".format(self=self))
 		
 		return Ops({self._name: {'$size': int(value)}})
 	

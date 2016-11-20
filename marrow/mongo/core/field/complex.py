@@ -34,10 +34,12 @@ class _HasKinds(Field):
 
 class Array(_HasKinds, Field):
 	__foreign__ = 'array'
+	__allowed_operators__ = {'#array', '$elemMatch'}
 
 
 class Embed(_HasKinds, Field):
 	__foreign__ = 'object'
+	__allowed_operators__ = {'#document'}
 	
 	def __init__(self, *kinds, **kw):
 		kw['kind'] = kinds
