@@ -97,6 +97,7 @@ class Document(Container):
 	
 	def _prepare_defaults(self):
 		"""Trigger assignment of default values."""
+		
 		for name, field in self.__fields__.items():
 			if field.assign:
 				getattr(self, name)
@@ -120,11 +121,11 @@ class Document(Container):
 					),
 				read_preference = cls.__read_preference__,
 				read_concern = cls.__read_concern__,
-				write_concern = None,  # TODO: Class-level configuration.
+				write_concern = cls.__write_concern__,
 			)
 		
 		cls.__bound__ = True
-		cls.__collection__ = collection
+		cls._collection = collection
 		
 		return cls
 	
@@ -148,11 +149,13 @@ class Document(Container):
 	@classmethod
 	def from_json(cls, json):
 		"""Convert JSON data into a Document instance."""
+		
 		deserialized = loads(json)
 		return cls.from_mongo(deserialized)
 	
 	def to_json(self, *args, **kw):
 		"""Convert our Document instance back into JSON data. Additional arguments are passed through."""
+		
 		return dumps(self, *args, **kw)
 	
 	@property
@@ -164,64 +167,79 @@ class Document(Container):
 		
 		https://docs.mongodb.com/manual/reference/mongodb-extended-json/
 		"""
+		
 		return self  # We're sufficiently dictionary-like to pass muster.
 	
 	# Mapping Protocol
 	
 	def __getitem__(self, name):
 		"""Retrieve data from the backing store."""
+		
 		return self.__data__[name]
 	
 	def __setitem__(self, name, value):
 		"""Assign data directly to the backing store."""
+		
 		self.__data__[name] = value
 	
 	def __delitem__(self, name):
 		"""Unset a value from the backing store."""
+		
 		del self.__data__[name]
 	
 	def __iter__(self):
 		"""Iterate the names of the values assigned to our backing store."""
+		
 		return iter(self.__data__.keys())
 	
 	def __len__(self):
 		"""Retrieve the size of the backing store."""
+		
 		return len(getattr(self, '__data__', {}))
 	
 	def keys(self):
 		"""Iterate the keys assigned to the backing store."""
+		
 		return self.__data__.keys()
 	
 	def items(self):
 		"""Iterate 2-tuple pairs of (key, value) from the backing store."""
+		
 		return self.__data__.items()
 	
 	def iteritems(self):
 		"""Python 2 interation, as per items."""
+		
 		return self.__data__.items()
 	
 	def values(self):
 		"""Iterate the values within the backing store."""
+		
 		return self.__data__.values()
 	
 	def __contains__(self, key):
 		"""Determine if the given key is present in the backing store."""
+		
 		return key in self.__data__
 	
 	def __eq__(self, other):
 		"""Equality comparison between the backing store and other value."""
+		
 		return self.__data__ == other
 	
 	def __ne__(self, other):
 		"""Inverse equality comparison between the backing store and other value."""
+		
 		return self.__data__ != other
 	
 	def get(self, key, default=None):
 		"""Retrieve a value from the backing store with a default value."""
+		
 		return self.__data__.get(key, default)
 	
 	def clear(self):
 		"""Empty the backing store of data."""
+		
 		self.__data__.clear()
 	
 	def pop(self, name, default=SENTINEL):
@@ -234,14 +252,17 @@ class Document(Container):
 	
 	def popitem(self):
 		"""Pop an item 2-tuple off the backing store."""
+		
 		return self.__data__.popitem()
 	
 	def update(self, *args, **kw):
 		"""Update the backing store directly."""
+		
 		self.__data__.update(*args, **kw)
 	
 	def setdefault(self, key, value=None):
 		"""Set a value in the backing store if no value is currently present."""
+		
 		return self.__data__.setdefault(key, value)
 
 
