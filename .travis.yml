@@ -25,7 +25,7 @@ python:
 
 install:
   - travis_retry pip install --upgrade setuptools pip pytest pytest-cov codecov 'setuptools_scm>=1.9'
-  - pip install -e '.[development]'
+  - pip install -e '.[development,logger]'
 
 script:
     python setup.py test
