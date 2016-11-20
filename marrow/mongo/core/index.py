@@ -31,8 +31,6 @@ class Index(Attribute):
 	min = Attribute(default=None)  # Minimum index key for use with a Geo2D index.
 	max = Attribute(default=None)  # Maximum index key for use with a Geo2D index.
 	
-	# Marrow Schema Interfaces
-	
 	def __init__(self, *args, **kw):
 		if args:
 			kw['fields'] = self.process_fields(args)
@@ -40,19 +38,16 @@ class Index(Attribute):
 		super(Index, self).__init__(**kw)
 	
 	def __fixup__(self, document):
-		self.__document__ = proxy(document)
-	
-	# Data Descriptor Protocol
-	
-	def __get__(self, obj, cls=None):
-		return self  # We're not really a field, so don't act like one.
-	
-	def __set__(self, obj, value):
-		raise AttributeError()  # Can't be assigned to.
-	
-	# Our Index Protocol
+		"""Process the fact that we've been bound to a document; transform field references to DB field names."""
+		
+		self.fields = [(  # Transform field names.
+				unicode(traverse(document, i[0], i[0])),  # Get the MongoDB field name.
+				i[1]  # Preserve the field order.
+			) for i in self.fields]
 	
 	def process_fields(self, fields):
+		"""Process a list of simple string field definitions and assign their order based on prefix."""
+		
 		result = []
 		strip = ''.join(self.PREFIX_MAP)
 		
@@ -73,11 +68,6 @@ class Index(Attribute):
 		This is where final field name resolution happens, via the reference we have to the containing document class.
 		"""
 		
-		fields = [(
-				unicode(traverse(self.__document__, i[0], i[0])),  # Get the MongoDB field name.
-				i[1]  # Preserve the field order.
-			) for i in self.fields]
-		
 		options = dict(
 				name = self.__name__,
 				unique = self.unique,
@@ -96,4 +86,4 @@ class Index(Attribute):
 			if options[key] is None:
 				del options[key]
 		
-		return collection.create_index(fields, **options)
+		return collection.create_index(self.fields, **options)
