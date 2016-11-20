@@ -6,15 +6,7 @@ from bson.code import Code
 from marrow.schema import Attribute
 
 from . import Field
-
-
-try:
-	unicode
-	bytes = str
-	str = unicode
-except:
-	str = str
-	bytes = bytes
+from ...util.compat import unicode
 
 
 class String(Field):
@@ -22,14 +14,14 @@ class String(Field):
 	__disallowed_operators__ = {'#array'}
 	
 	def to_foreign(self, obj, name, value):
-		return str(value)
+		return unicode(value)
 
 
 class Binary(Field):
 	__foreign__ = 'binData'
 	__disallowed_operators__ = {'#array'}
 	
-	def to_native(self, obj, name, value):
+	def to_foreign(self, obj, name, value):
 		return bytes(value)
 
 
@@ -37,19 +29,28 @@ class ObjectId(Field):
 	__foreign__ = 'objectId'
 	__disallowed_operators__ = {'#array'}
 	
-	default = Attribute(default=lambda: oid())
+	default = Attribute()
+	
+	def __fixup__(self, document):
+		super(ObjectId, self).__fixup__(document)
+		
+		try:  # Assign a default if one has not been given.
+			self.default
+		except AttributeError:
+			if self.__name__ == '_id':  # But only if we're actually the primary key.
+				self.default = lambda: oid()
 	
 	def to_foreign(self, obj, name, value):
-		if value is None:
-			if self.required:
-				raise ValueError()
-			
-			return value
-		
 		if isinstance(value, oid):
 			return value
 		
-		return oid(str(value))
+		if isinstance(value, datetime):
+			return oid.from_datetime(value)
+		
+		if isinstance(value, timedelta):
+			return oid.from_datetime(datetime.utcnow() + value)
+		
+		return oid(unicode(value))
 
 
 class Boolean(Field):
@@ -57,9 +58,6 @@ class Boolean(Field):
 	__disallowed_operators__ = {'#array'}
 	
 	def to_foreign(self, obj, name, value):
-		if value is None:
-			return None
-		
 		try:
 			value = value.lower()
 		except AttributeError:
@@ -71,7 +69,7 @@ class Boolean(Field):
 		if value in ('false', 'f', 'no', 'n', 'off', '0', False):
 			return False
 		
-		raise TypeError("Unknown or non-boolean value: " + value)
+		raise ValueError("Unknown or non-boolean value: " + value)
 
 
 class Date(Field):
@@ -91,9 +89,6 @@ class TTL(Date):
 	__disallowed_operators__ = {'#array'}
 	
 	def to_foreign(self, obj, name, value):
-		if not value:
-			return None
-		
 		if isinstance(value, timedelta):
 			return datetime.utcnow() + value
 		
