@@ -107,6 +107,18 @@ class TestDateField(FieldExam):
 
 class TestTTLField(FieldExam):
 	__field__ = TTL
+	
+	def test_cast_timedelta(self, Sample):
+		pass
+	
+	def test_cast_datetime(self, Sample):
+		pass
+	
+	def test_cast_integer(self, Sample):
+		pass
+	
+	def test_cast_failure(self, Sample):
+		pass
 
 
 class RegexField(FieldExam):
