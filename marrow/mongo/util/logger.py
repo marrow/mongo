@@ -1,8 +1,13 @@
 # encoding: utf-8
+# pragma: no cover
 
-"""
+"""Experimental Python standard logging support features.
 
-Example configuration:
+This is untested and is subject to change, use at own risk.
+
+Will utilize `pygments` syntax highlighting if available.
+
+Example logging "dictconfig":
 
 {
 	'version': 1,
@@ -31,8 +36,6 @@ Example configuration:
 				}
 		},
 }
-
-
 """
 
 from __future__ import unicode_literals
@@ -52,10 +55,8 @@ except ImportError:
 	_highlight = None
 
 
-
 DEFAULT_PROPERTIES = logging.LogRecord('', '', '', '', '', '', '', '').__dict__.keys()
 LOCAL_TZ = get_localzone()
-
 
 
 class JSONFormatter(logging.Formatter):
