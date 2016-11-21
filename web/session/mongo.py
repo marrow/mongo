@@ -1,10 +1,11 @@
 # encoding: utf-8
+# pragma: no cover
 
-"""Session handling extension using mongo db storage."""
+"""Experimental WebCore session handler using MongoDB storage."""
 
 from bson import ObjectId as oid
-from marrow.mongo import Document
-from marrow.mongo.field import ObjectId, Date
+from marrow.mongo import Document, Index
+from marrow.mongo.field import ObjectId, TTL
 
 
 log = __import__('logging').getLogger(__name__)
@@ -12,7 +13,9 @@ log = __import__('logging').getLogger(__name__)
 
 class MongoSessionStorage(Document):
 	id = ObjectId('_id', required=True, assign=False, default=None)
-	expires = Date('expires', default=None)
+	expires = TTL('expires', default=None)  # Override this field to specify an expiry time.
+	
+	_expires = Index('expires', expire=0)
 	
 	def __getattr__(self, name):
 		try:
@@ -69,13 +72,14 @@ class MongoSession(object):
 		D = self._Document
 		db = ctx.db[self._database]
 		docs = db[self._collection]
+		project = D.__projection__
 		
-		result = docs.find_one(D.id == session._id)
+		result = docs.find_one(D.id == session._id, project)
 		
 		if not result:
 			result = {'_id': oid(str(session._id))}
 		
-		result = session[self.name] = D.from_mongo(result)
+		result = session[self.name] = D.from_mongo(result, project.keys())
 		
 		return result
 	

@@ -1,6 +1,7 @@
 # encoding: utf-8
+# pragma: no cover
 
-"""Note: currently only tested on Python 3."""
+"""Note: experimental thingamabob."""
 
 from __future__ import unicode_literals
 
@@ -61,4 +62,3 @@ class Model(object):
 			setattr(instance, self.cache, collection)
 		
 		return collection
-
