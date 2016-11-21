@@ -263,7 +263,7 @@ class Q(object):
 	# Multiple Field Participation
 	
 	def __and__(self, other):
-		"""Allow the comparison of multiple fields against a single value. (Not implemented yet.)
+		"""Allow the comparison of multiple fields against a single value.
 		
 		Binary "and" comparison: both fields must match the final expression.
 		
@@ -273,7 +273,7 @@ class Q(object):
 		raise NotImplementedError()  # pragma: no cover
 	
 	def __or__(self, other):
-		"""Allow the comparison of multiple fields against a single value. (Not implemented yet.)
+		"""Allow the comparison of multiple fields against a single value.
 		
 		Binary "or" comparison: either field, or both, match the final expression.
 		
@@ -283,7 +283,7 @@ class Q(object):
 		raise NotImplementedError()  # pragma: no cover
 	
 	def __xor__(self, other):
-		"""Allow the comparison of multiple fields against a single value. (Not implemented yet.)
+		"""Allow the comparison of multiple fields against a single value.
 		
 		Binary "xor" comparison: the first field, or the second field, but not both must match the expression.
 		
