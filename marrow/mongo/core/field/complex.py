@@ -123,7 +123,7 @@ class Embed(_HasKinds, _CastingKind, Field):
 
 class Reference(_HasKinds, Field):
 	concrete = Attribute(default=False)  # If truthy, will store a DBRef instead of ObjectId.
-	#cache = Attribute(default=None)  # Attributes to preserve from the referenced object at the reference level.
+	cache = Attribute(default=None)  # Attributes to preserve from the referenced object at the reference level.
 	
 	@property
 	def __foreign__(self):
