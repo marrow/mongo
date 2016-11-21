@@ -5,6 +5,7 @@ from collections import Iterable
 from pkg_resources import iter_entry_points
 
 from marrow.schema import Attribute
+from marrow.package.canonical import name as canon
 from marrow.package.loader import traverse, load
 
 from .. import Document, Field
@@ -18,11 +19,17 @@ class _HasKinds(Field):
 	
 	kind = Attribute(default=None)  # One or more foreign model references, a string, Document subclass, or set of.
 	
+	def __init__(self, *kinds, **kw):
+		if kinds:
+			kw['kind'] = kinds
+		
+		super(_HasKinds, self).__init__(**kw)
+	
 	@property
 	def kinds(self):
 		values = self.kind
 		
-		if not isinstance(values, Iterable):
+		if isinstance(values, (str, unicode)) or not isinstance(values, Iterable):
 			values = (values, )
 		
 		for value in values:
@@ -32,41 +39,17 @@ class _HasKinds(Field):
 			yield value
 
 
-class Array(_HasKinds, Field):
-	__foreign__ = 'array'
-	__allowed_operators__ = {'#array', '$elemMatch'}
-
-
-class Embed(_HasKinds, Field):
-	__foreign__ = 'object'
-	__allowed_operators__ = {'#document'}
-	
-	def __init__(self, *kinds, **kw):
-		kw['kind'] = kinds
-		
-		if kw.get('assign', False) and 'default' not in kw:
-			if len(kinds) != 1:
-				raise ValueError("If auto-assignment is selected, must specify only one allowed kind.")
-			
-			def embed_default():
-				if isinstance(kinds[0], (str, unicode)):
-					return load(kinds[0], 'marrow.mongo.document')
-				return kinds[0]
-			
-			kw['default'] = embed_default
-		
-		super(Embed, self).__init__(**kw)
-	
+class _CastingKind(Field):
 	def to_native(self, obj, name, value):
-		"""Transform the MongoDB value into a Marrow Mongo value."""
-		
 		if not isinstance(value, Document):
+			"""Transform the MongoDB value into a Marrow Mongo value."""
+			
 			kinds = list(self.kinds)
 			
 			if len(kinds) == 1:
 				value = kinds[0].from_mongo(value)
 			else:
-				value = Document.from_mongo(value)  # This handles _cls lookup.
+				value = Document.from_mongo(value)  # TODO: Pass in allowed classes.
 		
 		return value
 	
@@ -78,15 +61,34 @@ class Embed(_HasKinds, Field):
 		if not isinstance(value, Document):
 			if len(kinds) != 1:
 				raise ValueError("Ambigouous assignment, assign an instance of: " + \
-						", ".join(kind.__name__ for kind in kinds))
+						", ".join(repr(kind) for kind in kinds))
 			
-			value = kinds[0](**value)
-			# DISCUSS: value.__data__.update(value) instead?
+			value = kinds[0](**value)  # We're going from Python-land to MongoDB, we like instantiation.
 		
-		if '_cls' not in value and len(kinds) != 1:
-			value['_cls'] = name(value.__class__)
+		if '_cls' not in value and len(kinds) != 1:  # Automatically add the tracking field.
+			value['_cls'] = canon(value.__class__)  # TODO: Optimize down to registered plugin name if possible.
 		
 		return value
+
+
+class Array(_HasKinds, _CastingKind, Field):
+	__foreign__ = 'array'
+	__allowed_operators__ = {'#array', '$elemMatch'}
+	
+	def to_native(self, obj, name, value):
+		"""Transform the MongoDB value into a Marrow Mongo value."""
+		
+		return [super(Array, self).to_native(obj, name, i) for i in value]
+	
+	def to_foreign(self, obj, name, value):
+		"""Transform to a MongoDB-safe value."""
+		
+		return [super(Array, self).to_foreign(obj, name, i) for i in value]
+
+
+class Embed(_HasKinds, _CastingKind, Field):
+	__foreign__ = 'object'
+	__allowed_operators__ = {'#document'}
 
 
 class Reference(_HasKinds, Field):
@@ -145,7 +147,7 @@ class Reference(_HasKinds, Field):
 			if not cache:
 				raise NotImplementedError()  # TODO: Load values to cache.
 			
-			store = {'_id': identifier, '_cls': name(self.kind)}
+			store = {'_id': identifier, '_cls': canon(self.kind)}
 			
 			for i in self.cache:
 				store[unicode(traverse(self.__document__, i, i))] = traverse(cache, i)
@@ -213,4 +215,4 @@ class PluginReference(Field):
 		if __debug__ and namespace and not explicit and value not in plugins:
 			raise ValueError(repr(value) + ' object is not a known plugin for namespace "' + namespace + '".')
 		
-		return plugins.get(value, name(value))
+		return plugins.get(value, canon(value))
