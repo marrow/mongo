@@ -9,11 +9,9 @@ from marrow.package.canonical import name as canon
 from marrow.package.loader import traverse, load
 
 from .. import Document, Field
-from ...util import adjust_attribute_sequence
 from ...util.compat import str, unicode
 
 
-@adjust_attribute_sequence(-1000, 'kind')  # Allow 'kind' to be passed positionally first.
 class _HasKinds(Field):
 	"""A mix-in to provide an easily definable singular or plural set of document types."""
 	
@@ -136,7 +134,6 @@ class Reference(_HasKinds, Field):
 		return identifier
 
 
-@adjust_attribute_sequence(-10000, 'namespace')  # Allow the namespace to be defined first.
 class PluginReference(Field):
 	"""A Python object reference.
 	
@@ -149,6 +146,13 @@ class PluginReference(Field):
 	explicit = Attribute()  # Allow explicit, non-plugin references.
 	
 	__foreign__ = {'string'}
+	
+	def __init__(self, *args, **kw):
+		if args:
+			kw['namespace'] = args[0]
+			args = args[1:]
+		
+		super(PluginReference, self).__init__(*args, **kw)
 	
 	def to_native(self, obj, name, value):
 		"""Transform the MongoDB value into a Marrow Mongo value."""
@@ -165,14 +169,10 @@ class PluginReference(Field):
 		
 		try:
 			namespace = self.namespace
-		
 		except AttributeError:
 			namespace = None
-			
 			if __debug__:
-				names = {}
-				plugins = {}
-		
+				names = plugins = {}
 		else:
 			if __debug__:
 				names = {i.name: i.load() for i in iter_entry_points(namespace)}

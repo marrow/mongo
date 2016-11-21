@@ -199,27 +199,44 @@ class TestConcreteReferenceField(FieldExam):
 		assert isinstance(inst.field, DBRef)
 
 
-#class TestCachingReferenceField(FieldExam):
-#	__field__ = Reference
-#	__args__ = (Document, )
-#	__kw__ = dict(cache={'foo'})
-#	
-#	def test_foreign(self, Sample):
-#		assert Sample.field._field.__foreign__ == 'object'
-#	
-#	def test_native_cast(self, Sample):
-#		pass
-#	
-#	def test_foreign_cast(self, Sample):
-#		pass
+class TestExplicitPluginReferenceField(FieldExam):
+	__field__ = PluginReference
+	
+	def test_native_cast(self, Sample):
+		inst = Sample.from_mongo({'field': 'marrow.mongo:Document'})
+		assert inst.field is Document
+	
+	def test_foreign_cast(self, Sample):
+		inst = Sample(Document)
+		assert inst['field'] == 'marrow.mongo.core.document:Document'
 
 
-class TestPluginReferenceField(FieldExam):
+class TestNamespacedPluginReferenceField(FieldExam):
 	__field__ = PluginReference
 	__args__ = ('marrow.mongo.document', )
 	
 	def test_native_cast(self, Sample):
-		pass
+		inst = Sample.from_mongo({'field': 'Document'})
+		assert inst.field is Document
 	
-	def test_foreign_cast(self, Sample):
-		pass
+	def test_foreign_object(self, Sample):
+		inst = Sample(Document)
+		assert inst['field'] == 'Document'
+		assert inst.field is Document
+	
+	def test_foreign_string(self, Sample):
+		inst = Sample('Document')
+		assert inst['field'] == 'Document'
+		assert inst.field is Document
+	
+	def test_foreign_fail_bad_reference(self, Sample):
+		with pytest.raises(ValueError):
+			Sample('UnknownDocumentTypeForRealsXYZZY')
+	
+	def test_foreign_fail_explicit(self, Sample):
+		with pytest.raises(ValueError):
+			Sample('marrow.mongo:Field')
+	
+	def test_foreign_fail_object(self, Sample):
+		with pytest.raises(ValueError):
+			Sample(object)
