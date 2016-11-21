@@ -273,7 +273,7 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
     :target: https://github.com/marrow/mongo/issues
     :alt: Github Issues
 
-.. |ghsince| image:: https://img.shields.io/github/commits-since/marrow/mongo/1.0.svg
+.. |ghsince| image:: https://img.shields.io/github/commits-since/marrow/mongo/1.0.0.svg
     :target: https://github.com/marrow/mongo/commits/develop
     :alt: Changes since last release.
 
