@@ -10,8 +10,6 @@ try:
 except ImportError:
 	from setuptools import setup, find_packages
 
-from setuptools.command.test import test as TestCommand
-
 
 if sys.version_info < (2, 7):
 	raise SystemExit("Python 2.7 or later is required.")
@@ -21,26 +19,18 @@ elif sys.version_info > (3, 0) and sys.version_info < (3, 2):
 version = description = url = author = ''  # Actually loaded on the next line; be quiet, linter.
 exec(open(os.path.join("marrow", "mongo", "core", "release.py")).read())
 
-
-class PyTest(TestCommand):
-	def finalize_options(self):
-		TestCommand.finalize_options(self)
-	
-		self.test_args = []
-		self.test_suite = True
-	
-	def run_tests(self):
-		import pytest
-		sys.exit(pytest.main(self.test_args))
-
-
 here = os.path.abspath(os.path.dirname(__file__))
 
 py2 = sys.version_info < (3,)
 py26 = sys.version_info < (2, 7)
 py32 = sys.version_info > (3,) and sys.version_info < (3, 3)
 
-tests_require = ['coverage' + ('<4' if py32 else ''), 'pytest', 'pytest-cov', 'pytest-flakes']
+tests_require = [
+		'pytest',  # test collector and extensible runner
+		'pytest-cov',  # coverage reporting
+		'pytest-flakes',  # syntax validation
+		'pytest-capturelog',  # log capture
+	]
 
 
 # # Entry Point
@@ -48,14 +38,11 @@ tests_require = ['coverage' + ('<4' if py32 else ''), 'pytest', 'pytest-cov', 'p
 setup(
 	name = "marrow.mongo",
 	version = version,
-	
 	description = description,
 	long_description = codecs.open(os.path.join(here, 'README.rst'), 'r', 'utf8').read(),
 	url = url,
-	
 	author = author.name,
 	author_email = author.email,
-	
 	license = 'MIT',
 	keywords = '',
 	classifiers = [
@@ -80,9 +67,13 @@ setup(
 	packages = find_packages(exclude=['test', 'example', 'benchmark', 'htmlcov']),
 	include_package_data = True,
 	package_data = {'': ['README.rst', 'LICENSE.txt']},
-	namespace_packages = ['marrow', 'marrow.mongo', 'marrow.mongo.field', 'web', 'web.db', 'web.session'],
+	namespace_packages = ['marrow', 'web', 'web.session'],
 	
 	# ## Dependency Declaration
+	
+	setup_requires = [
+			'pytest-runner',
+		] if {'pytest', 'test', 'ptr'}.intersection(sys.argv) else [],
 	
 	install_requires = [
 			'marrow.schema>=1.2.0,<2.0.0',  # Declarative schema support.
@@ -92,7 +83,7 @@ setup(
 		],
 	
 	extras_require = dict(
-			development = tests_require,
+			development = tests_require + ['pre-commit'],  # Development-time dependencies.
 			scripting = ['javascripthon<1.0'],  # Allow map/reduce functions and "stored functions" to be Python.
 			logger = ['tzlocal'],  # Timezone support to store log times in UTC like a sane person.
 		),
@@ -107,35 +98,27 @@ setup(
 						'Document = marrow.mongo.core:Document',
 					],
 				'marrow.mongo.field': [  # Field classes registered by (optionaly namespaced) name.
-						'Field = marrow.mongo.core:Field',
-						'String = marrow.mongo.field.base:String',
-						'Array = marrow.mongo.field.base:Array',
-						'Binary = marrow.mongo.field.base:Binary',
-						'ObjectId = marrow.mongo.field.base:ObjectId',
-						'Boolean = marrow.mongo.field.base:Boolean',
-						'Date = marrow.mongo.field.base:Date',
-						'Regex = marrow.mongo.field.base:Regex',
-						'JavaScript = marrow.mongo.field.base:JavaScript',
-						'Timestamp = marrow.mongo.field.base:Timestamp',
-						'Embed = marrow.mongo.field.complex:Embed',
-						'Reference = marrow.mongo.field.complex:Reference',
-						'PluginReference = marrow.mongo.field.complex:PluginReference',
-						'Number = marrow.mongo.field.number:Number',
-						'Double = marrow.mongo.field.number:Double',
-						'Integer = marrow.mongo.field.number:Integer',
-						'Long = marrow.mongo.field.number:Long',
+						'Field = marrow.mongo.core.field:Field',
+						'String = marrow.mongo.core.field.base:String',
+						'Binary = marrow.mongo.core.field.base:Binary',
+						'ObjectId = marrow.mongo.core.field.base:ObjectId',
+						'Boolean = marrow.mongo.core.field.base:Boolean',
+						'Date = marrow.mongo.core.field.base:Date',
+						'TTL = marrow.mongo.core.field.base:TTL',
+						'Regex = marrow.mongo.core.field.base:Regex',
+						'Timestamp = marrow.mongo.core.field.base:Timestamp',
+						'Array = marrow.mongo.core.field.complex:Array',
+						'Embed = marrow.mongo.core.field.complex:Embed',
+						'Reference = marrow.mongo.core.field.complex:Reference',
+						'PluginReference = marrow.mongo.core.field.complex:PluginReference',
+						'Number = marrow.mongo.core.field.number:Number',
+						'Double = marrow.mongo.core.field.number:Double',
+						'Integer = marrow.mongo.core.field.number:Integer',
+						'Long = marrow.mongo.core.field.number:Long',
 					],
 				# ### WebCore Extensions
-				'web.db': [  # Database Connector
-						'mongodb = web.db.mongo:MongoDBConnection',
-					],
 				'web.session': [  # Session Engine
 						'mongo = web.session.mongo:MongoSession',
 					],
 			},
-	
-	zip_safe = False,
-	cmdclass = dict(
-			test = PyTest,
-		)
 )

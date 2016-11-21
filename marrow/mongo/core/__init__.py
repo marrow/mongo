@@ -6,11 +6,5 @@ from .field import Field
 from .index import Index
 from .document import Document
 
-from .registry import Registry
-
 
 __all__ = ['__version__', 'Field', 'Index', 'Document']
-
-_field_registry = Registry('marrow:mongo', 'marrow.mongo.field')
-_document_registry = Registry('marrow:mongo', 'marrow.mongo.document')
-

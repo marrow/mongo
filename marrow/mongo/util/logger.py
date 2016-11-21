@@ -1,8 +1,13 @@
 # encoding: utf-8
+# pragma: no cover
 
-"""
+"""Experimental Python standard logging support features.
 
-Example configuration:
+This is untested and is subject to change, use at own risk.
+
+Will utilize `pygments` syntax highlighting if available.
+
+Example logging "dictconfig":
 
 {
 	'version': 1,
@@ -31,8 +36,6 @@ Example configuration:
 				}
 		},
 }
-
-
 """
 
 from __future__ import unicode_literals
@@ -52,10 +55,8 @@ except ImportError:
 	_highlight = None
 
 
-
 DEFAULT_PROPERTIES = logging.LogRecord('', '', '', '', '', '', '', '').__dict__.keys()
 LOCAL_TZ = get_localzone()
-
 
 
 class JSONFormatter(logging.Formatter):
@@ -137,7 +138,7 @@ class JSONFormatter(logging.Formatter):
 
 class MongoFormatter(logging.Formatter):
 	def format(self, record):
-		time = datetime.fromtimestamp(record.created),
+		time = datetime.datetime.fromtimestamp(record.created)
 		time = LOCAL_TZ.localize(time).astimezone(utc)
 		
 		document = dict(
@@ -164,6 +165,7 @@ class MongoFormatter(logging.Formatter):
 		
 		if record.exc_info is not None:
 			document['exception'] = dict(
+					cls = record.exc_info[0].__name__,
 					message = str(record.exc_info[1]),
 					trace = self.formatException(record.exc_info)
 				)
@@ -180,7 +182,7 @@ class MongoFormatter(logging.Formatter):
 
 class MongoHandler(logging.Handler):
 	def __init__(self, uri, collection, level=logging.NOTSET, quiet=False):
-		logging.Handler.__init__(level)
+		logging.Handler.__init__(self, level=level)
 		
 		if quiet:
 			self.lock = None  # We don't require I/O locking if we aren't touching stderr.
@@ -197,12 +199,12 @@ class MongoHandler(logging.Handler):
 			document = self.format(record)
 		except:
 			self.handleError(record)
+			return
 		
 		try:
 			result = self.collection.insert_one(document)
 		except:
 			self.handleError(record)
+			return
 		
 		document['_id'] = result.inserted_id
-		if self.quiet: return
-

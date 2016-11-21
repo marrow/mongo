@@ -15,6 +15,7 @@ from marrow.schema import Container, Attributes
 from .field import Field
 from .index import Index
 from ..util import SENTINEL
+from ..util.compat import unicode
 
 
 class Document(Container):
@@ -40,11 +41,12 @@ class Document(Container):
 	__read_concern__ = ReadConcern()  # Default read concern.
 	__write_concern__ = WriteConcern(w=1)  # Default write concern.
 	
-	__projected__ = None  # The set of fields used during projection, to identify fields which are not loaded.
+	__projection__ = None  # The set of fields used during projection, to identify fields which are not loaded.
+	__validation__ = None  # The MongoDB Validation document matching these records.
 	__fields__ = Attributes(only=Field)  # An ordered mapping of field names to their respective Field instance.
-	__fields__.__sequence__ = 20000
+	__fields__.__sequence__ = 10000
 	__indexes__ = Attributes(only=Index)  # An ordered mapping of index names to their respective Index instance.
-	__indexes__.__sequence__ = 20001
+	__indexes__.__sequence__ = 10000
 	
 	def __init__(self, *args, **kw):
 		"""Construct a new MongoDB Document instance.
@@ -61,28 +63,44 @@ class Document(Container):
 		if prepare_defaults:
 			self._prepare_defaults()
 	
+	@classmethod
+	def _get_default_projection(cls):
+		"""Construct the default projection document."""
+		
+		projected = []  # The fields explicitly requested for inclusion.
+		neutral = []  # Fields returning neutral (None) status.
+		omitted = False  # Have any fields been explicitly omitted?
+		
+		for name, field in cls.__fields__.items():
+			if field.project is None:
+				neutral.append(name)
+			elif field.project:
+				projected.append(name)
+			else:
+				omitted = True
+		
+		if not projected and not omitted:
+			# No preferences specified.
+			return None
+			
+		elif not projected and omitted:
+			# No positive inclusions given, but negative ones were.
+			projected = neutral
+		
+		return {name: True for name in projected}
+	
+	@classmethod
+	def __attributed__(cls):
+		"""Executed after each new subclass is constructed."""
+		
+		cls.__projection__ = cls._get_default_projection()
+	
 	def _prepare_defaults(self):
 		"""Trigger assignment of default values."""
+		
 		for name, field in self.__fields__.items():
 			if field.assign:
 				getattr(self, name)
-	
-	@property
-	def __field_names__(self):
-		"""Generate the name of the fields defined on the current document.
-		
-		This is a dynamic property because this represents actual data-defined fields, not schema-defined.
-		"""
-		names = tuple(self.__fields__)
-		
-		# These are explicit field names, returned regardless of presence in the actual data.
-		for name in names:  # Python 2 deprecation note: yield from
-			yield name
-		
-		# These are aditional fields present in the underlying document.
-		for name in self.__data__:
-			if name in names: continue  # Skip documented fields.
-			yield name
 	
 	@classmethod
 	def bind(cls, db=None, collection=None):
@@ -103,46 +121,20 @@ class Document(Container):
 					),
 				read_preference = cls.__read_preference__,
 				read_concern = cls.__read_concern__,
-				write_concern = None,  # TODO: Class-level configuration.
+				write_concern = cls.__write_concern__,
 			)
 		
 		cls.__bound__ = True
-		cls.__collection__ = collection
+		cls._collection = collection
 		
 		return cls
 	
 	@classmethod
-	def _get_mongo_name_for(cls, name):
-		"""Walk a string path (dot or double underscore separated) to find the MongoDB path to the attribute.
-		
-		This is the reverse of the process on individual Field._get_mongo_name, which walks up to the root document.
-		"""
-		
-		raise NotImplementedError("Much work needs to be done here.")
-		
-		current = cls
-		
-		if '__' in name:  # In case we're getting the name from a Django-style argument.
-			name = name.replace('__', '.')
-		
-		path = []
-		parts = name.split('.')
-		
-		while parts:
-			part = parts.pop(0)
-			
-			if getattr(current, 'translated', False) and (not path or path[0] != 'localized'):
-				path.insert(0, 'localized')  # We have a translated field on our hands...
-			
-			if hasattr(current, part):
-				current = getattr(current, part)
-				path.append(current.__name__)
-		
-		return '.'.join(path)
-	
-	@classmethod
 	def from_mongo(cls, doc, projected=None):
 		"""Convert data coming in from the MongoDB wire driver into a Document instance."""
+		
+		if isinstance(doc, Document):
+			return doc
 		
 		if '_cls' in doc:  # Instantiate any specific class mentioned in the data.
 			cls = load(doc['_cls'], 'marrow.mongo.document')
@@ -157,11 +149,13 @@ class Document(Container):
 	@classmethod
 	def from_json(cls, json):
 		"""Convert JSON data into a Document instance."""
+		
 		deserialized = loads(json)
 		return cls.from_mongo(deserialized)
 	
 	def to_json(self, *args, **kw):
 		"""Convert our Document instance back into JSON data. Additional arguments are passed through."""
+		
 		return dumps(self, *args, **kw)
 	
 	@property
@@ -173,60 +167,79 @@ class Document(Container):
 		
 		https://docs.mongodb.com/manual/reference/mongodb-extended-json/
 		"""
+		
 		return self  # We're sufficiently dictionary-like to pass muster.
 	
 	# Mapping Protocol
 	
 	def __getitem__(self, name):
 		"""Retrieve data from the backing store."""
+		
 		return self.__data__[name]
 	
 	def __setitem__(self, name, value):
 		"""Assign data directly to the backing store."""
+		
 		self.__data__[name] = value
 	
 	def __delitem__(self, name):
 		"""Unset a value from the backing store."""
+		
 		del self.__data__[name]
 	
 	def __iter__(self):
 		"""Iterate the names of the values assigned to our backing store."""
+		
 		return iter(self.__data__.keys())
 	
 	def __len__(self):
 		"""Retrieve the size of the backing store."""
+		
 		return len(getattr(self, '__data__', {}))
 	
 	def keys(self):
 		"""Iterate the keys assigned to the backing store."""
-		return self.__data__.iterkeys()
+		
+		return self.__data__.keys()
 	
 	def items(self):
 		"""Iterate 2-tuple pairs of (key, value) from the backing store."""
-		return self.__data__.iteritems()
+		
+		return self.__data__.items()
+	
+	def iteritems(self):
+		"""Python 2 interation, as per items."""
+		
+		return self.__data__.items()
 	
 	def values(self):
 		"""Iterate the values within the backing store."""
-		return self.__data__.itervalues()
+		
+		return self.__data__.values()
 	
 	def __contains__(self, key):
 		"""Determine if the given key is present in the backing store."""
+		
 		return key in self.__data__
 	
 	def __eq__(self, other):
 		"""Equality comparison between the backing store and other value."""
+		
 		return self.__data__ == other
 	
 	def __ne__(self, other):
 		"""Inverse equality comparison between the backing store and other value."""
+		
 		return self.__data__ != other
 	
 	def get(self, key, default=None):
 		"""Retrieve a value from the backing store with a default value."""
+		
 		return self.__data__.get(key, default)
 	
 	def clear(self):
 		"""Empty the backing store of data."""
+		
 		self.__data__.clear()
 	
 	def pop(self, name, default=SENTINEL):
@@ -239,14 +252,17 @@ class Document(Container):
 	
 	def popitem(self):
 		"""Pop an item 2-tuple off the backing store."""
+		
 		return self.__data__.popitem()
 	
 	def update(self, *args, **kw):
 		"""Update the backing store directly."""
+		
 		self.__data__.update(*args, **kw)
 	
 	def setdefault(self, key, value=None):
 		"""Set a value in the backing store if no value is currently present."""
+		
 		return self.__data__.setdefault(key, value)
 
 
