@@ -4,7 +4,7 @@ from __future__ import unicode_literals
 
 import pytest
 from datetime import datetime, timedelta
-from bson import ObjectId as oid
+from bson import DBRef, ObjectId as oid
 from bson.tz_util import utc
 
 from marrow.mongo import Document
@@ -23,6 +23,10 @@ class FieldExam(object):
 			field = self.__field__(*self.__args__, **self.__kw__)
 		
 		return Sample
+
+
+class Concrete(Document):
+	__collection__ = 'collection'
 
 
 class TestHasKinds(object):
@@ -111,15 +115,103 @@ class TestMultipleEmbedField(FieldExam):
 		assert inst.field['_cls'] == 'marrow.mongo.core.document:Document'
 
 
-class TestReferneceField(FieldExam):
+class TestReferenceField(FieldExam):
 	__field__ = Reference
 	__args__ = (Document, )
 	
-	def test_native_cast(self, Sample):
-		pass
+	def test_foreign(self, Sample):
+		assert Sample.field._field.__foreign__ == 'objectId'
 	
-	def test_foreign_cast(self, Sample):
-		pass
+	def test_foreign_cast_document_fail(self, Sample):
+		inst = Sample()
+		doc = Document()
+		
+		with pytest.raises(ValueError):
+			inst.field = doc
+	
+	def test_foreign_cast_document(self, Sample):
+		inst = Sample()
+		doc = Document()
+		doc['_id'] = 27
+		inst.field = doc
+		assert inst['field'] == 27
+	
+	def test_foreign_cast_string_oid(self, Sample):
+		inst = Sample()
+		inst.field = '58329b3a927cc647e94153c9'
+		assert inst['field'] == oid('58329b3a927cc647e94153c9')
+	
+	def test_foreign_cast_string_not_oid(self, Sample):
+		inst = Sample()
+		inst.field = '58329b3a927cz647e94153c9'
+		assert inst['field'] == '58329b3a927cz647e94153c9'
+
+
+class TestMultipleReferenceField(FieldExam):
+	__field__ = Reference
+	__args__ = (Document, Document)
+	
+	def test_foreign(self, Sample):
+		assert Sample.field._field.__foreign__ == 'objectId'
+	
+	def test_foreign_cast_document_fail(self, Sample):
+		with pytest.raises(ValueError):
+			Sample(Document())
+	
+	def test_foreign_cast_document(self, Sample):
+		inst = Sample()
+		doc = Document()
+		doc['_id'] = 27
+		inst.field = doc
+		assert inst['field'] == 27
+	
+	def test_foreign_cast_string_oid(self, Sample):
+		inst = Sample()
+		with pytest.raises(ValueError):
+			inst.field = '58329b3a927cc647e94153c9'
+	
+	def test_foreign_cast_string_not_oid(self, Sample):
+		inst = Sample()
+		with pytest.raises(ValueError):
+			inst.field = '58329b3a927cz647e94153c9'
+
+
+class TestConcreteReferenceField(FieldExam):
+	__field__ = Reference
+	__args__ = (Concrete, )
+	__kw__ = dict(concrete=True)
+	
+	def test_foreign(self, Sample):
+		assert Sample.field._field.__foreign__ == 'dbPointer'
+	
+	def test_foreign_cast_document(self, Sample):
+		val = Concrete()
+		val['_id'] = oid('58329b3a927cc647e94153c9')
+		inst = Sample(val)
+		assert isinstance(inst.field, DBRef)
+	
+	def test_foreign_cast_document_fail(self, Sample):
+		with pytest.raises(ValueError):
+			Sample(Concrete())
+	
+	def test_foreign_cast_reference(self, Sample):
+		inst = Sample('58329b3a927cc647e94153c9')
+		assert isinstance(inst.field, DBRef)
+
+
+#class TestCachingReferenceField(FieldExam):
+#	__field__ = Reference
+#	__args__ = (Document, )
+#	__kw__ = dict(cache={'foo'})
+#	
+#	def test_foreign(self, Sample):
+#		assert Sample.field._field.__foreign__ == 'object'
+#	
+#	def test_native_cast(self, Sample):
+#		pass
+#	
+#	def test_foreign_cast(self, Sample):
+#		pass
 
 
 class TestPluginReferenceField(FieldExam):

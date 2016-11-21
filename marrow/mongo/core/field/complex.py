@@ -1,6 +1,6 @@
 # encoding: utf-8
 
-from bson import ObjectId as oid
+from bson import DBRef, ObjectId as oid
 from collections import Iterable
 from pkg_resources import iter_entry_points
 
@@ -93,44 +93,28 @@ class Embed(_HasKinds, _CastingKind, Field):
 
 class Reference(_HasKinds, Field):
 	concrete = Attribute(default=False)  # If truthy, will store a DBRef instead of ObjectId.
-	cache = Attribute(default=None)  # Attributes to preserve from the referenced object at the reference level.
-	reverse = Attribute(default=None)  # What to assign as a reverse accessor?
+	#cache = Attribute(default=None)  # Attributes to preserve from the referenced object at the reference level.
 	
 	@property
 	def __foreign__(self):
 		"""Advertise that we store a simple reference, or deep reference, or object, depending on configuration."""
 		
-		if not self.cache:
-			if self.concrete:
-				return 'dbPointer'
-			
-			return 'objectId'
+		#if not self.cache:
+		if self.concrete:
+			return 'dbPointer'
 		
-		return 'object'
-	
-	def to_native(self, obj, name, value):
-		"""Transform the MongoDB value into a Marrow Mongo value."""
+		return 'objectId'
 		
-		# Identify the 
-		kinds = list(self.kinds)
-		
-		if isinstance(value, oid):
-			return value
-		
-		# Return a partially populated record based on our cached values.
-		return kinds[0].from_mongo(value, value.keys())
+		#return 'object'
 	
 	def to_foreign(self, obj, name, value):
 		"""Transform to a MongoDB-safe value."""
 		
-		cache = None
-		
 		# First, we handle the typcial Document object case.
 		if isinstance(value, Document):
-			cache = value
-			identifier = getattr(value, 'id', None)
+			identifier = value.__data__.get('_id', None)
 			if identifier is None:
-				raise ValueError("Can only store a reference to a saved Document instance with an `id`.")
+				raise ValueError("Can only store a reference to a saved Document instance with an `_id` stored.")
 		
 		elif isinstance(value, (str, unicode)) and len(value) == 24:
 			try:
@@ -138,24 +122,21 @@ class Reference(_HasKinds, Field):
 			except:
 				identifier = value
 		
-		if not cache and self.cache and not issubclass(self.kind, Document):
+		kinds = list(self.kinds)
+		
+		if not isinstance(value, Document) and len(kinds) > 1:
 			raise ValueError("Passed an identifier (not a Document instance) when multiple document kinds registered.")
 		
-		if self.cache:
-			raise NotImplementedError()
+		if self.concrete:
+			if isinstance(value, Document):
+				return DBRef(value.__collection__, identifier)
 			
-			if not cache:
-				raise NotImplementedError()  # TODO: Load values to cache.
-			
-			store = {'_id': identifier, '_cls': canon(self.kind)}
-			
-			for i in self.cache:
-				store[unicode(traverse(self.__document__, i, i))] = traverse(cache, i)
+			return DBRef(kinds[0].__collection__, identifier)
 		
-		return store
+		return identifier
 
 
-@adjust_attribute_sequence(-1000, 'namespace')  # Allow the namespace to be defined first.
+@adjust_attribute_sequence(-10000, 'namespace')  # Allow the namespace to be defined first.
 class PluginReference(Field):
 	"""A Python object reference.
 	
