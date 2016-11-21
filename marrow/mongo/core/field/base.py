@@ -1,6 +1,7 @@
 # encoding: utf-8
 
 from datetime import datetime, timedelta
+from numbers import Number
 from bson import ObjectId as oid
 from bson.code import Code
 from marrow.schema import Attribute
@@ -95,35 +96,16 @@ class TTL(Date):
 		if isinstance(value, datetime):
 			return value
 		
-		if isinstance(value, int):  # TODO: abc.Number
+		if isinstance(value, Number):
 			return datetime.utcnow() + timedelta(days=value)
 		
 		# TODO: use timeparser via context.locale to guess -- https://github.com/thomst/timeparser
-		raise TypeError("Invalid TTL value: " + repr(value))
+		raise ValueError("Invalid TTL value: " + repr(value))
 
 
 class Regex(String):
 	__foreign__ = 'regex'
 	__disallowed_operators__ = {'#array'}
-
-
-class JavaScript(String):
-	__disallowed_operators__ = {'#array'}
-	
-	scope = Attribute(default=None)
-	
-	def to_foreign(self, obj, name, value):
-		if isinstance(value, tuple):
-			return Code(*value)
-		
-		return Code(value)
-	
-	@property
-	def __foreign__(self):
-		if self.scope:
-			return 'javascriptWithScope'
-		
-		return 'javascript'
 
 
 class Timestamp(Field):

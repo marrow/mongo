@@ -8,7 +8,7 @@ from bson import ObjectId as oid
 from bson.tz_util import utc
 
 from marrow.mongo import Document
-from marrow.mongo.field import String, Binary, ObjectId, Boolean, Date, TTL, Regex, JavaScript, Timestamp
+from marrow.mongo.field import String, Binary, ObjectId, Boolean, Date, TTL, Regex, Timestamp
 from marrow.mongo.util.compat import unicode
 
 
@@ -109,24 +109,35 @@ class TestTTLField(FieldExam):
 	__field__ = TTL
 	
 	def test_cast_timedelta(self, Sample):
-		pass
+		v = timedelta(days=7)
+		r = (datetime.utcnow() + v).replace(microsecond=0, tzinfo=utc)
+		inst = Sample(v)
+		
+		assert isinstance(inst.__data__['field'], datetime)
+		assert inst.field.replace(microsecond=0, tzinfo=utc) == r
 	
 	def test_cast_datetime(self, Sample):
-		pass
+		v = datetime.utcnow().replace(microsecond=0, tzinfo=utc)
+		inst = Sample(v)
+		
+		assert isinstance(inst.__data__['field'], datetime)
+		assert inst.field is v
 	
 	def test_cast_integer(self, Sample):
-		pass
+		v = timedelta(days=7)
+		r = (datetime.utcnow() + v).replace(microsecond=0, tzinfo=utc)
+		inst = Sample(7)
+		
+		assert isinstance(inst.__data__['field'], datetime)
+		assert inst.field.replace(microsecond=0, tzinfo=utc) == r
 	
 	def test_cast_failure(self, Sample):
-		pass
+		with pytest.raises(ValueError):
+			Sample('xyzzy')
 
 
 class RegexField(FieldExam):
 	__field__ = Regex
-
-
-class TestJavaScriptField(FieldExam):
-	__field__ = JavaScript
 
 
 class TestTimestampField(FieldExam):

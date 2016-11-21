@@ -106,7 +106,6 @@ setup(
 						'Date = marrow.mongo.core.field.base:Date',
 						'TTL = marrow.mongo.core.field.base:TTL',
 						'Regex = marrow.mongo.core.field.base:Regex',
-						'JavaScript = marrow.mongo.core.field.base:JavaScript',
 						'Timestamp = marrow.mongo.core.field.base:Timestamp',
 						'Array = marrow.mongo.core.field.complex:Array',
 						'Embed = marrow.mongo.core.field.complex:Embed',
