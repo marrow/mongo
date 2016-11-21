@@ -1,9 +1,11 @@
 # encoding: utf-8
 
+from numbers import Number as NumberABC
 from bson.int64 import Int64
 from decimal import Decimal as dec
 
 from . import Field
+from ...util.compat import str, unicode
 
 
 class Number(Field):
@@ -11,12 +13,16 @@ class Number(Field):
 	__disallowed_operators__ = {'#array'}
 	
 	def to_foreign(self, obj, name, value):
-		try:
-			return int(value)
-		except ValueError:
-			return float(value)
+		if isinstance(value, NumberABC):
+			return value
 		
-		return value
+		if isinstance(value, unicode):
+			if value.isnumeric():
+				return int(value)
+			else:
+				return float(value)
+		
+		return int(value)
 
 
 class Double(Number):
@@ -38,14 +44,3 @@ class Long(Number):
 	
 	def to_foreign(self, obj, name, value):
 		return Int64(int(value))
-
-
-class _Decimal(Number):
-	"""A 128-bit IEEE 754-2008 deimal floating point number.
-	
-	Note: this is only compatible with MongoDB 3.4 and a compatible, updated driver that exposes Decimal support.
-	"""
-	__foreign__ = 'decimal'
-	
-	def to_foreign(self, obj, name, value):
-		return dec(value)
