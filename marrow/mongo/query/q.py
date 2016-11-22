@@ -8,7 +8,7 @@ For internal construction only.
 from __future__ import unicode_literals
 
 import re
-from copy import deepcopy
+from copy import copy, deepcopy
 from collections import Mapping, MutableMapping
 from pytz import utc
 from bson.codec_options import CodecOptions
@@ -93,15 +93,24 @@ class Q(object):
 			Person.tag[3] == "baz"
 		"""
 		
-		if self._document.__foreign__ != 'array':
+		from marrow.mongo import Document, Field, Embed
+		
+		if self._field.__foreign__ != 'array':  # Pass through if not an array type field.
 			return self._field[name]
 		
 		if not isinstance(name, int) and not name.isdigit():
 			raise ValueError("Must specify an index as either a number or string representation of a number.")
 		
-		instance = self.__class__(self._document, self._field)
-		instnace._name = self._name + '.' + unicode(name)
-		return instance
+		field = next(self._field.kinds)
+		
+		if isinstance(field, Field):  # Bare simple values.
+			field = copy(field)
+			field.__name__ = self._name + '.' + unicode(name)
+		
+		elif issubclass(field, Document):  # Embedded documents.
+			field = Embed(field, name=self._name + '.' + unicode(name))
+		
+		return self.__class__(self._document, field)
 	
 	def __unicode__(self):
 		return self._name
