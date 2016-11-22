@@ -68,6 +68,8 @@ class Q(object):
 		return "Q({self._document.__name__}, '{self}', {self._field!r})".format(self=self)
 	
 	def __getattr__(self, name):
+		"""Access field attributes, or, for complex fields (Array, Embed, Reference, etc.) nested fields."""
+		
 		if not hasattr(self._field, 'kinds'):
 			return getattr(self._field, name)
 		
@@ -82,6 +84,24 @@ class Q(object):
 				pass
 		
 		raise AttributeError()
+	
+	def __getitem__(self, name):
+		"""Allows for referencing specific array elements by index.
+		
+		For example, to check that the third tag is `baz`:
+		
+			Person.tag[3] == "baz"
+		"""
+		
+		if self._document.__foreign__ != 'array':
+			return self._field[name]
+		
+		if not isinstance(name, int) and not name.isdigit():
+			raise ValueError("Must specify an index as either a number or string representation of a number.")
+		
+		instance = self.__class__(self._document, self._field)
+		instnace._name = self._name + '.' + unicode(name)
+		return instance
 	
 	def __unicode__(self):
 		return self._name
