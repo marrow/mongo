@@ -111,6 +111,7 @@ setup(
 						'Embed = marrow.mongo.core.field.complex:Embed',
 						'Reference = marrow.mongo.core.field.complex:Reference',
 						'PluginReference = marrow.mongo.core.field.complex:PluginReference',
+						'Alias = marrow.mongo.core.field.complex:Alias',
 						'Number = marrow.mongo.core.field.number:Number',
 						'Double = marrow.mongo.core.field.number:Double',
 						'Integer = marrow.mongo.core.field.number:Integer',
