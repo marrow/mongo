@@ -129,3 +129,11 @@ class TestQueryable(object):  # TODO: Properly use pytest fixtures for this...
 	def test_match_query(self):
 		result = Sample.array.match(Sample.Embedded.name == "Alice")
 		assert result.as_query == {'field_name': {'$elemMatch': {'name': "Alice"}}}
+	
+	def test_non_array_passthrough(self):
+		with pytest.raises(TypeError):
+			Sample.generic['foo']
+	
+	def test_array_non_numeric(self):
+		with pytest.raises(ValueError):
+			Sample.array['bar']

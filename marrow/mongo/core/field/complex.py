@@ -3,6 +3,7 @@
 from bson import DBRef, ObjectId as oid
 from collections import Iterable
 from pkg_resources import iter_entry_points
+from weakref import proxy
 
 from marrow.schema import Attribute
 from marrow.package.canonical import name as canon
@@ -45,7 +46,10 @@ class _CastingKind(Field):
 			kinds = list(self.kinds)
 			
 			if len(kinds) == 1:
-				value = kinds[0].from_mongo(value)
+				if hasattr(kinds[0], 'transformer'):
+					value = kinds[0].transformer.native(value, (kinds[0], obj))
+				else:
+					value = kinds[0].from_mongo(value)
 			else:
 				value = Document.from_mongo(value)  # TODO: Pass in allowed classes.
 		
@@ -73,20 +77,46 @@ class Array(_HasKinds, _CastingKind, Field):
 	__foreign__ = 'array'
 	__allowed_operators__ = {'#array', '$elemMatch'}
 	
+	class List(list):
+		pass
+	
 	def to_native(self, obj, name, value):
 		"""Transform the MongoDB value into a Marrow Mongo value."""
 		
-		return [super(Array, self).to_native(obj, name, i) for i in value]
+		if isinstance(value, self.List):
+			return value
+		
+		result = self.List(super(Array, self).to_native(obj, name, i) for i in value)
+		obj.__data__[self.__name__] = result
+		
+		return result
 	
 	def to_foreign(self, obj, name, value):
 		"""Transform to a MongoDB-safe value."""
 		
-		return [super(Array, self).to_foreign(obj, name, i) for i in value]
+		return self.List(super(Array, self).to_foreign(obj, name, i) for i in value)
 
 
 class Embed(_HasKinds, _CastingKind, Field):
 	__foreign__ = 'object'
 	__allowed_operators__ = {'#document'}
+	
+	def to_native(self, obj, name, value):
+		"""Transform the MongoDB value into a Marrow Mongo value."""
+		
+		if isinstance(value, Document):
+			return value
+		
+		result = super(Embed, self).to_native(obj, name, value)
+		obj.__data__[self.__name__] = result
+		
+		return result
+	
+	def to_foreign(self, obj, name, value):
+		"""Transform to a MongoDB-safe value."""
+		
+		result = super(Embed, self).to_foreign(obj, name, value)
+		return result
 
 
 class Reference(_HasKinds, Field):
@@ -197,3 +227,52 @@ class PluginReference(Field):
 			raise ValueError(repr(value) + ' object is not a known plugin for namespace "' + namespace + '".')
 		
 		return plugins.get(value, canon(value))
+
+
+class Alias(Attribute):
+	"""Reference a field, potentially nested, elsewhere in the document.
+	
+	This provides a shortcut for querying nested fields, for example, in GeoJSON, to more easily access the latitude
+	and longitude:
+	
+		class Point(Document):
+			kind = String('type', default='point', assign=True)
+			coordinates = Array(Number(), default=lambda: [0, 0], assign=True)
+			latitude = Alias('coordinates.1')
+			longitude = Alias('coordinates.0')
+	
+	You can now read and write `latitude` and `longitude` on instances of `Point`, as well as query the nested values
+	through class attribute access.
+	"""
+	
+	path = Attribute()
+	
+	def __init__(self, path):
+		super(Alias, self).__init__(path=path)
+	
+	def __fixup__(self, document):
+		"""Called after an instance of our Field class is assigned to a Document."""
+		self.__document__ = proxy(document)
+	
+	def __get__(self, obj, cls=None):
+		if obj is None:
+			return traverse(self.__document__, self.path)
+		
+		return traverse(obj, self.path)
+	
+	def __set__(self, obj, value):
+		parts = self.path.split('.')
+		final = parts.pop()
+		current = obj
+		
+		for part in parts:
+			if part.lstrip('-').isdigit():
+				current = current[int(part)]
+				continue
+			
+			current = getattr(current, part)
+		
+		if final.lstrip('-').isdigit():
+			current[int(final)] = value
+		else:
+			setattr(current, final, value)

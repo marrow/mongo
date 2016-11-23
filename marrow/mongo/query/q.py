@@ -8,7 +8,7 @@ For internal construction only.
 from __future__ import unicode_literals
 
 import re
-from copy import deepcopy
+from copy import copy, deepcopy
 from collections import Mapping, MutableMapping
 from pytz import utc
 from bson.codec_options import CodecOptions
@@ -68,6 +68,8 @@ class Q(object):
 		return "Q({self._document.__name__}, '{self}', {self._field!r})".format(self=self)
 	
 	def __getattr__(self, name):
+		"""Access field attributes, or, for complex fields (Array, Embed, Reference, etc.) nested fields."""
+		
 		if not hasattr(self._field, 'kinds'):
 			return getattr(self._field, name)
 		
@@ -82,6 +84,34 @@ class Q(object):
 				pass
 		
 		raise AttributeError()
+	
+	def __getitem__(self, name):
+		"""Allows for referencing specific array elements by index.
+		
+		For example, to check that the third tag is `baz`:
+		
+			Person.tag[3] == "baz"
+		"""
+		
+		from marrow.mongo import Document, Field
+		from marrow.mongo.field import Embed
+		
+		if self._field.__foreign__ != 'array':  # Pass through if not an array type field.
+			return self._field[name]
+		
+		if not isinstance(name, int) and not name.isdigit():
+			raise ValueError("Must specify an index as either a number or string representation of a number.")
+		
+		field = next(self._field.kinds)
+		
+		if isinstance(field, Field):  # Bare simple values.
+			field = copy(field)
+			field.__name__ = self._name + '.' + unicode(name)
+		
+		elif issubclass(field, Document):  # Embedded documents.
+			field = Embed(field, name=self._name + '.' + unicode(name))
+		
+		return self.__class__(self._document, field)
 	
 	def __unicode__(self):
 		return self._name
