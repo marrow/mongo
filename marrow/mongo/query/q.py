@@ -93,7 +93,8 @@ class Q(object):
 			Person.tag[3] == "baz"
 		"""
 		
-		from marrow.mongo import Document, Field, Embed
+		from marrow.mongo import Document, Field
+		from marrow.mongo.field import Embed
 		
 		if self._field.__foreign__ != 'array':  # Pass through if not an array type field.
 			return self._field[name]
