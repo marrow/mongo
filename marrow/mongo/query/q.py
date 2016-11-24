@@ -139,7 +139,7 @@ class Q(object):
 		"""A basic operation operating on a single value."""
 		
 		if self._combining:  # We are a field-compound query fragment, e.g. (Foo.bar & Foo.baz).
-			return reduce(self._combining, (q._op(operation, other, *allowed) for q in self._field))
+			return reduce(self._combining, (q._op(operation, other, *allowed) for q in self._field))  # noqa
 		
 		# Optimize this away in production; diagnosic aide.
 		if __debug__ and _complex_safety_check(self._field, {operation} & set(allowed)):  # pragma: no cover
@@ -154,7 +154,7 @@ class Q(object):
 		"""
 		
 		if self._combining:  # We are a field-compound query fragment, e.g. (Foo.bar & Foo.baz).
-			return reduce(self._combining, (q._iop(operation, other, *allowed) for q in self._field))
+			return reduce(self._combining, (q._iop(operation, other, *allowed) for q in self._field))  # noqa
 		
 		# Optimize this away in production; diagnosic aide.
 		if __debug__ and _complex_safety_check(self._field, {operation} & set(allowed)):  # pragma: no cover
@@ -288,7 +288,7 @@ class Q(object):
 	
 	# Multiple Field Participation
 	
-	def _combine(self, other, operation):
+	def _combine(self, other, operation):  # pylint:disable=protected-access
 		if not isinstance(other, Q):
 			raise TypeError("Can not combine with non-Q.")
 		
