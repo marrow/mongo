@@ -141,15 +141,16 @@ class TestQueryable(object):  # TODO: Properly use pytest fixtures for this...
 
 
 class TestQueryableFieldCombinations(object):
-	def test_forum_example(self):
-		class Thread(Document):
-			class Reply(Document):
-				id = ObjectId()
-			
+	class Thread(Document):
+		class Reply(Document):
 			id = ObjectId()
-			reply = Embed(Reply)
 		
-		comb = Thread.id | Thread.reply.id
+		id = ObjectId()
+		reply = Embed(Reply)
+	
+	def test_forum_example(self):
+		T = self.Thread
+		comb = T.id | T.reply.id
 		assert repr(comb) == "Q(Thread, '$or', [Q(Thread, 'id', ObjectId('id')), Q(Thread, 'reply.id', ObjectId('id'))])"
 		
 		q = comb.range(datetime(2016, 1, 1), datetime(2017, 1, 1))
@@ -158,3 +159,15 @@ class TestQueryableFieldCombinations(object):
 		
 		assert q.operations['$or'][0]['id']['$gte'] == q.operations['$or'][1]['reply.id']['$gte']
 		assert q.operations['$or'][0]['id']['$lt'] == q.operations['$or'][1]['reply.id']['$lt']
+	
+	def test_combination_attribute_access_fails(self):
+		T = self.Thread
+		
+		with pytest.raises(AttributeError):
+			(T.id | T.reply.id).foo
+	
+	def test_combination_item_access_fails(self):
+		T = self.Thread
+		
+		with pytest.raises(KeyError):
+			(T.id | T.reply.id)[27]
