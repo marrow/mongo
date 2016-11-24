@@ -1,8 +1,4 @@
-doc-warnings: false
-test-warnings: false
-strictness: veryhigh
 max-line-length: 120
-autodetect: true
 ignore-paths:
   - example
 python-stargets:
@@ -11,9 +7,5 @@ python-stargets:
 pylint:
   disable:
     - redefined-builtin
-mccabe:
-  run: true
-dodgy:
-  run: true
 pyroma:
   run: true
