@@ -2,7 +2,7 @@
 marrow.mongo
 ============
 
-|latestversion| |ghtag| |masterstatus| |mastercover| |masterreq| |ghwatch| |ghstar|
+|latestversion| |ghtag| |masterstatus| |mastercover| |masterhealth| |masterreq| |ghwatch| |ghstar|
 
     © 2016 Alice Bevan-McGregor and contributors.
 
@@ -50,7 +50,7 @@ This package has only one hard dependency, a modern (>3.2) version of the ``pymo
 Development Version
 -------------------
 
-|developstatus| |developcover| |ghsince| |issuecount| |ghfork|
+|developstatus| |developcover| |develophealth| |ghsince| |issuecount| |ghfork|
 
 Development takes place on `GitHub <https://github.com/>`__ in the
 `marrow.mongo <https://github.com/marrow/mongo/>`__ project.  Issue tracking, documentation, and downloads
@@ -280,8 +280,12 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
     :target: https://pypi.python.org/pypi/marrow.mongo
     :alt: Latest released version.
 
-.. |downloads| image:: http://img.shields.io/pypi/dw/marrow.mongo.svg?style=flat
-    :target: https://pypi.python.org/pypi/marrow.mongo
-    :alt: Downloads per week.
+.. |masterhealth| image:: https://landscape.io/github/marrow/mongo/master/landscape.svg?style=flat
+    :target: https://landscape.io/github/marrow/mongo/master
+    :alt: Master Branch Code Health
+
+.. |develophealth| image:: https://landscape.io/github/marrow/mongo/develop/landscape.svg?style=flat
+    :target: https://landscape.io/github/marrow/mongo/develop
+    :alt: Develop Branch Code Health
 
 .. |cake| image:: http://img.shields.io/badge/cake-lie-1b87fb.svg?style=flat
