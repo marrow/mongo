@@ -170,6 +170,18 @@ class Document(Container):
 		
 		return self  # We're sufficiently dictionary-like to pass muster.
 	
+	# Object Heirarchy Utilities
+	
+	def _promote(self, other):
+		"""Promote an instance of one document class to an instance of a child class."""
+		
+		pass
+	
+	def _demote(self, other=None):
+		"""Demote an instance of one document class to an instance of one of its parent classes."""
+		
+		pass
+	
 	# Mapping Protocol
 	
 	def __getitem__(self, name):
