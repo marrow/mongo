@@ -135,5 +135,5 @@ class TestQueryable(object):  # TODO: Properly use pytest fixtures for this...
 			Sample.generic['foo']
 	
 	def test_array_non_numeric(self):
-		with pytest.raises(ValueError):
+		with pytest.raises(KeyError):
 			Sample.array['bar']
