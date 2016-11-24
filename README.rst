@@ -2,6 +2,8 @@
 marrow.mongo
 ============
 
+|latestversion| |ghtag| |masterstatus| |mastercover| |masterreq| |ghwatch| |ghstar|
+
     © 2016 Alice Bevan-McGregor and contributors.
 
 ..
@@ -10,7 +12,6 @@ marrow.mongo
 
 ..
 
-    |latestversion| |ghtag| |downloads| |masterstatus| |mastercover| |masterreq| |ghwatch| |ghstar|
 
 
 
@@ -49,7 +50,7 @@ This package has only one hard dependency, a modern (>3.2) version of the ``pymo
 Development Version
 -------------------
 
-    |developstatus| |developcover| |ghsince| |issuecount| |ghfork|
+|developstatus| |developcover| |ghsince| |issuecount| |ghfork|
 
 Development takes place on `GitHub <https://github.com/>`__ in the
 `marrow.mongo <https://github.com/marrow/mongo/>`__ project.  Issue tracking, documentation, and downloads
@@ -81,12 +82,6 @@ class model. For example, if you wanted to define a simple user account model, y
 
     from marrow.mongo import Index, Document
     from marrow.mongo.field import ObjectId, String, Number, Array
-
-One must always import ``Document`` from ``marrow.mongo.core`` prior to any import of registered fields from
-``marrow.mongo``. As a note, due to the magical nature of this plugin import registry, it may change in future feature
-releases. The old interface will be deprecated with a warning for one feature version first, however; pin your
-dependencies.
-
 
 Defining Documents
 ------------------
