@@ -11,6 +11,7 @@ import re
 from copy import copy, deepcopy
 from collections import Mapping, MutableMapping
 from operator import __and__, __or__, __xor__
+from functools import reduce
 from pytz import utc
 from bson.codec_options import CodecOptions
 from marrow.schema.compat import odict
@@ -413,6 +414,7 @@ class Q(object):
 		"""
 		
 		if self._combining:  # We are a field-compound query fragment, e.g. (Foo.bar & Foo.baz).
+			print("Combining", self._combining, self._field)
 			return reduce(self._combining, (q.range(gte, lt) for q in self._field))
 		
 		# Optimize this away in production; diagnosic aide.

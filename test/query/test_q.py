@@ -4,10 +4,11 @@ from __future__ import unicode_literals
 
 import pytest
 import operator
+from datetime import datetime
 from collections import OrderedDict as odict
 
 from marrow.mongo import Document, Field
-from marrow.mongo.field import String, Number, Array, Embed
+from marrow.mongo.field import String, Number, Array, Embed, ObjectId
 from marrow.mongo.query import Ops, Q
 from marrow.mongo.util.compat import py3, str, unicode
 
@@ -137,3 +138,23 @@ class TestQueryable(object):  # TODO: Properly use pytest fixtures for this...
 	def test_array_non_numeric(self):
 		with pytest.raises(KeyError):
 			Sample.array['bar']
+
+
+class TestQueryableFieldCombinations(object):
+	def test_forum_example(self):
+		class Thread(Document):
+			class Reply(Document):
+				id = ObjectId()
+			
+			id = ObjectId()
+			reply = Embed(Reply)
+		
+		comb = Thread.id | Thread.reply.id
+		assert repr(comb) == "Q(Thread, '$or', [Q(Thread, 'id', ObjectId('id')), Q(Thread, 'reply.id', ObjectId('id'))])"
+		
+		q = comb.range(datetime(2016, 1, 1), datetime(2017, 1, 1))
+		
+		assert q.operations['$or']
+		
+		assert q.operations['$or'][0]['id']['$gte'] == q.operations['$or'][1]['reply.id']['$gte']
+		assert q.operations['$or'][0]['id']['$lt'] == q.operations['$or'][1]['reply.id']['$lt']
