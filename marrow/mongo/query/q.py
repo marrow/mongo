@@ -54,12 +54,11 @@ class Q(object):
 	* range
 	* re
 	* size
-	
-	A possible workaround is making Q callable (__call__) and pulling the final element off to determine method to call.
 	"""
 	
 	def __init__(self, document, field, path=None):
-		"""Do not construct instances of Q yourself.""" 
+		"""Do not construct instances of Q yourself."""
+		
 		self._document = document
 		self._field = field
 		self._name = (path or '') + unicode(field)
