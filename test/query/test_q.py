@@ -6,6 +6,7 @@ import pytest
 import operator
 from datetime import datetime
 from collections import OrderedDict as odict
+from bson import ObjectId as oid
 
 from marrow.mongo import Document, Field
 from marrow.mongo.field import String, Number, Array, Embed, ObjectId
@@ -159,6 +160,15 @@ class TestQueryableFieldCombinations(object):
 		
 		assert q.operations['$or'][0]['id']['$gte'] == q.operations['$or'][1]['reply.id']['$gte']
 		assert q.operations['$or'][0]['id']['$lt'] == q.operations['$or'][1]['reply.id']['$lt']
+	
+	def test_basic_op(self):
+		T = self.Thread
+		comb = T.id & T.reply.id
+		v = oid()
+		q = comb == v
+		
+		assert q.operations['id'] == v
+		assert q.operations['reply.id'] == v
 	
 	def test_combination_attribute_access_fails(self):
 		T = self.Thread
