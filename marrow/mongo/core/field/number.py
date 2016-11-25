@@ -11,7 +11,7 @@ class Number(Field):
 	__foreign__ = 'number'
 	__disallowed_operators__ = {'#array'}
 	
-	def to_foreign(self, obj, name, value):  # noqa
+	def to_foreign(self, obj, name, value):  # pylint:disable=unused-argument
 		if isinstance(value, NumberABC):
 			return value
 		
@@ -27,19 +27,19 @@ class Number(Field):
 class Double(Number):
 	__foreign__ = 'double'
 	
-	def to_foreign(self, obj, name, value):  # noqa
+	def to_foreign(self, obj, name, value):  # pylint:disable=unused-argument
 		return float(value)
 
 
 class Integer(Number):
 	__foreign__ = 'integer'
 	
-	def to_foreign(self, obj, name, value):  # noqa
+	def to_foreign(self, obj, name, value):  # pylint:disable=unused-argument
 		return int(value)
 
 
 class Long(Number):
 	__foreign__ = 'long'
 	
-	def to_foreign(self, obj, name, value):  # noqa
+	def to_foreign(self, obj, name, value):  # pylint:disable=unused-argument
 		return Int64(int(value))
