@@ -201,13 +201,13 @@ class MongoHandler(logging.Handler):
 	def emit(self, record):
 		try:
 			document = self.format(record)
-		except:
+		except:  # noqa
 			self.handleError(record)
 			return
 		
 		try:
 			result = self.collection.insert_one(document)
-		except:
+		except:  # noqa
 			self.handleError(record)
 			return
 		
