@@ -4,10 +4,12 @@ from __future__ import unicode_literals
 
 import pytest
 import operator
+from datetime import datetime
 from collections import OrderedDict as odict
+from bson import ObjectId as oid
 
 from marrow.mongo import Document, Field
-from marrow.mongo.field import String, Number, Array, Embed
+from marrow.mongo.field import String, Number, Array, Embed, ObjectId
 from marrow.mongo.query import Ops, Q
 from marrow.mongo.util.compat import py3, str, unicode
 
@@ -24,6 +26,15 @@ class Sample(Document):
 
 mock_queryable = Sample.field
 
+@pytest.fixture()
+def S():
+	class Stringy(Document):
+		foo = String()
+		bar = String()
+		baz = String()
+		diz = String()
+	
+	return Stringy
 
 class TestQueryable(object):  # TODO: Properly use pytest fixtures for this...
 	operators = [
@@ -135,5 +146,159 @@ class TestQueryable(object):  # TODO: Properly use pytest fixtures for this...
 			Sample.generic['foo']
 	
 	def test_array_non_numeric(self):
-		with pytest.raises(ValueError):
+		with pytest.raises(KeyError):
 			Sample.array['bar']
+
+
+class TestQueryableQueryableQueryable(object):
+	def test_left_merge(self, S):
+		a = (S.foo & S.bar)
+		b = S.baz
+		z = a & b
+		
+		assert z._field == a._field + [b]
+	
+	def test_right_merge(self, S):
+		a = S.foo
+		b = (S.baz & S.diz)
+		z = a & b
+		
+		assert z._field == [a] + b._field
+	
+	def test_twin_merge(self, S):
+		a = (S.foo & S.bar)
+		b = (S.baz & S.diz)
+		z = a & b
+		
+		assert z._field == a._field + b._field
+	
+
+
+class TestQueryableFieldCombinations(object):
+	@pytest.fixture()
+	def T(self):
+		class Thread(Document):
+			class Reply(Document):
+				id = ObjectId()
+			
+			id = ObjectId()
+			reply = Embed(Reply)
+		
+		return Thread
+	
+	@pytest.fixture()
+	def E(self):
+		class Embeds(Document):
+			class Embedded(Document):
+				field = String()
+			
+			foo = Embed(Embedded)
+			bar = Embed(Embedded)
+		
+		return Embeds
+	
+	@pytest.fixture()
+	def A(self):
+		class Arrays(Document):
+			foo = Array(String())
+			bar = Array(String())
+		
+		return Arrays
+	
+	def test_forum_example(self, T):
+		comb = T.id | T.reply.id
+		assert repr(comb) == "Q(Thread, '$or', [Q(Thread, 'id', ObjectId('id')), Q(Thread, 'reply.id', ObjectId('id'))])"
+		
+		q = comb.range(datetime(2016, 1, 1), datetime(2017, 1, 1))
+		
+		assert q.operations['$or']
+		
+		assert q.operations['$or'][0]['id']['$gte'] == q.operations['$or'][1]['reply.id']['$gte']
+		assert q.operations['$or'][0]['id']['$lt'] == q.operations['$or'][1]['reply.id']['$lt']
+	
+	def test_equality_op(self, T):
+		comb = T.id & T.reply.id
+		v = oid()
+		q = comb == v
+		
+		assert q.operations['id'] == v
+		assert q.operations['reply.id'] == v
+	
+	def test_basic_op(self, T):
+		comb = T.id & T.reply.id
+		v = oid()
+		q = comb > v
+		
+		assert q.operations['id']['$gt'] == v
+		assert q.operations['reply.id']['$gt'] == v
+	
+	def test_iterable_op(self, T):
+		comb = T.id & T.reply.id
+		v = oid()
+		q = comb.any([v])
+		
+		assert q.operations['id']['$in'] == [v]
+		assert q.operations['reply.id']['$in'] == [v]
+	
+	def test_re_op(self, S):
+		comb = S.foo & S.bar
+		q = comb.re('^', 'foo', '$')
+		
+		assert q.operations['foo']['$re'] == '^foo$'
+		assert q.operations['bar']['$re'] == '^foo$'
+	
+	def test_match_op(self, E):
+		comb = E.foo & E.bar
+		v = {'foo': 'bar'}
+		q = comb.match(v)
+		
+		assert q['foo']['$elemMatch'] == v
+		assert q['bar']['$elemMatch'] == v
+	
+	def test_size_op(self, A):
+		comb = A.foo & A.bar
+		q = comb.size(27)
+		
+		assert q['foo']['$size'] == 27
+		assert q['bar']['$size'] == 27
+	
+	def test_neg_op(self, S):
+		comb = S.foo & S.bar
+		q = -comb
+		
+		assert q['foo']['$exists'] == False
+		assert q['bar']['$exists'] == False
+	
+	def test_pos_op(self, S):
+		comb = S.foo & S.bar
+		q = +comb
+		
+		assert q['foo']['$exists'] == True
+		assert q['bar']['$exists'] == True
+	
+	def test_type_op(self, S):
+		comb = S.foo & S.bar
+		q = comb.of_type()
+		
+		assert q['foo']['$type'] == 'string'
+		assert q['bar']['$type'] == 'string'
+	
+	def test_bad_combination(self, T):
+		with pytest.raises(TypeError):
+			assert T.id & 27
+	
+	def test_combination_attribute_access_fails(self, T):
+		with pytest.raises(AttributeError):
+			(T.id | T.reply.id).foo
+	
+	def test_combination_item_access_fails(self, T):
+		with pytest.raises(KeyError):
+			(T.id | T.reply.id)[27]
+	
+	def test_array_match_fails(self, T):
+		with pytest.raises(TypeError):
+			(T.id | T.reply.id).S
+	
+	def test_inversion_fails(self, T):
+		with pytest.raises(TypeError):
+			~(T.id ^ T.reply.id)
