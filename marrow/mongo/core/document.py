@@ -15,7 +15,6 @@ from marrow.schema import Container, Attributes
 from .field import Field
 from .index import Index
 from ..util import SENTINEL
-from ..util.compat import unicode
 
 
 class Document(Container):
