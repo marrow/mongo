@@ -137,12 +137,13 @@ class Reference(_HasKinds, Field):
 		
 		return 'objectId'
 	
-	def _populate_cache(self, value):
+	def _populate_cache(self, obj, value):
 		inst = odict()
 		
 		if isinstance(value, Document):
 			try:
 				inst['_id'] = value.__data__['_id']
+				inst['_cls'] = canon(value.__class__)
 			except KeyError:
 				raise ValueError("Must reference a document with an _id.")
 		
@@ -191,7 +192,7 @@ class Reference(_HasKinds, Field):
 		"""Transform to a MongoDB-safe value."""
 		
 		if self.cache:
-			return self._populate_cache(value)
+			return self._populate_cache(obj, value)
 		
 		# First, we handle the typcial Document object case.
 		if isinstance(value, Document):
