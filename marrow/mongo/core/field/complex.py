@@ -2,7 +2,7 @@
 
 from bson import DBRef, ObjectId as OID
 from bson.errors import InvalidId
-from collections import Iterable
+from collections import Iterable, Mapping, OrderedDict as odict
 from pkg_resources import iter_entry_points
 from weakref import proxy
 
@@ -129,16 +129,69 @@ class Reference(_HasKinds, Field):
 	def __foreign__(self):
 		"""Advertise that we store a simple reference, or deep reference, or object, depending on configuration."""
 		
-		#if not self.cache:
-		#return 'object'
+		if self.cache:
+			return 'object'
 		
 		if self.concrete:
 			return 'dbPointer'
 		
 		return 'objectId'
 	
+	def _populate_cache(self, value):
+		inst = odict()
+		
+		if isinstance(value, Document):
+			try:
+				inst['_id'] = value.__data__['_id']
+			except KeyError:
+				raise ValueError("Must reference a document with an _id.")
+		
+		elif isinstance(value, Mapping):
+			try:
+				inst['_id'] = value['_id']
+			except KeyError:
+				raise ValueError("Must reference a document with an _id.")
+		
+		elif isinstance(value, OID):
+			inst['_id'] = value
+		
+		elif isinstance(value, (str, unicode)) and len(value) == 24:
+			try:
+				inst['_id'] = OID(value)
+			except InvalidId:
+				raise ValueError("Not referenceable: " + repr(value))
+		
+		else:
+			raise ValueError("Not referenceable: " + repr(value))
+		
+		for field in self.cache:
+			if __debug__:  # This verification is potentially expensive, so skip it in production.
+				for chunk in field.split('.'):
+					if chunk.isnumeric():
+						raise ValueError("May not contain numeric array references.")
+			
+			try:
+				nested = current[parts[-1]] = traverse(obj, field)
+				
+			except LookupError:
+				pass
+			
+			else:
+				current = inst
+				parts = field.split('.')
+				
+				for part in parts[:-1]:
+					current = current.setdefault(part, odict())
+				
+				current[parts[-1]] = nested
+		
+		return inst
+	
 	def to_foreign(self, obj, name, value):  # pylint:disable=unused-argument
 		"""Transform to a MongoDB-safe value."""
+		
+		if self.cache:
+			return self._populate_cache(self, value)
 		
 		# First, we handle the typcial Document object case.
 		if isinstance(value, Document):
