@@ -4,12 +4,13 @@ from __future__ import unicode_literals
 
 import pytest
 from datetime import datetime, timedelta
+from collections import OrderedDict as odict
 from bson import DBRef, ObjectId as oid
 from bson.tz_util import utc
 
 from marrow.mongo import Document
 from marrow.mongo.core.field.complex import _HasKinds
-from marrow.mongo.field import Array, Embed, Reference, PluginReference
+from marrow.mongo.field import Array, Embed, Reference, PluginReference, String
 from marrow.mongo.util.compat import unicode
 
 
@@ -27,6 +28,9 @@ class FieldExam(object):
 
 class Concrete(Document):
 	__collection__ = 'collection'
+	
+	foo = String()
+	bar = String()
 
 
 class TestHasKinds(object):
@@ -197,6 +201,36 @@ class TestConcreteReferenceField(FieldExam):
 	def test_foreign_cast_reference(self, Sample):
 		inst = Sample('58329b3a927cc647e94153c9')
 		assert isinstance(inst.field, DBRef)
+
+
+class TestCachingReferenceField(FieldExam):
+	__field__ = Reference
+	__args__ = (Concrete, )
+	__kw__ = dict(cache=('foo', ))
+	
+	def test_foreign(self, Sample):
+		assert Sample.field._field.__foreign__ == 'object'
+	
+	def test_foreign_cast_document(self, Sample):
+		val = Concrete()
+		val['_id'] = oid('58329b3a927cc647e94153c9')
+		val.foo = 'foo'
+		val.bar = 'bar'
+		
+		inst = Sample(field=val)
+		
+		assert isinstance(inst.field, odict)
+		assert inst.field['_id'] == val['_id']
+		assert inst.field['_cls'] == 'test_complex:Concrete'
+		assert inst.field['foo'] == val['foo']
+	
+	def test_foreign_cast_document_fail(self, Sample):
+		with pytest.raises(ValueError):
+			Sample(Concrete())
+	
+	def test_foreign_cast_reference(self, Sample):
+		inst = Sample('58329b3a927cc647e94153c9')
+		assert isinstance(inst.field, odict)
 
 
 class TestExplicitPluginReferenceField(FieldExam):

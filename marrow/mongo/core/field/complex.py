@@ -137,7 +137,7 @@ class Reference(_HasKinds, Field):
 		
 		return 'objectId'
 	
-	def _populate_cache(self, obj, value):
+	def _populate_cache(self, value):
 		inst = odict()
 		
 		if isinstance(value, Document):
@@ -153,7 +153,7 @@ class Reference(_HasKinds, Field):
 			except KeyError:
 				raise ValueError("Must reference a document with an _id.")
 		
-		elif isinstance(value, OID):
+		elif isinstance(value, (OID, DBRef)):
 			inst['_id'] = value
 		
 		elif isinstance(value, (str, unicode)) and len(value) == 24:
@@ -172,7 +172,7 @@ class Reference(_HasKinds, Field):
 						raise ValueError("May not contain numeric array references.")
 			
 			try:
-				nested = traverse(obj, field)
+				nested = traverse(value, field)
 				
 			except LookupError:
 				pass
@@ -192,7 +192,7 @@ class Reference(_HasKinds, Field):
 		"""Transform to a MongoDB-safe value."""
 		
 		if self.cache:
-			return self._populate_cache(obj, value)
+			return self._populate_cache(value)
 		
 		# First, we handle the typcial Document object case.
 		if isinstance(value, Document):
