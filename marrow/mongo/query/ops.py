@@ -30,8 +30,8 @@ class Ops(object):
 		return "{}({}{}{}{})".format(
 				self.__class__.__name__,
 				repr([(i, j) for i, j in self.operations.items()]),
-				", collection={}".format() if self.collection else "",
-				", document={}".format() if self.document else "",
+				", collection={}".format(self.collection) if self.collection else "",
+				", document={}".format(self.document) if self.document else "",
 				extra or ""
 			)
 	
