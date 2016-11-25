@@ -38,9 +38,9 @@ class ObjectId(Field):
 			self.default
 		except AttributeError:
 			if self.__name__ == '_id':  # But only if we're actually the primary key.
-				self.default = lambda: OID()
+				self.default = lambda: OID()  # noqa -- classes aren't automatically instantiated
 	
-	def to_foreign(self, obj, name, value):
+	def to_foreign(self, obj, name, value):  # noqa
 		if isinstance(value, OID):
 			return value
 		
