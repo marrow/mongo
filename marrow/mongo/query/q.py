@@ -391,9 +391,6 @@ class Q(object):
 		if self._combining:  # We are a field-compound query fragment, e.g. (Foo.bar & Foo.baz).
 			return reduce(self._combining, (qp.match(q) for qp in self._field))
 		
-		if self._combining:
-			raise AttributeError()
-		
 		# Optimize this away in production; diagnosic aide.
 		if __debug__ and _complex_safety_check(self._field, {'$elemMatch', '#document'}):  # pragma: no cover
 			raise NotImplementedError("{self!r} does not allow $elemMatch comparison.".format(self=self))
