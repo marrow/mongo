@@ -191,7 +191,7 @@ class Reference(_HasKinds, Field):
 		"""Transform to a MongoDB-safe value."""
 		
 		if self.cache:
-			return self._populate_cache(self, value)
+			return self._populate_cache(value)
 		
 		# First, we handle the typcial Document object case.
 		if isinstance(value, Document):
