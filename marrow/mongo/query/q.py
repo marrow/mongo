@@ -7,14 +7,9 @@ For internal construction only.
 
 from __future__ import unicode_literals
 
-import re
-from copy import copy, deepcopy
-from collections import Mapping, MutableMapping
+from copy import copy
 from operator import __and__, __or__, __xor__
 from functools import reduce
-from pytz import utc
-from bson.codec_options import CodecOptions
-from marrow.schema.compat import odict
 
 from ..util.compat import py3, unicode
 from .ops import Ops
@@ -182,7 +177,7 @@ class Q(object):
 			raise TypeError("Unable to dereference after combining fields.")
 		
 		instance = self.__class__(self._document, self._field)
-		instance._name = self._name + '.' + '$'
+		instance._name = self._name + '.' + '$'  # noqa
 		return instance
 	
 	# Comparison Query Selectors

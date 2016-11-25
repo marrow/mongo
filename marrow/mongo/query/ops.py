@@ -9,12 +9,10 @@ from __future__ import unicode_literals
 
 from copy import deepcopy
 from collections import Mapping, MutableMapping
-from pytz import utc
-from bson.codec_options import CodecOptions
 from marrow.schema.compat import odict
 
 from ..util import SENTINEL
-from ..util.compat import py3, unicode
+from ..util.compat import py3
 
 
 

@@ -56,7 +56,7 @@ class Model(object):
 		"""Descriptor protocol getter."""
 		if instance is None: return self  # Return ourselves directly if requested from the class we were assigned to.
 		
-		collection = self.resolve(instance._ctx)
+		collection = self.resolve(instance._ctx)  # noqa -- we must only be attached to objects providing this interface
 		
 		if self.cache:  # Assign the cached value if requested.
 			setattr(instance, self.cache, collection)
