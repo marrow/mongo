@@ -102,35 +102,21 @@ UPDATE_SUFFIX_MAP = {
 
 def _process_arguments(Document, prefixes, suffixes, arguments):
 	for name, value in arguments.items():
-		# TODO: Rearrange this a bit to allow for automatic detection of method-based querying.
-		# That'd need the Field instance to expose safe operations, but save much of the above hard-coding.
-		nname, _, suffix = name.rpartition('__')
-		if suffix in suffixes:
-			name = nname
-		else:
-			suffix = None
-		
 		prefix, _, nname = name.partition('__')
 		if prefix in prefixes:
 			name = nname
 		else:
 			prefix = None
 		
-		# TODO: Eventually, nested dereferencing will track parent container name.
-		# Currently it does not, so we need to.
+		nname, _, suffix = name.rpartition('__')
+		if suffix in suffixes:
+			name = nname
+		else:
+			suffix = None
 		
-		path = ''
-		current = Document
-		parts = deque(name.split('__'))
+		field = traverse(Document, name.replace('__', '.'))
 		
-		while parts:
-			if path:  # TODO: As per above note, this _should_ go after retrieval and str(current) instead.
-				path += '.' + unicode(parts[0])
-			else:
-				path = unicode(parts[0])
-			current = getattr(current, parts.popleft())
-		
-		yield prefixes.get(prefix, None), suffixes.get(suffix, None), path, current, value
+		yield prefixes.get(prefix, None), suffixes.get(suffix, None), field, value
 
 
 
@@ -142,7 +128,7 @@ def F(Document, __raw__=None, **filters):
 	
 	ops = Ops(__raw__)
 	
-	for prefix, suffix, path, field, value in _process_arguments(Document, FILTER_PREFIX_MAP, FILTER_OPERATION_MAP, filters):
+	for prefix, suffix, field, value in _process_arguments(Document, FILTER_PREFIX_MAP, FILTER_OPERATION_MAP, filters):
 		if suffix:
 			op = suffix(field, value)
 		else:
