@@ -11,7 +11,7 @@ class Number(Field):
 	__foreign__ = 'number'
 	__disallowed_operators__ = {'#array'}
 	
-	def to_foreign(self, obj, name, value):
+	def to_foreign(self, obj, name, value):  # noqa
 		if isinstance(value, NumberABC):
 			return value
 		
