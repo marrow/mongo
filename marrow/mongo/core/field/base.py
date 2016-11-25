@@ -57,7 +57,7 @@ class Boolean(Field):
 	__foreign__ = 'bool'
 	__disallowed_operators__ = {'#array'}
 	
-	def to_foreign(self, obj, name, value):
+	def to_foreign(self, obj, name, value):  # noqa
 		try:
 			value = value.lower()
 		except AttributeError:
@@ -78,8 +78,6 @@ class Date(Field):
 	
 	now = Attribute(default=False)
 	autoupdate = Attribute(default=False)
-	
-	# TODO: use timeparser via context.locale to guess -- https://github.com/thomst/timeparser
 
 
 class TTL(Date):
@@ -88,7 +86,7 @@ class TTL(Date):
 	__foreign__ = 'date'
 	__disallowed_operators__ = {'#array'}
 	
-	def to_foreign(self, obj, name, value):
+	def to_foreign(self, obj, name, value):  # noqa
 		if isinstance(value, timedelta):
 			return datetime.utcnow() + value
 		
@@ -98,7 +96,6 @@ class TTL(Date):
 		if isinstance(value, Number):
 			return datetime.utcnow() + timedelta(days=value)
 		
-		# TODO: use timeparser via context.locale to guess -- https://github.com/thomst/timeparser
 		raise ValueError("Invalid TTL value: " + repr(value))
 
 
