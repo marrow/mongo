@@ -74,7 +74,7 @@ class JSONFormatter(logging.Formatter):
 		'stack_info',
 	}
 	
-	def __init__(self, highlight=None, indent=False, **kwargs):  # noqa
+	def __init__(self, highlight=None, indent=False, **kwargs):  # pylint:disable=unused-argument
 		if __debug__:
 			format = "{created}\t{levelname}\t{name}:{funcName}:{lineno}\t{message}"
 		else:
@@ -89,10 +89,10 @@ class JSONFormatter(logging.Formatter):
 		
 		try:
 			return unicode(value)
-		except:  # noqa
+		except:  # pylint:disable=bare-except
 			try:
 				return repr(value)
-			except:  # noqa
+			except:  # pylint:disable=bare-except
 				return self.REPR_FAILED
 	
 	def jsonify(self, record, **kw):
@@ -201,13 +201,13 @@ class MongoHandler(logging.Handler):
 	def emit(self, record):
 		try:
 			document = self.format(record)
-		except:  # noqa
+		except:  # pylint:disable=bare-except
 			self.handleError(record)
 			return
 		
 		try:
 			result = self.collection.insert_one(document)
-		except:  # noqa
+		except:  # pylint:disable=bare-except
 			self.handleError(record)
 			return
 		
