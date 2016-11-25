@@ -153,7 +153,7 @@ class Reference(_HasKinds, Field):
 			except KeyError:
 				raise ValueError("Must reference a document with an _id.")
 		
-		elif isinstance(value, (OID, DBRef)):
+		elif isinstance(value, OID):
 			inst['_id'] = value
 		
 		elif isinstance(value, (str, unicode)) and len(value) == 24:
@@ -167,9 +167,8 @@ class Reference(_HasKinds, Field):
 		
 		for field in self.cache:
 			if __debug__:  # This verification is potentially expensive, so skip it in production.
-				for chunk in field.split('.'):
-					if chunk.isnumeric():
-						raise ValueError("May not contain numeric array references.")
+				if any(chunk.isnumeric() for chunk in field.split('.')):
+					raise ValueError("May not contain numeric array references.")
 			
 			try:
 				nested = traverse(value, field)
