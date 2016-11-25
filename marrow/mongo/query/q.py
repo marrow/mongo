@@ -21,8 +21,10 @@ from .ops import Ops
 
 
 if __debug__:
-	_simple_safety_check = lambda s, o: (s.__allowed_operators__ and o not in s.__allowed_operators__) or o in s.__disallowed_operators__
-	_complex_safety_check = lambda s, o: (s.__allowed_operators__ and not s.__allowed_operators__.intersection(o)) or s.__disallowed_operators__.intersection(o)
+	_simple_safety_check = lambda s, o: (s.__allowed_operators__ and o not in s.__allowed_operators__) \
+			or o in s.__disallowed_operators__
+	_complex_safety_check = lambda s, o: (s.__allowed_operators__ and not s.__allowed_operators__.intersection(o)) \
+			or s.__disallowed_operators__.intersection(o)
 
 
 class Q(object):

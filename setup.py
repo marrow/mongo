@@ -44,7 +44,7 @@ setup(
 	author = author.name,
 	author_email = author.email,
 	license = 'MIT',
-	keywords = '',
+	keywords = ['mongodb', 'orm', 'odm', 'document mapper', 'declarative', 'marrow'],
 	classifiers = [
 			"Development Status :: 5 - Production/Stable",
 			"Intended Audience :: Developers",
@@ -68,6 +68,7 @@ setup(
 	include_package_data = True,
 	package_data = {'': ['README.rst', 'LICENSE.txt']},
 	namespace_packages = ['marrow', 'web', 'web.session'],
+	zip_safe = False,
 	
 	# ## Dependency Declaration
 	
