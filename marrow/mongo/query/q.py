@@ -136,7 +136,8 @@ class Q(object):
 		"""A basic operation operating on a single value."""
 		
 		if self._combining:  # We are a field-compound query fragment, e.g. (Foo.bar & Foo.baz).
-			return reduce(self._combining, (q._op(operation, other, *allowed) for q in self._field))  # noqa
+			return reduce(self._combining, (q._op(operation, other, *allowed) \
+					for q in self._field))  # pylint:disable=protected-access
 		
 		# Optimize this away in production; diagnosic aide.
 		if __debug__ and _complex_safety_check(self._field, {operation} & set(allowed)):  # pragma: no cover
@@ -151,7 +152,8 @@ class Q(object):
 		"""
 		
 		if self._combining:  # We are a field-compound query fragment, e.g. (Foo.bar & Foo.baz).
-			return reduce(self._combining, (q._iop(operation, other, *allowed) for q in self._field))  # noqa
+			return reduce(self._combining, (q._iop(operation, other, *allowed) \
+					for q in self._field))  # pylint:disable=protected-access
 		
 		# Optimize this away in production; diagnosic aide.
 		if __debug__ and _complex_safety_check(self._field, {operation} & set(allowed)):  # pragma: no cover

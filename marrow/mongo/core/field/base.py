@@ -13,7 +13,7 @@ class String(Field):
 	__foreign__ = 'string'
 	__disallowed_operators__ = {'#array'}
 	
-	def to_foreign(self, obj, name, value):  # noqa
+	def to_foreign(self, obj, name, value):  # pylint:disable=unused-argument
 		return unicode(value)
 
 
@@ -21,7 +21,7 @@ class Binary(Field):
 	__foreign__ = 'binData'
 	__disallowed_operators__ = {'#array'}
 	
-	def to_foreign(self, obj, name, value):  # noqa
+	def to_foreign(self, obj, name, value):  # pylint:disable=unused-argument
 		return bytes(value)
 
 
@@ -40,7 +40,7 @@ class ObjectId(Field):
 			if self.__name__ == '_id':  # But only if we're actually the primary key.
 				self.default = lambda: OID()  # noqa -- classes aren't automatically instantiated
 	
-	def to_foreign(self, obj, name, value):  # noqa
+	def to_foreign(self, obj, name, value):  # pylint:disable=unused-argument
 		if isinstance(value, OID):
 			return value
 		
@@ -57,7 +57,7 @@ class Boolean(Field):
 	__foreign__ = 'bool'
 	__disallowed_operators__ = {'#array'}
 	
-	def to_foreign(self, obj, name, value):  # noqa
+	def to_foreign(self, obj, name, value):  # pylint:disable=unused-argument
 		try:
 			value = value.lower()
 		except AttributeError:
@@ -86,7 +86,7 @@ class TTL(Date):
 	__foreign__ = 'date'
 	__disallowed_operators__ = {'#array'}
 	
-	def to_foreign(self, obj, name, value):  # noqa
+	def to_foreign(self, obj, name, value):  # pylint:disable=unused-argument
 		if isinstance(value, timedelta):
 			return datetime.utcnow() + value
 		
