@@ -68,16 +68,16 @@ class MongoSession(object):
 		if session is None:
 			return self
 		
-		ctx = session._ctx
+		ctx = session._ctx  # noqa
 		D = self._Document
 		db = ctx.db[self._database]
 		docs = db[self._collection]
 		project = D.__projection__
 		
-		result = docs.find_one(D.id == session._id, project)
+		result = docs.find_one(D.id == session._id, project)  # noqa
 		
 		if not result:
-			result = {'_id': oid(str(session._id))}
+			result = {'_id': oid(str(session._id))}  # noqa
 		
 		result = session[self.name] = D.from_mongo(result, project.keys())
 		
