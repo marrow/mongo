@@ -186,7 +186,7 @@ class PluginReference(Field):
 		
 		super(PluginReference, self).__init__(*args, **kw)
 	
-	def to_native(self, obj, name, value):
+	def to_native(self, obj, name, value):  # noqa
 		"""Transform the MongoDB value into a Marrow Mongo value."""
 		
 		try:
@@ -196,7 +196,7 @@ class PluginReference(Field):
 		
 		return load(value, namespace) if namespace else load(value)
 	
-	def to_foreign(self, obj, name, value):
+	def to_foreign(self, obj, name, value):  # noqa
 		"""Transform to a MongoDB-safe value."""
 		
 		try:
