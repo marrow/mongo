@@ -7,7 +7,7 @@ from time import time
 from pymongo.cursor import CursorType
 
 
-def tail(collection, filter=None, projection=None, limit=0, timeout=None, aggregate=False):
+def tail(collection, filter=None, projection=None, limit=0, timeout=None, aggregate=False):  # noqa
 	"""A generator which will block and yield entries as they are added to a capped collection.
 	
 	Only use this on capped collections; behaviour is undefined against non-tailable cursors. Accepts a timeout as an
