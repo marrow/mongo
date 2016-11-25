@@ -9,12 +9,10 @@ from __future__ import unicode_literals
 
 from copy import deepcopy
 from collections import Mapping, MutableMapping
-from pytz import utc
-from bson.codec_options import CodecOptions
 from marrow.schema.compat import odict
 
 from ..util import SENTINEL
-from ..util.compat import py3, unicode
+from ..util.compat import py3
 
 
 
@@ -30,8 +28,8 @@ class Ops(object):
 		return "{}({}{}{}{})".format(
 				self.__class__.__name__,
 				repr([(i, j) for i, j in self.operations.items()]),
-				", collection={}".format() if self.collection else "",
-				", document={}".format() if self.document else "",
+				", collection={}".format(self.collection) if self.collection else "",
+				", document={}".format(self.document) if self.document else "",
 				extra or ""
 			)
 	

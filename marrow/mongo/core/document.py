@@ -15,7 +15,6 @@ from marrow.schema import Container, Attributes
 from .field import Field
 from .index import Index
 from ..util import SENTINEL
-from ..util.compat import unicode
 
 
 class Document(Container):
@@ -141,7 +140,7 @@ class Document(Container):
 		
 		instance = cls(_prepare_defaults=False)
 		instance.__data__ = instance.__store__(doc)
-		instance._prepare_defaults()
+		instance._prepare_defaults()  # pylint:disable=protected-access
 		instance.__loaded__ = set(projected) if projected else None
 		
 		return instance

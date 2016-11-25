@@ -1,6 +1,5 @@
 # encoding: utf-8
 
-from weakref import proxy
 from pymongo import ASCENDING, DESCENDING, GEO2D, GEOHAYSTACK, GEOSPHERE, HASHED, TEXT
 
 from marrow.package.loader import traverse

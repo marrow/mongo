@@ -7,14 +7,9 @@ For internal construction only.
 
 from __future__ import unicode_literals
 
-import re
-from copy import copy, deepcopy
-from collections import Mapping, MutableMapping
+from copy import copy
 from operator import __and__, __or__, __xor__
 from functools import reduce
-from pytz import utc
-from bson.codec_options import CodecOptions
-from marrow.schema.compat import odict
 
 from ..util.compat import py3, unicode
 from .ops import Ops
@@ -141,7 +136,8 @@ class Q(object):
 		"""A basic operation operating on a single value."""
 		
 		if self._combining:  # We are a field-compound query fragment, e.g. (Foo.bar & Foo.baz).
-			return reduce(self._combining, (q._op(operation, other, *allowed) for q in self._field))  # noqa
+			return reduce(self._combining,
+					(q._op(operation, other, *allowed) for q in self._field))  # pylint:disable=protected-access
 		
 		# Optimize this away in production; diagnosic aide.
 		if __debug__ and _complex_safety_check(self._field, {operation} & set(allowed)):  # pragma: no cover
@@ -156,7 +152,8 @@ class Q(object):
 		"""
 		
 		if self._combining:  # We are a field-compound query fragment, e.g. (Foo.bar & Foo.baz).
-			return reduce(self._combining, (q._iop(operation, other, *allowed) for q in self._field))  # noqa
+			return reduce(self._combining,
+					(q._iop(operation, other, *allowed) for q in self._field))  # pylint:disable=protected-access
 		
 		# Optimize this away in production; diagnosic aide.
 		if __debug__ and _complex_safety_check(self._field, {operation} & set(allowed)):  # pragma: no cover
@@ -182,7 +179,7 @@ class Q(object):
 			raise TypeError("Unable to dereference after combining fields.")
 		
 		instance = self.__class__(self._document, self._field)
-		instance._name = self._name + '.' + '$'
+		instance._name = self._name + '.' + '$'  # pylint:disable=protected-access
 		return instance
 	
 	# Comparison Query Selectors
@@ -294,14 +291,16 @@ class Q(object):
 		if not isinstance(other, Q):
 			raise TypeError("Can not combine with non-Q.")
 		
-		if self._combining and self._combining is operation:
-			if other._combining and other._combining is operation:  # noqa
-				return self.__class__(self._document, self._field + other._field, None, operation)  # noqa
+		if self._combining and self._combining is operation:  # pylint:disable=protected-access
+			if other._combining and other._combining is operation:  # pylint:disable=protected-access
+				return self.__class__(self._document,
+						self._field + other._field, None, operation)  # pylint:disable=protected-access
 			
 			return self.__class__(self._document, self._field + [other], None, operation)
 		
-		if other._combining and other._combining is operation:  # noqa
-			return self.__class__(self._document, [self] + other._field, None, operation)  # noqa
+		if other._combining and other._combining is operation:  # pylint:disable=protected-access
+			return self.__class__(self._document,
+					[self] + other._field, None, operation)  # pylint:disable=protected-access
 		
 		return self.__class__(self._document, [self, other], None, operation)
 	

@@ -1,6 +1,7 @@
 # encoding: utf-8
 
-from bson import DBRef, ObjectId as oid
+from bson import DBRef, ObjectId as OID
+from bson.errors import InvalidId
 from collections import Iterable
 from pkg_resources import iter_entry_points
 from weakref import proxy
@@ -39,9 +40,10 @@ class _HasKinds(Field):
 
 
 class _CastingKind(Field):
-	def to_native(self, obj, name, value):
+	def to_native(self, obj, name, value):  # pylint:disable=unused-argument
+		"""Transform the MongoDB value into a Marrow Mongo value."""
+		
 		if not isinstance(value, Document):
-			"""Transform the MongoDB value into a Marrow Mongo value."""
 			
 			kinds = list(self.kinds)
 			
@@ -55,7 +57,7 @@ class _CastingKind(Field):
 		
 		return value
 	
-	def to_foreign(self, obj, name, value):
+	def to_foreign(self, obj, name, value):  # pylint:disable=unused-argument
 		"""Transform to a MongoDB-safe value."""
 		
 		kinds = list(self.kinds)
@@ -128,14 +130,14 @@ class Reference(_HasKinds, Field):
 		"""Advertise that we store a simple reference, or deep reference, or object, depending on configuration."""
 		
 		#if not self.cache:
+		#return 'object'
+		
 		if self.concrete:
 			return 'dbPointer'
 		
 		return 'objectId'
-		
-		#return 'object'
 	
-	def to_foreign(self, obj, name, value):
+	def to_foreign(self, obj, name, value):  # pylint:disable=unused-argument
 		"""Transform to a MongoDB-safe value."""
 		
 		# First, we handle the typcial Document object case.
@@ -146,8 +148,8 @@ class Reference(_HasKinds, Field):
 		
 		elif isinstance(value, (str, unicode)) and len(value) == 24:
 			try:
-				identifier = oid(value)
-			except:
+				identifier = OID(value)
+			except InvalidId:
 				identifier = value
 		
 		kinds = list(self.kinds)
@@ -184,7 +186,7 @@ class PluginReference(Field):
 		
 		super(PluginReference, self).__init__(*args, **kw)
 	
-	def to_native(self, obj, name, value):
+	def to_native(self, obj, name, value):  # pylint:disable=unused-argument
 		"""Transform the MongoDB value into a Marrow Mongo value."""
 		
 		try:
@@ -194,7 +196,7 @@ class PluginReference(Field):
 		
 		return load(value, namespace) if namespace else load(value)
 	
-	def to_foreign(self, obj, name, value):
+	def to_foreign(self, obj, name, value):  # pylint:disable=unused-argument
 		"""Transform to a MongoDB-safe value."""
 		
 		try:

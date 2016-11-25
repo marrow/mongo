@@ -1,8 +1,7 @@
 # encoding: utf-8
+# pylint:disable=too-many-arguments
 
 """Utilities relating to use and managemnet of capped collections."""
-
-from time import time
 
 from pymongo.cursor import CursorType
 

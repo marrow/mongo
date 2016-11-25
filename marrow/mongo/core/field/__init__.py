@@ -13,7 +13,7 @@ from ...util.compat import py3
 
 
 class FieldTransform(BaseTransform):
-	def foreign(self, value, context):
+	def foreign(self, value, context):  # pylint:disable=signature-differs
 		field, document = context
 		
 		if hasattr(field, 'to_foreign'):
@@ -21,7 +21,7 @@ class FieldTransform(BaseTransform):
 		
 		return value
 	
-	def native(self, value, context):
+	def native(self, value, context):  # pylint:disable=signature-differs
 		field, document = context
 		
 		if hasattr(field, 'to_native'):
