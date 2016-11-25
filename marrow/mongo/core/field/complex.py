@@ -171,7 +171,7 @@ class Reference(_HasKinds, Field):
 						raise ValueError("May not contain numeric array references.")
 			
 			try:
-				nested = current[parts[-1]] = traverse(obj, field)
+				nested = traverse(obj, field)
 				
 			except LookupError:
 				pass
