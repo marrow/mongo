@@ -2,8 +2,7 @@
 
 from datetime import datetime, timedelta
 from numbers import Number
-from bson import ObjectId as oid
-from bson.code import Code
+from bson import ObjectId as OID
 from marrow.schema import Attribute
 
 from . import Field
@@ -14,7 +13,7 @@ class String(Field):
 	__foreign__ = 'string'
 	__disallowed_operators__ = {'#array'}
 	
-	def to_foreign(self, obj, name, value):
+	def to_foreign(self, obj, name, value):  # noqa
 		return unicode(value)
 
 
@@ -22,7 +21,7 @@ class Binary(Field):
 	__foreign__ = 'binData'
 	__disallowed_operators__ = {'#array'}
 	
-	def to_foreign(self, obj, name, value):
+	def to_foreign(self, obj, name, value):  # noqa
 		return bytes(value)
 
 
@@ -39,19 +38,19 @@ class ObjectId(Field):
 			self.default
 		except AttributeError:
 			if self.__name__ == '_id':  # But only if we're actually the primary key.
-				self.default = lambda: oid()
+				self.default = lambda: OID()
 	
 	def to_foreign(self, obj, name, value):
-		if isinstance(value, oid):
+		if isinstance(value, OID):
 			return value
 		
 		if isinstance(value, datetime):
-			return oid.from_datetime(value)
+			return OID.from_datetime(value)
 		
 		if isinstance(value, timedelta):
-			return oid.from_datetime(datetime.utcnow() + value)
+			return OID.from_datetime(datetime.utcnow() + value)
 		
-		return oid(unicode(value))
+		return OID(unicode(value))
 
 
 class Boolean(Field):
