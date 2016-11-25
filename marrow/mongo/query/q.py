@@ -291,14 +291,16 @@ class Q(object):
 		if not isinstance(other, Q):
 			raise TypeError("Can not combine with non-Q.")
 		
-		if self._combining and self._combining is operation:
-			if other._combining and other._combining is operation:
-				return self.__class__(self._document, self._field + other._field, None, operation)
+		if self._combining and self._combining is operation:  # pylint:disable=protected-access
+			if other._combining and other._combining is operation:  # pylint:disable=protected-access
+				return self.__class__(self._document,
+						self._field + other._field, None, operation)  # pylint:disable=protected-access
 			
 			return self.__class__(self._document, self._field + [other], None, operation)
 		
-		if other._combining and other._combining is operation:
-			return self.__class__(self._document, [self] + other._field, None, operation)
+		if other._combining and other._combining is operation:  # pylint:disable=protected-access
+			return self.__class__(self._document,
+					[self] + other._field, None, operation)  # pylint:disable=protected-access
 		
 		return self.__class__(self._document, [self, other], None, operation)
 	

@@ -2,7 +2,7 @@
 
 import sys
 
-from .core import Document, Field, Index, __version__
+from .core import Document, Field, Index, __version__  # noqa
 from .util import Registry
 
 document = sys.modules['marrow.mongo.document'] = Registry('marrow.mongo.document')
