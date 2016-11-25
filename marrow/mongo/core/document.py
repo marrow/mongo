@@ -140,7 +140,7 @@ class Document(Container):
 		
 		instance = cls(_prepare_defaults=False)
 		instance.__data__ = instance.__store__(doc)
-		instance._prepare_defaults()
+		instance._prepare_defaults()  # noqa
 		instance.__loaded__ = set(projected) if projected else None
 		
 		return instance
