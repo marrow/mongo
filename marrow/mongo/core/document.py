@@ -130,7 +130,19 @@ class Document(Container):
 		http://api.mongodb.com/python/current/api/pymongo/database.html#pymongo.database.Database.create_collection
 		"""
 		
-		return cls.get_collection(target)
+		if recreate:
+			if isinstance(target, Collection):
+				target.drop()
+			
+			elif isinstance(target, Database):
+				target[cls.__collection__].drop()
+		
+		collection = cls.get_collection(target)
+		
+		if indexes:
+			cls.create_indexes(target)
+		
+		return collection
 	
 	@classmethod
 	def get_collection(cls, target):
