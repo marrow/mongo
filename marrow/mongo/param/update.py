@@ -21,4 +21,5 @@ def U(Document, **update):
 	Because this utility is likely going to be used frequently it has been given a single-character name.
 	"""
 	
-	return Ops()
+	Document
+	return Ops(update)

@@ -129,7 +129,6 @@ class Document(Container):
 		
 		http://api.mongodb.com/python/current/api/pymongo/database.html#pymongo.database.Database.create_collection
 		"""
-		pass  # TODO
 		
 		return cls.get_collection(target)
 	
@@ -165,9 +164,13 @@ class Document(Container):
 		"""Iterate all known indexes and construct them."""
 		
 		results = []
+		collection = cls.get_collection(target)
+		
+		if recreate:
+			collection.drop_indexes()
 		
 		for index in cls.__indexes__.values():
-			results.append(index.create_index(cls.get_collection(target)))
+			results.append(index.create_index(collection))
 		
 		return results
 	

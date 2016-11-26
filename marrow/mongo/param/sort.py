@@ -6,6 +6,8 @@ from __future__ import unicode_literals
 
 from pymongo import ASCENDING, DESCENDING
 
+from marrow.package.loader import traverse
+
 
 def S(Document, *fields):
 	"""Generate a MongoDB sort order list using the Django ORM style."""
@@ -27,6 +29,6 @@ def S(Document, *fields):
 		if field[0] in ('+', '-'):
 			field = field[1:]
 		
-		result.append((field, direction))
+		result.append((~traverse(Document, field), direction))
 	
 	return result

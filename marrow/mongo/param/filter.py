@@ -5,12 +5,10 @@
 from __future__ import unicode_literals
 
 import operator
-from collections import deque
 
 from pymongo import ASCENDING, DESCENDING
 
 from ..query import Ops
-from ..util.compat import unicode
 from .common import _deferred_method, _operator_choice, _process_arguments
 
 DEFAULT_FILTER = operator.eq
