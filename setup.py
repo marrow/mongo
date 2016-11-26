@@ -30,7 +30,6 @@ tests_require = [
 		'pytest-cov',  # coverage reporting
 		'pytest-flakes',  # syntax validation
 		'pytest-capturelog',  # log capture
-		'pytest-isort',  # import ordering
 	]
 
 
