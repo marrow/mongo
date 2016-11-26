@@ -4,6 +4,8 @@
 
 from __future__ import unicode_literals
 
+from marrow.package.loader import traverse
+
 
 def P(Document, *fields, **kw):
 	"""Generate a MongoDB projection dictionary using the Django ORM style."""
@@ -14,16 +16,19 @@ def P(Document, *fields, **kw):
 	
 	for field in fields:
 		if field[0] in ('-', '!'):
-			omitted.add(field[1:])
+			omitted.add(~traverse(Document, field[1:], field[1:]))
 		elif field[0] == '+':
-			projected.add(field[1:])
+			projected.add(~traverse(Document, field[1:], field[1:]))
 		else:
-			projected.add(field)
+			projected.add(~traverse(Document, field, field))
 	
-	if not projected:
+	if not projected:  # We only have exclusions from the default projection.
 		names = Document.__projection__.keys() if Document.__projection__ else Document.__fields__.keys()
 		projected = {name for name in (names - omitted)}
 	
 	projected |= __always__
+	
+	if not projected:
+		projected = {'_id'}
 	
 	return {name: True for name in projected}

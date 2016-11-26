@@ -15,7 +15,6 @@ class TestParametricSortConstructor(object):
 		class Sample(Document):
 			field = Field()
 			number = Number('other')
-			array = Array()
 		
 		return Sample
 	
