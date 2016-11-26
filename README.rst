@@ -43,8 +43,23 @@ library is installed.  We recommend using "less than" version numbers to ensure 
 side-effects when updating.  Use ``marrow.mongo<1.1`` to get all bugfixes for the current release, and
 ``marrow.mongo<2.0`` to get bugfixes and feature updates while ensuring that large breaking changes are not installed.
 
-This package has only one hard dependency, a modern (>3.2) version of the ``pymongo`` package.  Installing
-``marrow.mongo`` will also install this package.
+This package has a few dependencies:
+
+* Python 2.7 and above, or Python 3.2 and above, or compatible such as Pypy or Pypy3.
+* A modern (>3.2) version of the ``pymongo`` package.
+* The Marrow Package and Schema utility packages for plugin handling and declarative syntax support.
+
+There are a few conditional, tag-based dependencies:
+
+* ``development`` installs additional utilites relating to testing and contribution.
+* ``scripting`` pulls in the `Javascripthon <https://github.com/azazel75/metapensiero.pj>`__ Python to JavaScript
+  transpiler to enable use of native Python function transport to MongoDB.  (E.g. for use in map/reduce, stored
+  functions, etc.)
+* ``logger`` requires knowledge of the local host's timezone, so pulls in ``tzlocal`` to retrieve this information.
+
+Installing ``marrow.mongo`` will also install package dependencies automatically. To utilize optional tags, add them,
+comma separated, beween square braces.  E.g. ``marrow.mongo[scripting,logger]``. On a command line this will require
+quoting.
 
 
 Development Version
