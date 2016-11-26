@@ -8,12 +8,11 @@ For internal construction only.
 from __future__ import unicode_literals
 
 from copy import copy
-from operator import __and__, __or__, __xor__
 from functools import reduce
+from operator import __and__, __or__, __xor__
 
 from ..util.compat import py3, unicode
 from .ops import Ops
-
 
 if __debug__:
 	_simple_safety_check = lambda s, o: (s.__allowed_operators__ and o not in s.__allowed_operators__) \

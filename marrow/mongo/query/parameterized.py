@@ -5,12 +5,12 @@
 from __future__ import unicode_literals
 
 import operator
-
 from collections import deque
+
 from pymongo import ASCENDING, DESCENDING
 
-from ..util.compat import unicode
 from . import Ops
+from ..util.compat import unicode
 
 
 def _deferred_method(name, _named=None, **kw):

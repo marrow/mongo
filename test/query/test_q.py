@@ -2,14 +2,15 @@
 
 from __future__ import unicode_literals
 
-import pytest
 import operator
-from datetime import datetime
 from collections import OrderedDict as odict
+from datetime import datetime
+
+import pytest
 from bson import ObjectId as oid
 
 from marrow.mongo import Document, Field
-from marrow.mongo.field import String, Number, Array, Embed, ObjectId
+from marrow.mongo.field import Array, Embed, Number, ObjectId, String
 from marrow.mongo.query import Ops, Q
 from marrow.mongo.util.compat import py3, str, unicode
 

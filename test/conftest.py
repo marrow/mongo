@@ -1,9 +1,9 @@
 # encoding: utf-8
 
+from functools import partial
+
 import pymongo
 import pytest
-
-from functools import partial
 
 
 @pytest.fixture(scope="module", autouse=True)

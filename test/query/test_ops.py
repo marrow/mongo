@@ -2,9 +2,10 @@
 
 from __future__ import unicode_literals
 
-import pytest
 import operator
 from collections import OrderedDict as odict
+
+import pytest
 
 from marrow.mongo.query import Ops
 from marrow.mongo.util.compat import py3, str

@@ -3,7 +3,7 @@
 import pytest
 
 from marrow.mongo import Document, field
-from marrow.mongo.core.field import FieldTransform, Field
+from marrow.mongo.core.field import Field, FieldTransform
 
 
 def test_registry():

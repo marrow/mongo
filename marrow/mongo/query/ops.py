@@ -7,13 +7,13 @@ These encapsulate the functionality of creating combinable mappings
 
 from __future__ import unicode_literals
 
-from copy import deepcopy
 from collections import Mapping, MutableMapping
+from copy import deepcopy
+
 from marrow.schema.compat import odict
 
 from ..util import SENTINEL
 from ..util.compat import py3
-
 
 
 class Ops(object):

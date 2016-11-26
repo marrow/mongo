@@ -10,7 +10,6 @@ third-party software, these are subject to change at any time. Only symbols expo
 
 import sys
 
-
 # ## Module Exports
 
 __all__ = ['py3', 'pypy', 'unicode', 'str']
@@ -34,4 +33,3 @@ else:
 	unicode = unicode
 	str = str
 	items = dict.iteritems
-

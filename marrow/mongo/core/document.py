@@ -7,11 +7,12 @@ from bson.binary import STANDARD
 from bson.codec_options import CodecOptions
 from bson.json_util import dumps, loads
 from bson.tz_util import utc
-from marrow.package.loader import load
-from marrow.schema import Attributes, Container
 from pymongo.read_concern import ReadConcern
 from pymongo.read_preferences import ReadPreference
 from pymongo.write_concern import WriteConcern
+
+from marrow.package.loader import load
+from marrow.schema import Attributes, Container
 
 from ..util import SENTINEL
 from .field import Field

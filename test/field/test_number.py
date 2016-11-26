@@ -2,13 +2,14 @@
 
 from __future__ import unicode_literals
 
-import pytest
 from datetime import datetime, timedelta
+
+import pytest
 from bson import ObjectId as oid
 from bson.tz_util import utc
 
 from marrow.mongo import Document
-from marrow.mongo.field import Number, Double, Integer, Long
+from marrow.mongo.field import Double, Integer, Long, Number
 from marrow.mongo.util.compat import unicode
 
 
