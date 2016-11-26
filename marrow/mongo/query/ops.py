@@ -81,6 +81,19 @@ class Ops(object):
 				document = self.document
 			)
 	
+	def __invert__(self):
+		"""Return the boolean inversion of the current query.
+		
+		Equivalent to the MongoDB `$not` operator.
+		"""
+		operations = deepcopy(self.operations)
+		
+		return self.__class__(
+				operations = {'$not': operations},
+				collection = self.collection,
+				document = self.document
+			)
+	
 	# Mapping Protocol
 	
 	def __getitem__(self, name):

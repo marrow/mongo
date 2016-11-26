@@ -14,9 +14,20 @@ class TestParametricFilterConstructor(object):
 		class Sample(Document):
 			field = Field()
 			bar = Field()
+		
 		return Sample
 	
-	def test_basic_equality_operator_default(self, D):
+	def test_basic_equality_operator(self, D):
 		q = F(D, field=27)
 		assert isinstance(q, Ops)
 		assert q == {'field': 27}
+	
+	def test_basic_gt_suffix_operator(self, D):
+		q = F(D, field__gt=42)
+		assert isinstance(q, Ops)
+		assert q == {'field': {'$gt': 42}}
+	
+	def test_inverted_gt_suffix_operator(self, D):
+		q = F(D, not__field__gt=42)
+		assert isinstance(q, Ops)
+		assert q == {'$not': {'field': {'$gt': 42}}}
