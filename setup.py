@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 # encoding: utf-8
 
+import codecs
 import os
 import sys
-import codecs
 
 try:
 	from setuptools.core import setup, find_packages
@@ -87,6 +87,7 @@ setup(
 			development = tests_require + ['pre-commit'],  # Development-time dependencies.
 			scripting = ['javascripthon<1.0'],  # Allow map/reduce functions and "stored functions" to be Python.
 			logger = ['tzlocal'],  # Timezone support to store log times in UTC like a sane person.
+			taxonomy = ['pathlib2; python_version < "3.4"'],  # Path manipulation utility lib; builtin in 3.4 and 3.5.
 		),
 	
 	tests_require = tests_require,
