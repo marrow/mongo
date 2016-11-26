@@ -9,33 +9,11 @@ from collections import deque
 
 from pymongo import ASCENDING, DESCENDING
 
-from . import Ops
+from ..query import Ops
 from ..util.compat import unicode
-
-
-def _deferred_method(name, _named=None, **kw):
-	def _deferred_method_inner(self, other):
-		if _named:
-			if isinstance(_named, tuple):
-				assert len(_named) == len(other), "Incorrect number of arguments."
-				values = iter(other)
-				for i in _named:
-					kw[i] = next(values)
-			else:
-				kw[_named] = other
-			return getattr(self, name)(**kw)
-		return getattr(self, name)(other, **kw)
-	return _deferred_method_inner
-
-
-def _operator_choice(conversion, lookup, **kw):
-	def _operator_choice_inner(self, other):
-		return lookup[conversion(other)](self, **kw)
-	return _operator_choice_inner
-
+from .common import _deferred_method, _operator_choice, _process_arguments
 
 DEFAULT_FILTER = operator.eq
-DEFAULT_UPDATE = 'set'
 
 FILTER_PREFIX_MAP = {
 		'not': operator.invert,
@@ -90,36 +68,6 @@ FILTER_OPERATION_MAP = {
 	}
 
 
-UPDATE_PREFIX_MAP = {
-		
-	}
-
-UPDATE_SUFFIX_MAP = {
-		
-	}
-
-
-
-def _process_arguments(Document, prefixes, suffixes, arguments):
-	for name, value in arguments.items():
-		prefix, _, nname = name.partition('__')
-		if prefix in prefixes:
-			name = nname
-		else:
-			prefix = None
-		
-		nname, _, suffix = name.rpartition('__')
-		if suffix in suffixes:
-			name = nname
-		else:
-			suffix = None
-		
-		field = traverse(Document, name.replace('__', '.'))
-		
-		yield prefixes.get(prefix, None), suffixes.get(suffix, None), field, value
-
-
-
 def F(Document, __raw__=None, **filters):
 	"""Generate a MongoDB filter document using the Django ORM style.
 	
@@ -143,61 +91,3 @@ def F(Document, __raw__=None, **filters):
 		ops &= op
 	
 	return ops
-
-
-def S(Document, *fields):
-	"""Generate a MongoDB sort order list using the Django ORM style."""
-	
-	result = []
-	
-	for field in fields:
-		if isinstance(field, tuple):  # Unpack existing tuple.
-			field, direction = field
-			result.append((field, direction))
-			continue
-		
-		direction = ASCENDING
-		field = field.replace('__', '.')
-		
-		if field[0] == '-':
-			direction = DESCENDING
-		
-		if field[0] in ('+', '-'):
-			field = field[1:]
-		
-		result.append((field, direction))
-	
-	return result
-
-
-def P(Document, *fields, __always__=None):
-	"""Generate a MongoDB projection dictionary using the Django ORM style."""
-	
-	__always__ = __always__ if __always__ else set()
-	projected = set()
-	omitted = set()
-	
-	for field in fields:
-		if field[0] in ('-', '!'):
-			omitted.add(field[1:])
-		elif field[0] == '+':
-			projected.add(field[1:])
-		else:
-			projected.add(field)
-	
-	if not projected:
-		names = Document.__projection__.keys() if Document.__projection__ else Document.__fields__.keys()
-		projected = {name for name in (names - omitted)}
-	
-	projected |= __always__
-	
-	return {name: True for name in projected}
-
-
-def U(Document, **update):
-	"""Generate a MongoDB update document using the Django ORM style.
-	
-	Because this utility is likely going to be used frequently it has been given a single-character name.
-	"""
-	
-	return Ops()

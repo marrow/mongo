@@ -2,6 +2,6 @@
 
 from __future__ import unicode_literals
 
-from marrow.mongo.param import F
+from marrow.mongo.param import S
 
-F  # Filter Document
+S  # Sort Ordering

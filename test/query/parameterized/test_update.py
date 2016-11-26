@@ -2,6 +2,6 @@
 
 from __future__ import unicode_literals
 
-from marrow.mongo.param import F
+from marrow.mongo.param import U
 
-F  # Filter Document
+U  # Update Document
