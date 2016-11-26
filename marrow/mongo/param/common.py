@@ -10,15 +10,11 @@ from marrow.package.loader import traverse
 def _deferred_method(name, _named=None, **kw):
 	def _deferred_method_inner(self, other):
 		if _named:
-			if isinstance(_named, tuple):
-				assert len(_named) == len(other), "Incorrect number of arguments."
-				values = iter(other)
-				
-				for i in _named:
-					kw[i] = next(values)
+			assert len(_named) == len(other), "Incorrect number of arguments."
+			values = iter(other)
 			
-			else:
-				kw[_named] = other
+			for i in _named:
+				kw[i] = next(values)
 			
 			return getattr(self, name)(**kw)
 		
