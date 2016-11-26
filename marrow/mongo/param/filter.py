@@ -39,9 +39,9 @@ FILTER_OPERATION_MAP = {
 		'match': _deferred_method('match'),
 		'range': _deferred_method('range', ('gte', 'lt')),
 		'exists': _operator_choice(bool, {True: operator.pos, False: operator.neg}),
-		# 'mod': ,
 		
 		# String-Specific
+		're': _deferred_method('re'),
 		'exact': _deferred_method('exact'),
 		'iexact': _deferred_method('exact', insensitive=True),
 		'contains': _deferred_method('contains'),
@@ -75,18 +75,16 @@ def F(Document, __raw__=None, **filters):
 	"""
 	
 	ops = Ops(__raw__)
+	args = _process_arguments(Document, FILTER_PREFIX_MAP, FILTER_OPERATION_MAP, filters)
 	
-	for prefix, suffix, field, value in _process_arguments(Document, FILTER_PREFIX_MAP, FILTER_OPERATION_MAP, filters):
+	for prefix, suffix, field, value in args:
 		if suffix:
 			op = suffix(field, value)
 		else:
 			op = DEFAULT_FILTER(field, value)
 		
 		if prefix:
-			op.field = None
 			op = prefix(op)
-		
-		op.field = path
 		
 		ops &= op
 	
