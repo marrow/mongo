@@ -40,13 +40,14 @@ Example logging "dictconfig":
 
 from __future__ import unicode_literals
 
-import logging
 import datetime
+import logging
+
 from bson.json_util import dumps
-from pymongo import MongoClient
-from pytz import utc
-from tzlocal import get_localzone
+from bson.tz_util import utc
 from marrow.mongo.util.compat import unicode
+from pymongo import MongoClient
+from tzlocal import get_localzone
 
 try:
 	from pygments import highlight as _highlight

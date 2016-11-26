@@ -1,20 +1,21 @@
 # encoding: utf-8
 
-from pytz import utc
+from collections import OrderedDict as dict
+from collections import MutableMapping
+
 from bson.binary import STANDARD
 from bson.codec_options import CodecOptions
 from bson.json_util import dumps, loads
-from pymongo.read_preferences import ReadPreference
-from pymongo.read_concern import ReadConcern
-from pymongo.write_concern import WriteConcern
-from collections import OrderedDict as dict, MutableMapping
-
+from bson.tz_util import utc
 from marrow.package.loader import load
-from marrow.schema import Container, Attributes
+from marrow.schema import Attributes, Container
+from pymongo.read_concern import ReadConcern
+from pymongo.read_preferences import ReadPreference
+from pymongo.write_concern import WriteConcern
 
+from ..util import SENTINEL
 from .field import Field
 from .index import Index
-from ..util import SENTINEL
 
 
 class Document(Container):
