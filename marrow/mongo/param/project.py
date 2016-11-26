@@ -5,10 +5,10 @@
 from __future__ import unicode_literals
 
 
-def P(Document, *fields, __always__=None):
+def P(Document, *fields, **kw):
 	"""Generate a MongoDB projection dictionary using the Django ORM style."""
 	
-	__always__ = __always__ if __always__ else set()
+	__always__ = kw.pop('__always__', set())
 	projected = set()
 	omitted = set()
 	
