@@ -9,6 +9,8 @@ from bson.json_util import dumps, loads
 from bson.tz_util import utc
 from marrow.package.loader import load
 from marrow.schema import Attributes, Container
+from pymongo.collection import Collection
+from pymongo.database import Database
 from pymongo.read_concern import ReadConcern
 from pymongo.read_preferences import ReadPreference
 from pymongo.write_concern import WriteConcern
@@ -16,6 +18,8 @@ from pymongo.write_concern import WriteConcern
 from ..util import SENTINEL
 from .field import Field
 from .index import Index
+
+__all__ = ['Document']
 
 
 class Document(Container):
@@ -109,25 +113,64 @@ class Document(Container):
 		if db is collection is None:
 			raise ValueError("Must bind to either a database or explicit collection.")
 		
-		if collection is None:
-			collection = db[cls.__collection__]
-		
-		collection = collection.with_options(
-				codec_options = CodecOptions(
-						document_class = cls.__store__,
-						tz_aware = True,
-						uuid_representation = STANDARD,
-						tzinfo = utc,
-					),
-				read_preference = cls.__read_preference__,
-				read_concern = cls.__read_concern__,
-				write_concern = cls.__write_concern__,
-			)
+		collection = cls.get_collection(db or collection)
 		
 		cls.__bound__ = True
 		cls._collection = collection
 		
 		return cls
+	
+	# Database Operations
+	
+	@classmethod
+	def create_collection(cls, target, recreate=False, indexes=True):
+		"""Ensure the collection identified by this document class exists, creating it if not.
+		
+		http://api.mongodb.com/python/current/api/pymongo/database.html#pymongo.database.Database.create_collection
+		"""
+		pass  # TODO
+		
+		return cls.get_collection(target)
+	
+	@classmethod
+	def get_collection(cls, target):
+		"""Retrieve a properly configured collection object as configured by this document class.
+		
+		http://api.mongodb.com/python/current/api/pymongo/database.html#pymongo.database.Database.get_collection
+		"""
+		
+		config = {
+				'codec_options': CodecOptions(
+						document_class = cls.__store__,
+						tz_aware = True,
+						uuid_representation = STANDARD,
+						tzinfo = utc,
+					),
+				'read_preference': cls.__read_preference__,
+				'read_concern': cls.__read_concern__,
+				'write_concern': cls.__write_concern__,
+			}
+		
+		if isinstance(target, Collection):
+			return target.with_options(**config)
+		
+		elif isinstance(target, Database):
+			return target.get_collection(cls.__collection__, **config)
+		
+		raise TypeError("Can not retrieve collection from: " + repr(target))
+	
+	@classmethod
+	def create_indexes(cls, target, recreate=False):
+		"""Iterate all known indexes and construct them."""
+		
+		results = []
+		
+		for index in cls.__indexes__.values():
+			results.append(index.create_index(cls.get_collection(target)))
+		
+		return results
+	
+	# Data Conversion and Casting
 	
 	@classmethod
 	def from_mongo(cls, doc, projected=None):
