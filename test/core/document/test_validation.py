@@ -1,5 +1,9 @@
+# encoding: utf-8
+
+from __future__ import unicode_literals
+
 from marrow.mongo import Document
-from marrow.mongo.field import Array, Binary, Boolean, Date, ObjectId, String
+from marrow.mongo.field import Array, String
 
 
 class StringDocument(Document):

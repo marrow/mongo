@@ -5,9 +5,8 @@ from numbers import Number
 
 from bson import ObjectId as OID
 
-from marrow.schema import Attribute
-
 from . import Field
+from ....schema import Attribute
 from ...util.compat import unicode
 
 

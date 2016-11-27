@@ -2,11 +2,10 @@
 
 from weakref import proxy
 
-from marrow.package.loader import traverse
-from marrow.schema import Attribute
-from marrow.schema.transform import BaseTransform
-from marrow.schema.validate import Validator
-
+from ....package.loader import traverse
+from ....schema import Attribute
+from ....schema.transform import BaseTransform
+from ....schema.validate import Validator
 from ...query import Q
 from ...util import adjust_attribute_sequence, SENTINEL
 from ...util.compat import py3

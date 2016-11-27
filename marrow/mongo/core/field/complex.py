@@ -1,6 +1,5 @@
 # encoding: utf-8
 
-from collections import OrderedDict as odict
 from collections import Iterable, Mapping
 from weakref import proxy
 
@@ -9,11 +8,11 @@ from bson import DBRef
 from bson.errors import InvalidId
 from pkg_resources import iter_entry_points
 
-from marrow.package.canonical import name as canon
-from marrow.package.loader import load, traverse
-from marrow.schema import Attribute
-
 from .. import Document, Field
+from ....package.canonical import name as canon
+from ....package.loader import load, traverse
+from ....schema import Attribute
+from ....schema.compat import odict
 from ...util.compat import str, unicode
 
 

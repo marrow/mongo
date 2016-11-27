@@ -8,7 +8,7 @@ import operator
 
 from pymongo import ASCENDING, DESCENDING
 
-from ..query import Ops
+from ..query import Filter
 from .common import _deferred_method, _operator_choice, _process_arguments
 
 DEFAULT_FILTER = operator.eq
@@ -72,7 +72,7 @@ def F(Document, __raw__=None, **filters):
 	Because this utility is likely going to be used frequently it has been given a single-character name.
 	"""
 	
-	ops = Ops(__raw__)
+	ops = Filter(__raw__)
 	args = _process_arguments(Document, FILTER_PREFIX_MAP, FILTER_OPERATION_MAP, filters)
 	
 	for prefix, suffix, field, value in args:

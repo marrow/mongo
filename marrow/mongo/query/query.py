@@ -11,8 +11,8 @@ from copy import copy
 from functools import reduce
 from operator import __and__, __or__, __xor__
 
-from ..util.compat import py3, unicode
-from .ops import Ops
+from ...schema.compat import py3, unicode
+from .ops import Filter
 
 if __debug__:
 	_simple_safety_check = lambda s, o: (s.__allowed_operators__ and o not in s.__allowed_operators__) \
@@ -142,7 +142,7 @@ class Q(object):
 		if __debug__ and _complex_safety_check(self._field, {operation} & set(allowed)):  # pragma: no cover
 			raise NotImplementedError("{self!r} does not allow {op} comparison.".format(self=self, op=operation))
 		
-		return Ops({self._name: {operation: self._field.transformer.foreign(other, (self._field, self._document))}})
+		return Filter({self._name: {operation: self._field.transformer.foreign(other, (self._field, self._document))}})
 	
 	def _iop(self, operation, other, *allowed):
 		"""An iterative operation operating on multiple values.
@@ -162,7 +162,7 @@ class Q(object):
 		other = other if len(other) > 1 else other[0]
 		values = [self._field.transformer.foreign(value, (self._field, self._document)) for value in other]
 		
-		return Ops({self._name: {operation: values}})
+		return Filter({self._name: {operation: values}})
 	
 	# Matching Array Element
 	
@@ -200,7 +200,7 @@ class Q(object):
 		if __debug__ and _simple_safety_check(self._field, '$eq'):  # pragma: no cover
 			raise NotImplementedError("{self!r} does not allow $eq comparison.".format(self=self))
 		
-		return Ops({self._name: self._field.transformer.foreign(other, (self._field, self._document))})
+		return Filter({self._name: self._field.transformer.foreign(other, (self._field, self._document))})
 	
 	def __gt__(self, other):
 		"""Matches values that are greater than a specified value.
@@ -363,7 +363,7 @@ class Q(object):
 		if self._combining:  # We are a field-compound query fragment, e.g. (Foo.bar & Foo.baz).
 			return reduce(self._combining, (q.re(*parts) for q in self._field))
 		
-		return Ops({self._name: {'$re': ''.join(parts)}})
+		return Filter({self._name: {'$re': ''.join(parts)}})
 	
 	# Array Query Selectors
 	# https://docs.mongodb.org/manual/reference/operator/query/#array
@@ -398,7 +398,7 @@ class Q(object):
 		if hasattr(q, 'as_query'):
 			q = q.as_query
 		
-		return Ops({self._name: {'$elemMatch': q}})
+		return Filter({self._name: {'$elemMatch': q}})
 	
 	def range(self, gte, lt):
 		"""Matches values that are between a minimum and maximum value, semi-inclusive.
@@ -436,7 +436,7 @@ class Q(object):
 		if __debug__ and _complex_safety_check(self._field, {'$size', '#array'}):  # pragma: no cover
 			raise NotImplementedError("{self!r} does not allow $size comparison.".format(self=self))
 		
-		return Ops({self._name: {'$size': int(value)}})
+		return Filter({self._name: {'$size': int(value)}})
 	
 	# Element Query Selectors
 	# https://docs.mongodb.org/manual/reference/operator/query/#element
@@ -453,7 +453,7 @@ class Q(object):
 		if self._combining:  # We are a field-compound query fragment, e.g. (Foo.bar & Foo.baz).
 			return reduce(self._combining, (q.__neg__() for q in self._field))
 		
-		return Ops({self._name: {'$exists': False}})
+		return Filter({self._name: {'$exists': False}})
 	
 	def __pos__(self):
 		"""Matches documents that have the specified field.
@@ -467,7 +467,7 @@ class Q(object):
 		if self._combining:  # We are a field-compound query fragment, e.g. (Foo.bar & Foo.baz).
 			return reduce(self._combining, (q.__pos__() for q in self._field))
 		
-		return Ops({self._name: {'$exists': True}})
+		return Filter({self._name: {'$exists': True}})
 	
 	def of_type(self, *kinds):
 		"""Selects documents if a field is of the correct type.
@@ -485,9 +485,9 @@ class Q(object):
 		foreign = set(kinds) if kinds else self._field.__foreign__
 		
 		if not foreign:
-			return Ops()
+			return Filter()
 		
 		if len(foreign) == 1:  # Simplify if the value is singular.
 			foreign, = foreign  # Unpack.
 		
-		return Ops({self._name: {'$type': foreign}})
+		return Filter({self._name: {'$type': foreign}})

@@ -6,7 +6,7 @@ from __future__ import unicode_literals
 
 from pymongo import ASCENDING, DESCENDING
 
-from marrow.package.loader import traverse
+from ...package.loader import traverse
 
 
 def S(Document, *fields):

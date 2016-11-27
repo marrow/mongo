@@ -4,7 +4,7 @@
 
 from __future__ import unicode_literals
 
-from marrow.package.loader import traverse
+from ...package.loader import traverse
 
 
 def _deferred_method(name, _named=None, **kw):

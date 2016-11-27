@@ -2,7 +2,6 @@
 
 from __future__ import unicode_literals
 
-from collections import OrderedDict as odict
 from datetime import datetime, timedelta
 
 import pytest
@@ -14,6 +13,7 @@ from marrow.mongo import Document
 from marrow.mongo.core.field.complex import _HasKinds
 from marrow.mongo.field import Array, Embed, PluginReference, Reference, String
 from marrow.mongo.util.compat import unicode
+from marrow.schema.compat import odict
 
 
 class FieldExam(object):

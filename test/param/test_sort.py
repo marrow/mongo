@@ -6,7 +6,6 @@ import pytest
 
 from marrow.mongo import Document, Field, S
 from marrow.mongo.field import Array, Number
-from marrow.mongo.query import Ops
 
 
 class TestParametricSortConstructor(object):

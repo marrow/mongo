@@ -48,7 +48,7 @@ from bson.tz_util import utc
 from pymongo import MongoClient
 from tzlocal import get_localzone
 
-from marrow.mongo.util.compat import unicode
+from ...schema.compat import unicode
 
 try:
 	from pygments import highlight as _highlight

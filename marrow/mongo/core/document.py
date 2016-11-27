@@ -1,6 +1,5 @@
 # encoding: utf-8
 
-from collections import OrderedDict as dict
 from collections import MutableMapping
 
 from bson.binary import STANDARD
@@ -13,9 +12,9 @@ from pymongo.read_concern import ReadConcern
 from pymongo.read_preferences import ReadPreference
 from pymongo.write_concern import WriteConcern
 
-from marrow.package.loader import load
-from marrow.schema import Attributes, Container
-
+from ...package.loader import load
+from ...schema import Attributes, Container
+from ...schema.compat import odict
 from ..util import SENTINEL
 from .field import Field
 from .index import Index
@@ -37,7 +36,7 @@ class Document(Container):
 	"""
 	
 	# Note: These may be dynamic based on content; always access from an instance where possible.
-	__store__ = dict  # For fields, this may be a bson type like Binary, or Code.
+	__store__ = odict # For fields, this may be a bson type like Binary, or Code.
 	__foreign__ = {'object'}  # The representation for the database side of things, ref: $type
 	
 	__bound__ = False  # Has this class been "attached" to a live MongoDB connection?

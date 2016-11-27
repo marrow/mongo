@@ -7,8 +7,6 @@ from __future__ import unicode_literals
 
 __all__ = ['Model']
 
-log = __import__('logging').getLogger(__name__)
-
 
 class Model(object):
 	"""Lazy access to MongoDB database collections via the WebCore request context.

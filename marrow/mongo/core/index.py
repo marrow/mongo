@@ -2,9 +2,8 @@
 
 from pymongo import ASCENDING, DESCENDING, GEO2D, GEOHAYSTACK, GEOSPHERE, HASHED, TEXT
 
-from marrow.package.loader import traverse
-from marrow.schema import Attribute
-
+from ...package.loader import traverse
+from ...schema import Attribute
 from ..util.compat import unicode
 
 
