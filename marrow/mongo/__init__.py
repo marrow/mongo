@@ -18,6 +18,7 @@ __all__ = [
 	'Index',
 	'Ops',
 	'P',
+	'Q',
 	'S',
 	'U',
 	'Update',

@@ -6,8 +6,6 @@ from __future__ import unicode_literals
 
 import operator
 
-from pymongo import ASCENDING, DESCENDING
-
 from ..query import Filter
 from .common import _deferred_method, _operator_choice, _process_arguments
 

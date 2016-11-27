@@ -31,7 +31,7 @@ def _operator_choice(conversion, lookup, **kw):
 	return _operator_choice_inner
 
 
-def _process_arguments(Document, prefixes, suffixes, arguments, passthrough=set()):
+def _process_arguments(Document, prefixes, suffixes, arguments, passthrough=None):
 	for name, value in arguments.items():
 		prefix, _, nname = name.partition('__')
 		if prefix in prefixes:
@@ -43,8 +43,8 @@ def _process_arguments(Document, prefixes, suffixes, arguments, passthrough=set(
 		
 		field = traverse(Document, name.replace('__', '.'))  # Find the target field.
 		
-		if not passthrough & {prefix, suffix}:  # Typecast the value to MongoDB-safe as needed.
-			value = field._field.transformer.foreign(value, (field, Document))
+		if passthrough and not passthrough & {prefix, suffix}:  # Typecast the value to MongoDB-safe as needed.
+			value = field._field.transformer.foreign(value, (field, Document))  # pylint:disable=protected-access
 		
 		yield prefixes.get(prefix or None, None), suffixes.get(suffix, None), field, value
 
