@@ -10,25 +10,26 @@ from time import sleep, time
 import pytest
 from pytest import fixture
 
+from marrow.mongo import Document
 from marrow.mongo.util.capped import _patch, tail
 
 
-# General structure: {message: "String", priority: 0}
+class Uncapped(Document):
+	__collection__ = 'test_uncapped'
+
+
+class Capped(Document):
+	__collection__ = 'test_capped'
+	__capped__ = 16 * 1024 * 1024
+	__capped_count__ = 100
 
 
 @pytest.fixture
 def uncapped(request, connection):
 	db = connection.get_default_database()
+	request.addfinalizer(partial(db.drop_collection, Uncapped.__collection__))
 	
-	db.drop_collection('test_uncapped')
-	db.create_collection(
-			'test_uncapped',
-			capped = False,
-		)
-	
-	request.addfinalizer(partial(db.drop_collection, 'test_uncapped'))
-	
-	return db.test_uncapped
+	return Uncapped.create_collection(db, True)
 
 
 @pytest.fixture(autouse=True)
@@ -38,17 +39,9 @@ def capped(request, connection):
 	if tuple((int(i) for i in connection.server_info()['version'][:3].split('.'))) < (3, 2):
 		pytest.xfail("Test expected to fail on MongoDB versions prior to 3.2.")
 	
-	db.drop_collection('test_capped')
-	db.create_collection(
-			'test_capped',
-			capped = True,
-			size = 16 * 1024 * 1024,
-			max = 100,
-		)
+	request.addfinalizer(partial(db.drop_collection, Capped.__collection__))
 	
-	request.addfinalizer(partial(db.drop_collection, 'test_capped'))
-	
-	return db.test_capped
+	return Capped.create_collection(db, True)
 
 
 _PRIORITY = (-2, -1, 0, 1, 2)

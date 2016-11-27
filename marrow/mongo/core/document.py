@@ -143,6 +143,9 @@ class Document(Container):
 				'write_concern': cls.__write_concern__,
 			}
 		
+		if not creation:
+			return config
+		
 		if cls.__capped__:
 			config['size'] = cls.__capped__
 			config['capped'] = True
@@ -153,7 +156,7 @@ class Document(Container):
 		if cls.__engine__:
 			config['storageEngine'] = cls.__engine__
 		
-		if creation and cls.__validate__ != 'off':
+		if cls.__validate__ != 'off':
 			config['validator'] = cls.__validator__
 			config['validationLevel'] = 'strict' if cls.__validate__ is True else cls.__validate__
 		
