@@ -43,8 +43,8 @@ def _process_arguments(Document, prefixes, suffixes, arguments, passthrough=set(
 		
 		field = traverse(Document, name.replace('__', '.'))  # Find the target field.
 		
-		if not passthrough & {prefix, suffix}:
-			value = field.transformer.foreign(value, (field, Document))  # Typecast the value to MongoDB-safe as needed.
+		if not passthrough & {prefix, suffix}:  # Typecast the value to MongoDB-safe as needed.
+			value = field._field.transformer.foreign(value, (field, Document))
 		
 		yield prefixes.get(prefix or None, None), suffixes.get(suffix, None), field, value
 

@@ -184,12 +184,12 @@ class Update(Ops):
 	# Binary Operator Protocols
 	
 	def __and__(self, other):
-		operations = deepcopy(self.operations)
+		operations = deepcopy(odict(other.operations if hasattr(other, 'operations') else other))
 		
-		for op in other:
-			for field in other[op]:
+		for op in self:
+			for field in self[op]:
 				operations.setdefault(op, odict())
 				# TODO: Handle EACH_COMBINING updates to auto-transform multiple instances.
-				operations[op][field] = other[op][field]
+				operations[op][field] = self[op][field]
 		
 		return self.__class__(operations=operations, collection=self.collection, document=self.document)
