@@ -4,6 +4,7 @@
 
 from __future__ import unicode_literals
 
+from ...schema.compat import unicode
 from ...package.loader import traverse
 
 
@@ -16,11 +17,11 @@ def P(Document, *fields, **kw):
 	
 	for field in fields:
 		if field[0] in ('-', '!'):
-			omitted.add(~traverse(Document, field[1:], field[1:]))
+			omitted.add(field[1:])
 		elif field[0] == '+':
-			projected.add(~traverse(Document, field[1:], field[1:]))
+			projected.add(field[1:])
 		else:
-			projected.add(~traverse(Document, field, field))
+			projected.add(field)
 	
 	if not projected:  # We only have exclusions from the default projection.
 		names = set(Document.__projection__.keys() if Document.__projection__ else Document.__fields__.keys())
@@ -31,4 +32,4 @@ def P(Document, *fields, **kw):
 	if not projected:
 		projected = {'_id'}
 	
-	return {name: True for name in projected}
+	return {unicode(traverse(Document, name, name)): True for name in projected}
