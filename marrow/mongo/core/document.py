@@ -1,20 +1,20 @@
 # encoding: utf-8
 
-from collections import OrderedDict as dict
 from collections import MutableMapping
 
 from bson.binary import STANDARD
 from bson.codec_options import CodecOptions
 from bson.json_util import dumps, loads
 from bson.tz_util import utc
-from marrow.package.loader import load
-from marrow.schema import Attributes, Container
 from pymongo.collection import Collection
 from pymongo.database import Database
 from pymongo.read_concern import ReadConcern
 from pymongo.read_preferences import ReadPreference
 from pymongo.write_concern import WriteConcern
 
+from ...package.loader import load
+from ...schema import Attributes, Container
+from ...schema.compat import odict
 from ..util import SENTINEL
 from .field import Field
 from .index import Index
@@ -36,7 +36,7 @@ class Document(Container):
 	"""
 	
 	# Note: These may be dynamic based on content; always access from an instance where possible.
-	__store__ = dict  # For fields, this may be a bson type like Binary, or Code.
+	__store__ = odict # For fields, this may be a bson type like Binary, or Code.
 	__foreign__ = {'object'}  # The representation for the database side of things, ref: $type
 	
 	__bound__ = False  # Has this class been "attached" to a live MongoDB connection?
@@ -128,9 +128,20 @@ class Document(Container):
 		
 		http://api.mongodb.com/python/current/api/pymongo/database.html#pymongo.database.Database.create_collection
 		"""
-		pass  # TODO
 		
-		return cls.get_collection(target)
+		if recreate:
+			if isinstance(target, Collection):
+				target.drop()
+			
+			elif isinstance(target, Database):
+				target[cls.__collection__].drop()
+		
+		collection = cls.get_collection(target)
+		
+		if indexes:
+			cls.create_indexes(target)
+		
+		return collection
 	
 	@classmethod
 	def get_collection(cls, target):
@@ -164,9 +175,13 @@ class Document(Container):
 		"""Iterate all known indexes and construct them."""
 		
 		results = []
+		collection = cls.get_collection(target)
+		
+		if recreate:
+			collection.drop_indexes()
 		
 		for index in cls.__indexes__.values():
-			results.append(index.create_index(cls.get_collection(target)))
+			results.append(index.create_index(collection))
 		
 		return results
 	

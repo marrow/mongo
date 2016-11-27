@@ -2,9 +2,8 @@
 
 from pymongo import ASCENDING, DESCENDING, GEO2D, GEOHAYSTACK, GEOSPHERE, HASHED, TEXT
 
-from marrow.package.loader import traverse
-from marrow.schema import Attribute
-
+from ...package.loader import traverse
+from ...schema import Attribute
 from ..util.compat import unicode
 
 
@@ -65,6 +64,8 @@ class Index(Attribute):
 		"""Perform the translation needed to return the arguments for `Collection.create_index`.
 		
 		This is where final field name resolution happens, via the reference we have to the containing document class.
+		
+		http://api.mongodb.com/python/current/api/pymongo/collection.html#pymongo.collection.Collection.create_index
 		"""
 		
 		options = dict(

@@ -5,8 +5,8 @@
 These encapsulate the functionality of creating combinable mappings 
 """
 
-from .ops import Ops
-from .q import Q
+from .ops import Ops, Filter, Update
+from .query import Q  # noqa
 
 
-__all__ = ['Ops', 'Q']
+__all__ = ['Ops', 'Filter', 'Update', 'Q']

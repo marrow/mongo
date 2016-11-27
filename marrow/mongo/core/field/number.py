@@ -1,6 +1,7 @@
 # encoding: utf-8
 
 from numbers import Number as NumberABC
+
 from bson.int64 import Int64
 
 from . import Field

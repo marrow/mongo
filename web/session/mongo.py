@@ -4,9 +4,9 @@
 """Experimental WebCore session handler using MongoDB storage."""
 
 from bson import ObjectId as oid
-from marrow.mongo import Document, Index
-from marrow.mongo.field import ObjectId, TTL
 
+from marrow.mongo import Document, Index
+from marrow.mongo.field import TTL, ObjectId
 
 log = __import__('logging').getLogger(__name__)
 

@@ -2,11 +2,10 @@
 
 from weakref import proxy
 
-from marrow.package.loader import traverse
-from marrow.schema import Attribute
-from marrow.schema.transform import BaseTransform
-from marrow.schema.validate import Validator
-
+from ....package.loader import traverse
+from ....schema import Attribute
+from ....schema.transform import BaseTransform
+from ....schema.validate import Validator
 from ...query import Q
 from ...util import adjust_attribute_sequence, SENTINEL
 from ...util.compat import py3
@@ -41,6 +40,7 @@ class Field(Attribute):
 	__disallowed_operators__ = set()
 	__document__ = None  # If we're assigned to a Document, this gets populated with a weak reference proxy.
 	__foreign__ = {}
+	__acl__ = []  # Overall document access control list.
 	
 	# Inherits from Attribute: (name is usually, but not always the first positional parameter)
 	# name - The database-side name of the field, stored as __name__, defaulting to the attribute name assigned to.
@@ -51,14 +51,19 @@ class Field(Attribute):
 	nullable = Attribute(default=False)  # If True, will store None.  If False, will store non-None default, or not store.
 	exclusive = Attribute(default=None)  # The set of other fields that must not be set for this field to be settable.
 	
+	# Data Lifespan Properties
+	
 	transformer = Attribute(default=FieldTransform())  # A Transformer class to use when loading/saving values.
 	validator = Attribute(default=Validator())  # The Validator class to use when validating values.
 	translated = Attribute(default=False)  # If truthy this field should be stored in the per-language subdocument.
 	assign = Attribute(default=False)  # If truthy attempt to access and store resulting variable when instantiated.
 	
+	# Security Properties
+	
 	project = Attribute(default=None)  # Predicate to indicate inclusion in the default projection.
-	read = Attribute(default=True)  # Read predicate, either  a boolean or a callable returning a boolean.
-	write = Attribute(default=True)  # Write predicate, either a boolean or callable returning a boolean.
+	read = Attribute(default=True)  # Read predicate, either a boolean, callable, or web.security ACL predicate.
+	write = Attribute(default=True)  # Write predicate, either a boolean, callable, or web.security ACL predicate.
+	sort = Attribute(default=True)  # Sort predicate, either a boolean, callable, or web.security ACL predicate.
 	
 	def __repr__(self):
 		fields = []

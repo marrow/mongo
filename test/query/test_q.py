@@ -2,16 +2,16 @@
 
 from __future__ import unicode_literals
 
-import pytest
 import operator
 from datetime import datetime
-from collections import OrderedDict as odict
+
+import pytest
 from bson import ObjectId as oid
 
-from marrow.mongo import Document, Field
-from marrow.mongo.field import String, Number, Array, Embed, ObjectId
-from marrow.mongo.query import Ops, Q
+from marrow.mongo import Document, Field, Filter, Q
+from marrow.mongo.field import Array, Embed, Number, ObjectId, String
 from marrow.mongo.util.compat import py3, str, unicode
+from marrow.schema.compat import odict
 
 
 class Sample(Document):
@@ -83,12 +83,12 @@ class TestQueryable(object):  # TODO: Properly use pytest fixtures for this...
 	
 	def do_operator(self, operator, query, value, result, mock_queryable=mock_queryable):
 		op = operator(mock_queryable, value)
-		assert isinstance(op, Ops)
+		assert isinstance(op, Filter)
 		assert op.as_query == result
 	
 	def do_singleton(self, operator, query, result):
 		op = operator(mock_queryable)
-		assert isinstance(op, Ops)
+		assert isinstance(op, Filter)
 		assert op.as_query == result
 	
 	def test_operator_lt(self): self.do_operator(*self.operators[0])
@@ -109,7 +109,7 @@ class TestQueryable(object):  # TODO: Properly use pytest fixtures for this...
 	
 	def test_operator_range(self):
 		op = Q.range(mock_queryable, 5, 11)
-		assert isinstance(op, Ops)
+		assert isinstance(op, Filter)
 		
 		assert op.as_query == odict({'field_name': dict([('$gte', '5'), ('$lt', '11')])})
 	

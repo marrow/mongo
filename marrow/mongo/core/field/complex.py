@@ -1,16 +1,18 @@
 # encoding: utf-8
 
-from bson import DBRef, ObjectId as OID
-from bson.errors import InvalidId
-from collections import Iterable, Mapping, OrderedDict as odict
-from pkg_resources import iter_entry_points
+from collections import Iterable, Mapping
 from weakref import proxy
 
-from marrow.schema import Attribute
-from marrow.package.canonical import name as canon
-from marrow.package.loader import traverse, load
+from bson import ObjectId as OID
+from bson import DBRef
+from bson.errors import InvalidId
+from pkg_resources import iter_entry_points
 
 from .. import Document, Field
+from ....package.canonical import name as canon
+from ....package.loader import load, traverse
+from ....schema import Attribute
+from ....schema.compat import odict
 from ...util.compat import str, unicode
 
 

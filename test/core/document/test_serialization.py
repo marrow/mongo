@@ -1,7 +1,7 @@
 # encoding: utf-8
 
 from marrow.mongo import Document
-from marrow.mongo.field import String, Number
+from marrow.mongo.field import Number, String
 
 
 class Sample(Document):
