@@ -185,92 +185,11 @@ class Update(Ops):
 	
 	def __and__(self, other):
 		operations = deepcopy(self.operations)
-		other = self.__class__(
-				operations = other.as_query if hasattr(other, 'as_query') else other,
-				collection = self.collection,
-				document = self.document
-			)
 		
-		for k, v in getattr(other, 'operations', {}).items():
-			if k not in operations:
-				operations[k] = v
-			else:
-				if not isinstance(operations[k], Mapping):
-					operations[k] = odict((('$eq', operations[k]), ))
-				
-				if not isinstance(v, Mapping):
-					v = odict((('$eq', v), ))
-				
-				operations[k].update(v)
+		for op in other:
+			for field in other[op]:
+				operations.setdefault(op, odict())
+				# TODO: Handle EACH_COMBINING updates to auto-transform multiple instances.
+				operations[op][field] = other[op][field]
 		
 		return self.__class__(operations=operations, collection=self.collection, document=self.document)
-	
-	def __or__(self, other):
-		operations = deepcopy(self.operations)
-		
-		other = other.as_query if hasattr(other, 'as_query') else other
-		
-		if len(operations) == 1 and '$or' in operations:
-			# Update existing $or.
-			operations['$or'].append(other)
-			return self.__class__(
-					operations = operations,
-					collection = self.collection,
-					document = self.document
-				)
-		
-		return self.__class__(
-				operations = {'$or': [operations, other]},
-				collection = self.collection,
-				document = self.document
-			)
-	
-	def __invert__(self):
-		"""Return the boolean inversion of the current query.
-		
-		Equivalent to the MongoDB `$not` operator.
-		"""
-		operations = deepcopy(self.operations)
-		
-		return self.__class__(
-				operations = {'$not': operations},
-				collection = self.collection,
-				document = self.document
-			)
-	
-	# Mapping Protocol
-	
-	def __getitem__(self, name):
-		# TODO: Optionally allow lookup of operations per field.
-		return self.operations[name]
-	
-	def __setitem__(self, name, value):
-		# TODO: Optionally allow assignment of a group of operations for a field.
-		self.operations[name] = value
-	
-	def __delitem__(self, name):
-		# TODO: Optionally allow clearing of all operations for a field.
-		del self.operations[name]
-	
-	def __contains__(self, key):
-		# TODO: Optionally allow checking if a field is present.
-		return key in self.operations
-	
-	def get(self, key, default=None):
-		# TODO: Optionally allow retrieval of all operations for a field.
-		return self.operations.get(key, default)
-	
-	def pop(self, name, default=SENTINEL):
-		# TODO: Optionally allow retrieval of all operations for a field.
-		
-		if default is SENTINEL:
-			return self.operations.pop(name)
-		
-		return self.operations.pop(name, default)
-	
-	def update(self, *args, **kw):
-		# TODO: Allow assignment of operations by field.
-		self.operations.update(*args, **kw)
-	
-	def setdefault(self, key, value=None):
-		return self.operations.setdefault(key, value)
