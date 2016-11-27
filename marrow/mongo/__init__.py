@@ -1,5 +1,7 @@
 # encoding: utf-8
 
+from __future__ import unicode_literals
+
 import sys
 
 from .core import Document, Field, Index, __version__  # noqa

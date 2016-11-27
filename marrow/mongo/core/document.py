@@ -1,5 +1,7 @@
 # encoding: utf-8
 
+from __future__ import unicode_literals
+
 from collections import MutableMapping
 
 from bson.binary import STANDARD
@@ -38,6 +40,7 @@ class Document(Container):
 	# Note: These may be dynamic based on content; always access from an instance where possible.
 	__store__ = odict # For fields, this may be a bson type like Binary, or Code.
 	__foreign__ = {'object'}  # The representation for the database side of things, ref: $type
+	__type_store__ = '_cls'  # The pseudo-field to store embedded document class references as.
 	
 	__bound__ = False  # Has this class been "attached" to a live MongoDB connection?
 	__collection__ = None  # The name of the collection to "attach" to using bind().
@@ -194,8 +197,8 @@ class Document(Container):
 		if isinstance(doc, Document):
 			return doc
 		
-		if '_cls' in doc:  # Instantiate any specific class mentioned in the data.
-			cls = load(doc['_cls'], 'marrow.mongo.document')
+		if cls.__type_store__ in doc:  # Instantiate any specific class mentioned in the data.
+			cls = load(doc[cls.__type_store__], 'marrow.mongo.document')
 		
 		instance = cls(_prepare_defaults=False)
 		instance.__data__ = instance.__store__(doc)

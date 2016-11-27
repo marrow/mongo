@@ -2,6 +2,8 @@
 
 """Release information about Marrow Mongo."""
 
+from __future__ import unicode_literals
+
 from collections import namedtuple
 
 version_info = namedtuple('version_info', ('major', 'minor', 'micro', 'releaselevel', 'serial'))(1, 0, 0, 'final', 0)

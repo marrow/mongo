@@ -8,7 +8,7 @@ from operator import __neg__
 
 from ...schema.compat import unicode
 from ..query import Update
-from .common import _process_arguments, _current_date, _bit
+from .common import _bit, _current_date, _process_arguments
 
 DEFAULT_UPDATE = 'set'  # If no prefix is found, this will be the default operation.
 

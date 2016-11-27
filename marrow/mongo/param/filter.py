@@ -48,19 +48,19 @@ FILTER_OPERATION_MAP = {
 		'iendswith': _deferred_method('endswith', insensitive=True),
 		
 		# Geographic
-		#'near': _deferred_method('near'),
-		#'within': _deferred_method('within'),
-		#'geo_within': _deferred_method('within'),  # Alias
-		#'within_box': _deferred_method('within', 'box'),
-		#'geo_within_box': _deferred_method('within', 'box'),  # Alias
-		#'within_polygon': _deferred_method('within', 'polygon'),
-		#'geo_within_polygon': _deferred_method('within', 'polygon'),  # Alias
-		#'within_center': _deferred_method('within', ('center', 'radius')),
-		#'geo_within_center': _deferred_method('within', ('center', 'radius')),  # Alias
-		#'within_sphere': _deferred_method('within', ('sphere', 'radius')),
-		#'geo_within_sphere': _deferred_method('within', ('sphere', 'radius')),  # Alias
-		#'intersects': _deferred_method('intersects'),
-		#'geo_intersects': _deferred_method('intersects'),  # Alias
+		'near': _deferred_method('near'),
+		'within': _deferred_method('within'),
+		'geo_within': _deferred_method('within'),  # Alias
+		'within_box': _deferred_method('within', 'box'),
+		'geo_within_box': _deferred_method('within', 'box'),  # Alias
+		'within_polygon': _deferred_method('within', 'polygon'),
+		'geo_within_polygon': _deferred_method('within', 'polygon'),  # Alias
+		'within_center': _deferred_method('within', ('center', 'radius')),
+		'geo_within_center': _deferred_method('within', ('center', 'radius')),  # Alias
+		'within_sphere': _deferred_method('within', ('sphere', 'radius')),
+		'geo_within_sphere': _deferred_method('within', ('sphere', 'radius')),  # Alias
+		'intersects': _deferred_method('intersects'),
+		'geo_intersects': _deferred_method('intersects'),  # Alias
 	}
 
 

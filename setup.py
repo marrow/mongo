@@ -45,7 +45,8 @@ setup(
 	author = author.name,
 	author_email = author.email,
 	license = 'MIT',
-	keywords = ['mongodb', 'orm', 'odm', 'document mapper', 'declarative', 'marrow'],
+	keywords = ['mongodb', 'GeoJSON', 'geospatial', 'full text', 'facted', 'orm', 'odm', 'document mapper',
+			'declarative', 'marrow'],
 	classifiers = [
 			"Development Status :: 5 - Production/Stable",
 			"Intended Audience :: Developers",
@@ -97,6 +98,15 @@ setup(
 				# ### Marrow Mongo Lookups
 				'marrow.mongo.document': [  # Document classes registered by name.
 						'Document = marrow.mongo.core:Document',
+						'GeoJSON = marrow.mongo.geo:GeoJSON',
+						'GeoJSONCoord = marrow.mongo.geo:GeoJSONCoord',
+						'Point = marrow.mongo.geo:Point',
+						'LineString = marrow.mongo.geo:LineString',
+						'Polygon = marrow.mongo.geo:Polygon',
+						'MultiPoint = marrow.mongo.geo:MultiPoint',
+						'MultiLineString = marrow.mongo.geo:MultiLineString',
+						'MultiPolygon = marrow.mongo.geo:MultiPolygon',
+						'GeometryCollection = marrow.mongo.geo:GeometryCollection',
 					],
 				'marrow.mongo.field': [  # Field classes registered by (optionaly namespaced) name.
 						'Field = marrow.mongo.core.field:Field',
