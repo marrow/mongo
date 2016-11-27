@@ -1,6 +1,6 @@
 # encoding: utf-8
 
-from collections import Iterable, Mapping, MutableMapping
+from collections import Iterable, Mapping
 from weakref import proxy
 
 from bson import ObjectId as OID
