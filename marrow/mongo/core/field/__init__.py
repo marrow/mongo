@@ -8,9 +8,9 @@ from ....package.loader import traverse
 from ....schema import Attribute
 from ....schema.transform import BaseTransform
 from ....schema.validate import Validator
+from ....schema.compat import py3
 from ...query import Q
 from ...util import adjust_attribute_sequence, SENTINEL
-from ...util.compat import py3
 
 
 class FieldTransform(BaseTransform):

@@ -7,7 +7,7 @@ from numbers import Number as NumberABC
 from bson.int64 import Int64
 
 from . import Field
-from ...util.compat import unicode
+from ....schema.compat import unicode
 
 
 class Number(Field):

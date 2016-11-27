@@ -10,7 +10,7 @@ from bson.tz_util import utc
 
 from marrow.mongo import Document
 from marrow.mongo.field import TTL, Binary, Boolean, Date, ObjectId, Regex, String, Timestamp
-from marrow.mongo.util.compat import unicode
+from marrow.schema.compat import unicode
 
 
 class FieldExam(object):
