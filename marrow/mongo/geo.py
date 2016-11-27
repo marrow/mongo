@@ -3,13 +3,8 @@
 """GeoJSON support for Marrow Mongo."""
 
 from collections.abc import MutableSequence
-from weakref import proxy
-
-from marrow.package.loader import traverse
-from marrow.schema import Attribute
 
 from . import Document, Field
-from .query import Q
 from .field import String, Array, Number, Alias
 
 
@@ -41,7 +36,7 @@ class GeoJSONCoord(GeoJSON):
 	def append(self, item):
 		self.coordinates.append(self.to_foreign(item))
 	
-	def reverse(self, other):
+	def reverse(self):
 		self.coordinates.reverse()
 	
 	def extend(self, other):
@@ -104,7 +99,7 @@ class Point(GeoJSONCoord):
 	long = longitude = Alias('coordinates.0')
 	
 	def __init__(self, longitude=0, latitude=0, **kw):
-		return super(Point, self).__init__(coordinates=kw.pop('coordinates', [longitude, latitude]), **kw)
+		super(Point, self).__init__(coordinates=kw.pop('coordinates', [longitude, latitude]), **kw)
 	
 	def to_foreign(self, value):
 		return value
