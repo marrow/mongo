@@ -45,7 +45,8 @@ setup(
 	author = author.name,
 	author_email = author.email,
 	license = 'MIT',
-	keywords = ['mongodb', 'orm', 'odm', 'document mapper', 'declarative', 'marrow'],
+	keywords = ['mongodb', 'GeoJSON', 'geospatial', 'full text', 'facted', 'orm', 'odm', 'document mapper',
+			'declarative', 'marrow'],
 	classifiers = [
 			"Development Status :: 5 - Production/Stable",
 			"Intended Audience :: Developers",
