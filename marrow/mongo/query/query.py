@@ -605,6 +605,10 @@ class Q(object):
 		
 		Geospatial operator: {$geoIntersects: {...}}
 		Documentation: https://docs.mongodb.com/manual/reference/operator/query/geoIntersects/#op._S_geoIntersects
+		
+			{
+				$geoIntersects: { $geometry: <geometry; a GeoJSON object> }
+			}
 		"""
 		
 		if crs:
