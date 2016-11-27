@@ -1,6 +1,6 @@
 # encoding: utf-8
 
-from collections import Iterable, Mapping
+from collections import Iterable, Mapping, MutableMapping
 from weakref import proxy
 
 from bson import ObjectId as OID
@@ -69,10 +69,17 @@ class _CastingKind(Field):
 				raise ValueError("Ambigouous assignment, assign an instance of: " + \
 						", ".join(repr(kind) for kind in kinds))
 			
-			value = kinds[0](**value)  # We're going from Python-land to MongoDB, we like instantiation.
+			kind = kinds[0]
+			
+			# Attempt to figure out what to do with the value.
+			if isinstance(kind, Field):
+				kind.__name__ = self.__name__
+				return kind.transformer.foreign(value, (kind, obj))
+			
+			value = kind(**value)
 		
-		if '_cls' not in value and len(kinds) != 1:  # Automatically add the tracking field.
-			value['_cls'] = canon(value.__class__)  # TODO: Optimize down to registered plugin name if possible.
+		if isinstance(value, Document) and '_cls' not in value and len(kinds) != 1:
+			value['_cls'] = canon(value.__class__)  # Automatically add the tracking field.
 		
 		return value
 

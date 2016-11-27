@@ -16,7 +16,7 @@ class GeoJSONCoord(GeoJSON):
 	coordinates = Array(Field(), default=lambda: [], assign=True)
 	
 	def __init__(self, *coords, **kw):
-		kw['coordinates'] = list(self.to_native(i) for i in (coords if coords else kw.get('coordinates', [])))
+		kw['coordinates'] = list(self.to_foreign(i) for i in (coords if coords else kw.get('coordinates', [])))
 		super(GeoJSONCoord, self).__init__(**kw)
 	
 	def to_native(self, value):
@@ -55,7 +55,7 @@ class GeoJSONCoord(GeoJSON):
 		return self.to_foreign(item) in self.coordinates
 	
 	def __iter__(self):
-		return iter(self.to_native(i) for i in self.coordinates)
+		return iter(self.coordinates)
 	
 	def __reversed__(self):
 		return (self.to_native(i) for i in reversed(self.coordinates))
@@ -102,7 +102,7 @@ class Point(GeoJSONCoord):
 		super(Point, self).__init__(coordinates=kw.pop('coordinates', [longitude, latitude]), **kw)
 	
 	def to_foreign(self, value):
-		return value
+		return float(value)
 
 
 class LineString(GeoJSONCoord):
