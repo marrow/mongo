@@ -1,4 +1,5 @@
 # encoding: utf-8
+# pylint:disable=too-many-arguments
 
 """A comparison proxy and Ops factory to help build nested inquiries.
 
