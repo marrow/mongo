@@ -32,17 +32,11 @@ class GeoJSONCoord(GeoJSON):
 	
 	# Mutable Sequence Methods
 	
-	def index(self, item):
-		return self.coordinates.index(self.to_foreign(item))
-	
-	def count(self, item):
-		return self.coordinates.count(self.to_foreign(item))
+	def insert(self, index, item):
+		self.coordinates.insert(index, self.to_foreign(item))
 	
 	def append(self, item):
 		self.coordinates.append(self.to_foreign(item))
-	
-	def reverse(self):
-		return reversed(self)
 	
 	def extend(self, other):
 		if isinstance(other, self.__class__):
@@ -50,15 +44,9 @@ class GeoJSONCoord(GeoJSON):
 		else:
 			self.coordinates.extend(self.to_foreign(i) for i in other)
 	
-	def pop(self, item, default=None):
-		return self.to_native(self.coordinates.pop(self.to_foreign(item), default))
-	
-	def remove(self, item):
-		return self.coordinates.remove(self.to_foreign(item))
-	
 	def __getitem__(self, item):
 		if isinstance(item, NumberABC) or item.lstrip('-').isnumeric():
-			return self.to_native(self.coordinates[item])
+			return self.to_native(self.coordinates[int(item)])
 		
 		return super(GeoJSONCoord, self).__getitem__(item)
 	
@@ -70,15 +58,12 @@ class GeoJSONCoord(GeoJSON):
 	
 	def __delitem__(self, item):
 		if isinstance(item, NumberABC) or item.lstrip('-').isnumeric():
-			del self.coordinates[item]
+			del self.coordinates[int(item)]
 		
 		super(GeoJSONCoord, self).__delitem__(item)
 	
 	def __len__(self):
 		return len(self.coordinates)
-	
-	def insert(self, index, item):
-		self.coordinates.insert(index, self.to_foreign(item))
 
 
 MutableSequence.register(GeoJSONCoord)
