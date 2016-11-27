@@ -587,18 +587,18 @@ class Q(object):
 			inner = {'$center': [list(center), radius]}
 		
 		elif sphere:
-			inner = {'$centerSphere': [list(center), radius]}
+			inner = {'$centerSphere': [list(sphere), radius]}
 		
 		elif box:
 			inner = {'$box': list(list(i) for i in box)}
 		
 		elif polygon:
-			inner = {'$polygon': list(list(i) for i in box)}
+			inner = {'$polygon': list(list(i) for i in polygon)}
 		
 		else:
 			raise TypeError("Requires at least one argument.")
 		
-		return Filter({self._name: inner})
+		return Filter({self._name: {'$geoWithin': inner}})
 	
 	def intersects(self, geometry, crs=None):
 		"""Select geometries that intersect with a GeoJSON geometry.

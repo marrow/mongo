@@ -7,6 +7,7 @@ import pytest
 from marrow.mongo import Document
 from marrow.mongo.document import (
 		GeometryCollection, LineString, MultiLineString, MultiPoint, MultiPolygon, Point, Polygon)
+from marrow.mongo.field import Embed
 
 
 class TestPointField(object):
@@ -15,6 +16,13 @@ class TestPointField(object):
 	@pytest.fixture
 	def p(self):
 		return self.D(27, 42)
+	
+	@pytest.fixture
+	def S(self):
+		class Sample(Document):
+			field = Embed(Point)
+		
+		return Sample
 	
 	def test_constructor(self, p):
 		assert isinstance(p, self.D)
@@ -31,6 +39,48 @@ class TestPointField(object):
 	
 	def test_conversion(self, p):
 		assert dict(p) == {'type': 'Point', 'coordinates': [27, 42]}
+	
+	def test_near(self, S):
+		q = S.field.near((20, 40), min=2, max=10)
+		assert dict(q) == {'field': {'$near': {'$geometry': {'type': 'Point',
+				'coordinates': [20, 40]}, '$minDistance': 2.0, '$maxDistance': 10.0}}}
+	
+	def test_intersects(self, S):
+		q = S.field.intersects(Point(10, 15))
+		assert dict(q) == {'field': {'$geoIntersects': {'$geometry': {'type': 'Point',
+				'coordinates': [10, 15]}}}}
+	
+	def test_intersects_crs(self, S):
+		q = S.field.intersects(Point(10, 15), 'urn:x-mongodb:crs:strictwinding:EPSG:4326')
+		assert dict(q) == {'field': {'$geoIntersects': {'$geometry': {'type': 'Point',
+				'coordinates': [10, 15], 'crs': {'type': "name", 'properties': {
+				'name': "urn:x-mongodb:crs:strictwinding:EPSG:4326"}}}}}}
+	
+	def test_within_geometry(self, S):
+		q = S.field.within(Point(10, 15), crs='urn:x-mongodb:crs:strictwinding:EPSG:4326')
+		assert dict(q) == {'field': {'$geoWithin': {'$geometry': {'type': 'Point',
+				'coordinates': [10, 15], 'crs': {'type': "name", 'properties': {
+				'name': "urn:x-mongodb:crs:strictwinding:EPSG:4326"}}}}}}
+	
+	def test_within_center(self, S):
+		q = S.field.within(center=(5, 10), radius=10)
+		assert dict(q) == {'field': {'$geoWithin': {'$center': [[5, 10], 10]}}}
+	
+	def test_within_sphere(self, S):
+		q = S.field.within(sphere=(5, 10), radius=10)
+		assert dict(q) == {'field': {'$geoWithin': {'$centerSphere': [[5, 10], 10]}}}
+	
+	def test_within_box(self, S):
+		q = S.field.within(box=[(5, 0), (0, 5)])
+		assert dict(q) == {'field': {'$geoWithin': {'$box': [[5, 0], [0, 5]]}}}
+	
+	def test_within_polygon(self, S):
+		q = S.field.within(polygon=[(1, 1), (2, 2), (1, 2), (1, 1)])
+		assert dict(q) == {'field': {'$geoWithin': {'$polygon': [[1, 1], [2, 2], [1, 2], [1, 1]]}}}
+	
+	def test_within_error(self, S):
+		with pytest.raises(TypeError):
+			S.field.within()
 
 
 class TestLineStringField(object):
