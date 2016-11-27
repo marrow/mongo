@@ -13,7 +13,7 @@ class StringDocument(Document):
 
 
 def test_string_document():
-	validator = StringDocument.__validation__
+	validator = StringDocument.__validator__
 	return
 	
 	assert validator == {

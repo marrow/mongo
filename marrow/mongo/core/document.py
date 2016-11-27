@@ -47,9 +47,13 @@ class Document(Container):
 	__read_preference__ = ReadPreference.PRIMARY  # Default read preference to assign when binding.
 	__read_concern__ = ReadConcern()  # Default read concern.
 	__write_concern__ = WriteConcern(w=1)  # Default write concern.
+	__capped__ = False  # The size of the capped collection to create in bytes.
+	__capped_count__ = None  # The optional number of records to limit the capped collection to.
+	__engine__ = None  # Override the default storage engine (and configuration) as a mapping of `{name: options}`.
+	__validate__ = 'off'  # Control validation strictness: off, strict, or moderate.
 	
 	__projection__ = None  # The set of fields used during projection, to identify fields which are not loaded.
-	__validation__ = None  # The MongoDB Validation document matching these records.
+	__validator__ = None  # The MongoDB Validation document matching these records.
 	__fields__ = Attributes(only=Field)  # An ordered mapping of field names to their respective Field instance.
 	__fields__.__sequence__ = 10000
 	__indexes__ = Attributes(only=Index)  # An ordered mapping of index names to their respective Index instance.
@@ -126,33 +130,7 @@ class Document(Container):
 	# Database Operations
 	
 	@classmethod
-	def create_collection(cls, target, recreate=False, indexes=True):
-		"""Ensure the collection identified by this document class exists, creating it if not.
-		
-		http://api.mongodb.com/python/current/api/pymongo/database.html#pymongo.database.Database.create_collection
-		"""
-		
-		if recreate:
-			if isinstance(target, Collection):
-				target.drop()
-			
-			elif isinstance(target, Database):
-				target[cls.__collection__].drop()
-		
-		collection = cls.get_collection(target)
-		
-		if indexes:
-			cls.create_indexes(target)
-		
-		return collection
-	
-	@classmethod
-	def get_collection(cls, target):
-		"""Retrieve a properly configured collection object as configured by this document class.
-		
-		http://api.mongodb.com/python/current/api/pymongo/database.html#pymongo.database.Database.get_collection
-		"""
-		
+	def _collection_configuration(cls):
 		config = {
 				'codec_options': CodecOptions(
 						document_class = cls.__store__,
@@ -165,11 +143,59 @@ class Document(Container):
 				'write_concern': cls.__write_concern__,
 			}
 		
+		if cls.__capped__:
+			config['size'] = cls.__capped__
+			config['capped'] = True
+			
+			if cls.__capped_count__:
+				config['max'] = cls.__capped_count__
+		
+		if cls.__engine__:
+			config['storageEngine'] = cls.__engine__
+		
+		if cls.__validate__ is not 'off':
+			config['validator'] = cls.__validator__
+			config['validationLevel'] = 'strict' if cls.__validate__ is True else cls.__validate__
+		
+		return config
+	
+	@classmethod
+	def create_collection(cls, target, recreate=False, indexes=True):
+		"""Ensure the collection identified by this document class exists, creating it if not.
+		
+		http://api.mongodb.com/python/current/api/pymongo/database.html#pymongo.database.Database.create_collection
+		"""
+		
 		if isinstance(target, Collection):
-			return target.with_options(**config)
+			name = target.name
+			target = target.database
+		else:
+			name = cls.__collection__
+		
+		if recreate:
+			target.drop_collection(name)
+		
+		collection = target.create_collection(name, **cls._collection_configuration())
+		
+		if indexes:
+			cls.create_indexes(collection)
+		
+		return collection
+	
+	@classmethod
+	def get_collection(cls, target):
+		"""Retrieve a properly configured collection object as configured by this document class.
+		
+		If given an existing collection, will instead call `collection.with_options`.
+		
+		http://api.mongodb.com/python/current/api/pymongo/database.html#pymongo.database.Database.get_collection
+		"""
+		
+		if isinstance(target, Collection):
+			return target.with_options(**cls._collection_configuration())
 		
 		elif isinstance(target, Database):
-			return target.get_collection(cls.__collection__, **config)
+			return target.get_collection(cls.__collection__, **cls._collection_configuration())
 		
 		raise TypeError("Can not retrieve collection from: " + repr(target))
 	
