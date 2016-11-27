@@ -4,8 +4,8 @@
 
 from __future__ import unicode_literals
 
-from ...schema.compat import odict
 from ...package.loader import traverse
+from ...schema.compat import odict
 
 
 def _deferred_method(name, _named=None, **kw):

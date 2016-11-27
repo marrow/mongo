@@ -520,6 +520,9 @@ class Q(object):
 				}
 			}
 		"""
+		
+		from marrow.mongo.geo import Point
+		
 		near = {'$geometry': Point(*center)}
 		
 		if min:

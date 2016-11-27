@@ -5,7 +5,7 @@
 from collections.abc import MutableSequence
 
 from . import Document, Field
-from .field import String, Array, Number, Alias
+from .field import Alias, Array, Number, String
 
 
 class GeoJSON(Document):

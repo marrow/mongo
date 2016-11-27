@@ -4,8 +4,8 @@
 
 from __future__ import unicode_literals
 
-from ...schema.compat import unicode
 from ...package.loader import traverse
+from ...schema.compat import unicode
 
 
 def P(Document, *fields, **kw):
