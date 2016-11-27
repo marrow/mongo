@@ -130,7 +130,7 @@ class Document(Container):
 	# Database Operations
 	
 	@classmethod
-	def _collection_configuration(cls):
+	def _collection_configuration(cls, creation=False):
 		config = {
 				'codec_options': CodecOptions(
 						document_class = cls.__store__,
@@ -153,7 +153,7 @@ class Document(Container):
 		if cls.__engine__:
 			config['storageEngine'] = cls.__engine__
 		
-		if cls.__validate__ is not 'off':
+		if creation and cls.__validate__ != 'off':
 			config['validator'] = cls.__validator__
 			config['validationLevel'] = 'strict' if cls.__validate__ is True else cls.__validate__
 		
@@ -175,7 +175,7 @@ class Document(Container):
 		if recreate:
 			target.drop_collection(name)
 		
-		collection = target.create_collection(name, **cls._collection_configuration())
+		collection = target.create_collection(name, **cls._collection_configuration(True))
 		
 		if indexes:
 			cls.create_indexes(collection)
