@@ -28,7 +28,7 @@ class GeoJSONCoord(GeoJSON):
 		return value
 	
 	def to_foreign(self, value):
-		return list(value)
+		return list(getattr(value, 'coordinates', value))
 	
 	# Mutable Sequence Methods
 	
@@ -53,12 +53,14 @@ class GeoJSONCoord(GeoJSON):
 	def __setitem__(self, item, value):
 		if isinstance(item, NumberABC) or item.lstrip('-').isnumeric():
 			self.coordinates[int(item)] = self.to_foreign(value)
+			return
 		
 		super(GeoJSONCoord, self).__setitem__(item, value)
 	
 	def __delitem__(self, item):
 		if isinstance(item, NumberABC) or item.lstrip('-').isnumeric():
 			del self.coordinates[int(item)]
+			return
 		
 		super(GeoJSONCoord, self).__delitem__(item)
 	

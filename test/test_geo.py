@@ -92,11 +92,39 @@ class TestLineStringField(object):
 	
 	def test_constructor(self, ls):
 		assert isinstance(ls, self.D)
-		assert ls.coordinates == ls.coordinates == [[40, 5], [41, 6]]
+		assert ls.coordinates == [[40, 5], [41, 6]]
 	
 	def test_point_access(self, ls):
 		assert isinstance(ls[0], Point)
 		assert ls[0].coordinates == [40, 5]
+	
+	def test_insert(self, ls):
+		ls.insert(0, (27, 42))
+		assert ls.coordinates == [[27, 42], [40, 5], [41, 6]]
+	
+	def test_append(self, ls):
+		ls.append((27, 42))
+		assert ls.coordinates == [[40, 5], [41, 6], [27, 42]]
+	
+	def test_extend(self, ls):
+		ls.extend([(27, 42)])
+		assert ls.coordinates == [[40, 5], [41, 6], [27, 42]]
+	
+	def test_extend_similar(self, ls):
+		ls.extend(ls)
+		assert ls.coordinates == [[40, 5], [41, 6], [40, 5], [41, 6]]
+	
+	def test_setitem_passthrough(self, ls):
+		ls['foo'] = 27
+		assert dict(ls)['foo'] == 27
+	
+	def test_delitem(self, ls):
+		del ls[1]
+		assert ls.coordinates == [[40, 5]]
+	
+	def test_delitem_passthrough(self, ls):
+		with pytest.raises(KeyError):
+			del ls['foo']
 
 
 class TestPolygonField(object):
