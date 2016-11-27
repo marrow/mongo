@@ -1,8 +1,10 @@
 # encoding: utf-8
 
 
+from pprint import pprint
+
 from marrow.mongo.document import Document
-from marrow.mongo.field import ObjectId, String, Embed
+from marrow.mongo.field import Embed, ObjectId, String
 
 
 class Sample(Document):
@@ -14,7 +16,6 @@ class Sample(Document):
 	nested = Embed(Nested, default=lambda: Nested(), assign=True)
 
 
-from pprint import pprint
 
 pprint(Sample.id == None)
 pprint(Sample.nested.name == "Alice")

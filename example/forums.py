@@ -65,5 +65,3 @@ class Thread(Document):
 	
 	subs = Array(ObjectId())
 	updated = Date(now=True)
-
-

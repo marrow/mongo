@@ -7,20 +7,18 @@ For internal construction only.
 
 from __future__ import unicode_literals
 
-import re
-from copy import copy, deepcopy
-from collections import Mapping, MutableMapping
-from pytz import utc
-from bson.codec_options import CodecOptions
-from marrow.schema.compat import odict
+from copy import copy
+from functools import reduce
+from operator import __and__, __or__, __xor__
 
-from ..util.compat import py3, unicode
-from .ops import Ops
-
+from ...schema.compat import py3, unicode
+from .ops import Filter
 
 if __debug__:
-	_simple_safety_check = lambda s, o: (s.__allowed_operators__ and o not in s.__allowed_operators__) or o in s.__disallowed_operators__
-	_complex_safety_check = lambda s, o: (s.__allowed_operators__ and not s.__allowed_operators__.intersection(o)) or s.__disallowed_operators__.intersection(o)
+	_simple_safety_check = lambda s, o: (s.__allowed_operators__ and o not in s.__allowed_operators__) \
+			or o in s.__disallowed_operators__
+	_complex_safety_check = lambda s, o: (s.__allowed_operators__ and not s.__allowed_operators__.intersection(o)) \
+			or s.__disallowed_operators__.intersection(o)
 
 
 class Q(object):
@@ -54,21 +52,28 @@ class Q(object):
 	* range
 	* re
 	* size
-	
-	A possible workaround is making Q callable (__call__) and pulling the final element off to determine method to call.
 	"""
 	
-	def __init__(self, document, field, path=None):
-		"""Do not construct instances of Q yourself.""" 
+	__slots__ = ('_document', '_field', '_name', '_combining')
+	
+	def __init__(self, document, field, path=None, combining=None):
+		"""Do not construct instances of Q yourself."""
+		
 		self._document = document
 		self._field = field
-		self._name = (path or '') + unicode(field)
+		self._name = None if isinstance(field, list) else ((path or '') + unicode(field))
+		self._combining = combining
 	
 	def __repr__(self):
+		"""Programmers' representation for Q instances."""
+		
 		return "Q({self._document.__name__}, '{self}', {self._field!r})".format(self=self)
 	
 	def __getattr__(self, name):
 		"""Access field attributes, or, for complex fields (Array, Embed, Reference, etc.) nested fields."""
+		
+		if self._combining:  # If we are combining fields, we can not dereference further.
+			raise AttributeError()
 		
 		if not hasattr(self._field, 'kinds'):
 			return getattr(self._field, name)
@@ -96,11 +101,14 @@ class Q(object):
 		from marrow.mongo import Document, Field
 		from marrow.mongo.field import Embed
 		
+		if self._combining:  # If we are combining fields, we can not dereference further.
+			raise KeyError()
+		
 		if self._field.__foreign__ != 'array':  # Pass through if not an array type field.
 			return self._field[name]
 		
 		if not isinstance(name, int) and not name.isdigit():
-			raise ValueError("Must specify an index as either a number or string representation of a number.")
+			raise KeyError("Must specify an index as either a number or string representation of a number: " + name)
 		
 		field = next(self._field.kinds)
 		
@@ -114,7 +122,9 @@ class Q(object):
 		return self.__class__(self._document, field)
 	
 	def __unicode__(self):
-		return self._name
+		"""Return the name of the field, or combining operation."""
+		
+		return {__and__: '$and', __or__: '$or', __xor__: '$$xor'}[self._combining] if self._combining else self._name
 	
 	if py3:
 		__str__ = __unicode__
@@ -124,17 +134,25 @@ class Q(object):
 	def _op(self, operation, other, *allowed):
 		"""A basic operation operating on a single value."""
 		
+		if self._combining:  # We are a field-compound query fragment, e.g. (Foo.bar & Foo.baz).
+			return reduce(self._combining,
+					(q._op(operation, other, *allowed) for q in self._field))  # pylint:disable=protected-access
+		
 		# Optimize this away in production; diagnosic aide.
 		if __debug__ and _complex_safety_check(self._field, {operation} & set(allowed)):  # pragma: no cover
 			raise NotImplementedError("{self!r} does not allow {op} comparison.".format(self=self, op=operation))
 		
-		return Ops({self._name: {operation: self._field.transformer.foreign(other, (self._field, self._document))}})
+		return Filter({self._name: {operation: self._field.transformer.foreign(other, (self._field, self._document))}})
 	
 	def _iop(self, operation, other, *allowed):
 		"""An iterative operation operating on multiple values.
 		
 		Consumes iterators to construct a concrete list at time of execution.
 		"""
+		
+		if self._combining:  # We are a field-compound query fragment, e.g. (Foo.bar & Foo.baz).
+			return reduce(self._combining,
+					(q._iop(operation, other, *allowed) for q in self._field))  # pylint:disable=protected-access
 		
 		# Optimize this away in production; diagnosic aide.
 		if __debug__ and _complex_safety_check(self._field, {operation} & set(allowed)):  # pragma: no cover
@@ -144,7 +162,7 @@ class Q(object):
 		other = other if len(other) > 1 else other[0]
 		values = [self._field.transformer.foreign(value, (self._field, self._document)) for value in other]
 		
-		return Ops({self._name: {operation: values}})
+		return Filter({self._name: {operation: values}})
 	
 	# Matching Array Element
 	
@@ -156,8 +174,11 @@ class Q(object):
 		Array update operator: https://docs.mongodb.com/manual/reference/operator/update/positional/
 		"""
 		
+		if self._combining:
+			raise TypeError("Unable to dereference after combining fields.")
+		
 		instance = self.__class__(self._document, self._field)
-		instance._name = self._name + '.' + '$'
+		instance._name = self._name + '.' + '$'  # pylint:disable=protected-access
 		return instance
 	
 	# Comparison Query Selectors
@@ -172,11 +193,14 @@ class Q(object):
 		Documentation: https://docs.mongodb.org/manual/reference/operator/query/eq/#op._S_eq
 		"""
 		
+		if self._combining:  # We are a field-compound query fragment, e.g. (Foo.bar & Foo.baz).
+			return reduce(self._combining, (q.__eq__(other) for q in self._field))
+		
 		# Optimize this away in production; diagnosic aide.
 		if __debug__ and _simple_safety_check(self._field, '$eq'):  # pragma: no cover
 			raise NotImplementedError("{self!r} does not allow $eq comparison.".format(self=self))
 		
-		return Ops({self._name: self._field.transformer.foreign(other, (self._field, self._document))})
+		return Filter({self._name: self._field.transformer.foreign(other, (self._field, self._document))})
 	
 	def __gt__(self, other):
 		"""Matches values that are greater than a specified value.
@@ -262,35 +286,52 @@ class Q(object):
 	
 	# Multiple Field Participation
 	
+	def _combine(self, other, operation):  # pylint:disable=protected-access
+		if not isinstance(other, Q):
+			raise TypeError("Can not combine with non-Q.")
+		
+		if self._combining and self._combining is operation:  # pylint:disable=protected-access
+			if other._combining and other._combining is operation:  # pylint:disable=protected-access
+				return self.__class__(self._document,
+						self._field + other._field, None, operation)  # pylint:disable=protected-access
+			
+			return self.__class__(self._document, self._field + [other], None, operation)
+		
+		if other._combining and other._combining is operation:  # pylint:disable=protected-access
+			return self.__class__(self._document,
+					[self] + other._field, None, operation)  # pylint:disable=protected-access
+		
+		return self.__class__(self._document, [self, other], None, operation)
+	
 	def __and__(self, other):
-		"""Allow the comparison of multiple fields against a single value. (Not implemented yet.)
+		"""Allow the comparison of multiple fields against a single value.
 		
 		Binary "and" comparison: both fields must match the final expression.
 		
 			(Document.first & Document.second) == 42
 		"""
 		
-		raise NotImplementedError()  # pragma: no cover
+		return self._combine(other, __and__)
 	
 	def __or__(self, other):
-		"""Allow the comparison of multiple fields against a single value. (Not implemented yet.)
+		"""Allow the comparison of multiple fields against a single value.
 		
 		Binary "or" comparison: either field, or both, match the final expression.
 		
 			(Document.first | Document.second) == 27
 		"""
 		
-		raise NotImplementedError()  # pragma: no cover
+		return self._combine(other, __or__)
 	
 	def __xor__(self, other):
-		"""Allow the comparison of multiple fields against a single value. (Not implemented yet.)
+		"""Allow the comparison of multiple fields against a single value.
 		
 		Binary "xor" comparison: the first field, or the second field, but not both must match the expression.
 		
 			(Document.first ^ Document.second) == 55
 		"""
 		
-		raise NotImplementedError()  # pragma: no cover
+		return self._combine(other, __xor__)
 	
 	def __invert__(self):
 		"""Return the fully qualified name of the current field reference, for use in custom dictionary construction.
@@ -302,6 +343,9 @@ class Q(object):
 		Will be obsolete and possibly re-tasked if and when pymongo is patched to allow string-like (or stringify)
 		keys. (That would allow simple `{Document.field: 1}` given we make ourselves hashable.)
 		"""
+		
+		if self._combining:
+			raise TypeError("Combined fields have ambiguous field name.")
 		
 		return self._name
 	
@@ -316,7 +360,10 @@ class Q(object):
 		Documentation: https://docs.mongodb.com/manual/reference/operator/query/regex/
 		"""
 		
-		return Ops({self._name: {'$re': ''.join(parts)}})
+		if self._combining:  # We are a field-compound query fragment, e.g. (Foo.bar & Foo.baz).
+			return reduce(self._combining, (q.re(*parts) for q in self._field))
+		
+		return Filter({self._name: {'$re': ''.join(parts)}})
 	
 	# Array Query Selectors
 	# https://docs.mongodb.org/manual/reference/operator/query/#array
@@ -341,6 +388,9 @@ class Q(object):
 		Documentation: https://docs.mongodb.org/manual/reference/operator/query/elemMatch/#op._S_elemMatch
 		"""
 		
+		if self._combining:  # We are a field-compound query fragment, e.g. (Foo.bar & Foo.baz).
+			return reduce(self._combining, (qp.match(q) for qp in self._field))
+		
 		# Optimize this away in production; diagnosic aide.
 		if __debug__ and _complex_safety_check(self._field, {'$elemMatch', '#document'}):  # pragma: no cover
 			raise NotImplementedError("{self!r} does not allow $elemMatch comparison.".format(self=self))
@@ -348,7 +398,7 @@ class Q(object):
 		if hasattr(q, 'as_query'):
 			q = q.as_query
 		
-		return Ops({self._name: {'$elemMatch': q}})
+		return Filter({self._name: {'$elemMatch': q}})
 	
 	def range(self, gte, lt):
 		"""Matches values that are between a minimum and maximum value, semi-inclusive.
@@ -359,6 +409,10 @@ class Q(object):
 		
 		Comparison operator: {$gte: gte, $lt: lt}
 		"""
+		
+		if self._combining:  # We are a field-compound query fragment, e.g. (Foo.bar & Foo.baz).
+			print("Combining", self._combining, self._field)
+			return reduce(self._combining, (q.range(gte, lt) for q in self._field))
 		
 		# Optimize this away in production; diagnosic aide.
 		if __debug__ and _simple_safety_check(self._field, '$eq'):  # pragma: no cover
@@ -375,11 +429,14 @@ class Q(object):
 		Documentation: https://docs.mongodb.org/manual/reference/operator/query/size/#op._S_size
 		"""
 		
+		if self._combining:  # We are a field-compound query fragment, e.g. (Foo.bar & Foo.baz).
+			return reduce(self._combining, (q.size(value) for q in self._field))
+		
 		# Optimize this away in production; diagnosic aide.
 		if __debug__ and _complex_safety_check(self._field, {'$size', '#array'}):  # pragma: no cover
 			raise NotImplementedError("{self!r} does not allow $size comparison.".format(self=self))
 		
-		return Ops({self._name: {'$size': int(value)}})
+		return Filter({self._name: {'$size': int(value)}})
 	
 	# Element Query Selectors
 	# https://docs.mongodb.org/manual/reference/operator/query/#element
@@ -393,7 +450,10 @@ class Q(object):
 		Documentation: https://docs.mongodb.org/manual/reference/operator/query/exists/#op._S_exists
 		"""
 		
-		return Ops({self._name: {'$exists': False}})
+		if self._combining:  # We are a field-compound query fragment, e.g. (Foo.bar & Foo.baz).
+			return reduce(self._combining, (q.__neg__() for q in self._field))
+		
+		return Filter({self._name: {'$exists': False}})
 	
 	def __pos__(self):
 		"""Matches documents that have the specified field.
@@ -404,7 +464,10 @@ class Q(object):
 		Documentation: https://docs.mongodb.org/manual/reference/operator/query/exists/#op._S_exists
 		"""
 		
-		return Ops({self._name: {'$exists': True}})
+		if self._combining:  # We are a field-compound query fragment, e.g. (Foo.bar & Foo.baz).
+			return reduce(self._combining, (q.__pos__() for q in self._field))
+		
+		return Filter({self._name: {'$exists': True}})
 	
 	def of_type(self, *kinds):
 		"""Selects documents if a field is of the correct type.
@@ -416,12 +479,15 @@ class Q(object):
 		Documentation: https://docs.mongodb.org/manual/reference/operator/query/type/#op._S_type
 		"""
 		
+		if self._combining:  # We are a field-compound query fragment, e.g. (Foo.bar & Foo.baz).
+			return reduce(self._combining, (q.of_type(*kinds) for q in self._field))
+		
 		foreign = set(kinds) if kinds else self._field.__foreign__
 		
 		if not foreign:
-			return Ops()
+			return Filter()
 		
 		if len(foreign) == 1:  # Simplify if the value is singular.
 			foreign, = foreign  # Unpack.
 		
-		return Ops({self._name: {'$type': foreign}})
+		return Filter({self._name: {'$type': foreign}})

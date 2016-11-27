@@ -40,12 +40,15 @@ Example logging "dictconfig":
 
 from __future__ import unicode_literals
 
-import logging
 import datetime
+import logging
+
 from bson.json_util import dumps
+from bson.tz_util import utc
 from pymongo import MongoClient
-from pytz import utc
 from tzlocal import get_localzone
+
+from ...schema.compat import unicode
 
 try:
 	from pygments import highlight as _highlight
@@ -73,7 +76,7 @@ class JSONFormatter(logging.Formatter):
 		'stack_info',
 	}
 	
-	def __init__(self, highlight=None, indent=False, **kwargs):
+	def __init__(self, highlight=None, indent=False, **kwargs):  # pylint:disable=unused-argument
 		if __debug__:
 			format = "{created}\t{levelname}\t{name}:{funcName}:{lineno}\t{message}"
 		else:
@@ -83,12 +86,15 @@ class JSONFormatter(logging.Formatter):
 		self.indent = indent
 	
 	def _default(self, value):
+		if hasattr('decode'):
+			return value.decode('utf-8')
+		
 		try:
-			return str(value)
-		except:
+			return unicode(value)
+		except:  # pylint:disable=bare-except
 			try:
 				return repr(value)
-			except:
+			except:  # pylint:disable=bare-except
 				return self.REPR_FAILED
 	
 	def jsonify(self, record, **kw):
@@ -197,13 +203,13 @@ class MongoHandler(logging.Handler):
 	def emit(self, record):
 		try:
 			document = self.format(record)
-		except:
+		except:  # pylint:disable=bare-except
 			self.handleError(record)
 			return
 		
 		try:
 			result = self.collection.insert_one(document)
-		except:
+		except:  # pylint:disable=bare-except
 			self.handleError(record)
 			return
 		

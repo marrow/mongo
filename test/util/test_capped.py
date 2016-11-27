@@ -2,16 +2,15 @@
 
 from __future__ import unicode_literals
 
+from functools import partial
+from random import choice
+from threading import Thread
+from time import sleep, time
 
 import pytest
-from time import time, sleep
 from pytest import fixture
-from random import choice
-from functools import partial
-from threading import Thread
 
-from marrow.mongo.util.capped import tail, _patch
-
+from marrow.mongo.util.capped import _patch, tail
 
 
 # General structure: {message: "String", priority: 0}

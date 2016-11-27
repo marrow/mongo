@@ -2,6 +2,8 @@
 marrow.mongo
 ============
 
+|latestversion| |ghtag| |masterstatus| |mastercover| |masterhealth| |masterreq| |ghwatch| |ghstar|
+
     © 2016 Alice Bevan-McGregor and contributors.
 
 ..
@@ -10,7 +12,6 @@ marrow.mongo
 
 ..
 
-    |latestversion| |ghtag| |downloads| |masterstatus| |mastercover| |masterreq| |ghwatch| |ghstar|
 
 
 
@@ -42,14 +43,29 @@ library is installed.  We recommend using "less than" version numbers to ensure 
 side-effects when updating.  Use ``marrow.mongo<1.1`` to get all bugfixes for the current release, and
 ``marrow.mongo<2.0`` to get bugfixes and feature updates while ensuring that large breaking changes are not installed.
 
-This package has only one hard dependency, a modern (>3.2) version of the ``pymongo`` package.  Installing
-``marrow.mongo`` will also install this package.
+This package has a few dependencies:
+
+* Python 2.7 and above, or Python 3.2 and above, or compatible such as Pypy or Pypy3.
+* A modern (>3.2) version of the ``pymongo`` package.
+* The Marrow Package and Schema utility packages for plugin handling and declarative syntax support.
+
+There are a few conditional, tag-based dependencies:
+
+* ``development`` installs additional utilites relating to testing and contribution.
+* ``scripting`` pulls in the `Javascripthon <https://github.com/azazel75/metapensiero.pj>`__ Python to JavaScript
+  transpiler to enable use of native Python function transport to MongoDB.  (E.g. for use in map/reduce, stored
+  functions, etc.)
+* ``logger`` requires knowledge of the local host's timezone, so pulls in ``tzlocal`` to retrieve this information.
+
+Installing ``marrow.mongo`` will also install package dependencies automatically. To utilize optional tags, add them,
+comma separated, beween square braces.  E.g. ``marrow.mongo[scripting,logger]``. On a command line this will require
+quoting.
 
 
 Development Version
 -------------------
 
-    |developstatus| |developcover| |ghsince| |issuecount| |ghfork|
+|developstatus| |developcover| |develophealth| |ghsince| |issuecount| |ghfork|
 
 Development takes place on `GitHub <https://github.com/>`__ in the
 `marrow.mongo <https://github.com/marrow/mongo/>`__ project.  Issue tracking, documentation, and downloads
@@ -81,12 +97,6 @@ class model. For example, if you wanted to define a simple user account model, y
 
     from marrow.mongo import Index, Document
     from marrow.mongo.field import ObjectId, String, Number, Array
-
-One must always import ``Document`` from ``marrow.mongo.core`` prior to any import of registered fields from
-``marrow.mongo``. As a note, due to the magical nature of this plugin import registry, it may change in future feature
-releases. The old interface will be deprecated with a warning for one feature version first, however; pin your
-dependencies.
-
 
 Defining Documents
 ------------------
@@ -285,8 +295,12 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
     :target: https://pypi.python.org/pypi/marrow.mongo
     :alt: Latest released version.
 
-.. |downloads| image:: http://img.shields.io/pypi/dw/marrow.mongo.svg?style=flat
-    :target: https://pypi.python.org/pypi/marrow.mongo
-    :alt: Downloads per week.
+.. |masterhealth| image:: https://landscape.io/github/marrow/mongo/master/landscape.svg?style=flat
+    :target: https://landscape.io/github/marrow/mongo/master
+    :alt: Master Branch Code Health
+
+.. |develophealth| image:: https://landscape.io/github/marrow/mongo/develop/landscape.svg?style=flat
+    :target: https://landscape.io/github/marrow/mongo/develop
+    :alt: Develop Branch Code Health
 
 .. |cake| image:: http://img.shields.io/badge/cake-lie-1b87fb.svg?style=flat

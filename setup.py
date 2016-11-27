@@ -30,6 +30,7 @@ tests_require = [
 		'pytest-cov',  # coverage reporting
 		'pytest-flakes',  # syntax validation
 		'pytest-capturelog',  # log capture
+		'pytest-isort',  # import ordering
 	]
 
 
@@ -44,7 +45,7 @@ setup(
 	author = author.name,
 	author_email = author.email,
 	license = 'MIT',
-	keywords = '',
+	keywords = ['mongodb', 'orm', 'odm', 'document mapper', 'declarative', 'marrow'],
 	classifiers = [
 			"Development Status :: 5 - Production/Stable",
 			"Intended Audience :: Developers",
@@ -68,6 +69,7 @@ setup(
 	include_package_data = True,
 	package_data = {'': ['README.rst', 'LICENSE.txt']},
 	namespace_packages = ['marrow', 'web', 'web.session'],
+	zip_safe = False,
 	
 	# ## Dependency Declaration
 	
@@ -79,7 +81,6 @@ setup(
 			'marrow.schema>=1.2.0,<2.0.0',  # Declarative schema support.
 			'marrow.package>=1.1.0,<2.0.0',  # Plugin discovery and loading.
 			'pymongo>=3.2',  # We require modern API.
-			'pytz',  # Timezone support.
 		],
 	
 	extras_require = dict(

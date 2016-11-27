@@ -1,21 +1,25 @@
 # encoding: utf-8
 
-from pytz import utc
+from collections import MutableMapping
+
 from bson.binary import STANDARD
 from bson.codec_options import CodecOptions
 from bson.json_util import dumps, loads
-from pymongo.read_preferences import ReadPreference
+from bson.tz_util import utc
+from pymongo.collection import Collection
+from pymongo.database import Database
 from pymongo.read_concern import ReadConcern
+from pymongo.read_preferences import ReadPreference
 from pymongo.write_concern import WriteConcern
-from collections import OrderedDict as dict, MutableMapping
 
-from marrow.package.loader import load
-from marrow.schema import Container, Attributes
-
+from ...package.loader import load
+from ...schema import Attributes, Container
+from ...schema.compat import odict
+from ..util import SENTINEL
 from .field import Field
 from .index import Index
-from ..util import SENTINEL
-from ..util.compat import unicode
+
+__all__ = ['Document']
 
 
 class Document(Container):
@@ -32,7 +36,7 @@ class Document(Container):
 	"""
 	
 	# Note: These may be dynamic based on content; always access from an instance where possible.
-	__store__ = dict  # For fields, this may be a bson type like Binary, or Code.
+	__store__ = odict # For fields, this may be a bson type like Binary, or Code.
 	__foreign__ = {'object'}  # The representation for the database side of things, ref: $type
 	
 	__bound__ = False  # Has this class been "attached" to a live MongoDB connection?
@@ -109,25 +113,79 @@ class Document(Container):
 		if db is collection is None:
 			raise ValueError("Must bind to either a database or explicit collection.")
 		
-		if collection is None:
-			collection = db[cls.__collection__]
-		
-		collection = collection.with_options(
-				codec_options = CodecOptions(
-						document_class = cls.__store__,
-						tz_aware = True,
-						uuid_representation = STANDARD,
-						tzinfo = utc,
-					),
-				read_preference = cls.__read_preference__,
-				read_concern = cls.__read_concern__,
-				write_concern = cls.__write_concern__,
-			)
+		collection = cls.get_collection(db or collection)
 		
 		cls.__bound__ = True
 		cls._collection = collection
 		
 		return cls
+	
+	# Database Operations
+	
+	@classmethod
+	def create_collection(cls, target, recreate=False, indexes=True):
+		"""Ensure the collection identified by this document class exists, creating it if not.
+		
+		http://api.mongodb.com/python/current/api/pymongo/database.html#pymongo.database.Database.create_collection
+		"""
+		
+		if recreate:
+			if isinstance(target, Collection):
+				target.drop()
+			
+			elif isinstance(target, Database):
+				target[cls.__collection__].drop()
+		
+		collection = cls.get_collection(target)
+		
+		if indexes:
+			cls.create_indexes(target)
+		
+		return collection
+	
+	@classmethod
+	def get_collection(cls, target):
+		"""Retrieve a properly configured collection object as configured by this document class.
+		
+		http://api.mongodb.com/python/current/api/pymongo/database.html#pymongo.database.Database.get_collection
+		"""
+		
+		config = {
+				'codec_options': CodecOptions(
+						document_class = cls.__store__,
+						tz_aware = True,
+						uuid_representation = STANDARD,
+						tzinfo = utc,
+					),
+				'read_preference': cls.__read_preference__,
+				'read_concern': cls.__read_concern__,
+				'write_concern': cls.__write_concern__,
+			}
+		
+		if isinstance(target, Collection):
+			return target.with_options(**config)
+		
+		elif isinstance(target, Database):
+			return target.get_collection(cls.__collection__, **config)
+		
+		raise TypeError("Can not retrieve collection from: " + repr(target))
+	
+	@classmethod
+	def create_indexes(cls, target, recreate=False):
+		"""Iterate all known indexes and construct them."""
+		
+		results = []
+		collection = cls.get_collection(target)
+		
+		if recreate:
+			collection.drop_indexes()
+		
+		for index in cls.__indexes__.values():
+			results.append(index.create_index(collection))
+		
+		return results
+	
+	# Data Conversion and Casting
 	
 	@classmethod
 	def from_mongo(cls, doc, projected=None):
@@ -141,7 +199,7 @@ class Document(Container):
 		
 		instance = cls(_prepare_defaults=False)
 		instance.__data__ = instance.__store__(doc)
-		instance._prepare_defaults()
+		instance._prepare_defaults()  # pylint:disable=protected-access
 		instance.__loaded__ = set(projected) if projected else None
 		
 		return instance

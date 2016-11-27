@@ -7,15 +7,11 @@ These encapsulate the functionality of creating combinable mappings
 
 from __future__ import unicode_literals
 
-from copy import deepcopy
 from collections import Mapping, MutableMapping
-from pytz import utc
-from bson.codec_options import CodecOptions
-from marrow.schema.compat import odict
+from copy import deepcopy
 
+from ...schema.compat import odict, py3
 from ..util import SENTINEL
-from ..util.compat import py3, unicode
-
 
 
 class Ops(object):
@@ -30,58 +26,14 @@ class Ops(object):
 		return "{}({}{}{}{})".format(
 				self.__class__.__name__,
 				repr([(i, j) for i, j in self.operations.items()]),
-				", collection={}".format() if self.collection else "",
-				", document={}".format() if self.document else "",
+				", collection={}".format(self.collection) if self.collection else "",
+				", document={}".format(self.document) if self.document else "",
 				extra or ""
 			)
 	
 	@property
 	def as_query(self):
 		return self.operations
-	
-	# Binary Operator Protocols
-	
-	def __and__(self, other):
-		operations = deepcopy(self.operations)
-		other = self.__class__(
-				operations = other.as_query if hasattr(other, 'as_query') else other,
-				collection = self.collection,
-				document = self.document
-			)
-		
-		for k, v in getattr(other, 'operations', {}).items():
-			if k not in operations:
-				operations[k] = v
-			else:
-				if not isinstance(operations[k], Mapping):
-					operations[k] = odict((('$eq', operations[k]), ))
-				
-				if not isinstance(v, Mapping):
-					v = odict((('$eq', v), ))
-				
-				operations[k].update(v)
-		
-		return self.__class__(operations=operations, collection=self.collection, document=self.document)
-	
-	def __or__(self, other):
-		operations = deepcopy(self.operations)
-		
-		other = other.as_query if hasattr(other, 'as_query') else other
-		
-		if len(operations) == 1 and '$or' in operations:
-			# Update existing $or.
-			operations['$or'].append(other)
-			return self.__class__(
-					operations = operations,
-					collection = self.collection,
-					document = self.document
-				)
-		
-		return self.__class__(
-				operations = {'$or': [operations, other]},
-				collection = self.collection,
-				document = self.document
-			)
 	
 	# Mapping Protocol
 	
@@ -152,3 +104,88 @@ class Ops(object):
 
 
 MutableMapping.register(Ops)  # Metaclass conflict if we subclass.
+
+
+class Filter(Ops):
+	__slots__ = ('operations', 'collection', 'document')
+	
+	# Binary Operator Protocols
+	
+	def __and__(self, other):
+		operations = deepcopy(self.operations)
+		other = self.__class__(
+				operations = other.as_query if hasattr(other, 'as_query') else other,
+				collection = self.collection,
+				document = self.document
+			)
+		
+		for k, v in getattr(other, 'operations', {}).items():
+			if k not in operations:
+				operations[k] = v
+			else:
+				if not isinstance(operations[k], Mapping):
+					operations[k] = odict((('$eq', operations[k]), ))
+				
+				if not isinstance(v, Mapping):
+					v = odict((('$eq', v), ))
+				
+				operations[k].update(v)
+		
+		return self.__class__(operations=operations, collection=self.collection, document=self.document)
+	
+	def __or__(self, other):
+		operations = deepcopy(self.operations)
+		
+		other = other.as_query if hasattr(other, 'as_query') else other
+		
+		if len(operations) == 1 and '$or' in operations:
+			# Update existing $or.
+			operations['$or'].append(other)
+			return self.__class__(
+					operations = operations,
+					collection = self.collection,
+					document = self.document
+				)
+		
+		return self.__class__(
+				operations = {'$or': [operations, other]},
+				collection = self.collection,
+				document = self.document
+			)
+	
+	def __invert__(self):
+		"""Return the boolean inversion of the current query.
+		
+		Equivalent to the MongoDB `$not` operator.
+		"""
+		operations = deepcopy(self.operations)
+		
+		return self.__class__(
+				operations = {'$not': operations},
+				collection = self.collection,
+				document = self.document
+			)
+
+
+class Update(Ops):
+	__slots__ = ('operations', 'collection', 'document')
+	
+	EACH_COMBINING = {'$addToSet', '$push'}
+	
+	def __init__(self, operations=None, collection=None, document=None):
+		self.operations = operations or odict()
+		self.collection = collection
+		self.document = document
+	
+	# Binary Operator Protocols
+	
+	def __and__(self, other):
+		operations = deepcopy(odict(other.operations if hasattr(other, 'operations') else other))
+		
+		for op in self:
+			for field in self[op]:
+				operations.setdefault(op, odict())
+				# TODO: Handle EACH_COMBINING updates to auto-transform multiple instances.
+				operations[op][field] = self[op][field]
+		
+		return self.__class__(operations=operations, collection=self.collection, document=self.document)

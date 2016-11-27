@@ -2,9 +2,9 @@
 
 import pytest
 
-from marrow.schema.compat import odict
 from marrow.mongo import Document, Field
 from marrow.mongo.util import SENTINEL
+from marrow.schema.compat import odict
 
 
 class Person(Document):
