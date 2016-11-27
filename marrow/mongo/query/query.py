@@ -495,11 +495,116 @@ class Q(object):
 	# Geospatial Query Selectors
 	# https://docs.mongodb.com/manual/reference/operator/query/#geospatial
 	
-	def near(self):
-		pass
+	def near(self, center, sphere=False, min=None, max=None):
+		"""Order results by their distance from the given point, optionally with range limits in meters.
+		
+		Geospatial operator: {$near: {...}}
+		Documentation: https://docs.mongodb.com/manual/reference/operator/query/near/#op._S_near
+		
+			{
+				$near: {
+					$geometry: <center; Point or (long, lat)>,
+					$minDistance: <min; distance in meters>,
+					$maxDistance: <max; distance in meters>
+				}
+			}
+		
+		Geospatial operator: {$nearSphere: {...}}
+		Documentation: https://docs.mongodb.com/manual/reference/operator/query/nearSphere/#op._S_nearSphere
+		
+			{
+				$nearSphere: {
+					$geometry: <center; Point or (long, lat)>,
+					$minDistance: <min; distance in meters>,
+					$maxDistance: <max; distance in meters>
+				}
+			}
+		"""
+		near = {'$geometry': Point(*center)}
+		
+		if min:
+			near['$minDistance'] = float(min)
+		
+		if max:
+			near['$maxDistance'] = float(max)
+		
+		return Filter({self._name: {'$nearSphere' if sphere else '$near': near}})
 	
-	def within(self, center=None, radius=None, box=None, polygon=None, sphere=None):
-		pass
+	def within(self, geometry=None, center=None, sphere=None, radius=None, box=None, polygon=None, crs=None):
+		"""Select geometries within a bounding GeoJSON geometry.
+		
+		Documentation: https://docs.mongodb.com/manual/reference/operator/query/geoWithin/#op._S_geoWithin
+		
+		Geospatial operator: {$geoWithin: {$geometry: ...}}}
+		Documentation: https://docs.mongodb.com/manual/reference/operator/query/geometry/#op._S_geometry
+		
+			{
+				$geoWithin: { $geometry: <Polygon or MultiPolygon> }
+			}
+		
+		Geospatial operator: {$geoWithin: {$center: ...}}}
+		Documentation: https://docs.mongodb.com/manual/reference/operator/query/center/#op._S_center
+		
+			{
+				$geoWithin: { $center: [ <center; Point or (long, lat)>, <radius in coord system units> ] }
+			}
+		
+		Geospatial operator: {$geoWithin: {$centerSphere: ...}}}
+		Documentation: https://docs.mongodb.com/manual/reference/operator/query/centerSphere/#op._S_centerSphere
+		
+			{
+				$geoWithin: { $centerSphere: [ <sphere; Point or (long, lat)>, <radius in radians> ] }
+			}
+		
+		Geospatial operator: {$geoWithin: {$box: ...}}}
+		Documentataion: https://docs.mongodb.com/manual/reference/operator/query/box/#op._S_box
+		
+			{
+				$geoWithin: { $box: <box; 2-element GeoJSON object representing, or
+						[(bottom left long, long), (upper right long, lat)]> }
+			}
+		
+		Geospatial operator: {$geoWithin: {$polygon: ...}}}
+		Documentation: https://docs.mongodb.com/manual/reference/operator/query/polygon/#op._S_polygon
+		
+			{
+				$geoWithin: { $polygon: <polygon; Polygon or [(long, lat), ...]> }
+			}
+		"""
+		
+		if geometry:
+			if crs:
+				geometry = dict(geometry)
+				geometry['crs'] = {'type': 'name', 'properties': {'name': crs}}
+			
+			inner = {'$geometry': geometry}
+		
+		elif center:
+			inner = {'$center': [list(center), radius]}
+		
+		elif sphere:
+			inner = {'$centerSphere': [list(center), radius]}
+		
+		elif box:
+			inner = {'$box': list(list(i) for i in box)}
+		
+		elif polygon:
+			inner = {'$polygon': list(list(i) for i in box)}
+		
+		else:
+			raise TypeError("Requires at least one argument.")
+		
+		return Filter({self._name: inner})
 	
-	def intersects(self):
-		pass
+	def intersects(self, geometry, crs=None):
+		"""Select geometries that intersect with a GeoJSON geometry.
+		
+		Geospatial operator: {$geoIntersects: {...}}
+		Documentation: https://docs.mongodb.com/manual/reference/operator/query/geoIntersects/#op._S_geoIntersects
+		"""
+		
+		if crs:
+			geometry = dict(geometry)
+			geometry['crs'] = {'type': 'name', 'properties': {'name': crs}}
+		
+		return Filter({self._name: {'$geoIntersects': {'$geometry': geometry}}})
