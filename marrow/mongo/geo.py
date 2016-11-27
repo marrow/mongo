@@ -37,7 +37,7 @@ class GeoJSONCoord(GeoJSON):
 		self.coordinates.append(self.to_foreign(item))
 	
 	def reverse(self):
-		self.coordinates.reverse()
+		return reversed(self)
 	
 	def extend(self, other):
 		if isinstance(other, self.__class__):
@@ -58,7 +58,7 @@ class GeoJSONCoord(GeoJSON):
 		return iter(self.to_native(i) for i in self.coordinates)
 	
 	def __reversed__(self):
-		return reversed(self.to_native(i) for i in self.coordinates)
+		return (self.to_native(i) for i in reversed(self.coordinates))
 	
 	def __getitem__(self, item):
 		return self.to_native(self.coordinates[item])
