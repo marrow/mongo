@@ -37,3 +37,13 @@ class TestParametricUpdateConstructor(object):
 		q = U(D, bit_xor__number=27)
 		assert isinstance(q, Update)
 		assert q.operations == {'$bit': {'other': {'xor': 27}}}
+	
+	def test_date(self, D):
+		q = U(D, now__field=True)
+		assert isinstance(q, Update)
+		assert q.operations == {'$currentDate': {'field': True}}
+	
+	def test_timestamp(self, D):
+		q = U(D, now__field='ts')
+		assert isinstance(q, Update)
+		assert q.operations == {'$currentDate': {'field': {'$type': 'timestamp'}}}

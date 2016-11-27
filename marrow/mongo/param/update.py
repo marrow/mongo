@@ -23,9 +23,9 @@ UPDATE_ALIASES = {
 		'bit_or': ('bit', _bit('or')),  # Parameterized bitwise update.
 		'bit_xor': ('bit', _bit('xor')),  # Parameterized bitwise update.
 		'currentDate': ('currentDate', _current_date),  # Typecast to more expanded values.
-		'current_date': 'currentDate',  # Unserscore to camel case conversion.
+		'current_date': ('currentDate', _current_date),  # Unserscore to camel case conversion.
 		'dec': ('inc', __neg__),  # "Decrement"; invert the value and use $inc.
-		'now': 'currentDate',  # A shortcut for the longer form.
+		'now': ('currentDate', _current_date),  # A shortcut for the longer form.
 		'pull_all': 'pullAll',  # Unserscore to camel case conversion.
 		'push_all': 'pushAll',  # Unserscore to camel case conversion.
 		'rename': ('rename', unicode),  # Typecast to unicode.
@@ -39,7 +39,7 @@ UPDATE_ALIASES.update({i: i for i in {'bit', 'inc', 'max', 'min', 'mul', 'pull',
 		'rename', 'set', 'setOnInsert', 'unset'}})
 
 # These should not utilize field to_foreign typecasting.
-UPDATE_PASSTHROUGH = {'rename', 'unset', 'pull', 'push', 'bit'}
+UPDATE_PASSTHROUGH = {'rename', 'unset', 'pull', 'push', 'bit', 'currentDate'}
 
 
 def U(Document, __raw__=None, **update):

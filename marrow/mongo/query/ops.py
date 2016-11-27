@@ -177,10 +177,6 @@ class Update(Ops):
 		self.collection = collection
 		self.document = document
 	
-	@property
-	def as_query(self):
-		return self.operations
-	
 	# Binary Operator Protocols
 	
 	def __and__(self, other):
