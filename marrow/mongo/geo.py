@@ -2,8 +2,8 @@
 
 """GeoJSON support for Marrow Mongo."""
 
-from numbers import Number as NumberABC
 from collections import MutableSequence
+from numbers import Number as NumberABC
 
 from . import Document, Field
 from .field import Alias, Array, Number, String
