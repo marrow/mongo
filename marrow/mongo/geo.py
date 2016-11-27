@@ -2,6 +2,7 @@
 
 """GeoJSON support for Marrow Mongo."""
 
+from numbers import Number as NumberABC
 from collections import MutableSequence
 
 from . import Document, Field
@@ -9,6 +10,8 @@ from .field import Alias, Array, Number, String
 
 
 class GeoJSON(Document):
+	__type_store__ = 'type'
+	
 	kind = String('type', required=True)
 
 
@@ -51,23 +54,23 @@ class GeoJSONCoord(GeoJSON):
 	def remove(self, item):
 		return self.coordinates.remove(self.to_foreign(item))
 	
-	def __contains__(self, item):
-		return self.to_foreign(item) in self.coordinates
-	
-	def __iter__(self):
-		return iter(self.coordinates)
-	
-	def __reversed__(self):
-		return (self.to_native(i) for i in reversed(self.coordinates))
-	
 	def __getitem__(self, item):
-		return self.to_native(self.coordinates[item])
+		if isinstance(item, NumberABC) or item.lstrip('-').isnumeric():
+			return self.to_native(self.coordinates[item])
+		
+		return super(GeoJSONCoord, self).__getitem__(item)
 	
 	def __setitem__(self, item, value):
-		self.coordinates[item] = self.to_foreign(value)
+		if isinstance(item, NumberABC) or item.lstrip('-').isnumeric():
+			self.coordinates[int(item)] = self.to_foreign(value)
+		
+		super(GeoJSONCoord, self).__setitem__(item, value)
 	
 	def __delitem__(self, item):
-		del self.coordinates[self.to_foreign(item)]
+		if isinstance(item, NumberABC) or item.lstrip('-').isnumeric():
+			del self.coordinates[item]
+		
+		super(GeoJSONCoord, self).__delitem__(item)
 	
 	def __len__(self):
 		return len(self.coordinates)
@@ -84,6 +87,8 @@ class Point(GeoJSONCoord):
 	
 	Example:
 	
+		Point(40, 5)
+		
 		{ type: "Point", coordinates: [ 40, 5 ] }
 	
 	References:
@@ -92,7 +97,7 @@ class Point(GeoJSONCoord):
 		http://geojson.org/geojson-spec.html#point
 	"""
 	
-	kind = String('type', default='point', assign=True)
+	kind = String('type', default='Point', assign=True)
 	coordinates = Array(Number())
 	
 	lat = latitude = Alias('coordinates.1')
@@ -110,6 +115,8 @@ class LineString(GeoJSONCoord):
 	
 	Example:
 	
+		LineString((40, 5), (41, 6))
+		
 		{ type: "LineString", coordinates: [ [ 40, 5 ], [ 41, 6 ] ] }
 	
 	References:
@@ -118,11 +125,11 @@ class LineString(GeoJSONCoord):
 		http://geojson.org/geojson-spec.html#linestring
 	"""
 	
-	kind = String('type', default='point', assign=True)
+	kind = String('type', default='LineString', assign=True)
 	coordinates = Array(Array(Number()))
 	
 	def to_native(self, value):
-		return Point(*value)
+		return Point(*(getattr(value, 'coordinates', value)))
 
 
 class Polygon(GeoJSONCoord):
@@ -130,6 +137,8 @@ class Polygon(GeoJSONCoord):
 	
 	Example:
 	
+		Polygon([(0, 0), (3, 6), (6, 1), (0, 0)])
+		
 		{
 			type: "Polygon",
 			coordinates: [ [ [ 0 , 0 ] , [ 3 , 6 ] , [ 6 , 1 ] , [ 0 , 0  ] ] ]
@@ -149,13 +158,13 @@ class Polygon(GeoJSONCoord):
 		http://geojson.org/geojson-spec.html#polygon
 	"""
 	
-	kind = String('type', default='point', assign=True)
+	kind = String('type', default='Polygon', assign=True)
 	coordinates = Array(Array(Array(Number())))
 	
 	exterior = Alias('coordinates.0')
 	
 	def to_native(self, value):
-		return LineString(*value)
+		return LineString(*(getattr(value, 'coordinates', value)))
 
 
 class MultiPoint(GeoJSONCoord):
@@ -163,6 +172,8 @@ class MultiPoint(GeoJSONCoord):
 	
 	Example:
 	
+		MultiPoint((-73.9580, 40.8003), (-73.9498, 40.7968), (-73.9737, 40.7648), (-73.9814, 40.7681))
+		
 		{
 			type: "MultiPoint",
 			coordinates: [
@@ -179,11 +190,11 @@ class MultiPoint(GeoJSONCoord):
 		http://geojson.org/geojson-spec.html#multipoint
 	"""
 	
-	kind = String('type', default='point', assign=True)
+	kind = String('type', default='MultiPoint', assign=True)
 	coordinates = Array(Array(Number()))
 	
 	def to_native(self, value):
-		return Point(*value)
+		return Point(*(getattr(value, 'coordinates', value)))
 
 
 class MultiLineString(GeoJSONCoord):
@@ -191,6 +202,9 @@ class MultiLineString(GeoJSONCoord):
 	
 	Example:
 	
+		MultiLineString([(-73.96943, 40.78519), (-73.96082, 40.78095)], [(-73.96415, 40.79229), (-73.95544, 40.78854)],
+				[(-73.97162, 40.78205), (-73.96374, 40.77715)], [(-73.97880, 40.77247), (-73.97036, 40.76811)])
+		
 		{
 			type: "MultiLineString",
 			coordinates: [
@@ -207,11 +221,11 @@ class MultiLineString(GeoJSONCoord):
 		http://geojson.org/geojson-spec.html#multilinestring
 	"""
 	
-	kind = String('type', default='point', assign=True)
+	kind = String('type', default='MultiLineString', assign=True)
 	coordinates = Array(Array(Array(Number())))
 	
 	def to_native(self, value):
-		return LineString(*value)
+		return LineString(*(getattr(value, 'coordinates', value)))
 
 
 class MultiPolygon(GeoJSONCoord):
@@ -234,11 +248,11 @@ class MultiPolygon(GeoJSONCoord):
 		http://geojson.org/geojson-spec.html#multipolygon
 	"""
 	
-	kind = String('type', default='point', assign=True)
+	kind = String('type', default='MultiPolygon', assign=True)
 	coordinates = Array(Array(Array(Array(Number()))))
 	
 	def to_native(self, value):
-		return Polygon(*value)
+		return Polygon(*(getattr(value, 'coordinates', value)))
 
 
 class GeometryCollection(GeoJSON):
@@ -276,7 +290,7 @@ class GeometryCollection(GeoJSON):
 		http://geojson.org/geojson-spec.html#geometrycollection
 	"""
 	
-	kind = String('type', default='point', assign=True)
+	kind = String('type', default='GeometryCollection', assign=True)
 	geometries = Array(GeoJSONCoord, default=lambda: [], assign=True)
 	
 	def __init__(self, *geometries, **kw):

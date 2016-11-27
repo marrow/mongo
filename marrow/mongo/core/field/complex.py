@@ -78,8 +78,8 @@ class _CastingKind(Field):
 			
 			value = kind(**value)
 		
-		if isinstance(value, Document) and '_cls' not in value and len(kinds) != 1:
-			value['_cls'] = canon(value.__class__)  # Automatically add the tracking field.
+		if isinstance(value, Document) and value.__type_store__ not in value and len(kinds) != 1:
+			value[value.__type_store__] = canon(value.__class__)  # Automatically add the tracking field.
 		
 		return value
 
@@ -152,7 +152,7 @@ class Reference(_HasKinds, Field):
 		if isinstance(value, Document):
 			try:
 				inst['_id'] = value.__data__['_id']
-				inst['_cls'] = canon(value.__class__)
+				inst[value.__type_store__] = canon(value.__class__)
 			except KeyError:
 				raise ValueError("Must reference a document with an _id.")
 		
