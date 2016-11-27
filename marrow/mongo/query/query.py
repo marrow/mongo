@@ -491,3 +491,15 @@ class Q(object):
 			foreign, = foreign  # Unpack.
 		
 		return Filter({self._name: {'$type': foreign}})
+	
+	# Geospatial Query Selectors
+	# https://docs.mongodb.com/manual/reference/operator/query/#geospatial
+	
+	def near(self):
+		pass
+	
+	def within(self, center=None, radius=None, box=None, polygon=None, sphere=None):
+		pass
+	
+	def intersects(self):
+		pass
