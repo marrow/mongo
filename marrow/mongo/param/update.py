@@ -6,8 +6,9 @@ from __future__ import unicode_literals
 
 from operator import __neg__
 
-from ...schema.compat import odict
+from ...schema.compat import unicode
 from ..query import Update
+from .common import _process_arguments, _current_date, _bit
 
 DEFAULT_UPDATE = 'set'  # If no prefix is found, this will be the default operation.
 
@@ -17,15 +18,28 @@ DEFAULT_UPDATE = 'set'  # If no prefix is found, this will be the default operat
 # be provided which will be called to apply the value to the operations being built.
 UPDATE_ALIASES = {
 		'add': 'inc',  # "Add"; a simple alias.
-		'dec': ('inc', __neg__),  # "Decrement"; invert the value and use $inc.
-		'sub': ('inc', __neg__),  # "Subtract"; invert the value and use $inc.
-		'soi': 'setOnInsert',  # A shortcut for the longer form.
-		'set_on_insert': 'setOnInsert',  # Underscore to camel case conversion.
-		'current_date': 'currentDate',  # Unserscore to camel case conversion.
 		'add_to_set': 'addToSet',  # Unserscore to camel case conversion.
+		'bit_and': ('bit', _bit('and')),  # Parameterized bitwise update.
+		'bit_or': ('bit', _bit('or')),  # Parameterized bitwise update.
+		'bit_xor': ('bit', _bit('xor')),  # Parameterized bitwise update.
+		'currentDate': ('currentDate', _current_date),  # Typecast to more expanded values.
+		'current_date': 'currentDate',  # Unserscore to camel case conversion.
+		'dec': ('inc', __neg__),  # "Decrement"; invert the value and use $inc.
+		'now': 'currentDate',  # A shortcut for the longer form.
 		'pull_all': 'pullAll',  # Unserscore to camel case conversion.
 		'push_all': 'pushAll',  # Unserscore to camel case conversion.
+		'rename': ('rename', unicode),  # Typecast to unicode.
+		'set_on_insert': 'setOnInsert',  # Underscore to camel case conversion.
+		'soi': 'setOnInsert',  # A shortcut for the longer form.
+		'sub': ('inc', __neg__),  # "Subtract"; invert the value and use $inc.
 	}
+
+# Update with passthrough values.
+UPDATE_ALIASES.update({i: i for i in {'bit', 'inc', 'max', 'min', 'mul', 'pull', 'pullALl', 'push', 'pushAll',
+		'rename', 'set', 'setOnInsert', 'unset'}})
+
+# These should not utilize field to_foreign typecasting.
+UPDATE_PASSTHROUGH = {'rename', 'unset', 'pull', 'push', 'bit'}
 
 
 def U(Document, __raw__=None, **update):
@@ -38,9 +52,17 @@ def U(Document, __raw__=None, **update):
 	Because this utility is likely going to be used frequently it has been given a single-character name.
 	"""
 	
-	ops = odict(__raw__ or {})
+	ops = Update(__raw__)
+	args = _process_arguments(Document, UPDATE_ALIASES, {}, update, UPDATE_PASSTHROUGH)
 	
+	for operation, _, field, value in args:
+		if not operation:
+			operation = DEFAULT_UPDATE
+		
+		if isinstance(operation, tuple):
+			operation, cast = operation
+			value = cast(value)
+		
+		ops &= Update({'$' + operation: {~field: value}})
 	
-	
-	Document
-	return Ops(update)
+	return ops

@@ -170,6 +170,8 @@ class Filter(Ops):
 class Update(Ops):
 	__slots__ = ('operations', 'collection', 'document')
 	
+	EACH_COMBINING = {'$addToSet', '$push'}
+	
 	def __init__(self, operations=None, collection=None, document=None):
 		self.operations = operations or odict()
 		self.collection = collection

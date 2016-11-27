@@ -4,6 +4,7 @@
 
 from __future__ import unicode_literals
 
+from ...schema.compat import odict
 from ...package.loader import traverse
 
 
@@ -30,7 +31,7 @@ def _operator_choice(conversion, lookup, **kw):
 	return _operator_choice_inner
 
 
-def _process_arguments(Document, prefixes, suffixes, arguments):
+def _process_arguments(Document, prefixes, suffixes, arguments, passthrough=set()):
 	for name, value in arguments.items():
 		prefix, _, nname = name.partition('__')
 		if prefix in prefixes:
@@ -41,6 +42,22 @@ def _process_arguments(Document, prefixes, suffixes, arguments):
 			name = nname
 		
 		field = traverse(Document, name.replace('__', '.'))  # Find the target field.
-		value = field.transformer.foreign(value, (field, Document))  # Typecast the value to MongoDB-safe as needed.
+		
+		if not passthrough & {prefix, suffix}:
+			value = field.transformer.foreign(value, (field, Document))  # Typecast the value to MongoDB-safe as needed.
 		
 		yield prefixes.get(prefix or None, None), suffixes.get(suffix, None), field, value
+
+
+def _current_date(value):
+	if value in ('ts', 'timestamp'):
+		return {'$type': 'timestamp'}
+	
+	return True
+
+
+def _bit(op):
+	def bitwiseUpdate(value):
+		return odict({op: int(value)})
+	
+	return bitwiseUpdate

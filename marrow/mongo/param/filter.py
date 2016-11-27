@@ -67,7 +67,10 @@ FILTER_OPERATION_MAP = {
 
 
 def F(Document, __raw__=None, **filters):
-	"""Generate a MongoDB filter document using the Django ORM style.
+	"""Generate a MongoDB filter document through parameter interpolation.
+	
+	Arguments passed by name have their name interpreted as an optional prefix (currently only `not`), a double-
+	underscore
 	
 	Because this utility is likely going to be used frequently it has been given a single-character name.
 	"""
