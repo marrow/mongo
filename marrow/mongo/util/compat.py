@@ -8,6 +8,8 @@ third-party software, these are subject to change at any time. Only symbols expo
 
 # ## Imports
 
+from __future__ import unicode_literals
+
 import sys
 
 # ## Module Exports
