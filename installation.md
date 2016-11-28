@@ -1,10 +1,12 @@
+# Installation Instructions
+
 Installation is easy using the `pip` package manager.
 
 {% method -%}
 **Requirements**
 
-* Python 2.7 and above, or Python 3.2 and above; or compatible, such as Pypy or Pypy3.
-* An accessible MongoDB installation; some features may require MongoDB version 3.2, decimal support requires version 3.4.
+* [Python](https://www.python.org) 2.7 or 3.2 and above, or compatible runtime such as [Pypy](http://pypy.org) or Pypy3.
+* An accessible [MongoDB](https://www.mongodb.com/) installation; some features may require MongoDB version 3.2, decimal support requires version 3.4.
 
 {% sample lang="bash" -%}
 ```bash
@@ -12,14 +14,13 @@ pip install marrow.mongo
 ```
 {% endmethod %}
 
+## Dependencies
 
-> #### info::Installation Isolation
+> #### info::Dependecy Isolation
 > 
 > We _strongly_ recommend always using a container, virtualization, or sandboxing environment of some kind when developing using Python; installing things system-wide is yucky \(for a variety of reasons\) nine times out of ten.
 > 
 > We prefer light-weight [virtualenv](https://virtualenv.pypa.io/en/latest/virtualenv.html), others prefer solutions as robust as [Vagrant](http://www.vagrantup.com).
-
-## Dependencies
 
 {% method -%}
 Python dependencies will be automatically installed when `marrow.mongo` is installed:
@@ -38,7 +39,7 @@ pip install 'marrow.mongo[scripting,logger]'
 ```
 
 {% common -%}
-#### Package Flags
+### Package Flags
 
 * **`development`**
 

@@ -1,12 +1,14 @@
-# Documents
+Documents are the records of MongoDB, stored in an efficient binary form called [BSON](http://bsonspec.org) allowing record manipulation that is cosmetically similar to JSON. In Python these are typically represented as dictionaries, Python's native mapping type.
 
-This package utilizes the [Marrow Schema](https://github.com/marrow/schema#readme) declarative schema toolkit and extends it to encompass MongoDB data storage concerns. Its documentation may assist you in understanding the processes involved in Marrow Mongo. Basically, you define data models by importing classes describing the various components of a collection, such as ``Document``, ``ObjectId``, or ``String``, then compose them into a declarative class model. For example, if you wanted to define a simple user account model, you would begin by importing:
+{% method -%}
+This package utilizes the [Marrow Schema](https://github.com/marrow/schema#readme) declarative schema toolkit and extends it to encompass MongoDB data storage concerns. Its documentation may assist you in understanding the processes involved in Marrow Mongo. Basically, you define data models by importing classes describing the various components of a collection, such as ``Document``, ``ObjectId``, or ``String``, then compose them into a declarative class model. For example, if you wanted to define a simple user account model, you would begin by importing various components from the `marrow.mongo` package.
 
-{% label %}Python{% endlabel %}
+{% sample lang="python" -%}
 ```python
 from marrow.mongo import Index, Document
 from marrow.mongo.field import ObjectId, String, Number, Array
 ```
+{% endmethod %}
 
 
 ## Defining Documents
