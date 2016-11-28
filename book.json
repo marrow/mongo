@@ -10,7 +10,8 @@
         "scrollablecode",
         "book-summary-scroll-position-saver",
         "tags",
-        "wide-page"
+        "wide-page",
+        "theme-api"
     ],
     "pluginsConfig": {
         "editlink": {
@@ -39,6 +40,11 @@
         "theme-default": {
             "styles": "",
             "showLevel": true
+        },
+        "theme-api": {
+            "languages": "Python,JSON",
+            "split": true,
+            "theme": "dark"
         }
     }
 }
