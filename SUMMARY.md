@@ -17,7 +17,7 @@
 
 ## Guide
 
-* [Documents](guide/documents.md)
+* [Documents and Indexes](guide/documents.md)
 * [Fields](guide/fields.md)
 * [Native Querying](guide/querying.md)
 * [Parametric Helpers](guide/parametric.md)
