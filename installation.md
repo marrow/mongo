@@ -34,6 +34,10 @@ There are a few conditional, tag-based dependencies; to utilize these optional t
 
 {% common -%}
 
+```bash
+pip install 'marrow.mongo[scripting,logger]'
+```
+
 #### Package Flags
 
 * **`development`**
@@ -48,11 +52,6 @@ There are a few conditional, tag-based dependencies; to utilize these optional t
 
   Logging requires knowledge of the local host's timezone, so this pulls in the \`tzlocal\` package to retrieve this information. |
 
-
-
-```bash
-pip install 'marrow.mongo[scripting,logger]'
-```
 {% endmethod %}
 
 
