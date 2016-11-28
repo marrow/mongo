@@ -7,7 +7,7 @@
 {% method -%}
 Installation is easy using the `pip` package manager.
 
-{% sample lang="Bash" -%}
+{% sample lang="bash" -%}
 ```bash
 pip install marrow.mongo
 ```
