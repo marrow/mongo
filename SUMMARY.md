@@ -20,9 +20,11 @@
 
 ## Guide
 
-* [Documents and Indexes](guide/documents.md)
+* [Declaring Documents](guide/documents.md)
+* [Document Instances](guide/document-instances.md)
 * [Fields](guide/fields.md)
-* [Native Querying](guide/querying.md)
+* [Indexes](guide/fields.md)
+* [Querying](guide/querying.md)
 * [Parametric Helpers](guide/parametric.md)
 * [GeoJSON](guide/geojson.md)
 
