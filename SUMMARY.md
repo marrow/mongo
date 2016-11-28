@@ -26,18 +26,18 @@
 ## API
 
 * Core
-  * [`marrow.mongo:Document`](api/document.md)
-  * [`marrow.mongo:Field`](api/field.md)
-  * [`marrow.mongo:Index`](api/index.md)
+  * [_marrow.mongo._**Document**](api/document.md)
+  * [_marrow.mongo._**Field**](api/field.md)
+  * [_marrow.mongo._**Index**](api/index.md)
 * Parametric
-  * [`marrow.mongo:F` (Filter)](api/parametric/filter.md)
-  * [`marrow.mongo:P` (Project)](api/parametric/project.md)
-  * [`marrow.mongo:S` (Sort)](api/parametric/sort.md)
-  * [`marrow.mongo:U` (Update)](api/parametric/update.md)
+  * [_marrow.mongo._**F** (Filter)](api/parametric/filter.md)
+  * [_marrow.mongo._**P** (Project)](api/parametric/project.md)
+  * [_marrow.mongo._**S** (Sort)](api/parametric/sort.md)
+  * [_marrow.mongo._**U** (Update)](api/parametric/update.md)
 * Query
-  * [marrow.mongo:Ops](api/query/ops.md)
-  * [marrow.mongo:Q](api/query/query.md)
+  * [_marrow.mongo._**Ops**](api/query/ops.md)
+  * [_marrow.mongo._**Q**](api/query/query.md)
 * Extras
-  * [`marrow.mongo.geo`](api/geo.md)
-  * [`marrow.mongo.util.capped`](api/util/capped.md)
-  * ['marrow.mongo.util.logger`](api/util/logger.md)
+  * [_marrow.mongo._**geo**](api/geo.md)
+  * [_marrow.mongo.util._**capped**](api/util/capped.md)
+  * [_marrow.mongo.util._**logger**](api/util/logger.md)
