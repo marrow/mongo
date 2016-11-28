@@ -6,6 +6,7 @@
         "bootstrap-callout",
         "multipart",
         "toggle-chapters",
-        "collapsible-chapters"
+        "collapsible-chapters",
+        "localized-footer"
     ]
 }
