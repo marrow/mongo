@@ -57,21 +57,16 @@ pip install 'marrow.mongo[scripting,logger]'
 
 ## Development Version
 
+{% method -%}
 Development takes place on [GitHub](https://github.com/) in the [marrow.mongo](https://github.com/marrow/mongo/) project. Issue tracking, documentation, and downloads are provided there.
 
-Installing the current development version requires [Git](http://git-scm.com/), a distributed source code management system. If you have Git you can run the following to download and _link_ the development version into your Python runtime::
+Installing the current development version requires [Git](http://git-scm.com/), a distributed source code management system. If you have Git you can run the following to download and _link_ the development version into your Python runtime.
 
-{% label %}Terminal{% endlabel %}
+{% sample lang="bash" -%}
 ```bash
 git clone https://github.com/marrow/mongo.git
 (cd mongo; python setup.py develop)
 ```
-
-You can then upgrade to the latest version at any time::
-
-{% label %}Terminal{% endlabel %}
-```bash
-(cd mongo; git pull; python setup.py develop)
-```
+{% endmethod %}
 
 If you would like to make changes and contribute them back to the project, fork the GitHub project, make your changes, and submit a pull request. For more information see the [Contributing](/CONTRIBUTING.md) section, and [GitHub's documentation](http://help.github.com/).
