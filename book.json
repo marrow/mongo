@@ -8,6 +8,7 @@
         "collapsible-chapters",
         "localized-footer",
         "editlink",
+	"infinitescroll",
         "scrollablecode",
         "book-summary-scroll-position-saver"
     ],
