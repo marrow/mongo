@@ -36,7 +36,8 @@ There are a few conditional, tag-based dependencies:
 
 To utilize optional tags, add them, comma separated, beween square braces; this may require shell escaping or quoting.
 
-```shell:Terminal
+{% label %}Terminal{% endlabel %}
+```bash
 pip install 'marrow.mongo[scripting,logger]'
 ```
 
@@ -46,16 +47,17 @@ Development takes place on [GitHub](https://github.com/) in the [marrow.mongo](h
 
 Installing the current development version requires [Git](http://git-scm.com/), a distributed source code management system. If you have Git you can run the following to download and _link_ the development version into your Python runtime::
 
-```bash:Terminal
+{% label %}Terminal{% endlabel %}
+```bash
 git clone https://github.com/marrow/mongo.git
 (cd mongo; python setup.py develop)
 ```
 
 You can then upgrade to the latest version at any time::
 
-```bash:Terminal
+{% label %}Terminal{% endlabel %}
+```bash
 (cd mongo; git pull; python setup.py develop)
 ```
 
 If you would like to make changes and contribute them back to the project, fork the GitHub project, make your changes, and submit a pull request. This process is beyond the scope of this documentation; for more information see [GitHub's documentation](http://help.github.com/).
-
