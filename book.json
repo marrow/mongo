@@ -5,6 +5,7 @@
         "codeblock-label",
         "bootstrap-callout",
         "multipart",
-        "collapsible-menu"
+        "collapsible-menu",
+        "collapsible-chapters"
     ]
 }
