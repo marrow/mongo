@@ -1,12 +1,18 @@
 # Installation
 
+To utilize the Marrow Mongo Document Mapper you will need:
+
+* Python 2.7 and above, or Python 3.2 and above; or compatible, such as Pypy or Pypy3.
+* A modern \(3.2 or newer\) version of the `pymongo` package.
+* An accessible MongoDB installation.
+
 Installing `marrow.mongo` is easy, just execute the following:
 
 ```bash:Terminal
 pip install marrow.mongo
 ```
 
-> #### \*\*Note\*\* Installation Isolation
+> #### **Note** Installation Isolation
 > 
 > We _strongly_ recommend always using a container, virtualization, or sandboxing environment of some kind when developing using Python; installing things system-wide is yucky \(for a variety of reasons\) nine times out of ten. We prefer light-weight [virtualenv](https://virtualenv.pypa.io/en/latest/virtualenv.html), others prefer solutions as robust as [Vagrant](http://www.vagrantup.com).
 
@@ -14,12 +20,9 @@ If you add `marrow.mongo` to the `install_requires` argument of the call to `set
 
 This package has a few dependencies:
 
-* Python 2.7 and above, or Python 3.2 and above, or compatible such as Pypy or Pypy3.
-* A modern \(&gt;3.2\) version of the `pymongo` package.
-* The Marrow Package and Schema utility packages for plugin handling and declarative syntax support.
+The Marrow Package and Schema utility packages for plugin handling and declarative syntax support.
 
 There are a few conditional, tag-based dependencies:
-
 * `development` installs additional utilites relating to testing and contribution.
 * `scripting` pulls in the [Javascripthon](https://github.com/azazel75/metapensiero.pj) Python to JavaScript transpiler to enable use of native Python function transport to MongoDB. \(E.g. for use in map\/reduce, stored functions, etc.\)
 * `logger` requires knowledge of the local host's timezone, so pulls in `tzlocal` to retrieve this information.
