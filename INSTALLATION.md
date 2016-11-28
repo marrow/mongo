@@ -1,4 +1,4 @@
-# Installation
+# Installing Marrow Mongo
 
 To utilize the Marrow Mongo Document Mapper you will need:
 
