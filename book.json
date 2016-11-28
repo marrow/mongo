@@ -5,6 +5,7 @@
         "codeblock-label",
         "bootstrap-callout",
         "multipart",
-        "collapsible-chapters"
+        "collapsible-chapters",
+        "toggle-chapters"
     ]
 }
