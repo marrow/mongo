@@ -1,6 +1,6 @@
-{% method -%}
 Installation is easy using the `pip` package manager.
 
+{% method -%}
 **Requirements**
 
 * Python 2.7 and above, or Python 3.2 and above; or compatible, such as Pypy or Pypy3.
