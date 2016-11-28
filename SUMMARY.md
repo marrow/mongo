@@ -3,6 +3,8 @@
 * [Introduction](README.md)
 * [Installation](INSTALLATION.md)
 * [Contributing](CONTRIBUTING.md)
+* [Colophon](COLOPHON.md)
+* [License](LICENSE.md)
 
 ## Tutorial
 
@@ -42,8 +44,3 @@
 * Utilities
   * [_marrow.mongo.util._**capped**](api/util/capped.md)
   * [_marrow.mongo.util._**logger**](api/util/logger.md)
-
-## End Matter
-
-* [Colophon](COLOPHON.md)
-* [License](LICENSE.md)
