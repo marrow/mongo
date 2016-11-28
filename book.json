@@ -7,6 +7,15 @@
         "multipart",
         "collapsible-chapters",
         "localized-footer",
-        "styles-sass"
-    ]
+        "styles-sass",
+        "editlink",
+        "gitversion"
+    ],
+    "pluginsConfig": {
+        "editlink": {
+            "base": "https://github.com/marrow/mongo/tree/book",
+            "label": "Edit This Page",
+            "multilingual": false
+        }
+    }
 }
