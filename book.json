@@ -2,6 +2,7 @@
     "plugins": [
         "richquotes",
         "anchors",
-        "codeblock-label"
+        "codeblock-label",
+        "bootstrap-callout"
     ]
 }
