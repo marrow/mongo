@@ -68,3 +68,10 @@ The first step in determining how best to tackle a concern is to ask about it. T
   1. Ensure cross-runtime (CPython, Pypy) and cross-version (2.7, 3.x) compatibility.
   2. Ensure code coverage and code health do not decrease.
   3. Ensure changes are up to date with their parent branch and that they do not conflict.
+
+<!-- 
+https://github.com/nayafia/contributing-template/blob/master/CONTRIBUTING-template.md
+https://gist.github.com/audreyr/4feef90445b9680475f2
+http://gruntjs.com/contributing
+http://www.contribution-guide.org
+-->
