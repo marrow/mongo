@@ -14,8 +14,7 @@ from .. import Document, Field
 from ....package.canonical import name as canon
 from ....package.loader import load, traverse
 from ....schema import Attribute
-from ....schema.compat import odict
-from ...util.compat import str, unicode
+from ....schema.compat import odict, str, unicode
 
 
 class _HasKinds(Field):

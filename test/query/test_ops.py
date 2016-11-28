@@ -7,8 +7,7 @@ import operator
 import pytest
 
 from marrow.mongo import Filter
-from marrow.mongo.util.compat import py3, str
-from marrow.schema.compat import odict
+from marrow.schema.compat import odict, py3
 
 
 @pytest.fixture

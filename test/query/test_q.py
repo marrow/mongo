@@ -10,8 +10,7 @@ from bson import ObjectId as oid
 
 from marrow.mongo import Document, Field, Filter, Q
 from marrow.mongo.field import Array, Embed, Number, ObjectId, String
-from marrow.mongo.util.compat import py3, str, unicode
-from marrow.schema.compat import odict
+from marrow.schema.compat import odict, py3, str, unicode
 
 
 class Sample(Document):

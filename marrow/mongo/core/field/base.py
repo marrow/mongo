@@ -9,7 +9,7 @@ from bson import ObjectId as OID
 
 from . import Field
 from ....schema import Attribute
-from ...util.compat import unicode
+from ....schema.compat import unicode
 
 
 class String(Field):

@@ -12,8 +12,7 @@ from bson.tz_util import utc
 from marrow.mongo import Document
 from marrow.mongo.core.field.complex import _HasKinds
 from marrow.mongo.field import Array, Embed, PluginReference, Reference, String
-from marrow.mongo.util.compat import unicode
-from marrow.schema.compat import odict
+from marrow.schema.compat import odict, unicode
 
 
 class FieldExam(object):
