@@ -3,7 +3,6 @@
 To utilize the Marrow Mongo Document Mapper you will need:
 
 * Python 2.7 and above, or Python 3.2 and above; or compatible, such as Pypy or Pypy3.
-* A modern \(3.2 or newer\) version of the `pymongo` package.
 * An accessible MongoDB installation.
 
 Installing `marrow.mongo` is easy, just execute the following:
@@ -16,18 +15,29 @@ pip install marrow.mongo
 > 
 > We _strongly_ recommend always using a container, virtualization, or sandboxing environment of some kind when developing using Python; installing things system-wide is yucky \(for a variety of reasons\) nine times out of ten. We prefer light-weight [virtualenv](https://virtualenv.pypa.io/en/latest/virtualenv.html), others prefer solutions as robust as [Vagrant](http://www.vagrantup.com).
 
+## Handling Dependencies
+
 If you add `marrow.mongo` to the `install_requires` argument of the call to `setup()` in your application's `setup.py` file, `marrow.mongo` will be automatically installed and made available when your own application or library is installed. We recommend using "less than" version numbers to ensure there are no unintentional side-effects when updating. Use `marrow.mongo<1.2` to get all bugfixes for the current release, and `marrow.mongo<2.0` to get bugfixes and feature updates while ensuring that large breaking changes are not installed.
 
-This package has a few dependencies:
+Python dependencies will be automatically installed when `marrow.mongo` is installed:
 
-The Marrow Package and Schema utility packages for plugin handling and declarative syntax support.
+* A modern \(3.2 or newer\) version of the `pymongo` package.
+* The `marrow.package` plugin and canonical object loader.
+* The `marrow.schema` declarative syntax toolkit.
 
 There are a few conditional, tag-based dependencies:
-* `development` installs additional utilites relating to testing and contribution.
-* `scripting` pulls in the [Javascripthon](https://github.com/azazel75/metapensiero.pj) Python to JavaScript transpiler to enable use of native Python function transport to MongoDB. \(E.g. for use in map\/reduce, stored functions, etc.\)
-* `logger` requires knowledge of the local host's timezone, so pulls in `tzlocal` to retrieve this information.
 
-Installing `marrow.mongo` will also install package dependencies automatically. To utilize optional tags, add them, comma separated, beween square braces. E.g. `marrow.mongo[scripting,logger]`. On a command line this will require quoting.
+| Tag | Purpose |
+| --- | --- |
+| `development` | Install additional utilities relating to testing and contribution, including `pytest` and various plugins, static analysis tools, debugger, and enhanced REPL shell. |
+| `scripting` | Pulls in the [Javascripthon](https://github.com/azazel75/metapensiero.pj) Python to JavaScript transpiler to enable use of native Python function transport to MongoDB. (E.g. for use in map/reduce, stored functions, etc.) |
+| `logger` | Logging requires knowledge of the local host's timezone, so this pulls in the \`tzlocal\` package to retrieve this information. |
+
+To utilize optional tags, add them, comma separated, beween square braces; this may require shell escaping or quoting.
+
+```shell:Terminal
+pip install 'marrow.mongo[scripting,logger]'
+```
 
 ## Development Version
 
