@@ -29,6 +29,7 @@
   * [_marrow.mongo._**Document**](api/document.md)
   * [_marrow.mongo._**Field**](api/field.md)
   * [_marrow.mongo._**Index**](api/index.md)
+  * [_marrow.mongo._**geo**](api/geo.md)
 * Parametric
   * [_marrow.mongo._**F** (Filter)](api/parametric/filter.md)
   * [_marrow.mongo._**P** (Project)](api/parametric/project.md)
@@ -37,7 +38,6 @@
 * Query
   * [_marrow.mongo._**Ops**](api/query/ops.md)
   * [_marrow.mongo._**Q**](api/query/query.md)
-* Extras
-  * [_marrow.mongo._**geo**](api/geo.md)
+* Utilities
   * [_marrow.mongo.util._**capped**](api/util/capped.md)
   * [_marrow.mongo.util._**logger**](api/util/logger.md)
