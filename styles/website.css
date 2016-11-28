@@ -1,0 +1,8 @@
+/* Web Theme Customizations */
+
+#page-footer {
+    text-align: center;
+    font-size: 70%;
+    text-transform: uppercase;
+    opacity: 0.8;
+}
