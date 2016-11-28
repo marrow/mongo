@@ -9,6 +9,9 @@
 ## Tutorial
 
 * [Getting Started](tutorial/getting-started.md)
+* Developing a Wiki
+  * [Defining a Model](tutorial/wiki/model.md)
+  * [Working with Pages](tutorial/wiki/page.md)
 * Developing a Forum
   * [Defining a Model](tutorial/forum/model.md)
   * [Working with Threads](tutorial/forum/thread.md)
