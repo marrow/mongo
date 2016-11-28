@@ -34,6 +34,8 @@ Marrow Mongo is a collection of small, focused utilities written to enhance use 
 
 ## Code Metrics
 
+| 
+| --- | --- |
 | **Total Lines** | 2,976 |
 | **SLoC** | 1,479 |
 | **Functions** | 57 |
