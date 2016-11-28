@@ -33,7 +33,7 @@ The first step in determining how best to tackle a concern is to ask about it. T
 
 * **Help Wanted**
 
-  Look through the [Help Wanted](https://github.com/marrow/mongo/labels/help%20wanted+sort%3Areactions-%2B1-desc) issues on GitHub. Look for tickets with greater numbers of reactions and comments to help gauge impact.
+  Look through the [Help Wanted](https://github.com/marrow/mongo/issues?q=is%3Aopen+label%3A%22help+wanted%22+sort%3Areactions-%2B1-desc) issues on GitHub. Look for tickets with greater numbers of reactions and comments to help gauge impact.
 
 * **Write Some Documentation**
 
