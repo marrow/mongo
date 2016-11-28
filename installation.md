@@ -30,8 +30,11 @@ Python dependencies will be automatically installed when `marrow.mongo` is insta
 {% method -%}
 If you add `marrow.mongo` to the `install_requires` argument of the call to `setup()` in your application's `setup.py` file, `marrow.mongo` will be automatically installed and made available when your own application or library is installed. We recommend using "less than" version numbers to ensure there are no unintentional side-effects when updating. Use `marrow.mongo<1.2` to get all bugfixes for the current release, and `marrow.mongo<2.0` to get bugfixes and feature updates while ensuring that large breaking changes are not installed.
 
+There are a few conditional, tag-based dependencies; to utilize these optional tags add them, comma separated, beween square braces. This may require shell escaping or quoting.
+
 {% common -%}
-There are a few conditional, tag-based dependencies:
+
+#### Package Flags
 
 * **`development`**
 
@@ -45,9 +48,8 @@ There are a few conditional, tag-based dependencies:
 
   Logging requires knowledge of the local host's timezone, so this pulls in the \`tzlocal\` package to retrieve this information. |
 
-To utilize optional tags, add them, comma separated, beween square braces; this may require shell escaping or quoting.
 
-{% label %}Terminal{% endlabel %}
+
 ```bash
 pip install 'marrow.mongo[scripting,logger]'
 ```
