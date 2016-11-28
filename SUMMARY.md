@@ -34,5 +34,5 @@
   * [marrow.mongo:Q](api/query/query.md)
 * Extras
   * [`marrow.mongo.geo`](api/geo.md)
-  * [`marrow.mongo.util.capped:`](api/util/capped.md)
+  * [`marrow.mongo.util.capped`](api/util/capped.md)
   * ['marrow.mongo.util.logger`](api/util/logger.md)
