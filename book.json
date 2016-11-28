@@ -41,7 +41,7 @@
             "showLevel": true
         },
         "theme-api": {
-            "languages": "Python,JSON",
+            "languages": ["Shell", "Python", "PyMongo", "Mongo REPL"],
             "split": true,
             "theme": "dark"
         }
