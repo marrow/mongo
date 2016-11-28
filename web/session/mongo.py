@@ -4,9 +4,9 @@
 """Experimental WebCore session handler using MongoDB storage."""
 
 from bson import ObjectId as oid
-from marrow.mongo import Document, Index
-from marrow.mongo.field import ObjectId, TTL
 
+from marrow.mongo import Document, Index
+from marrow.mongo.field import TTL, ObjectId
 
 log = __import__('logging').getLogger(__name__)
 
@@ -68,16 +68,16 @@ class MongoSession(object):
 		if session is None:
 			return self
 		
-		ctx = session._ctx
+		ctx = session._ctx  # pylint:disable=protected-access
 		D = self._Document
 		db = ctx.db[self._database]
 		docs = db[self._collection]
 		project = D.__projection__
 		
-		result = docs.find_one(D.id == session._id, project)
+		result = docs.find_one(D.id == session._id, project)  # pylint:disable=protected-access
 		
 		if not result:
-			result = {'_id': oid(str(session._id))}
+			result = {'_id': oid(str(session._id))}  # pylint:disable=protected-access
 		
 		result = session[self.name] = D.from_mongo(result, project.keys())
 		

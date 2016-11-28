@@ -30,6 +30,7 @@ tests_require = [
 		'pytest-cov',  # coverage reporting
 		'pytest-flakes',  # syntax validation
 		'pytest-capturelog',  # log capture
+		'pytest-isort',  # import ordering
 	]
 
 
@@ -44,7 +45,8 @@ setup(
 	author = author.name,
 	author_email = author.email,
 	license = 'MIT',
-	keywords = '',
+	keywords = ['mongodb', 'GeoJSON', 'geospatial', 'full text', 'facted', 'orm', 'odm', 'document mapper',
+			'declarative', 'marrow'],
 	classifiers = [
 			"Development Status :: 5 - Production/Stable",
 			"Intended Audience :: Developers",
@@ -68,6 +70,7 @@ setup(
 	include_package_data = True,
 	package_data = {'': ['README.rst', 'LICENSE.txt']},
 	namespace_packages = ['marrow', 'web', 'web.session'],
+	zip_safe = False,
 	
 	# ## Dependency Declaration
 	
@@ -79,7 +82,6 @@ setup(
 			'marrow.schema>=1.2.0,<2.0.0',  # Declarative schema support.
 			'marrow.package>=1.1.0,<2.0.0',  # Plugin discovery and loading.
 			'pymongo>=3.2',  # We require modern API.
-			'pytz',  # Timezone support.
 		],
 	
 	extras_require = dict(
@@ -96,6 +98,15 @@ setup(
 				# ### Marrow Mongo Lookups
 				'marrow.mongo.document': [  # Document classes registered by name.
 						'Document = marrow.mongo.core:Document',
+						'GeoJSON = marrow.mongo.geo:GeoJSON',
+						'GeoJSONCoord = marrow.mongo.geo:GeoJSONCoord',
+						'Point = marrow.mongo.geo:Point',
+						'LineString = marrow.mongo.geo:LineString',
+						'Polygon = marrow.mongo.geo:Polygon',
+						'MultiPoint = marrow.mongo.geo:MultiPoint',
+						'MultiLineString = marrow.mongo.geo:MultiLineString',
+						'MultiPolygon = marrow.mongo.geo:MultiPolygon',
+						'GeometryCollection = marrow.mongo.geo:GeometryCollection',
 					],
 				'marrow.mongo.field': [  # Field classes registered by (optionaly namespaced) name.
 						'Field = marrow.mongo.core.field:Field',
@@ -111,6 +122,7 @@ setup(
 						'Embed = marrow.mongo.core.field.complex:Embed',
 						'Reference = marrow.mongo.core.field.complex:Reference',
 						'PluginReference = marrow.mongo.core.field.complex:PluginReference',
+						'Alias = marrow.mongo.core.field.complex:Alias',
 						'Number = marrow.mongo.core.field.number:Number',
 						'Double = marrow.mongo.core.field.number:Double',
 						'Integer = marrow.mongo.core.field.number:Integer',

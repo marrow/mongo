@@ -1,12 +1,12 @@
 # encoding: utf-8
 
+from marrow.mongo.field import String
 from web.core import Application
-from web.ext.debug import DebugExtension
-from web.ext.db import DatabaseExtension
 from web.db.mongo import MongoDBConnection
+from web.ext.db import DatabaseExtension
+from web.ext.debug import DebugExtension
 from web.ext.session import SessionExtension
 from web.session.mongo import MongoSession, MongoSessionStorage
-from marrow.mongo.field import String
 
 
 class Session(MongoSessionStorage):

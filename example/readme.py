@@ -1,9 +1,9 @@
 # encoding: utf-8
 
 from pymongo import MongoClient
-from marrow.mongo import Document, Index
-from marrow.mongo.field import ObjectId, String, Number, Array
 
+from marrow.mongo import Document, Index
+from marrow.mongo.field import Array, Number, ObjectId, String
 
 collection = MongoClient().test.collection
 collection.drop()

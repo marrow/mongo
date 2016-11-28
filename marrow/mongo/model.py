@@ -5,10 +5,7 @@
 
 from __future__ import unicode_literals
 
-
 __all__ = ['Model']
-
-log = __import__('logging').getLogger(__name__)
 
 
 class Model(object):
@@ -56,7 +53,7 @@ class Model(object):
 		"""Descriptor protocol getter."""
 		if instance is None: return self  # Return ourselves directly if requested from the class we were assigned to.
 		
-		collection = self.resolve(instance._ctx)
+		collection = self.resolve(instance._ctx)  # pylint:disable=protected-access
 		
 		if self.cache:  # Assign the cached value if requested.
 			setattr(instance, self.cache, collection)

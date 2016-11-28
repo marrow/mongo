@@ -1,5 +1,9 @@
+# encoding: utf-8
+
+from __future__ import unicode_literals
+
 from marrow.mongo import Document
-from marrow.mongo.field import String, Array, Binary, ObjectId, Boolean, Date
+from marrow.mongo.field import Array, String
 
 
 class StringDocument(Document):
@@ -9,7 +13,7 @@ class StringDocument(Document):
 
 
 def test_string_document():
-	validator = StringDocument.__validation__
+	validator = StringDocument.__validator__
 	return
 	
 	assert validator == {

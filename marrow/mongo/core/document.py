@@ -1,21 +1,27 @@
 # encoding: utf-8
 
-from pytz import utc
+from __future__ import unicode_literals
+
+from collections import MutableMapping
+
 from bson.binary import STANDARD
 from bson.codec_options import CodecOptions
 from bson.json_util import dumps, loads
-from pymongo.read_preferences import ReadPreference
+from bson.tz_util import utc
+from pymongo.collection import Collection
+from pymongo.database import Database
 from pymongo.read_concern import ReadConcern
+from pymongo.read_preferences import ReadPreference
 from pymongo.write_concern import WriteConcern
-from collections import OrderedDict as dict, MutableMapping
 
-from marrow.package.loader import load
-from marrow.schema import Container, Attributes
-
+from ...package.loader import load
+from ...schema import Attributes, Container
+from ...schema.compat import odict
+from ..util import SENTINEL
 from .field import Field
 from .index import Index
-from ..util import SENTINEL
-from ..util.compat import unicode
+
+__all__ = ['Document']
 
 
 class Document(Container):
@@ -32,17 +38,22 @@ class Document(Container):
 	"""
 	
 	# Note: These may be dynamic based on content; always access from an instance where possible.
-	__store__ = dict  # For fields, this may be a bson type like Binary, or Code.
+	__store__ = odict # For fields, this may be a bson type like Binary, or Code.
 	__foreign__ = {'object'}  # The representation for the database side of things, ref: $type
+	__type_store__ = '_cls'  # The pseudo-field to store embedded document class references as.
 	
 	__bound__ = False  # Has this class been "attached" to a live MongoDB connection?
 	__collection__ = None  # The name of the collection to "attach" to using bind().
 	__read_preference__ = ReadPreference.PRIMARY  # Default read preference to assign when binding.
 	__read_concern__ = ReadConcern()  # Default read concern.
 	__write_concern__ = WriteConcern(w=1)  # Default write concern.
+	__capped__ = False  # The size of the capped collection to create in bytes.
+	__capped_count__ = None  # The optional number of records to limit the capped collection to.
+	__engine__ = None  # Override the default storage engine (and configuration) as a mapping of `{name: options}`.
+	__validate__ = 'off'  # Control validation strictness: off, strict, or moderate.
 	
 	__projection__ = None  # The set of fields used during projection, to identify fields which are not loaded.
-	__validation__ = None  # The MongoDB Validation document matching these records.
+	__validator__ = None  # The MongoDB Validation document matching these records.
 	__fields__ = Attributes(only=Field)  # An ordered mapping of field names to their respective Field instance.
 	__fields__.__sequence__ = 10000
 	__indexes__ = Attributes(only=Index)  # An ordered mapping of index names to their respective Index instance.
@@ -109,25 +120,104 @@ class Document(Container):
 		if db is collection is None:
 			raise ValueError("Must bind to either a database or explicit collection.")
 		
-		if collection is None:
-			collection = db[cls.__collection__]
-		
-		collection = collection.with_options(
-				codec_options = CodecOptions(
-						document_class = cls.__store__,
-						tz_aware = True,
-						uuid_representation = STANDARD,
-						tzinfo = utc,
-					),
-				read_preference = cls.__read_preference__,
-				read_concern = cls.__read_concern__,
-				write_concern = cls.__write_concern__,
-			)
+		collection = cls.get_collection(db or collection)
 		
 		cls.__bound__ = True
 		cls._collection = collection
 		
 		return cls
+	
+	# Database Operations
+	
+	@classmethod
+	def _collection_configuration(cls, creation=False):
+		config = {
+				'codec_options': CodecOptions(
+						document_class = cls.__store__,
+						tz_aware = True,
+						uuid_representation = STANDARD,
+						tzinfo = utc,
+					),
+				'read_preference': cls.__read_preference__,
+				'read_concern': cls.__read_concern__,
+				'write_concern': cls.__write_concern__,
+			}
+		
+		if not creation:
+			return config
+		
+		if cls.__capped__:
+			config['size'] = cls.__capped__
+			config['capped'] = True
+			
+			if cls.__capped_count__:
+				config['max'] = cls.__capped_count__
+		
+		if cls.__engine__:
+			config['storageEngine'] = cls.__engine__
+		
+		if cls.__validate__ != 'off':
+			config['validator'] = cls.__validator__
+			config['validationLevel'] = 'strict' if cls.__validate__ is True else cls.__validate__
+		
+		return config
+	
+	@classmethod
+	def create_collection(cls, target, recreate=False, indexes=True):
+		"""Ensure the collection identified by this document class exists, creating it if not.
+		
+		http://api.mongodb.com/python/current/api/pymongo/database.html#pymongo.database.Database.create_collection
+		"""
+		
+		if isinstance(target, Collection):
+			name = target.name
+			target = target.database
+		else:
+			name = cls.__collection__
+		
+		if recreate:
+			target.drop_collection(name)
+		
+		collection = target.create_collection(name, **cls._collection_configuration(True))
+		
+		if indexes:
+			cls.create_indexes(collection)
+		
+		return collection
+	
+	@classmethod
+	def get_collection(cls, target):
+		"""Retrieve a properly configured collection object as configured by this document class.
+		
+		If given an existing collection, will instead call `collection.with_options`.
+		
+		http://api.mongodb.com/python/current/api/pymongo/database.html#pymongo.database.Database.get_collection
+		"""
+		
+		if isinstance(target, Collection):
+			return target.with_options(**cls._collection_configuration())
+		
+		elif isinstance(target, Database):
+			return target.get_collection(cls.__collection__, **cls._collection_configuration())
+		
+		raise TypeError("Can not retrieve collection from: " + repr(target))
+	
+	@classmethod
+	def create_indexes(cls, target, recreate=False):
+		"""Iterate all known indexes and construct them."""
+		
+		results = []
+		collection = cls.get_collection(target)
+		
+		if recreate:
+			collection.drop_indexes()
+		
+		for index in cls.__indexes__.values():
+			results.append(index.create_index(collection))
+		
+		return results
+	
+	# Data Conversion and Casting
 	
 	@classmethod
 	def from_mongo(cls, doc, projected=None):
@@ -136,12 +226,12 @@ class Document(Container):
 		if isinstance(doc, Document):
 			return doc
 		
-		if '_cls' in doc:  # Instantiate any specific class mentioned in the data.
-			cls = load(doc['_cls'], 'marrow.mongo.document')
+		if cls.__type_store__ in doc:  # Instantiate any specific class mentioned in the data.
+			cls = load(doc[cls.__type_store__], 'marrow.mongo.document')
 		
 		instance = cls(_prepare_defaults=False)
 		instance.__data__ = instance.__store__(doc)
-		instance._prepare_defaults()
+		instance._prepare_defaults()  # pylint:disable=protected-access
 		instance.__loaded__ = set(projected) if projected else None
 		
 		return instance

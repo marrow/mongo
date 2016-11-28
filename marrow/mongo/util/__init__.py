@@ -1,6 +1,8 @@
 # encoding: utf-8
 
-from marrow.package.loader import load
+from __future__ import unicode_literals
+
+from ...package.loader import load
 
 
 SENTINEL = object()  # Singleton value to detect unassigned values.

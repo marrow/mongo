@@ -1,20 +1,22 @@
 # encoding: utf-8
 
+from __future__ import unicode_literals
+
 from datetime import datetime, timedelta
 from numbers import Number
-from bson import ObjectId as oid
-from bson.code import Code
-from marrow.schema import Attribute
+
+from bson import ObjectId as OID
 
 from . import Field
-from ...util.compat import unicode
+from ....schema import Attribute
+from ....schema.compat import unicode
 
 
 class String(Field):
 	__foreign__ = 'string'
 	__disallowed_operators__ = {'#array'}
 	
-	def to_foreign(self, obj, name, value):
+	def to_foreign(self, obj, name, value):  # pylint:disable=unused-argument
 		return unicode(value)
 
 
@@ -22,7 +24,7 @@ class Binary(Field):
 	__foreign__ = 'binData'
 	__disallowed_operators__ = {'#array'}
 	
-	def to_foreign(self, obj, name, value):
+	def to_foreign(self, obj, name, value):  # pylint:disable=unused-argument
 		return bytes(value)
 
 
@@ -39,26 +41,26 @@ class ObjectId(Field):
 			self.default
 		except AttributeError:
 			if self.__name__ == '_id':  # But only if we're actually the primary key.
-				self.default = lambda: oid()
+				self.default = lambda: OID()  # pylint:disable=unnecessary-lambda
 	
-	def to_foreign(self, obj, name, value):
-		if isinstance(value, oid):
+	def to_foreign(self, obj, name, value):  # pylint:disable=unused-argument
+		if isinstance(value, OID):
 			return value
 		
 		if isinstance(value, datetime):
-			return oid.from_datetime(value)
+			return OID.from_datetime(value)
 		
 		if isinstance(value, timedelta):
-			return oid.from_datetime(datetime.utcnow() + value)
+			return OID.from_datetime(datetime.utcnow() + value)
 		
-		return oid(unicode(value))
+		return OID(unicode(value))
 
 
 class Boolean(Field):
 	__foreign__ = 'bool'
 	__disallowed_operators__ = {'#array'}
 	
-	def to_foreign(self, obj, name, value):
+	def to_foreign(self, obj, name, value):  # pylint:disable=unused-argument
 		try:
 			value = value.lower()
 		except AttributeError:
@@ -79,8 +81,6 @@ class Date(Field):
 	
 	now = Attribute(default=False)
 	autoupdate = Attribute(default=False)
-	
-	# TODO: use timeparser via context.locale to guess -- https://github.com/thomst/timeparser
 
 
 class TTL(Date):
@@ -89,7 +89,7 @@ class TTL(Date):
 	__foreign__ = 'date'
 	__disallowed_operators__ = {'#array'}
 	
-	def to_foreign(self, obj, name, value):
+	def to_foreign(self, obj, name, value):  # pylint:disable=unused-argument
 		if isinstance(value, timedelta):
 			return datetime.utcnow() + value
 		
@@ -99,7 +99,6 @@ class TTL(Date):
 		if isinstance(value, Number):
 			return datetime.utcnow() + timedelta(days=value)
 		
-		# TODO: use timeparser via context.locale to guess -- https://github.com/thomst/timeparser
 		raise ValueError("Invalid TTL value: " + repr(value))
 
 
