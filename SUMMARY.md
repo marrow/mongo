@@ -3,7 +3,6 @@
 * [Introduction](README.md)
 * [Installation](INSTALLATION.md)
 * [Contributing](CONTRIBUTING.md)
-* [License](LICENSE.md)
 
 ## Tutorial
 
@@ -49,4 +48,7 @@
   * [capped](api/util/capped.md)
   * [logger](api/util/logger.md)
 
+## End Matter
 
+* [Colophon](COLOPHON.md)
+* [License](LICENSE.md)
