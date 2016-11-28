@@ -21,7 +21,8 @@
 		},
 		"versions": {
 			"type": "tags",
-			"includeFilepath": true
+			"includeFilepath": false,
+			"placement": "bottom"
 		},
 		"sharing": {
 			"facebook": true,

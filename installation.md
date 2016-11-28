@@ -70,3 +70,6 @@ git clone https://github.com/marrow/mongo.git
 {% endmethod %}
 
 If you would like to make changes and contribute them back to the project, fork the GitHub project, make your changes, and submit a pull request. For more information see the [Contributing](/CONTRIBUTING.md) section, and [GitHub's documentation](http://help.github.com/).
+
+
+tags: beginner
