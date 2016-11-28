@@ -7,10 +7,8 @@
         "multipart",
         "collapsible-chapters",
         "localized-footer",
-        "styles-sass",
         "editlink",
         "gitversion",
-        "infinitescroll",
         "scrollablecode",
         "book-summary-scroll-position-saver"
     ],
