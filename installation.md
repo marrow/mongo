@@ -1,7 +1,7 @@
 #### Requirements
 
 * Python 2.7 and above, or Python 3.2 and above; or compatible, such as Pypy or Pypy3.
-* An accessible MongoDB installation.
+* An accessible MongoDB installation; some features may require MongoDB version 3.2, decimal support requires version 3.4.
 
 Installation is easy, just execute the following:
 

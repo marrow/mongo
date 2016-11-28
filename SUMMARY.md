@@ -1,8 +1,8 @@
 # Summary
 
 * [Introduction](README.md)
-* [Installation](INSTALLATION.md)
-* [Contributing](CONTRIBUTING.md)
+* [Installation](installation.md)
+* [Contributing](contributing.md)
 
 ## Tutorial
 
@@ -52,5 +52,5 @@
 
 ## End Matter
 
-* [Colophon](COLOPHON.md)
-* [License](LICENSE.md)
+* [Colophon](colophon.md)
+* [License](license.md)
