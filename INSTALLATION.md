@@ -28,11 +28,19 @@ Python dependencies will be automatically installed when `marrow.mongo` is insta
 
 There are a few conditional, tag-based dependencies:
 
-| Tag | Purpose |
-| --- | --- |
-| `development` | Install additional utilities relating to testing and contribution, including `pytest` and various plugins, static analysis tools, debugger, and enhanced REPL shell. |
-| `scripting` | Pulls in the [Javascripthon](https://github.com/azazel75/metapensiero.pj) Python to JavaScript transpiler to enable use of native Python function transport to MongoDB. (E.g. for use in map/reduce, stored functions, etc.) |
-| `logger` | Logging requires knowledge of the local host's timezone, so this pulls in the \`tzlocal\` package to retrieve this information. |
+* **`development`**
+
+  Install additional utilities relating to testing and contribution, including `pytest` and various plugins, static analysis tools, debugger, and enhanced REPL shell.
+
+
+* **`scripting`**
+
+  Pulls in the [Javascripthon](https://github.com/azazel75/metapensiero.pj) Python to JavaScript transpiler to enable use of native Python function transport to MongoDB. (E.g. for use in map/reduce, stored functions, etc.)
+
+
+* **`logger`**
+
+  Logging requires knowledge of the local host's timezone, so this pulls in the \`tzlocal\` package to retrieve this information. |
 
 To utilize optional tags, add them, comma separated, beween square braces; this may require shell escaping or quoting.
 
