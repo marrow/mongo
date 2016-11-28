@@ -22,28 +22,28 @@ Marrow Mongo is a collection of small, focused utilities written to enhance use 
 {% common -%}
 ## Code Quality
 
-* **100% test coverage.**
+* **100% test coverage.** Releases are gaurenteed to be fully tested.
 
-* **100% code quality.**
+* **100% code quality.** Extensive static analysis helps to keep the codebase maintainable.
 
-* **Fantastic documentation.**
+* **Fantastic documentation.** We'd like to think so, at least!
 
-* **1:1 or greater code to comment ratio.**
+* **1:1 or greater code to comment ratio.** Code should be self-descriptive and obvious.
 
-* **Extensive roadmap.**
+* **Extensive roadmap.** Changes to the library are meditated upon before work begins.
 
 ## Code Metrics
 
-**Total Lines:** 2,976 
-**SLoC:** 1,479 
-**Functions:** 57 
-**Classes:** 41 
-**Modules:** 23 
-**Average Complexity:** 2.460 
-**Complexity 95th %:** 6 
-**Maximum Complexity:** 17 
-**# > 15 Complexity:** 1 
-**Bytecode Size:** 71 KiB 
+| **Total Lines** | 2,976 |
+| **SLoC** | 1,479 |
+| **Functions** | 57 |
+| **Classes** | 41 |
+| **Modules** | 23 |
+| **Average Complexity** | 2.460 |
+| **Complexity 95th %** | 6 |
+| **Maximum Complexity** | 17 |
+| **# > 15 Complexity** | 1 |
+| **Bytecode Size** | 71 KiB |
 
 (As of a889491.)
 
