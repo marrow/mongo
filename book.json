@@ -4,6 +4,7 @@
         "anchors",
         "codeblock-label",
         "bootstrap-callout",
-        "multipart"
+        "multipart",
+        "collapsible-menu"
     ]
 }
