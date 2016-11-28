@@ -3,7 +3,6 @@
         "richquotes",
         "anchors",
         "codeblock-label",
-        "bootstrap-callout",
-        "multipart"
+        "bootstrap-callout"
     ]
 }
