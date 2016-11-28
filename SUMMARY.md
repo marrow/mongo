@@ -20,10 +20,10 @@
 
 ## API
 
-* [`marrow.mongo:Document`](api/document.md)
-* [`marrow.mongo:Field`](api/field.md)
-* [`marrow.mongo:Index`](api/index.md)
-* [`marrow.mongo.geo`](api/geo.md)
+* Core
+  * [`marrow.mongo:Document`](api/document.md)
+  * [`marrow.mongo:Field`](api/field.md)
+  * [`marrow.mongo:Index`](api/index.md)
 * Parametric
   * [`marrow.mongo:F` (Filter)](api/parametric/filter.md)
   * [`marrow.mongo:P` (Project)](api/parametric/project.md)
@@ -32,3 +32,5 @@
 * Query
   * [marrow.mongo:Ops](api/query/ops.md)
   * [marrow.mongo:Q](api/query/query.md)
+* Extras
+  * [`marrow.mongo.geo`](api/geo.md)
