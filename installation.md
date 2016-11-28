@@ -19,7 +19,7 @@ pip install marrow.mongo
 > 
 > We prefer light-weight [virtualenv](https://virtualenv.pypa.io/en/latest/virtualenv.html), others prefer solutions as robust as [Vagrant](http://www.vagrantup.com).
 
-## Dependency Management
+## Dependencies
 
 {% method -%}
 Python dependencies will be automatically installed when `marrow.mongo` is installed:
