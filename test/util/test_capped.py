@@ -36,7 +36,7 @@ def uncapped(request, connection):
 def capped(request, connection):
 	db = connection.get_default_database()
 	
-	if tuple((int(i) for i in connection.server_info()['version'][:3].split('.'))) < (3, 2):
+	if tuple((int(i) for i in connection.server_info()['version'].split('.')[:3])) < (3, 2):
 		pytest.xfail("Test expected to fail on MongoDB versions prior to 3.2.")
 	
 	request.addfinalizer(partial(db.drop_collection, Capped.__collection__))
@@ -78,12 +78,10 @@ class TestCappedQueries(object):
 		assert len(result) == capped.count()
 		assert 0.4 < delta < 0.6
 	
-	@pytest.mark.xfail(run=__debug__, reason="Development-time diagnostics unavailable in production.")
 	def test_capped_trap(self, uncapped):
 		with pytest.raises(TypeError):
 			list(tail(uncapped))
 	
-	@pytest.mark.xfail(run=__debug__, reason="Development-time diagnostics unavailable in production.")
 	def test_empty_trap(self, capped):
 		with pytest.raises(ValueError):
 			list(tail(capped))
