@@ -5,9 +5,9 @@
 }
 
 .markdown-section h2 {
-	font-size: 1.5em;
 	color: rgba(0, 0, 0, 0.8);
 	border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+	font-weight: 300;
 }
 
 .book .book-body .page-wrapper .page-inner {
