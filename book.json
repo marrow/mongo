@@ -9,7 +9,6 @@
 		"editlink",
 		"scrollablecode",
 		"book-summary-scroll-position-saver",
-		"tags",
 		"wide-page",
 		"theme-api"
 	],
@@ -21,8 +20,7 @@
 		},
 		"versions": {
 			"type": "tags",
-			"includeFilepath": false,
-			"placement": "bottom"
+			"includeFilepath": true
 		},
 		"sharing": {
 			"facebook": true,
