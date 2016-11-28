@@ -1,6 +1,5 @@
 {
     "plugins": [
-        "richquotes",
         "anchors",
         "codeblock-label",
         "bootstrap-callout",
@@ -36,6 +35,10 @@
             "theme": "night",
             "family": "serif",
             "size": 2
+        },
+        "theme-default": {
+            "styles": "",
+            "showLevel": true
         }
     }
 }
