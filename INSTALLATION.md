@@ -1,4 +1,4 @@
-# Installing the Marrow Mongo Document Mapper
+# Installation
 
 #### Requirements
 
@@ -18,7 +18,7 @@ pip install marrow.mongo
 > 
 > We prefer light-weight [virtualenv](https://virtualenv.pypa.io/en/latest/virtualenv.html), others prefer solutions as robust as [Vagrant](http://www.vagrantup.com).
 
-## Handling Dependencies
+## Dependency Management
 
 If you add `marrow.mongo` to the `install_requires` argument of the call to `setup()` in your application's `setup.py` file, `marrow.mongo` will be automatically installed and made available when your own application or library is installed. We recommend using "less than" version numbers to ensure there are no unintentional side-effects when updating. Use `marrow.mongo<1.2` to get all bugfixes for the current release, and `marrow.mongo<2.0` to get bugfixes and feature updates while ensuring that large breaking changes are not installed.
 
@@ -62,4 +62,4 @@ You can then upgrade to the latest version at any time::
 (cd mongo; git pull; python setup.py develop)
 ```
 
-If you would like to make changes and contribute them back to the project, fork the GitHub project, make your changes, and submit a pull request. This process is beyond the scope of this documentation; for more information see [GitHub's documentation](http://help.github.com/).
+If you would like to make changes and contribute them back to the project, fork the GitHub project, make your changes, and submit a pull request. For more information see the [Contributing](/CONTRIBUTING.md) section, and [GitHub's documentation](http://help.github.com/).
