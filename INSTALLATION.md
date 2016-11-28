@@ -7,7 +7,8 @@ To utilize the Marrow Mongo Document Mapper you will need:
 
 Installing `marrow.mongo` is easy, just execute the following:
 
-```bash:Terminal
+{% label %}Terminal{% endlabel %}
+```bash
 pip install marrow.mongo
 ```
 

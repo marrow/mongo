@@ -1,7 +1,7 @@
 {
     "plugins": [
         "richquotes",
-        "codeblock-filename",
-        "anchors"
+        "anchors",
+        "codeblock-label"
     ]
 }
