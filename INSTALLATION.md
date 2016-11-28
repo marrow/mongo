@@ -1,7 +1,5 @@
 # Installation
 
-<!-- toc -->
-
 To utilize the Marrow Mongo Document Mapper you will need:
 
 * Python 2.7 and above, or Python 3.2 and above; or compatible, such as Pypy or Pypy3.
