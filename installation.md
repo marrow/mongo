@@ -21,13 +21,13 @@ pip install marrow.mongo
 
 ## Dependency Management
 
+{% method -%}
 Python dependencies will be automatically installed when `marrow.mongo` is installed:
 
 * A modern (3.2 or newer) version of the `pymongo` package.
 * The `marrow.package` plugin and canonical object loader.
 * The `marrow.schema` declarative syntax toolkit.
 
-{% method -%}
 If you add `marrow.mongo` to the `install_requires` argument of the call to `setup()` in your application's `setup.py` file, `marrow.mongo` will be automatically installed and made available when your own application or library is installed. We recommend using "less than" version numbers to ensure there are no unintentional side-effects when updating. Use `marrow.mongo<1.2` to get all bugfixes for the current release, and `marrow.mongo<2.0` to get bugfixes and feature updates while ensuring that large breaking changes are not installed.
 
 There are a few conditional, tag-based dependencies; to utilize these optional tags add them, comma separated, beween square braces. This may require shell escaping or quoting.
