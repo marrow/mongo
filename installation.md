@@ -1,11 +1,10 @@
+{% method -%}
+Installation is easy using the `pip` package manager.
+
 **Requirements**
 
 * Python 2.7 and above, or Python 3.2 and above; or compatible, such as Pypy or Pypy3.
 * An accessible MongoDB installation; some features may require MongoDB version 3.2, decimal support requires version 3.4.
-
-
-{% method -%}
-Installation is easy using the `pip` package manager.
 
 {% sample lang="bash" -%}
 ```bash
@@ -22,6 +21,7 @@ pip install marrow.mongo
 
 ## Dependency Management
 
+{% method -%}
 If you add `marrow.mongo` to the `install_requires` argument of the call to `setup()` in your application's `setup.py` file, `marrow.mongo` will be automatically installed and made available when your own application or library is installed. We recommend using "less than" version numbers to ensure there are no unintentional side-effects when updating. Use `marrow.mongo<1.2` to get all bugfixes for the current release, and `marrow.mongo<2.0` to get bugfixes and feature updates while ensuring that large breaking changes are not installed.
 
 Python dependencies will be automatically installed when `marrow.mongo` is installed:
@@ -30,6 +30,7 @@ Python dependencies will be automatically installed when `marrow.mongo` is insta
 * The `marrow.package` plugin and canonical object loader.
 * The `marrow.schema` declarative syntax toolkit.
 
+{% common -%}
 There are a few conditional, tag-based dependencies:
 
 * **`development`**
@@ -52,6 +53,8 @@ To utilize optional tags, add them, comma separated, beween square braces; this 
 ```bash
 pip install 'marrow.mongo[scripting,logger]'
 ```
+{% endmethod %}
+
 
 ## Development Version
 
