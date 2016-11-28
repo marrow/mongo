@@ -1,7 +1,5 @@
 # Summary
 
-## Overview
-
 * [Introduction](README.md)
 * [Installation](INSTALLATION.md)
 * [Contributing](CONTRIBUTING.md)
