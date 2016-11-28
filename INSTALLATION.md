@@ -22,7 +22,7 @@ If you add `marrow.mongo` to the `install_requires` argument of the call to `set
 
 Python dependencies will be automatically installed when `marrow.mongo` is installed:
 
-* A modern \(3.2 or newer\) version of the `pymongo` package.
+* A modern (3.2 or newer) version of the `pymongo` package.
 * The `marrow.package` plugin and canonical object loader.
 * The `marrow.schema` declarative syntax toolkit.
 
