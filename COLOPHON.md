@@ -1,5 +1,3 @@
-## Colophon
-
 The Marrow Mongo Document Mapper is built on the shoulders of giants:
 
 * [Python](https://www.python.org/) programming language and standard library.
