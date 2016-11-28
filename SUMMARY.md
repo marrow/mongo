@@ -9,10 +9,10 @@
 ## Tutorial
 
 * [Getting Started](tutorial/getting-started.md)
-* Developing a Wiki
+* [Developing a Wiki](tutorial/wiki/README.md)
   * [Defining a Model](tutorial/wiki/model.md)
   * [Working with Pages](tutorial/wiki/page.md)
-* Developing a Forum
+* [Developing a Forum](tutorial/forum/README.md)
   * [Defining a Model](tutorial/forum/model.md)
   * [Working with Threads](tutorial/forum/thread.md)
   * [Working with Replies](tutorial/forum/reply.md)
