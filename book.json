@@ -8,15 +8,30 @@
         "collapsible-chapters",
         "localized-footer",
         "editlink",
-	"infinitescroll",
+        "infinitescroll",
         "scrollablecode",
-        "book-summary-scroll-position-saver"
+        "book-summary-scroll-position-saver",
+        "versions",
+        "tags"
     ],
     "pluginsConfig": {
         "editlink": {
             "base": "https://github.com/marrow/mongo/tree/book",
             "label": "Edit This Page",
             "multilingual": false
+        },
+        "versions": {
+            "type": "tags",
+            "includeFilepath": true
+        },
+        "sharing": {
+            "facebook": true,
+            "twitter": true,
+            "google": false,
+            "weibo": false,
+            "instapaper": false,
+            "vk": false,
+            "all": ""
         }
     }
 }
