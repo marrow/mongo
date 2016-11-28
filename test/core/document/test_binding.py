@@ -51,6 +51,9 @@ class TestDocumentBinding(object):
 	def test_create_collection(self, db, Sample):
 		assert Sample.create_collection(db).name == 'collection'
 	
+	def test_create_collection_collection(self, db, Sample):
+		assert Sample.create_collection(db.foo, True).name == 'foo'
+	
 	def test_validation(self, db, Sample):
 		if tuple((int(i) for i in db.client.server_info()['version'].split('.')[:3])) < (3, 2):
 			pytest.xfail("Test expected to fail on MongoDB versions prior to 3.2.")
