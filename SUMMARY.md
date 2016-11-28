@@ -1,9 +1,9 @@
 # Summary
 
+* [Colophon](COLOPHON.md)
 * [Introduction](README.md)
 * [Installation](INSTALLATION.md)
 * [Contributing](CONTRIBUTING.md)
-* [Colophon](COLOPHON.md)
 * [License](LICENSE.md)
 
 ## Tutorial
