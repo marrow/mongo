@@ -31,7 +31,7 @@
             "weibo": false,
             "instapaper": false,
             "vk": false,
-            "all": ""
+            "all": []
         }
     }
 }
