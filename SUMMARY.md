@@ -1,7 +1,5 @@
 # Summary
 
-* [Colophon](COLOPHON.md)
-
 ## Overview
 
 * [Introduction](README.md)
@@ -43,3 +41,8 @@
 * Utilities
   * [_marrow.mongo.util._**capped**](api/util/capped.md)
   * [_marrow.mongo.util._**logger**](api/util/logger.md)
+
+## End Matter
+
+* [Colophon](COLOPHON.md)
+* [License](LICENSE.md)
