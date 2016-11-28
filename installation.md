@@ -32,12 +32,12 @@ If you add `marrow.mongo` to the `install_requires` argument of the call to `set
 
 There are a few conditional, tag-based dependencies; to utilize these optional tags add them, comma separated, beween square braces. This may require shell escaping or quoting.
 
-{% common -%}
-
+{% sample lang="bash" -%}
 ```bash
 pip install 'marrow.mongo[scripting,logger]'
 ```
 
+{% common -%}
 #### Package Flags
 
 * **`development`**
