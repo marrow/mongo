@@ -8,7 +8,7 @@
 
 ## Tutorial
 
-* [Getting Started](tutorial/getting-started.md)
+* [Getting Started](tutorial/README.md)
 * [Developing a Wiki](tutorial/wiki/README.md)
   * [Defining a Model](tutorial/wiki/model.md)
   * [Working with Pages](tutorial/wiki/page.md)
