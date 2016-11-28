@@ -1,6 +1,6 @@
 /* Web Theme Customizations */
 
-#page-footer {
+.book .book-body section #page-footer {
     text-align: center;
     font-size: 70%;
     text-transform: uppercase;
