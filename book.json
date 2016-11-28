@@ -9,7 +9,10 @@
         "localized-footer",
         "styles-sass",
         "editlink",
-        "gitversion"
+        "gitversion",
+        "infinitescroll",
+        "scrollablecode",
+        "book-summary-scroll-position-saver"
     ],
     "pluginsConfig": {
         "editlink": {
