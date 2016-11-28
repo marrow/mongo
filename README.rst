@@ -40,7 +40,7 @@ robust as `Vagrant <http://www.vagrantup.com>`__.
 If you add ``marrow.mongo`` to the ``install_requires`` argument of the call to ``setup()`` in your application's
 ``setup.py`` file, marrow.mongo will be automatically installed and made available when your own application or
 library is installed.  We recommend using "less than" version numbers to ensure there are no unintentional
-side-effects when updating.  Use ``marrow.mongo<1.1`` to get all bugfixes for the current release, and
+side-effects when updating.  Use ``marrow.mongo<1.2`` to get all bugfixes for the current release, and
 ``marrow.mongo<2.0`` to get bugfixes and feature updates while ensuring that large breaking changes are not installed.
 
 This package has a few dependencies:
@@ -214,10 +214,8 @@ variable name to make repeated reference easier.
 Version History
 ===============
 
-Version 1.0
------------
-
-* Initial release.
+To see the complete version history, including detailed per-version change logs, please see the `GitHub Releases
+<https://github.com/marrow/mongo/releases/latest>`__ section.
 
 
 License
@@ -283,12 +281,12 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
     :target: https://github.com/marrow/mongo/issues
     :alt: Github Issues
 
-.. |ghsince| image:: https://img.shields.io/github/commits-since/marrow/mongo/1.0.0.svg
+.. |ghsince| image:: https://img.shields.io/github/commits-since/marrow/mongo/1.1.0.svg
     :target: https://github.com/marrow/mongo/commits/develop
     :alt: Changes since last release.
 
 .. |ghtag| image:: https://img.shields.io/github/tag/marrow/mongo.svg
-    :target: https://github.com/marrow/mongo/tree/1.0.0
+    :target: https://github.com/marrow/mongo/tree/1.1.0
     :alt: Latest Github tagged release.
 
 .. |latestversion| image:: http://img.shields.io/pypi/v/marrow.mongo.svg?style=flat
