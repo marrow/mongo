@@ -4,6 +4,7 @@
         "anchors",
         "codeblock-label",
         "bootstrap-callout",
-        "section"
+        "toggle-chapters",
+        "multipart"
     ]
 }
