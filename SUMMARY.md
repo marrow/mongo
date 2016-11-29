@@ -17,13 +17,12 @@
   * [Working with Replies](tutorial/forum/reply.md)
   * [Common Front-End Operations](tutorial/forum/front-end.md)
 
-
 ## Guide
 
 * [Declaring Documents](guide/documents.md)
 * [Document Instances](guide/document-instances.md)
 * [Fields](guide/fields.md)
-* [Indexes](guide/fields.md)
+* [Indexes](guide/indexes.md)
 * [Querying](guide/querying.md)
 * [Parametric Helpers](guide/parametric.md)
 * [GeoJSON](guide/geojson.md)
