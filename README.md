@@ -50,13 +50,13 @@ collection = Television.create_collection(database)
 {% common -%}
 ## Code Quality
 
-##### 100% test coverage.
+##### Tested, healthy, and up-to-date.
 
-Guaranteed to be fully tested before any release. We utilize [Travis](https://travis-ci.org/marrow/mongo/) continuous integration, wiht test coverage reporting provided by [Codecov.io](https://codecov.io/gh/marrow/mongo/). We also monitor requirements for security concerns and deprecation using [Requires.io](https://requires.io/github/marrow/mongo/requirements/?branch=master).
+[![Release build status.](http://img.shields.io/travis/marrow/mongo/master.svg?style=flat)](https://travis-ci.org/marrow/mongo/branches) [![Release test coverage.](http://img.shields.io/codecov/c/github/marrow/mongo/master.svg?style=flat)](https://codecov.io/github/marrow/mongo?branch=master) [![Release code health.](https://landscape.io/github/marrow/mongo/master/landscape.svg?style=flat)](https://landscape.io/github/marrow/mongo/master) [![Status of release dependencies.](https://img.shields.io/requires/github/marrow/mongo.svg)](https://requires.io/github/marrow/mongo/requirements/?branch=master)
 
-##### 100% code quality.
+Guaranteed to be fully tested before any release. We utilize [Travis](https://travis-ci.org/marrow/mongo/) continuous integration, with test coverage reporting provided by [Codecov.io](https://codecov.io/gh/marrow/mongo/). We also monitor requirements for security concerns and deprecation using [Requires.io](https://requires.io/github/marrow/mongo/requirements/?branch=master).
 
-Extensive static analysis and proactive use of tools such as [pre-commit](http://pre-commit.com), with [plugins](https://github.com/marrow/mongo/blob/develop/.pre-commit-config.yaml) such as the infosec analyzer [OpenStack Bandit](https://wiki.openstack.org/wiki/Security/Projects/Bandit), plus various linting tools, help to keep code maintainable and secure.
+Extensive static analysis through [Landscape.io](https://landscape.io/marrow/mongo/) and proactive use of tools such as [pre-commit](http://pre-commit.com), with [plugins](https://github.com/marrow/mongo/blob/develop/.pre-commit-config.yaml) such as the infosec analyzer [OpenStack Bandit](https://wiki.openstack.org/wiki/Security/Projects/Bandit), plus various linting tools, help to keep code maintainable and secure.
 
 ##### Fantastic documentation.
 
