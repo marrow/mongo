@@ -364,7 +364,7 @@ class Q(object):
 		if self._combining:  # We are a field-compound query fragment, e.g. (Foo.bar & Foo.baz).
 			return reduce(self._combining, (q.re(*parts) for q in self._field))
 		
-		return Filter({self._name: {'$re': ''.join(parts)}})
+		return Filter({self._name: {'$regex': ''.join(parts)}})
 	
 	# Array Query Selectors
 	# https://docs.mongodb.org/manual/reference/operator/query/#array
