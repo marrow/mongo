@@ -30,7 +30,9 @@ class Television(Document):
 
 ##### Refined, Pythonic _data access object_ interactions.
 
-Utilize `Document` instances as attribute access mutable mappings with value typecasting, directly usable with PyMongo APIs. Attention is paid to matching Python language expectations, such as allowing instantiation using positional arguments. Values are always stored in the PyMongo-preferred MongoDB native format, and cast on attribute access as needed. [Learn more about interacting with documents.](guide/instances.md)
+Utilize `Document` instances as attribute access mutable mappings with value typecasting, directly usable with PyMongo APIs. Attention is paid to matching Python language expectations, such as allowing instantiation using positional arguments. Values are always stored in the PyMongo-preferred MongoDB native format, and cast on attribute access as needed.
+
+[Learn more about interacting with documents.](guide/instances.md)
 
 ```python
 tv = Television('D50u-D1')

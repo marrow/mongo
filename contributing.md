@@ -67,9 +67,9 @@ The first step in determining how best to tackle a concern is to ask about it. T
   2. Ensure code coverage and code health do not decrease.
   3. Ensure changes are up to date with their parent branch and that they do not conflict.
 
-<!-- 
-https://github.com/nayafia/contributing-template/blob/master/CONTRIBUTING-template.md
-https://gist.github.com/audreyr/4feef90445b9680475f2
-http://gruntjs.com/contributing
-http://www.contribution-guide.org
--->
+
+## Donations and Patreon Support
+
+Financial contributions are welcome. To arrange a one-time donation, please contact `GothAlice` on IRC (see details above) and for more ongoing support we have [Patreon](https://www.patreon.com/GothAlice) prepared for you. We have rewards (such as inclusion in the [Patrons team on GitHub](https://github.com/orgs/marrow/teams/patrons) and our eternal gratitude) and goals, so please give it a look; every cent helps pay for infrastructure costs and caffeine. So much caffine.
+
+If at any point you wish or need to cease recurring donations, do not feel bad. Don't put yourself out on our account, and thank you!
