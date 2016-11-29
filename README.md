@@ -17,7 +17,7 @@ Marrow Mongo is a collection of small, focused utilities written to enhance use 
 
 * **Advanced GeoJSON support.**
 
-* **Python logging provider.**
+* **Liberally licensed under MIT.**
 
 {% common -%}
 ## Code Quality
@@ -34,7 +34,7 @@ Marrow Mongo is a collection of small, focused utilities written to enhance use 
 
 ## Code Metrics
 
-| 
+| Metric | Value |
 | --- | --- |
 | **Total Lines** | 2,976 |
 | **SLoC** | 1,479 |
