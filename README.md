@@ -6,7 +6,13 @@ description: An introduction to the Marrow Mongo Document Mapper and overview of
 Marrow Mongo is a collection of small, focused utilities written to enhance use of the [PyMongo native MongoDB driver](http://api.mongodb.com/python/current/) without the overhead, glacial update cycle, complexity, and head-space requirements of a full *active record* object document mapper.
 
 {% method -%}
-## Features
+## Overview
+
+[![version](http://img.shields.io/pypi/v/marrow.mongo.svg?style=flat "Latest version.")](https://pypi.python.org/pypi/marrow.mongo) 
+[![tag](https://img.shields.io/github/tag/marrow/mongo.svg "Latest tag.")](https://github.com/marrow/mongo/releases/latest) 
+[![watch](https://img.shields.io/github/watchers/marrow/mongo.svg?style=social&label=Watch "Subscribe to project activity on Github.")](https://github.com/marrow/mongo/subscription)
+[![star](https://img.shields.io/github/stars/marrow/mongo.svg?style=social&label=Star "Star this project on Github.")](https://github.com/marrow/mongo/subscription)
+[![fork](https://img.shields.io/github/forks/marrow/mongo.svg?style=social&label=Fork "Fork this project on Github.")](https://github.com/marrow/mongo/fork)
 
 ##### Declarative document modeling.
 
@@ -50,12 +56,12 @@ collection = Television.create_collection(database)
 {% common -%}
 ## Code Quality
 
-##### Guaranteed to be fully tested before any release.
-
 [![status](http://img.shields.io/travis/marrow/mongo/master.svg?style=flat "Release build status.")](https://travis-ci.org/marrow/mongo/branches) 
 [![coverage](http://img.shields.io/codecov/c/github/marrow/mongo/master.svg?style=flat "Release test coverage.")](https://codecov.io/github/marrow/mongo?branch=master) 
 [![health](https://landscape.io/github/marrow/mongo/master/landscape.svg?style=flat "Release code health.")](https://landscape.io/github/marrow/mongo/master) 
 [![dependencies](https://img.shields.io/requires/github/marrow/mongo.svg "Status of release dependencies.")](https://requires.io/github/marrow/mongo/requirements/?branch=master)
+
+##### Guaranteed to be fully tested before any release.
 
 We utilize [Travis](https://travis-ci.org/marrow/mongo/) continuous integration, with test coverage reporting provided by [Codecov.io](https://codecov.io/gh/marrow/mongo/). We also monitor requirements for security concerns and deprecation using [Requires.io](https://requires.io/github/marrow/mongo/requirements/?branch=master). Extensive static analysis through [Landscape.io](https://landscape.io/marrow/mongo/) and proactive use of tools such as [pre-commit](http://pre-commit.com), with [plugins](https://github.com/marrow/mongo/blob/develop/.pre-commit-config.yaml) such as the infosec analyzer [OpenStack Bandit](https://wiki.openstack.org/wiki/Security/Projects/Bandit), plus various linting tools, help to keep code maintainable and secure.
 
