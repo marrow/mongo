@@ -19,7 +19,9 @@ This is a living document, evolving as the framework evolves.  You can always [b
 
 ##### Declarative document modeling.
 
-Instantiate field objects and associate them with custom `Document` sub-classes to model your data declaratively. [Learn more about constructing documents.](guide/documents.md)
+Instantiate field objects and associate them with custom `Document` sub-classes to model your data declaratively.
+
+[Learn more about constructing documents.](guide/documents.md)
 
 ```python
 class Television(Document):
@@ -37,7 +39,9 @@ assert tv.model == tv['model'] == 'D50u-D1'
 
 ##### Collection and index metadata, and creation shortcuts.
 
-Keep information about your data model with your data model and standardize access. [Read more about indexing.](guide/indexes.md)
+Keep information about your data model with your data model and standardize access.
+
+[Learn more about indexing.](guide/indexes.md)
 
 ```python
 class Television(Document):
@@ -52,7 +56,9 @@ collection.insert_one(Television('D50u-D1'))
 
 ##### Filter construction through rich comparisons.
 
-Construct filter documents through comparison of (or method calls on) field instances accessed as class attributes. [Learn more about querying documents.](guide/querying.md)
+Construct filter documents through comparison of (or method calls on) field instances accessed as class attributes.
+
+[Learn more about querying documents.](guide/querying.md)
 
 ```python
 tv_a = Television.from_mongo(collection.find_one(Television.model == 'D50u-D1'))
@@ -63,7 +69,9 @@ assert tv_a['_id'] == tv_b['_id']
 
 ##### Parametric filter, projection, sort, and update document construction.
 
-Many Python _active record_ object relational mappers (ORMs) and object document mappers (ODMs) provide a short-hand involving the transformation of named parameters into database concepts. [Learn more about the parametric helpers.](guide/parametric.md)
+Many Python _active record_ object relational mappers (ORMs) and object document mappers (ODMs) provide a short-hand involving the transformation of named parameters into database concepts.
+
+[Learn more about the parametric helpers.](guide/parametric.md)
 
 ```python
 collection.update_one(
@@ -80,13 +88,14 @@ assert tv.brand == 'Vizio'
 
 ##### Advanced GeoJSON support.
 
-Marrow Mongo comes with [GeoJSON](http://geojson.org) "batteries included", having extensive support for querying, constructing, and manipulating GeoJSON data. [Learn more about working with geospatial data.](guide/geospatial.md)
+Marrow Mongo comes with [GeoJSON](http://geojson.org) "batteries included", having extensive support for querying, constructing, and manipulating GeoJSON data.
+
+[Learn more about working with geospatial data.](guide/geospatial.md)
 
 ```python
 position = Point(longitude, latitude)
 collection.find(Battleship.location.near(position))
 ```
-
 
 {% common -%}
 ## Code Quality
