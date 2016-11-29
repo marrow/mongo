@@ -134,7 +134,7 @@ You are effectively free to deal in this software however you choose, **without 
 | **Functions** | 57 |
 | **Classes** | 41 |
 | **Modules** | 23 |
-| **Average Complexity** | 2.460 |
+| **Average Complexity** | 2.5 |
 | **Complexity 95th %** | 6 |
 | **Maximum Complexity** | 17 |
 | **# > 15 Complexity** | 1 |
