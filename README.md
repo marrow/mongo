@@ -5,40 +5,40 @@ Marrow Mongo is a collection of small, focused utilities written to enhance use 
 {% method -%}
 ## Core Features
 
-#### Declarative document modeling.
+##### Declarative document modeling.
 
-#### Refined, Pythonic _data access object_ (DAO) interactions.
+##### Refined, Pythonic _data access object_ (DAO) interactions.
 
-#### Collection and index metadata and creation shortcuts.
+##### Collection and index metadata and creation shortcuts.
 
-#### Filter construction through rich comparisons.
+##### Filter construction through rich comparisons.
 
-#### Parametric filter, projection, sort, and update document construction.
+##### Parametric filter, projection, sort, and update document construction.
 
-#### Advanced GeoJSON support.
+##### Advanced GeoJSON support.
 
-#### Liberally MIT licensed.
+##### Liberally MIT licensed.
 
 {% common -%}
 ## Code Quality
 
-#### 100% test coverage.
+##### 100% test coverage.
 
 Guaranteed to be fully tested before any release.
 
-#### 100% code quality.
+##### 100% code quality.
 
 Extensive static analysis helps to keep the code maintainable.
 
-#### Fantastic documentation.
+##### Fantastic documentation.
 
 We'd like to think so, at least!
 
-#### 1:1 or greater code to comment ratio.
+##### 1:1 or greater code to comment ratio.
 
 Code should be self-descriptive and obvious.
 
-#### Extensive road map.
+##### Extensive road map.
 
 Changes to the library require meditation before work begins.
 
