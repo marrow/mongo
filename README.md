@@ -5,7 +5,7 @@ Marrow Mongo is a collection of small, focused utilities written to enhance use 
 {% method -%}
 ## Core Features
 
-* **Declarative document modelling.**
+* **Declarative document modeling.**
 
 * **Refined, Pythonic _data access object_ (DAO) interactions.**
 
@@ -22,19 +22,24 @@ Marrow Mongo is a collection of small, focused utilities written to enhance use 
 {% common -%}
 ## Code Quality
 
-* **100% test coverage.** Releases are gaurenteed to be fully tested.
+* **100% test coverage.**  
+  Guaranteed to be fully tested before any release.
 
-* **100% code quality.** Extensive static analysis helps to keep the codebase maintainable.
+* **100% code quality.**  
+  Extensive static analysis helps to keep the code maintainable.
 
-* **Fantastic documentation.** We'd like to think so, at least!
+* **Fantastic documentation.**  
+  We'd like to think so, at least!
 
-* **1:1 or greater code to comment ratio.** Code should be self-descriptive and obvious.
+* **1:1 or greater code to comment ratio.**  
+  Code should be self-descriptive and obvious.
 
-* **Extensive roadmap.** Changes to the library are meditated upon before work begins.
+* **Extensive road map.**
+  Changes to the library require meditation before work begins.
 
 ## Code Metrics
 
-| Metric | Value |
+| Metric as of a889491 | Value |
 | --- | --- |
 | **Total Lines** | 2,976 |
 | **SLoC** | 1,479 |
@@ -47,12 +52,7 @@ Marrow Mongo is a collection of small, focused utilities written to enhance use 
 | **# > 15 Complexity** | 1 |
 | **Bytecode Size** | 71 KiB |
 
-(As of a889491.)
-
 {% endmethod %}
-
-
-
 
 Additionally, it provides a very light-weight database connection plugin for the [WebCore web framework](https://github.com/marrow/WebCore) and Python standard logging adapter to emit logs to MongoDB.
 
