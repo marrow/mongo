@@ -3,11 +3,15 @@
 Marrow Mongo is a collection of small, focused utilities written to enhance use of the [PyMongo native MongoDB driver](http://api.mongodb.com/python/current/) without the overhead, glacial update cycle, complexity, and head-space requirements of a full *active record* object document mapper.
 
 {% method -%}
-## Core Features
+## Features
 
 ##### Declarative document modeling.
 
+Instantiate field objects and associate them with custom `Document` sub-classes to model your data declaratively.
+
 ##### Refined, Pythonic _data access object_ (DAO) interactions.
+
+Utilize `Document` instances as attribute access mutable mappings, with value typecasting, which are directly usable with PyMongo APIs.
 
 ##### Collection and index metadata and creation shortcuts.
 
