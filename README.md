@@ -11,7 +11,7 @@ This is a living document, evolving as the framework evolves.  You can always [b
 {% method -%}
 ## Overview
 
-[![version](http://img.shields.io/pypi/v/marrow.mongo.svg?style=flat "Latest version.")](https://pypi.python.org/pypi/marrow.mongo) 
+[![version](https://img.shields.io/pypi/v/marrow.mongo.svg?style=flat "Latest version.")](https://pypi.python.org/pypi/marrow.mongo) 
 [![tag](https://img.shields.io/github/tag/marrow/mongo.svg "Latest tag.")](https://github.com/marrow/mongo/releases/latest) 
 [![watch](https://img.shields.io/github/watchers/marrow/mongo.svg?style=social&label=Watch "Subscribe to project activity on Github.")](https://github.com/marrow/mongo/subscription)
 [![star](https://img.shields.io/github/stars/marrow/mongo.svg?style=social&label=Star "Star this project on Github.")](https://github.com/marrow/mongo/subscription)
@@ -91,8 +91,8 @@ collection.find(Battleship.location.near(position))
 {% common -%}
 ## Code Quality
 
-[![status](http://img.shields.io/travis/marrow/mongo/master.svg?style=flat "Release build status.")](https://travis-ci.org/marrow/mongo/branches) 
-[![coverage](http://img.shields.io/codecov/c/github/marrow/mongo/master.svg?style=flat "Release test coverage.")](https://codecov.io/github/marrow/mongo?branch=master) 
+[![status](https://img.shields.io/travis/marrow/mongo/master.svg?style=flat "Release build status.")](https://travis-ci.org/marrow/mongo/branches) 
+[![coverage](https://img.shields.io/codecov/c/github/marrow/mongo/master.svg?style=flat "Release test coverage.")](https://codecov.io/github/marrow/mongo?branch=master) 
 [![health](https://landscape.io/github/marrow/mongo/master/landscape.svg?style=flat "Release code health.")](https://landscape.io/github/marrow/mongo/master) 
 [![dependencies](https://img.shields.io/requires/github/marrow/mongo.svg "Status of release dependencies.")](https://requires.io/github/marrow/mongo/requirements/?branch=master)
 
