@@ -20,10 +20,13 @@
 	margin-top: 0;
 }
 
+.markdown-section {
+	padding: 30px;
+}
+
 .markdown-section h1 {
-	text-align: center;
 	font-weight: 100;
-	margin-top: .85em;
+	margin-bottom: 30px;
 	font-size: 2.25em;
 }
 
