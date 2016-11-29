@@ -26,7 +26,7 @@
 	font-weight: 300;
 }
 
-.book.two-columns .api-method .api-method-definition {
+.book.two-columns .api-method .api-method-definition h2:first-child {
 	padding-top: 30px;
 }
 
