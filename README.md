@@ -1,3 +1,6 @@
+---
+description: An introduction to the Marrow Mongo Document Mapper and overview of features.
+---
 # The Marrow Mongo Document Mapper
 
 Marrow Mongo is a collection of small, focused utilities written to enhance use of the [PyMongo native MongoDB driver](http://api.mongodb.com/python/current/) without the overhead, glacial update cycle, complexity, and head-space requirements of a full *active record* object document mapper.
@@ -49,7 +52,7 @@ collection = Television.create_collection(database)
 
 ##### 100% test coverage.
 
-Guaranteed to be fully tested before any release.
+Guaranteed to be fully tested before any release, we utilize [Travis](https://travis-ci.org/marrow/mongo/) continuous integration and [Codecov.io]() reporting services.
 
 ##### 100% code quality.
 
@@ -65,14 +68,15 @@ Code should be self-descriptive and obvious.
 
 ##### Extensive road map.
 
-Changes to the library require meditation before work begins.
+Changes to the library demand meditation to ensure feature creep and organic growth are kept in check.
 
 ## Code Metrics
 
-| Metric as of a889491 | Value |
+| `marrow.mongo` as of `a889491` | Value |
 | --- | --- |
 | **Total Lines** | 2,976 |
 | **SLoC** | 1,479 |
+| **Logical Lines** | 840 |
 | **Functions** | 57 |
 | **Classes** | 41 |
 | **Modules** | 23 |
