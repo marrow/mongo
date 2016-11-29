@@ -20,14 +20,18 @@
 	margin-top: 0;
 }
 
-.book.two-columns .api-method .api-method-definition {
-	padding-top: 30px;
-}
-
 .markdown-section h2 {
 	color: rgba(0, 0, 0, 0.8);
 	border-bottom: 1px solid rgba(0, 0, 0, 0.1);
 	font-weight: 300;
+}
+
+.book.two-columns .api-method .api-method-definition {
+	padding-top: 30px;
+}
+
+.book.color-theme-3 .book-body section .api-method-code h2 {
+	border-bottom-color: rgba(255, 255, 255, 0.1);
 }
 
 .book .book-body .page-wrapper .page-inner {
