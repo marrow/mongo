@@ -31,6 +31,10 @@
 	font-size: 2.25em;
 }
 
+.markdown-section h1:not(#the-marrow-mongo-document-mapper) {
+	display: none;
+}
+
 .markdown-section h1 strong {
 	font-weight: 200;
 }
