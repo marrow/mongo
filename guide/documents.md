@@ -35,7 +35,7 @@ Breaking this chunk of code down:
 class Account(Document):
 ```
 
-No surprises here, we subclass the `Document` class. This is required to utilize the metaclass that makes the declarative naming and order-presrving sequence generation work. We begin to define fields:
+No surprises here, we subclass the `Document` class. This is required to utilize the metaclass that makes the declarative naming and order-preserving sequence generation work. We begin to define fields:
 
 ```python
 username = String(required=True)
