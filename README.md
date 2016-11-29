@@ -52,7 +52,10 @@ collection = Television.create_collection(database)
 
 ##### Tested, healthy, and up-to-date.
 
-[![Release build status.](http://img.shields.io/travis/marrow/mongo/master.svg?style=flat)](https://travis-ci.org/marrow/mongo/branches) [![Release test coverage.](http://img.shields.io/codecov/c/github/marrow/mongo/master.svg?style=flat)](https://codecov.io/github/marrow/mongo?branch=master) [![Release code health.](https://landscape.io/github/marrow/mongo/master/landscape.svg?style=flat)](https://landscape.io/github/marrow/mongo/master) [![Status of release dependencies.](https://img.shields.io/requires/github/marrow/mongo.svg)](https://requires.io/github/marrow/mongo/requirements/?branch=master)
+[![status](http://img.shields.io/travis/marrow/mongo/master.svg?style=flat "Release build status.")](https://travis-ci.org/marrow/mongo/branches) 
+[![coverage](http://img.shields.io/codecov/c/github/marrow/mongo/master.svg?style=flat "Release test coverage.")](https://codecov.io/github/marrow/mongo?branch=master) 
+[![health](https://landscape.io/github/marrow/mongo/master/landscape.svg?style=flat "Release code health.")](https://landscape.io/github/marrow/mongo/master) 
+[![dependencies](https://img.shields.io/requires/github/marrow/mongo.svg "Status of release dependencies.")](https://requires.io/github/marrow/mongo/requirements/?branch=master)
 
 Guaranteed to be fully tested before any release. We utilize [Travis](https://travis-ci.org/marrow/mongo/) continuous integration, with test coverage reporting provided by [Codecov.io](https://codecov.io/gh/marrow/mongo/). We also monitor requirements for security concerns and deprecation using [Requires.io](https://requires.io/github/marrow/mongo/requirements/?branch=master).
 
