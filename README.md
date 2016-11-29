@@ -9,11 +9,32 @@ Marrow Mongo is a collection of small, focused utilities written to enhance use 
 
 Instantiate field objects and associate them with custom `Document` sub-classes to model your data declaratively.
 
-##### Refined, Pythonic _data access object_ (DAO) interactions.
+```python
+class Television(Document):
+	model = String()
+```
 
-Utilize `Document` instances as attribute access mutable mappings, with value typecasting, which are directly usable with PyMongo APIs.
+##### Refined, Pythonic _data access object_ interactions.
+
+Utilize `Document` instances as attribute access mutable mappings with value typecasting, directly usable with PyMongo APIs. Attention is paid to matching Python language expectations, such as allowing instantiation using positional arguments. Values are always stored in the PyMongo-preferred MongoDB native format, and cast on attribute access as needed.
+
+```python
+document = Television('D50u-D1')
+collection.insert_one(document)
+```
 
 ##### Collection and index metadata and creation shortcuts.
+
+Keep information about your data model with your data model and standardize access.
+
+```python
+class Television(Document):
+	__collection__ = 'tv'
+	model = String()
+	_model = Index('model')
+
+collection = Television.create_collection(database)
+```
 
 ##### Filter construction through rich comparisons.
 
