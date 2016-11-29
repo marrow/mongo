@@ -5,6 +5,9 @@ description: An introduction to the Marrow Mongo Document Mapper and overview of
 
 Marrow Mongo is a collection of small, focused utilities written to enhance use of the [PyMongo native MongoDB driver](http://api.mongodb.com/python/current/) without the overhead, glacial update cycle, complexity, and head-space requirements of a full *active record* object document mapper.
 
+This is a living document, evolving as the framework evolves.  You can always browse any point in time within the source repository to review previous versions of these instructions.
+
+
 {% method -%}
 ## Overview
 
@@ -126,15 +129,5 @@ You are effectively free to deal in this software however you choose, **without 
 | **Maximum Complexity** | 17 |
 | **# > 15 Complexity** | 1 |
 | **Bytecode Size** | 71 KiB |
-
-{% endmethod %}
-
-Additionally, it provides a very light-weight database connection plugin for the [WebCore web framework](https://github.com/marrow/WebCore) and Python standard logging adapter to emit logs to MongoDB.
-
-This is a living document, evolving as the framework evolves.  You can always browse any point in time within the source repository to review previous versions of these instructions.
-
-{% method -%}
-
-{% common -%}
 
 {% endmethod %}
