@@ -50,28 +50,22 @@ collection = Television.create_collection(database)
 {% common -%}
 ## Code Quality
 
-##### Tested, healthy, and up-to-date.
+##### Guaranteed to be fully tested before any release.
 
 [![status](http://img.shields.io/travis/marrow/mongo/master.svg?style=flat "Release build status.")](https://travis-ci.org/marrow/mongo/branches) 
 [![coverage](http://img.shields.io/codecov/c/github/marrow/mongo/master.svg?style=flat "Release test coverage.")](https://codecov.io/github/marrow/mongo?branch=master) 
 [![health](https://landscape.io/github/marrow/mongo/master/landscape.svg?style=flat "Release code health.")](https://landscape.io/github/marrow/mongo/master) 
 [![dependencies](https://img.shields.io/requires/github/marrow/mongo.svg "Status of release dependencies.")](https://requires.io/github/marrow/mongo/requirements/?branch=master)
 
-Guaranteed to be fully tested before any release. We utilize [Travis](https://travis-ci.org/marrow/mongo/) continuous integration, with test coverage reporting provided by [Codecov.io](https://codecov.io/gh/marrow/mongo/). We also monitor requirements for security concerns and deprecation using [Requires.io](https://requires.io/github/marrow/mongo/requirements/?branch=master).
+We utilize [Travis](https://travis-ci.org/marrow/mongo/) continuous integration, with test coverage reporting provided by [Codecov.io](https://codecov.io/gh/marrow/mongo/). We also monitor requirements for security concerns and deprecation using [Requires.io](https://requires.io/github/marrow/mongo/requirements/?branch=master). Extensive static analysis through [Landscape.io](https://landscape.io/marrow/mongo/) and proactive use of tools such as [pre-commit](http://pre-commit.com), with [plugins](https://github.com/marrow/mongo/blob/develop/.pre-commit-config.yaml) such as the infosec analyzer [OpenStack Bandit](https://wiki.openstack.org/wiki/Security/Projects/Bandit), plus various linting tools, help to keep code maintainable and secure.
 
-Extensive static analysis through [Landscape.io](https://landscape.io/marrow/mongo/) and proactive use of tools such as [pre-commit](http://pre-commit.com), with [plugins](https://github.com/marrow/mongo/blob/develop/.pre-commit-config.yaml) such as the infosec analyzer [OpenStack Bandit](https://wiki.openstack.org/wiki/Security/Projects/Bandit), plus various linting tools, help to keep code maintainable and secure.
+##### Extensively documented, with a > 1:1 code to comment ratio.
 
-##### Fantastic documentation.
+Every developer has run into those objects that fail to produce sensible or useful programmers' representation, or fail to provide introspective help. With more documentation in the code than code, you won't find that problem here. Code should be self-descriptive and obvious; we feel comments and _docstrings_ are integral to this.
 
-We'd like to think so, at least!
+##### A considered road map.
 
-##### 1:1 or greater code to comment ratio.
-
-Code should be self-descriptive and obvious.
-
-##### Extensive road map.
-
-Changes to the library demand meditation to ensure feature creep and organic growth are kept in check.
+Changes to the library demand [meditation](https://github.com/marrow/mongo/projects) to ensure feature creep and organic growth are kept in check. Where possible, solutions involving objects passed to standard PyMongo functions and methods are preferred to solutions involving wrapping, proxying, or middleware. All but minor changes are isolated in [pull requests](https://github.com/marrow/mongo/pulls) to aid in code review.
 
 ## Code Metrics
 
