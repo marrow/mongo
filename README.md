@@ -29,8 +29,7 @@ Utilize `Document` instances as attribute access mutable mappings with value typ
 
 ```python
 tv = Television('D50u-D1')
-assert tv.model == 'D50u-D1'
-collection.insert_one(tv)
+assert tv.model == tv['model'] == 'D50u-D1'
 ```
 
 ##### Collection and index metadata, and creation shortcuts.
@@ -41,18 +40,50 @@ Keep information about your data model with your data model and standardize acce
 class Television(Document):
 	__collection__ = 'tv'
 	model = String()
+	brand = String()
 	_model = Index('model')
 
 collection = Television.create_collection(database)
+collection.insert_one(Television('D50u-D1'))
 ```
 
 ##### Filter construction through rich comparisons.
 
+Construct filter documents through comparison of (or method calls on) field instances accessed as class attributes.
+
+```python
+tv_a = Television.from_mongo(collection.find_one(Television.model == 'D50u-D1'))
+tv_b = Television.from_mongo(collection.find_one(Television.model.re(r'^D50\w')))
+assert tv_a.model == tv_b.model == 'D50u-D1'
+assert tv_a['_id'] == tv_b['_id']
+```
+
 ##### Parametric filter, projection, sort, and update document construction.
+
+Many Python _active record_ object relational mappers (ORMs) and object document mappers (ODMs) provide a short-hand involving the transformation of named parameters into database concepts.
+
+```python
+collection.update_one(
+	F(Television, model__ne='XY-zzy'),
+	U(Television, set__brand='Vizio'))
+
+tv = Television.from_mongo(collection.find_one(
+		F(Television, model='D50u-D1'),
+		P(Television, 'brand')
+	))
+
+assert tv.brand == 'Vizio'
+```
 
 ##### Advanced GeoJSON support.
 
-##### Liberally MIT licensed.
+Marrow Mongo comes with [GeoJSON](http://geojson.org) "batteries included", having extensive support for querying, constructing, and manipulating GeoJSON data.
+
+```python
+position = Point(longitude, latitude)
+collection.find(Battleship.location.near(position))
+```
+
 
 {% common -%}
 ## Code Quality
