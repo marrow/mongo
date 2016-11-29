@@ -39,7 +39,7 @@ pip install 'marrow.mongo[scripting,logger]'
 ```
 
 {% common -%}
-### Package Flags
+## Package Flags
 
 * **`development`**
 
