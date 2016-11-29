@@ -28,11 +28,12 @@ class Television(Document):
 Utilize `Document` instances as attribute access mutable mappings with value typecasting, directly usable with PyMongo APIs. Attention is paid to matching Python language expectations, such as allowing instantiation using positional arguments. Values are always stored in the PyMongo-preferred MongoDB native format, and cast on attribute access as needed.
 
 ```python
-document = Television('D50u-D1')
-collection.insert_one(document)
+tv = Television('D50u-D1')
+assert tv.model == 'D50u-D1'
+collection.insert_one(tv)
 ```
 
-##### Collection and index metadata and creation shortcuts.
+##### Collection and index metadata, and creation shortcuts.
 
 Keep information about your data model with your data model and standardize access.
 
@@ -67,11 +68,17 @@ We utilize [Travis](https://travis-ci.org/marrow/mongo/) continuous integration,
 
 ##### Extensively documented, with a > 1:1 code to comment ratio.
 
-Every developer has run into those objects that fail to produce sensible or useful programmers' representation, or fail to provide introspective help. With more documentation in the code than code, you won't find that problem here. Code should be self-descriptive and obvious; we feel comments and _docstrings_ are integral to this.
+Every developer has run into those objects that fail to produce sensible or useful programmers' representation, generate meaningless exception messages, or fail to provide introspective help. With more documentation in the code than code, you won't find that problem here. Code should be self-descriptive and obvious; we feel comments and _docstrings_ are integral to this.
 
 ##### A considered road map.
 
 Changes to the library demand [meditation](https://github.com/marrow/mongo/projects) to ensure feature creep and organic growth are kept in check. Where possible, solutions involving objects passed to standard PyMongo functions and methods are preferred to solutions involving wrapping, proxying, or middleware. All but minor changes are isolated in [pull requests](https://github.com/marrow/mongo/pulls) to aid in code review.
+
+## MIT Licensed
+
+The [MIT License](license.md) is highly permissive, allowing **commercial** and **non-commercial** _use_, _reproduction_, _modification_, _republication_, _redistribtution_, _sublicensing_, and _sale_ of the software (and associated documentation) and its components, given that the license notice is included in the reproduced work and warranty and liability is waived.
+
+You are effectively free to deal in this software however you choose, **without commercial hinderance**, unlike some other open-source licenses.
 
 ## Code Metrics
 
