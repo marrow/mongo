@@ -20,6 +20,17 @@
 	margin-top: 0;
 }
 
+.markdown-section h1 {
+	text-align: center;
+	font-weight: 100;
+	margin-top: .85em;
+	font-size: 2.25em;
+}
+
+.markdown-section h1 strong {
+	font-weight: 200;
+}
+
 .markdown-section h2 {
 	color: rgba(0, 0, 0, 0.8);
 	border-bottom: 1px solid rgba(0, 0, 0, 0.1);
