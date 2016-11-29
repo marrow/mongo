@@ -20,12 +20,12 @@
 ## Guide
 
 * [Declaring Documents](guide/documents.md)
-* [Document Instances](guide/document-instances.md)
+* [Document Instances](guide/instances.md)
 * [Fields](guide/fields.md)
 * [Indexes](guide/indexes.md)
 * [Querying](guide/querying.md)
 * [Parametric Helpers](guide/parametric.md)
-* [GeoJSON](guide/geojson.md)
+* [Geospatial](guide/geospatial.md)
 
 ## API
 
