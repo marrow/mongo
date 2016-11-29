@@ -130,6 +130,7 @@ You are effectively free to deal in this software however you choose, **without 
 | **Total Lines** | 2,976 |
 | **SLoC** | 1,479 |
 | **Logical Lines** | 840 |
+| **Tests** | 305 |
 | **Functions** | 57 |
 | **Classes** | 41 |
 | **Modules** | 23 |
