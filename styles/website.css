@@ -25,6 +25,7 @@
 }
 
 .markdown-section h1 {
+	text-align: center;
 	font-weight: 100;
 	margin-bottom: 30px;
 	font-size: 2.25em;
