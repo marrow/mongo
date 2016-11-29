@@ -52,11 +52,11 @@ collection = Television.create_collection(database)
 
 ##### 100% test coverage.
 
-Guaranteed to be fully tested before any release. We utilize [Travis](https://travis-ci.org/marrow/mongo/) continuous integration, [Codecov.io](https://codecov.io/gh/marrow/mongo/) test coverage reporting, monitor requirements for security concerns and deprecation using [Requires.io](https://requires.io/github/marrow/mongo/requirements/?branch=master), 
+Guaranteed to be fully tested before any release. We utilize [Travis](https://travis-ci.org/marrow/mongo/) continuous integration reporting to [Codecov.io](https://codecov.io/gh/marrow/mongo/) for test coverage reporting. We also monitor requirements for security concerns and deprecation using [Requires.io](https://requires.io/github/marrow/mongo/requirements/?branch=master),
 
 ##### 100% code quality.
 
-Extensive static analysis and proactive use of tools such as [pre-commit](http://pre-commit.com), with plugins [such as](https://github.com/marrow/mongo/blob/develop/.pre-commit-config.yaml) the [OpenStack Bandit](https://wiki.openstack.org/wiki/Security/Projects/Bandit) infosec analyzer, and various linting tools, help to keep code maintainable and secure.
+Extensive static analysis and proactive use of tools such as [pre-commit](http://pre-commit.com), with plugins [such as](https://github.com/marrow/mongo/blob/develop/.pre-commit-config.yaml) [OpenStack Bandit](https://wiki.openstack.org/wiki/Security/Projects/Bandit) infosec analyzer, and various linting tools, help to keep code maintainable and secure.
 
 ##### Fantastic documentation.
 
