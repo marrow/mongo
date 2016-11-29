@@ -1,4 +1,4 @@
-## Instantiating Documents
+# Document Instances
 
 With a document schema defined we can now begin populating data:
 

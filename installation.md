@@ -1,4 +1,4 @@
-# Installation Instructions
+# Installation
 
 Installation is easy using the `pip` package manager.
 

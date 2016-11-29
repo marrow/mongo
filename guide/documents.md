@@ -1,3 +1,5 @@
+# Defining Documents
+
 Documents are the records of MongoDB, stored in an efficient binary form called [BSON](http://bsonspec.org) allowing record manipulation that is cosmetically similar to JSON. In Python these are typically represented as dictionaries, Python's native mapping type.
 
 {% method -%}
@@ -9,9 +11,6 @@ from marrow.mongo import Index, Document
 from marrow.mongo.field import ObjectId, String, Number, Array
 ```
 {% endmethod %}
-
-
-## Defining Documents
 
 Let us define our own ``Document`` subclass:
 

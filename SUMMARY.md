@@ -19,7 +19,7 @@
 
 ## Guide
 
-* [Declaring Documents](guide/documents.md)
+* [Defining Documents](guide/documents.md)
 * [Document Instances](guide/instances.md)
 * [Fields](guide/fields.md)
 * [Indexes](guide/indexes.md)
