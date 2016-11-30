@@ -52,7 +52,7 @@ try:
 	from decimal import Decimal, localcontext
 	from bson.decimal128 import Decimal128, create_decimal128_context
 
-except ImportError:
+except ImportError:  # pragma: no cover
 	Decimal = None
 
 else:
