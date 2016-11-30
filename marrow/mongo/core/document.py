@@ -51,6 +51,7 @@ class Document(Container):
 	__capped_count__ = None  # The optional number of records to limit the capped collection to.
 	__engine__ = None  # Override the default storage engine (and configuration) as a mapping of `{name: options}`.
 	__validate__ = 'off'  # Control validation strictness: off, strict, or moderate.
+	__collation__ = None  # A pymongo.collation.Collation object to control collation during creation.
 	
 	__projection__ = None  # The set of fields used during projection, to identify fields which are not loaded.
 	__validator__ = None  # The MongoDB Validation document matching these records.
@@ -159,6 +160,9 @@ class Document(Container):
 		if cls.__validate__ != 'off':
 			config['validator'] = cls.__validator__
 			config['validationLevel'] = 'strict' if cls.__validate__ is True else cls.__validate__
+		
+		if cls.__collation__ is not None:
+			config['collation'] = cls.__collation__
 		
 		return config
 	
