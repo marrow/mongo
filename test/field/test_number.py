@@ -3,13 +3,15 @@
 from __future__ import unicode_literals
 
 from datetime import datetime, timedelta
+from decimal import Decimal as dec
 
 import pytest
 from bson import ObjectId as oid
+from bson.decimal128 import Decimal128
 from bson.tz_util import utc
 
 from marrow.mongo import Document
-from marrow.mongo.field import Double, Integer, Long, Number
+from marrow.mongo.field import Decimal, Double, Integer, Long, Number
 from marrow.schema.compat import unicode
 
 
@@ -77,3 +79,26 @@ class TestLongField(FieldExam):
 	def test_biginteger(self, Sample):
 		result = Sample(272787482374844672646272463).field
 		assert result == 272787482374844672646272463
+
+
+class TestDecimalField(FieldExam):
+	__field__ = Decimal
+	
+	def test_decimal(self, Sample):
+		v = dec('3.141592')
+		result = Sample(v)
+		assert isinstance(result['field'], Decimal128)
+		assert result['field'] == Decimal128('3.141592')
+		assert result.field == v
+	
+	def test_decimal_cast_up(self, Sample):
+		result = Sample.from_mongo({'field': 27.4})
+		v = result.field
+		assert isinstance(v, dec)
+		assert float(v) == 27.4
+	
+	def test_decimal_from_number(self, Sample):
+		result = Sample(27)
+		assert isinstance(result['field'], Decimal128)
+		assert result['field'] == Decimal128('27')
+		assert int(result.field) == 27
