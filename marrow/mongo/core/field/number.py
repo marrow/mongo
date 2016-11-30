@@ -46,3 +46,30 @@ class Long(Number):
 	
 	def to_foreign(self, obj, name, value):  # pylint:disable=unused-argument
 		return Int64(int(value))
+
+
+try:
+	from decimal import Decimal, localcontext
+	from bson.decimal128 import Decimal128, create_decimal128_context
+
+except ImportError:
+	Decimal = None
+
+else:
+	class Decimal(Number):
+		__foreign__ = 'decimal'
+		
+		DECIMAL_CONTEXT = create_decimal128_context()
+		
+		def to_native(self, obj, name, value):  # pylint:disable=unused-argument
+			if hasattr(value, 'to_decimal'):
+				return value.to_decimal()
+			
+			return Decimal(value)
+		
+		def to_foreign(self, obj, name, value):  # pylint:disable=unused-argument
+			if not isinstance(value, Decimal):
+				with localcontext(self.DECIMAL_CONTEXT) as ctx:
+					value = ctx.create_decimal(value)
+			
+			return Decimal128(value)
