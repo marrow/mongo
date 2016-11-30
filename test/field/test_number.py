@@ -92,8 +92,13 @@ class TestDecimalField(FieldExam):
 		assert result.field == v
 	
 	def test_decimal_cast_up(self, Sample):
-		from marrow.package.canonical import name
 		result = Sample.from_mongo({'field': 27.4})
 		v = result.field
 		assert isinstance(v, dec)
 		assert float(v) == 27.4
+	
+	def test_decimal_from_number(self, Sample):
+		result = Sample(27)
+		assert isinstance(result['field'], Decimal128)
+		assert result['field'] == Decimal128('27')
+		assert int(result.field) == 27
