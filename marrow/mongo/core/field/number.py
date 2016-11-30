@@ -49,7 +49,7 @@ class Long(Number):
 
 
 try:
-	from decimal import Decimal, localcontext
+	from decimal import Decimal as dec, localcontext
 	from bson.decimal128 import Decimal128, create_decimal128_context
 
 except ImportError:  # pragma: no cover
@@ -65,10 +65,10 @@ else:
 			if hasattr(value, 'to_decimal'):
 				return value.to_decimal()
 			
-			return Decimal(value)
+			return dec(value)
 		
 		def to_foreign(self, obj, name, value):  # pylint:disable=unused-argument
-			if not isinstance(value, Decimal):
+			if not isinstance(value, dec):
 				with localcontext(self.DECIMAL_CONTEXT) as ctx:
 					value = ctx.create_decimal(value)
 			
