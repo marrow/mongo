@@ -13,11 +13,6 @@
     - id: check-json
     - id: check-xml
     - id: check-yaml
-- repo: git://github.com/FalconSocial/pre-commit-python-sorter
-  sha: 1.0.1
-  hooks:
-    - id: python-import-sorter
-      args: ['--silent-overwrite']
 - repo: https://github.com/Lucas-C/pre-commit-hooks-safety
   sha: v1.0.9
   hooks:

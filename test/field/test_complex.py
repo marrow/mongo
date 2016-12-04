@@ -2,16 +2,17 @@
 
 from __future__ import unicode_literals
 
-import pytest
 from datetime import datetime, timedelta
-from collections import OrderedDict as odict
-from bson import DBRef, ObjectId as oid
+
+import pytest
+from bson import ObjectId as oid
+from bson import DBRef
 from bson.tz_util import utc
 
 from marrow.mongo import Document
 from marrow.mongo.core.field.complex import _HasKinds
-from marrow.mongo.field import Array, Embed, Reference, PluginReference, String
-from marrow.mongo.util.compat import unicode
+from marrow.mongo.field import Array, Embed, PluginReference, Reference, String
+from marrow.schema.compat import odict, unicode
 
 
 class FieldExam(object):

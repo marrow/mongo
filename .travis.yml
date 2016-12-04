@@ -14,11 +14,12 @@ addons:
 branches:
   except:
       - /^[^/]+/.+$/
+      - book
+      - /^book/.+$/
 
 python:
   - "2.7"
   - "pypy"
-  - "pypy3"
   - "3.3"
   - "3.4"
   - "3.5"

@@ -2,14 +2,15 @@
 
 from __future__ import unicode_literals
 
-import pytest
 from datetime import datetime, timedelta
+
+import pytest
 from bson import ObjectId as oid
 from bson.tz_util import utc
 
 from marrow.mongo import Document
-from marrow.mongo.field import String, Binary, ObjectId, Boolean, Date, TTL, Regex, Timestamp
-from marrow.mongo.util.compat import unicode
+from marrow.mongo.field import TTL, Binary, Boolean, Date, ObjectId, Regex, String, Timestamp
+from marrow.schema.compat import unicode
 
 
 class FieldExam(object):
@@ -69,6 +70,11 @@ class TestObjectIdField(FieldExam):
 		
 		assert isinstance(inst.__data__['field'], oid)
 		assert inst.field.generation_time == r
+	
+	def test_cast_document(self, Sample):
+		v = {'_id': oid()}
+		inst = Sample(v)
+		assert inst.field == v['_id']
 
 
 class TestBooleanField(FieldExam):

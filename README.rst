@@ -40,11 +40,26 @@ robust as `Vagrant <http://www.vagrantup.com>`__.
 If you add ``marrow.mongo`` to the ``install_requires`` argument of the call to ``setup()`` in your application's
 ``setup.py`` file, marrow.mongo will be automatically installed and made available when your own application or
 library is installed.  We recommend using "less than" version numbers to ensure there are no unintentional
-side-effects when updating.  Use ``marrow.mongo<1.1`` to get all bugfixes for the current release, and
+side-effects when updating.  Use ``marrow.mongo<1.2`` to get all bugfixes for the current release, and
 ``marrow.mongo<2.0`` to get bugfixes and feature updates while ensuring that large breaking changes are not installed.
 
-This package has only one hard dependency, a modern (>3.2) version of the ``pymongo`` package.  Installing
-``marrow.mongo`` will also install this package.
+This package has a few dependencies:
+
+* Python 2.7 and above, or Python 3.2 and above, or compatible such as Pypy or Pypy3.
+* A modern (>3.2) version of the ``pymongo`` package.
+* The Marrow Package and Schema utility packages for plugin handling and declarative syntax support.
+
+There are a few conditional, tag-based dependencies:
+
+* ``development`` installs additional utilites relating to testing and contribution.
+* ``scripting`` pulls in the `Javascripthon <https://github.com/azazel75/metapensiero.pj>`__ Python to JavaScript
+  transpiler to enable use of native Python function transport to MongoDB.  (E.g. for use in map/reduce, stored
+  functions, etc.)
+* ``logger`` requires knowledge of the local host's timezone, so pulls in ``tzlocal`` to retrieve this information.
+
+Installing ``marrow.mongo`` will also install package dependencies automatically. To utilize optional tags, add them,
+comma separated, beween square braces.  E.g. ``marrow.mongo[scripting,logger]``. On a command line this will require
+quoting.
 
 
 Development Version
@@ -199,10 +214,8 @@ variable name to make repeated reference easier.
 Version History
 ===============
 
-Version 1.0
------------
-
-* Initial release.
+To see the complete version history, including detailed per-version change logs, please see the `GitHub Releases
+<https://github.com/marrow/mongo/releases/latest>`__ section.
 
 
 License
@@ -268,12 +281,12 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
     :target: https://github.com/marrow/mongo/issues
     :alt: Github Issues
 
-.. |ghsince| image:: https://img.shields.io/github/commits-since/marrow/mongo/1.0.0.svg
+.. |ghsince| image:: https://img.shields.io/github/commits-since/marrow/mongo/1.1.0.svg
     :target: https://github.com/marrow/mongo/commits/develop
     :alt: Changes since last release.
 
 .. |ghtag| image:: https://img.shields.io/github/tag/marrow/mongo.svg
-    :target: https://github.com/marrow/mongo/tree/1.0.0
+    :target: https://github.com/marrow/mongo/tree/1.1.0
     :alt: Latest Github tagged release.
 
 .. |latestversion| image:: http://img.shields.io/pypi/v/marrow.mongo.svg?style=flat

@@ -5,8 +5,8 @@ from __future__ import unicode_literals
 import pytest
 
 from marrow.mongo import Document
-from marrow.mongo.field import Alias, Array, String, Embed
-from marrow.mongo.util.compat import unicode
+from marrow.mongo.field import Alias, Array, Embed, String
+from marrow.schema.compat import unicode
 
 
 class TestAliasDirect(object):

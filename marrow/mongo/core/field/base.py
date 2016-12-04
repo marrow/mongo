@@ -1,12 +1,16 @@
 # encoding: utf-8
 
+from __future__ import unicode_literals
+
 from datetime import datetime, timedelta
 from numbers import Number
+from collections import MutableMapping
+
 from bson import ObjectId as OID
-from marrow.schema import Attribute
 
 from . import Field
-from ...util.compat import unicode
+from ....schema import Attribute
+from ....schema.compat import unicode
 
 
 class String(Field):
@@ -49,6 +53,9 @@ class ObjectId(Field):
 		
 		if isinstance(value, timedelta):
 			return OID.from_datetime(datetime.utcnow() + value)
+		
+		if isinstance(value, MutableMapping) and '_id' in value:
+			return OID(value['_id'])
 		
 		return OID(unicode(value))
 

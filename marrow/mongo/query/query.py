@@ -1,4 +1,5 @@
 # encoding: utf-8
+# pylint:disable=too-many-arguments
 
 """A comparison proxy and Ops factory to help build nested inquiries.
 
@@ -8,12 +9,11 @@ For internal construction only.
 from __future__ import unicode_literals
 
 from copy import copy
-from operator import __and__, __or__, __xor__
 from functools import reduce
+from operator import __and__, __or__, __xor__
 
-from ..util.compat import py3, unicode
-from .ops import Ops
-
+from ...schema.compat import py3, unicode
+from .ops import Filter
 
 if __debug__:
 	_simple_safety_check = lambda s, o: (s.__allowed_operators__ and o not in s.__allowed_operators__) \
@@ -143,7 +143,7 @@ class Q(object):
 		if __debug__ and _complex_safety_check(self._field, {operation} & set(allowed)):  # pragma: no cover
 			raise NotImplementedError("{self!r} does not allow {op} comparison.".format(self=self, op=operation))
 		
-		return Ops({self._name: {operation: self._field.transformer.foreign(other, (self._field, self._document))}})
+		return Filter({self._name: {operation: self._field.transformer.foreign(other, (self._field, self._document))}})
 	
 	def _iop(self, operation, other, *allowed):
 		"""An iterative operation operating on multiple values.
@@ -163,7 +163,7 @@ class Q(object):
 		other = other if len(other) > 1 else other[0]
 		values = [self._field.transformer.foreign(value, (self._field, self._document)) for value in other]
 		
-		return Ops({self._name: {operation: values}})
+		return Filter({self._name: {operation: values}})
 	
 	# Matching Array Element
 	
@@ -201,7 +201,7 @@ class Q(object):
 		if __debug__ and _simple_safety_check(self._field, '$eq'):  # pragma: no cover
 			raise NotImplementedError("{self!r} does not allow $eq comparison.".format(self=self))
 		
-		return Ops({self._name: self._field.transformer.foreign(other, (self._field, self._document))})
+		return Filter({self._name: self._field.transformer.foreign(other, (self._field, self._document))})
 	
 	def __gt__(self, other):
 		"""Matches values that are greater than a specified value.
@@ -364,7 +364,7 @@ class Q(object):
 		if self._combining:  # We are a field-compound query fragment, e.g. (Foo.bar & Foo.baz).
 			return reduce(self._combining, (q.re(*parts) for q in self._field))
 		
-		return Ops({self._name: {'$re': ''.join(parts)}})
+		return Filter({self._name: {'$regex': ''.join(parts)}})
 	
 	# Array Query Selectors
 	# https://docs.mongodb.org/manual/reference/operator/query/#array
@@ -399,7 +399,7 @@ class Q(object):
 		if hasattr(q, 'as_query'):
 			q = q.as_query
 		
-		return Ops({self._name: {'$elemMatch': q}})
+		return Filter({self._name: {'$elemMatch': q}})
 	
 	def range(self, gte, lt):
 		"""Matches values that are between a minimum and maximum value, semi-inclusive.
@@ -437,7 +437,7 @@ class Q(object):
 		if __debug__ and _complex_safety_check(self._field, {'$size', '#array'}):  # pragma: no cover
 			raise NotImplementedError("{self!r} does not allow $size comparison.".format(self=self))
 		
-		return Ops({self._name: {'$size': int(value)}})
+		return Filter({self._name: {'$size': int(value)}})
 	
 	# Element Query Selectors
 	# https://docs.mongodb.org/manual/reference/operator/query/#element
@@ -454,7 +454,7 @@ class Q(object):
 		if self._combining:  # We are a field-compound query fragment, e.g. (Foo.bar & Foo.baz).
 			return reduce(self._combining, (q.__neg__() for q in self._field))
 		
-		return Ops({self._name: {'$exists': False}})
+		return Filter({self._name: {'$exists': False}})
 	
 	def __pos__(self):
 		"""Matches documents that have the specified field.
@@ -468,7 +468,7 @@ class Q(object):
 		if self._combining:  # We are a field-compound query fragment, e.g. (Foo.bar & Foo.baz).
 			return reduce(self._combining, (q.__pos__() for q in self._field))
 		
-		return Ops({self._name: {'$exists': True}})
+		return Filter({self._name: {'$exists': True}})
 	
 	def of_type(self, *kinds):
 		"""Selects documents if a field is of the correct type.
@@ -486,9 +486,133 @@ class Q(object):
 		foreign = set(kinds) if kinds else self._field.__foreign__
 		
 		if not foreign:
-			return Ops()
+			return Filter()
 		
 		if len(foreign) == 1:  # Simplify if the value is singular.
 			foreign, = foreign  # Unpack.
 		
-		return Ops({self._name: {'$type': foreign}})
+		return Filter({self._name: {'$type': foreign}})
+	
+	# Geospatial Query Selectors
+	# https://docs.mongodb.com/manual/reference/operator/query/#geospatial
+	
+	def near(self, center, sphere=False, min=None, max=None):
+		"""Order results by their distance from the given point, optionally with range limits in meters.
+		
+		Geospatial operator: {$near: {...}}
+		Documentation: https://docs.mongodb.com/manual/reference/operator/query/near/#op._S_near
+		
+			{
+				$near: {
+					$geometry: <center; Point or (long, lat)>,
+					$minDistance: <min; distance in meters>,
+					$maxDistance: <max; distance in meters>
+				}
+			}
+		
+		Geospatial operator: {$nearSphere: {...}}
+		Documentation: https://docs.mongodb.com/manual/reference/operator/query/nearSphere/#op._S_nearSphere
+		
+			{
+				$nearSphere: {
+					$geometry: <center; Point or (long, lat)>,
+					$minDistance: <min; distance in meters>,
+					$maxDistance: <max; distance in meters>
+				}
+			}
+		"""
+		
+		from marrow.mongo.geo import Point
+		
+		near = {'$geometry': Point(*center)}
+		
+		if min:
+			near['$minDistance'] = float(min)
+		
+		if max:
+			near['$maxDistance'] = float(max)
+		
+		return Filter({self._name: {'$nearSphere' if sphere else '$near': near}})
+	
+	def within(self, geometry=None, center=None, sphere=None, radius=None, box=None, polygon=None, crs=None):
+		"""Select geometries within a bounding GeoJSON geometry.
+		
+		Documentation: https://docs.mongodb.com/manual/reference/operator/query/geoWithin/#op._S_geoWithin
+		
+		Geospatial operator: {$geoWithin: {$geometry: ...}}}
+		Documentation: https://docs.mongodb.com/manual/reference/operator/query/geometry/#op._S_geometry
+		
+			{
+				$geoWithin: { $geometry: <Polygon or MultiPolygon> }
+			}
+		
+		Geospatial operator: {$geoWithin: {$center: ...}}}
+		Documentation: https://docs.mongodb.com/manual/reference/operator/query/center/#op._S_center
+		
+			{
+				$geoWithin: { $center: [ <center; Point or (long, lat)>, <radius in coord system units> ] }
+			}
+		
+		Geospatial operator: {$geoWithin: {$centerSphere: ...}}}
+		Documentation: https://docs.mongodb.com/manual/reference/operator/query/centerSphere/#op._S_centerSphere
+		
+			{
+				$geoWithin: { $centerSphere: [ <sphere; Point or (long, lat)>, <radius in radians> ] }
+			}
+		
+		Geospatial operator: {$geoWithin: {$box: ...}}}
+		Documentataion: https://docs.mongodb.com/manual/reference/operator/query/box/#op._S_box
+		
+			{
+				$geoWithin: { $box: <box; 2-element GeoJSON object representing, or
+						[(bottom left long, long), (upper right long, lat)]> }
+			}
+		
+		Geospatial operator: {$geoWithin: {$polygon: ...}}}
+		Documentation: https://docs.mongodb.com/manual/reference/operator/query/polygon/#op._S_polygon
+		
+			{
+				$geoWithin: { $polygon: <polygon; Polygon or [(long, lat), ...]> }
+			}
+		"""
+		
+		if geometry:
+			if crs:
+				geometry = dict(geometry)
+				geometry['crs'] = {'type': 'name', 'properties': {'name': crs}}
+			
+			inner = {'$geometry': geometry}
+		
+		elif center:
+			inner = {'$center': [list(center), radius]}
+		
+		elif sphere:
+			inner = {'$centerSphere': [list(sphere), radius]}
+		
+		elif box:
+			inner = {'$box': list(list(i) for i in box)}
+		
+		elif polygon:
+			inner = {'$polygon': list(list(i) for i in polygon)}
+		
+		else:
+			raise TypeError("Requires at least one argument.")
+		
+		return Filter({self._name: {'$geoWithin': inner}})
+	
+	def intersects(self, geometry, crs=None):
+		"""Select geometries that intersect with a GeoJSON geometry.
+		
+		Geospatial operator: {$geoIntersects: {...}}
+		Documentation: https://docs.mongodb.com/manual/reference/operator/query/geoIntersects/#op._S_geoIntersects
+		
+			{
+				$geoIntersects: { $geometry: <geometry; a GeoJSON object> }
+			}
+		"""
+		
+		if crs:
+			geometry = dict(geometry)
+			geometry['crs'] = {'type': 'name', 'properties': {'name': crs}}
+		
+		return Filter({self._name: {'$geoIntersects': {'$geometry': geometry}}})
