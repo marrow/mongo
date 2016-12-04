@@ -70,6 +70,11 @@ class TestObjectIdField(FieldExam):
 		
 		assert isinstance(inst.__data__['field'], oid)
 		assert inst.field.generation_time == r
+	
+	def test_cast_document(self, Sample):
+		v = {'_id': oid()}
+		inst = Sample(v)
+		assert inst.field == v['_id']
 
 
 class TestBooleanField(FieldExam):
