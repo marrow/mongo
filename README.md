@@ -1,5 +1,5 @@
 ---
-description: An introduction to the Marrow Mongo Document Mapper and overview of features.
+description: An introduction to the Marrow Mongo Document Mapper and an overview of features, license, and code metrics.
 ---
 # The **Marrow Mongo** Document Mapper
 
@@ -56,15 +56,19 @@ collection = Television.create_collection(database)
 collection.insert_one(Television('D50u-D1'))
 ```
 
-##### Filter construction through rich comparisons.
+##### Filter construction through rich comparison.
 
 Construct filter documents through comparison of (or method calls on) field instances accessed as class attributes.
 
 [Learn more about querying documents.](guide/querying.md)
 
 ```python
-tv_a = Television.from_mongo(collection.find_one(Television.model == 'D50u-D1'))
-tv_b = Television.from_mongo(collection.find_one(Television.model.re(r'^D50\w')))
+exact = Television.model == 'D50u-D1'
+prefix = Television.model.re(r'^D50\w')
+
+tv_a = Television.from_mongo(collection.find_one(exact))
+tv_b = Television.from_mongo(collection.find_one(prefix))
+
 assert tv_a.model == tv_b.model == 'D50u-D1'
 assert tv_a['_id'] == tv_b['_id']
 ```
