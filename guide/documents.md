@@ -3,32 +3,33 @@
 Documents are the records of MongoDB, stored in an efficient binary form called [BSON](http://bsonspec.org) allowing record manipulation that is cosmetically similar to JSON. In Python these are typically represented as dictionaries, Python's native mapping type.
 
 {% method -%}
-This package utilizes the [Marrow Schema](https://github.com/marrow/schema#readme) declarative schema toolkit and extends it to encompass MongoDB data storage concerns. Its documentation may assist you in understanding the processes involved in Marrow Mongo. Basically, you define data models by importing classes describing the various components of a collection, such as ``Document``, ``ObjectId``, or ``String``, then compose them into a declarative class model. For example, if you wanted to define a simple user account model, you would begin by importing various components from the `marrow.mongo` package.
+This package utilizes the [Marrow Schema](https://github.com/marrow/schema#readme) declarative schema toolkit and extends it to encompass MongoDB data storage concerns. Its documentation may assist you in understanding the processes involved in Marrow Mongo. Basically, you define data models by importing classes describing the various components of a collection, such as ``Document``, ``ObjectId``, or ``String``, then compose them into a declarative class model. Begin by importing various components from the `marrow.mongo` package.
 
 {% sample lang="python" -%}
 ```python
-from marrow.mongo import Index, Document
+from marrow.mongo import Document, Index
 from marrow.mongo.field import ObjectId, String, Number, Array
 ```
 {% endmethod %}
 
-Let us define our own ``Document`` subclass:
+{% method -%}
+Let us now define a ``Document`` subclass, in this example to store information about user accounts, and populate it with a few different types of field.
 
-{% label %}Python{% endlabel %}
+{% sample lang="python" -%}
 ```python
 class Account(Document):
 	username = String(required=True)
 	name = String()
-	locale = String(default='en-CA-u-tz-cator-cu-CAD', assign=True)
+	locale = String(default='en-CA', assign=True)
 	age = Number()
-
+	
 	id = ObjectId('_id', assign=True)
 	tag = Array(String(), default=lambda: [], assign=True)
-
+	
 	_username = Index('username', unique=True)
 ```
+{% endmethod %}
 
-Breaking this chunk of code down:
 
 ```python
 class Account(Document):
