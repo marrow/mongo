@@ -89,6 +89,7 @@ setup(
 			development = tests_require + ['pre-commit'],  # Development-time dependencies.
 			scripting = ['javascripthon<1.0'],  # Allow map/reduce functions and "stored functions" to be Python.
 			logger = ['tzlocal'],  # Timezone support to store log times in UTC like a sane person.
+			markdown = ['misaka', 'pygments'],  # Markdown text storage.
 		),
 	
 	tests_require = tests_require,
@@ -99,6 +100,10 @@ setup(
 				# ### Marrow Mongo Lookups
 				'marrow.mongo.document': [  # Document classes registered by name.
 						'Document = marrow.mongo.core:Document',
+						
+						'VerifiedAddress = marrow.mongo.core.basics:VerifiedAddress',
+						'BaseLocation = marrow.mongo.core.basics.location:BaseLocation',
+						
 						'GeoJSON = marrow.mongo.geo:GeoJSON',
 						'GeoJSONCoord = marrow.mongo.geo:GeoJSONCoord',
 						'Point = marrow.mongo.geo:Point',
@@ -111,6 +116,7 @@ setup(
 					],
 				'marrow.mongo.field': [  # Field classes registered by (optionaly namespaced) name.
 						'Field = marrow.mongo.core.field:Field',
+						
 						'String = marrow.mongo.core.field.base:String',
 						'Binary = marrow.mongo.core.field.base:Binary',
 						'ObjectId = marrow.mongo.core.field.base:ObjectId',
@@ -119,16 +125,27 @@ setup(
 						'TTL = marrow.mongo.core.field.base:TTL',
 						'Regex = marrow.mongo.core.field.base:Regex',
 						'Timestamp = marrow.mongo.core.field.base:Timestamp',
+						
 						'Array = marrow.mongo.core.field.complex:Array',
 						'Embed = marrow.mongo.core.field.complex:Embed',
 						'Reference = marrow.mongo.core.field.complex:Reference',
 						'PluginReference = marrow.mongo.core.field.complex:PluginReference',
 						'Alias = marrow.mongo.core.field.complex:Alias',
+						
 						'Number = marrow.mongo.core.field.number:Number',
 						'Double = marrow.mongo.core.field.number:Double',
 						'Integer = marrow.mongo.core.field.number:Integer',
 						'Long = marrow.mongo.core.field.number:Long',
 						'Decimal = marrow.mongo.core.field.number:Decimal[decimal]',
+						
+						'Markdown = marrow.mongo.core.field.md:Markdown[markdown]',
+					],
+				'marrow.mongo.trait': [  # Document traits for use as mix-ins.
+						'Expires = marrow.mongo.core.trait.expires:Expires',
+						'Heirarchical = marrow.mongo.core.trait.heir:Heirarchical',
+						'Owned = marrow.mongo.core.trait.owned:Owned',
+						'Published = marrow.mongo.core.trait.published:Published',
+						'Stateful = marrow.mongo.core.trait.stateful:Stateful',
 					],
 				# ### WebCore Extensions
 				'web.session': [  # Session Engine
