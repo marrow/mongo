@@ -2,6 +2,9 @@
 
 from __future__ import unicode_literals
 
+from datetime import datetime
+from bson.tz_util import utc
+
 from ...package.loader import load
 
 
@@ -32,3 +35,7 @@ class Registry(object):
 	
 	def __getitem__(self, name):
 		return load(name, self._namespace)
+
+
+def utcnow():
+	return datetime.utcnow().replace(tzinfo=utc)
