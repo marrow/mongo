@@ -3,8 +3,8 @@
 """Common Location (address) model."""
 
 from ...schema.compat import unicode, py3
-from ... import Document
-from ...field import String, Embed
+from .. import Document
+from ..field import String, Embed
 
 
 __all__ = ('BaseLocation', )
@@ -29,4 +29,3 @@ class BaseLocation(Document):
 	def __repr__(self):
 		parts = [(i + "=" + repr(getattr(self, i, None))) for i in self.__fields__]
 		return self.__class__.__name__ + "(" + ", ".join(parts) + ")"
-

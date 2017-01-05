@@ -1,7 +1,7 @@
 # encoding: utf-8
 
-from ... import Document
-from ...field import String, Boolean, Date
+from .. import Document
+from ..field import String, Boolean, Date
 
 
 __all__ = ('VerifiedAddress')
