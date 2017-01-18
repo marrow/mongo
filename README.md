@@ -94,7 +94,7 @@ assert tv.brand == 'Vizio'
 
 ##### Advanced GeoJSON support.
 
-Marrow Mongo comes with [GeoJSON](http://geojson.org) "batteries included", having extensive support for querying, constructing, and manipulating GeoJSON data.
+Marrow Mongo comes with [GeoJSON](http://geojson.org) batteries included, having extensive support for querying, constructing, and manipulating GeoJSON data.
 
 [Learn more about working with geospatial data.](guide/geospatial.md)
 
