@@ -22,19 +22,19 @@ The first step in determining how best to tackle a concern is to ask about it. T
 
 * **Freenode IRC**
 
-  Likely the best way to get fast turnaround on inquiries is through the Marrow Open Source Collective community on Freenode IRC.  Point your IRC client at the [`#webcore`](irc://chat.freenode.net:6667/%23webcore) channel on `chat.freenode.net:6667` (SSL; non-SSL port 6667) or, if you are viewing this on a medium which supports it and have an IRC client installed which recognizes `irc://` URLs, just click that link.
+  Likely the best way to get fast turnaround on inquiries is through the Marrow Open Source Collective community on Freenode IRC.  Point your IRC client at the `#webcore` channel on `chat.freenode.net:6667` (SSL; non-SSL port 6667) or, if you are viewing this on a medium which supports it and have an IRC client installed which recognizes `irc://` URLs, just [use this link](irc://chat.freenode.net:6667/%23webcore).
 
   If you have general Python questions, or general MongoDB questions, [`##python-friendly`](irc://chat.freenode.net:6667/%23%23python-friendly), [`#python`](irc://chat.freenode.net:6667/%23python), or [`#mongodb`](irc://chat.freenode.net:6667/%23mongodb), as appropraite, may be more active. Stack Overflow is also worth considering.
+
+* **Stack Overflow**
+
+  To help develop a comprehensive knowledgebase of problems and solutions, with good metadata, user incentives, and fancy native apps, you can utilize Stack Overflow to ask your questions.  Just remember to tag your question [`marrow.mongo`](http://stackoverflow.com/questions/tagged/marrow.mongo) so that it can be found.
 
 * **GitHub Issues**
 
   For problems relating to bugs or enhancements witin Marrow Mongo itself, please utilize the [Marrow Mongo Issue Tracker](https://github.com/marrow/mongo/issues) provided by GitHub.  If you have identified an issue and have already begun work on a feature branch, just issue a pull request instead of creating a ticket, then creating a pull request.
 
   Please do not use the issue tracker for general support questions.  IRC, above, or Stack Overflow, below, are better resources for quick questions or longer questions, respectively.
-
-* **Stack Overflow**
-
-  To help develop a comprehensive knowledgebase of problems and solutions, with good metadata, user incentives, and fancy native apps, you can utilize Stack Overflow to ask your questions.  Just remember to tag your question [`marrow.mongo`](http://stackoverflow.com/questions/tagged/marrow.mongo) so that it can be found.
 
 
 ## First Steps
