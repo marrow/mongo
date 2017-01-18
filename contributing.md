@@ -39,14 +39,13 @@ The first step in determining how best to tackle a concern is to ask about it. T
 
 ## First Steps
 
-* **Triage** 
+* **Triage**
 
-  If you find an [unreviewed ticket](https://github.com/marrow/mongo/issues?q=is%3Aopen+is%3Aissue+no%3Alabel) reporting a bug, try to reproduce it. If the problem appears valid make a note that you confirmed the bug. If you feel it's a problem you can help solve, ask to be assigned.
-
+  If you find an [unreviewed ticket](https://github.com/marrow/mongo/issues?q=is%3Aopen+is%3Aissue+no%3Alabel) reporting a bug, try to reproduce it. If the problem appears valid make a note that you confirmed the bug.
 
 * **Help Wanted**
 
-  Look through the [Help Wanted](https://github.com/marrow/mongo/issues?q=is%3Aopen+label%3A%22help+wanted%22+sort%3Areactions-%2B1-desc) issues on GitHub. Look for tickets with greater numbers of reactions and comments to help gauge impact.
+  Look through the [Help Wanted](https://github.com/marrow/mongo/issues?q=is%3Aopen+label%3A%22help+wanted%22+sort%3Areactions-%2B1-desc) issues on GitHub. Look for tickets with greater numbers of reactions and comments to help gauge impact. If you feel it's a problem you can help solve, ask to be assigned.
 
 * **Write Some Documentation**
 
@@ -62,7 +61,6 @@ The first step in determining how best to tackle a concern is to ask about it. T
 * **Leave feedback.**
 
   See an idea being discussed, or a work-in-progress you feel could use your input? Do not hesitate to comment anywhere at any time.
-
 
 * **Large (especially breaking) changes should be discussed.**
 
