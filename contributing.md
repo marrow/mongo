@@ -3,7 +3,7 @@
 {% method -%}
 Thank you for considering contributing to this project! We welcome contributions large and small, from documentation to code. Following these guidelines helps communicate that you respect the time of the developers managing and developing this open source project. In return, we will recriprocate that respect in addressing your issue, assessing changes, and helping you finalize your pull requests.
 
-There are many ways to contribute, from advocy through writing tutorials or blog posts, improving or translating the documentation, submitting bug reports and feature requests, or writing code which can be incorporated into future Marrow Mongo releases.
+There are many ways to contribute, from advocacy through writing tutorials or blog posts, improving or translating the documentation, submitting bug reports and feature requests, or writing code which can be incorporated into future Marrow Mongo releases.
 
 {% common -%}
 #### Table of Contents
