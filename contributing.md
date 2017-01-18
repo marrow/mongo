@@ -34,7 +34,7 @@ The first step in determining how best to tackle a concern is to ask about it. T
 
   For problems relating to bugs or enhancements witin Marrow Mongo itself, please utilize the [Marrow Mongo Issue Tracker](https://github.com/marrow/mongo/issues) provided by GitHub.  If you have identified an issue and have already begun work on a feature branch, just issue a pull request instead of creating a ticket, then creating a pull request.
 
-  Please do not use the issue tracker for general support questions.  IRC, above, or Stack Overflow, below, are better resources for quick questions or longer questions, respectively.
+  Please do not use the issue tracker for general support questions.  IRC or Stack Overflow are better resources for quick questions or longer questions, respectively.
 
 
 ## First Steps
