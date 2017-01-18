@@ -125,9 +125,9 @@ Changes to the library demand [meditation](https://github.com/marrow/mongo/proje
 
 ## MIT Licensed
 
-The [MIT License](license.md) is highly permissive, allowing **commercial** and **non-commercial** _use_, _reproduction_, _modification_, _republication_, _redistribtution_, _sublicensing_, and _sale_ of the software (and associated documentation) or its components. This, given that the license notice is included in the reproduced work, and that any warranty or liability on behalf of the [Marrow Open Source Collective](https://github.com/marrow/) or [project contributors](https://github.com/marrow/mongo/graphs/contributors) is waived.
+The [MIT License](license.md) is highly permissive, allowing **commercial** and **non-commercial** _use_, _reproduction_, _modification_, _republication_, _redistribtution_, _sublicensing_, and _sale_ of the software (and associated documentation) or its components. The license notice must be included in the reproduced work, and any warranty or liability on behalf of the [Marrow Open Source Collective](https://github.com/marrow/) or [project contributors](https://github.com/marrow/mongo/graphs/contributors) waived.
 
-You are effectively free to deal in this software however you choose, **without commercial hinderance**, unlike some other open-source licenses.
+You are effectively free to deal in this software however you choose, **without commercial hinderance**.
 
 ## Code Metrics
 
