@@ -47,11 +47,11 @@ pip install 'marrow.mongo[scripting,logger]'
 
 * **`scripting`**
 
-  Pulls in the [Javascripthon](https://github.com/azazel75/metapensiero.pj) Python to JavaScript transpiler to enable use of native Python function transport to MongoDB. (E.g. for use in map/reduce, stored functions, etc.)
+  Pulls in the [Javascripthon](https://github.com/azazel75/metapensiero.pj) Python to JavaScript _transpiler_ to enable use of native Python function transport to MongoDB. (E.g. for use in map/reduce, stored functions, etc.)
 
 * **`logger`**
 
-  Logging requires knowledge of the local host's timezone, so this pulls in the \`tzlocal\` package to retrieve this information. |
+  Logging requires knowledge of the local host's timezone, so this pulls in the `tzlocal` package to retrieve this information.
 
 {% endmethod %}
 
