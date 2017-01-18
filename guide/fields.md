@@ -77,39 +77,5 @@ class MyDocument(Document):
 As we rely on Marrow Schema we make use of its transformation and validation APIs (and objects) to allow for customization of both data ingress and egress. By default Marrow Mongo attempts to ensure the value stored behind-the-scenes matches MongoDB and BSON datatype expectations to allow for conversion-free final use.
 
 
-### Overriding Transformation
 
-{% method -%}
-If one wanted to store Python `Decimal` objects within the database and wasn't running the latest MongoDB version which has direct support for this type, you could store them safely as strings. An easy way to accomplish this is to use Marrow Schema's `Decimal` transformer.
-
-When attempting to retrieve the value the string stored in the database will be converted to a `Decimal` object automatically.  When assigning a `Decimal` value to the attribute it will be likewise converted back to a string for storage in MongoDB.
-
-{% sample lang="python" -%}
-```python
-from marrow.mongo import Document
-from marrow.mongo.field import String
-from marrow.schema.transform import decimal
-
-class MyDocument(Document):
-	field = String(transformer=decimal)
-```
-{% endmethod %}
-
-{% method -%}
-Additionally there is a shortcut for handling validation (when using the default validator) in field subclasses, used extensively by the built-in field types. When subclassing `Field` you can simply define a `to_native` and/or `to_foreign` method.
-
-These methods are passed the document the field is attached to, the name of the field, and the value being read or written. They must return either the same value, or some value after hypothetical transformation. The reason for the seeming duplication of the field information (which would otherwise be accessible via `self`) is to allow for the assignment of non-method functions, callable objects, or static methods.
-
-{% sample lang="python" -%}
-```python
-from marrow.mongo import Field
-
-class AwesomeField(Field):
-	def to_native(self, doc, name, value):
-		return value
-	
-	def to_foreign(self, doc, name, value):
-		return str(value).upper()
-```
-{% endmethod %}
 
