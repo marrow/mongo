@@ -113,7 +113,7 @@ collection.find(Battleship.location.near(position))
 
 ##### Guaranteed to be fully tested before any release.
 
-We utilize [Travis](https://travis-ci.org/marrow/mongo/) continuous integration, with test coverage reporting provided by [Codecov.io](https://codecov.io/gh/marrow/mongo/). We also monitor requirements for security concerns and deprecation using [Requires.io](https://requires.io/github/marrow/mongo/requirements/?branch=master). Extensive static analysis through [Landscape.io](https://landscape.io/marrow/mongo/) and proactive use of tools such as [pre-commit](http://pre-commit.com), with [plugins](https://github.com/marrow/mongo/blob/develop/.pre-commit-config.yaml) such as the infosec analyzer [OpenStack Bandit](https://wiki.openstack.org/wiki/Security/Projects/Bandit), plus various linting tools, help to keep code maintainable and secure.
+We utilize [Travis](https://travis-ci.org/marrow/mongo/) continuous integration, with test coverage reporting provided by [Codecov.io](https://codecov.io/gh/marrow/mongo/). We also monitor requirements for security concerns and deprecation using [Requires.io](https://requires.io/github/marrow/mongo/requirements/?branch=master). Extensive static analysis through [Landscape.io](https://landscape.io/marrow/mongo/), proactive use of tools such as [pre-commit](http://pre-commit.com) with [plugins](https://github.com/marrow/mongo/blob/develop/.pre-commit-config.yaml) such as the infosec analyzer [OpenStack Bandit](https://wiki.openstack.org/wiki/Security/Projects/Bandit), and various linting tools help to keep code maintainable and secure.
 
 ##### Extensively documented, with a > 1:1 code to comment ratio.
 
