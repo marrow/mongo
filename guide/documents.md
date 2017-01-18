@@ -43,7 +43,7 @@ name = String()
 locale = String(default='en-CA-u-tz-cator-cu-CAD', assign=True)
 ```
 
-Introduced here is `required`, indicating that when generating the *validation document* for this document to ensure this field always has a value. This validation is not currently performed application-side. Also notable is the use of `assign` on a string field; this will assign the default value during instantiation. Then we have a different type of field:
+Introduced on the `username` attribute is `required`, indicating that when generating the *validation document* for this document to ensure this field always has a value. This validation is not currently performed application-side. Also notable is the use of `assign` on a string field; this will assign the default value during instantiation. Then we have a different type of field:
 
 ```python
 age = Number()
@@ -55,7 +55,7 @@ This allows storage of any numeric value, either integer or floating point. Now 
 id = ObjectId('_id', assign=True)
 ```
 
-Marrow Mongo does not assume your documents contain IDs; there is no separation internally between top-level documents and *embedded documents*, leaving the declaration of an ID up to you. You might not always wish to use an ObjectID, either; please see MongoDB's documentation for discussion of general modelling practices. The first positional parameter for most non-complex fields is the name of the MongoDB-side field. Underscores imply an attribute is "protected" in Python, so we remap it by assigning it to just `id`. The `assign` argument here ensures whenever a new `Account` is instantiated an ObjectID will be immediately generated and assigned.
+Marrow Mongo does not assume your documents contain IDs; there is no separation internally between top-level documents and *embedded documents*, leaving the declaration of an ID up to you. You might not always wish to use an ObjectID, either; please see MongoDB's documentation for discussion of general modelling practices. The first positional parameter for most non-complex fields is the name of the MongoDB-side field. Underscores imply an attribute is _protected_ in Python, so we remap it by assigning it to just `id`. The `assign` argument here ensures whenever a new `Account` is instantiated an ObjectID will be immediately generated and assigned.
 
 Finally there is an array of tags:
 
@@ -63,7 +63,7 @@ Finally there is an array of tags:
 tag = Array(String(), default=lambda: [], assign=True)
 ```
 
-This combines what we've been using so far into one field. An `Array` is a *complex field* (a container) and as such the types of values allowed to be contained therein may be defined positionally. (If you want to override the field's database-side name, pass in a `name` as a keyword argument.) A default is defined as an anonymous callback function which constructs a new list on each request. The default will be executed and the result assigned automatically during initialization as per `id` or `locale`.
+This combines what we've been using so far into one field. An `Array` is a *complex field* (a container) and as such the types of values allowed to be contained therein may be defined positionally. If you want to override the field's database-side name, pass in a `name` as a keyword argument. A default is defined as an anonymous callback function which constructs a new list on each request. The default will be executed and the result assigned automatically during initialization as per `id` or `locale`.
 
 Lastly we define a unique index on the username to speed up any queries involving that field:
 
