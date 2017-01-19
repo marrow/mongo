@@ -1,17 +1,18 @@
 # Fields
 
-Included with Marrow Mongo are field types covering all core types supported by MongoDB. A class model is used to define new field types, with a large amount of functionality provided by the base `Field` class itself. This base class is directly usable where the underlying field type is dynamic or not known prior to access.
+Included with Marrow Mongo are field types covering all core types supported by MongoDB. A class model is used to define new field types, with a large amount of functionality provided by the base `Field` class itself.
+
+{% method -%}
+This base class is directly usable where the underlying field type is dynamic or not known prior to access.
 
 The `Field` class is a subclass of Marrow Schema's `Attribute` and all field instances applicable to a given `Document` class or instnace are accessible using the ordered dictionary `__fields__`.
-
-## Field
 
 ```python
 from marrow.mongo import Field
 ```
 
 
-### Name Mapping
+## Name Mapping
 
 {% method -%}
 In general, basic fields accept one positional parameter: the name of the field to store data against within MongoDB. In the following example any attempt to read or write to the `field` attriute of a `MyDocument` instance will instead retrieve data from the backing document using the key `name`. If no name is specified explicitly the name of the attribute the field is assigned to is used by default.
@@ -26,7 +27,7 @@ class MyDocument(Document):
 {% endmethod %}
 
 
-### Default Values
+## Default Values
 
 {% method -%}
 There are a few attributes of a field that determine what happens when an attempt is made to access a value that currently does not exist in the backing document. If no default is provided and there is no value in the backing store for the field any attempt to read the value of the field through attribute access will result in an `AttributeError` exception.
@@ -50,7 +51,7 @@ There are a few attributes of a field that determine what happens when an attemp
 {% endmethod %}
 
 
-### Limiting Choice
+## Limiting Choice
 
 Passing an iterable of values or a callback producing an iterable of values as the `choices` argument allows you to restrict the acceptable values for the field. If static, this list will be included in the validation document. In this way you can emulate an enum or a set if applied to a field encapsulated in an `Array`.
 
@@ -78,7 +79,7 @@ class MyDocument(Document):
 As we rely on Marrow Schema we make use of its transformation and validation APIs (and objects) to allow for customization of both data ingress and egress. By default Marrow Mongo attempts to ensure the value stored behind-the-scenes matches MongoDB and BSON datatype expectations to allow for conversion-free final use.
 
 
-### Overriding Transformation
+#### Overriding Transformation
 
 {% method -%}
 If one wanted to store Python `Decimal` objects within the database and wasn't running the latest MongoDB version which has direct support for this type, you could store them safely as strings. An easy way to accomplish this is to use Marrow Schema's `Decimal` transformer.
@@ -97,7 +98,7 @@ class MyDocument(Document):
 {% endmethod %}
 
 {% method -%}
-Additionally there is a shortcut for handling validation (when using the default validator) in field subclasses, used extensively by the built-in field types. When subclassing `Field` you can simply define a `to_native` and/or `to_foreign` method.
+Additionally there is a shortcut for handling transformation (when using the default transfomer) in field subclasses, used extensively by the built-in field types. When subclassing `Field` you can simply define a `to_native` and/or `to_foreign` method.
 
 These methods are passed the document the field is attached to, the name of the field, and the value being read or written. They must return either the same value, or some value after hypothetical transformation. The reason for the seeming duplication of the field information (which would otherwise be accessible via `self`) is to allow for the assignment of non-method functions, callable objects, or static methods.
 
