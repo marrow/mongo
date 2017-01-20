@@ -74,7 +74,7 @@ class MyDocument(Document):
 {% endmethod %}
 
 
-## Transformation and Validation
+## Data Transformation
 
 As we rely on Marrow Schema we make use of its transformation and validation APIs (and objects) to allow for customization of both data ingress and egress. By default Marrow Mongo attempts to ensure the value stored behind-the-scenes matches MongoDB and BSON datatype expectations to allow for conversion-free final use.
 
@@ -96,6 +96,8 @@ class MyDocument(Document):
 	field = String(transformer=decimal)
 ```
 {% endmethod %}
+
+#### Transformation in Field Subclasses
 
 {% method -%}
 Additionally there is a shortcut for handling transformation (when using the default transfomer) in field subclasses, used extensively by the built-in field types. When subclassing `Field` you can simply define a `to_native` and/or `to_foreign` method.
