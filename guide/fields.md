@@ -7,9 +7,11 @@ This base class is directly usable where the underlying field type is dynamic or
 
 The `Field` class is a subclass of Marrow Schema's `Attribute` and all field instances applicable to a given `Document` class or instnace are accessible using the ordered dictionary `__fields__`.
 
+{% sample lang="python" -%}
 ```python
 from marrow.mongo import Field
 ```
+{% endmethod %}
 
 
 ## Name Mapping
