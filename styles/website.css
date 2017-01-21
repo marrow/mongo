@@ -85,6 +85,7 @@ nav ul.summary > :nth-child(-n+2), nav ul.summary > :nth-last-child(-n+2) {
 	float: left;
 	clear: left;
 	width: 10em;
+	margin-top: 0;
 }
 
 .markdown-section dl dt h5 {
