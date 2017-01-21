@@ -134,21 +134,21 @@ class MyDocument(Document):
 		<h5 id="ttl-value-timedelta"><code>timedelta</code></h5>
 	</dt><dd>
 		<p>
-			Assignment of a `timedelta` instance will result in the storage of `datetime` representing the current time in UTC modified by that delta through addition.
+			Assignment of a <code>timedelta</code> instance will result in the storage of `datetime` representing the current time in UTC modified by that delta through addition.
 		</p>
 	</dd>
 	<dt>
 		<h5 id="ttl-value-datetime"><code>datetime</code></h5>
 	</dt><dd>
 		<p>
-			Any explicit `datetime` will be utilized unmodified.
+			Any explicit <code>datetime</code> will be utilized unmodified.
 		</p>
 	</dd>
 	<dt>
 		<h5 id="ttl-value-number">numbers</h5>
 	</dt><dd>
 		<p>
-			Assigning any numeric value (i.e. `int`, `float`) will interpret that as the `days` argument to `timedelta`, applied as per a `timedelta` described above.
+			Assigning any numeric value (i.e. <code>int</code>, <code>float</code>) will interpret that as the <code>days</code> argument to <code>timedelta</code>, applied as per a <code>timedelta</code> described above.
 		</p>
 	</dd>
 </dl>
