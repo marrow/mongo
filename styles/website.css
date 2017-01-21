@@ -89,6 +89,10 @@ nav ul.summary > :nth-child(-n+2), nav ul.summary > :nth-last-child(-n+2) {
 	font-size: inherit;
 }
 
+.markdown-section dl dt small {
+	color: rgba(0, 0, 0, 0.5);
+}
+
 .markdown-section dl dt small,
 .markdown-section dl dd label {
 	margin: 0;
