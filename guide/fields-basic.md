@@ -131,6 +131,13 @@ class MyDocument(Document):
 
 <dl>
 	<dt>
+		<h5 id="ttl-value-number"><em>numbers</em></h5>
+	</dt><dd>
+		<p>
+			Assigning any numeric value (i.e. <code>int</code>, <code>float</code>) will interpret that as the <code>days</code> argument to <code>timedelta</code>, applied as per a <code>timedelta</code> described below.
+		</p>
+	</dd>
+	<dt>
 		<h5 id="ttl-value-timedelta"><code>timedelta</code></h5>
 	</dt><dd>
 		<p>
@@ -142,13 +149,6 @@ class MyDocument(Document):
 	</dt><dd>
 		<p>
 			Any explicit <code>datetime</code> will be utilized unmodified.
-		</p>
-	</dd>
-	<dt>
-		<h5 id="ttl-value-number"><em>numbers</em></h5>
-	</dt><dd>
-		<p>
-			Assigning any numeric value (i.e. <code>int</code>, <code>float</code>) will interpret that as the <code>days</code> argument to <code>timedelta</code>, applied as per a <code>timedelta</code> described above.
 		</p>
 	</dd>
 </dl>
