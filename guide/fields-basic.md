@@ -145,7 +145,7 @@ class MyDocument(Document):
 		</p>
 	</dd>
 	<dt>
-		<h5 id="ttl-value-number">numbers</h5>
+		<h5 id="ttl-value-number"><em>numbers</em></h5>
 	</dt><dd>
 		<p>
 			Assigning any numeric value (i.e. <code>int</code>, <code>float</code>) will interpret that as the <code>days</code> argument to <code>timedelta</code>, applied as per a <code>timedelta</code> described above.
