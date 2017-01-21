@@ -5,7 +5,7 @@ Included with Marrow Mongo are field types covering all core types supported by 
 {% method -%}
 This base class is directly usable where the underlying field type is dynamic or not known prior to access.
 
-The `Field` class is a subclass of Marrow Schema's `Attribute` and all field instances applicable to a given `Document` class or instnace are accessible using the ordered dictionary `__fields__`.
+The `Field` class is a subclass of Marrow Schema's `Attribute` and all field instances applicable to a given `Document` class or instance are accessible using the ordered dictionary `__fields__`.
 
 {% sample lang="python" -%}
 ```python
