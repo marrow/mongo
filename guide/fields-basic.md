@@ -86,7 +86,7 @@ class MyDocument(Document):
 		</p>
 	</dd>
 	<dt>
-		<h5 id="objectid-value-"><em>MongoDB document</em></h5>
+		<h5 id="objectid-value-"><em>document</em></h5>
 	</dt><dd>
 		<p>
 			Use of a dictionary or dictionary-alike (such as a <code>Document</code> instance) with an assigned <code>_id</code> key will utilize the value of that key automatically after casting with the BSON <code>ObjectId</code> type.
