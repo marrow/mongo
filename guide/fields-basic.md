@@ -67,6 +67,15 @@ Unicode text stored as a UTF-8 encoded binary string. In Python 3 this is repres
 
 Subclasses may utilize `super()` to invoke this standaard behaviour within overridden `to_native` and `to_foreign` methods.
 
+{% sample lang="python" -%}
+```python
+from marrow.mongo.field import String
+
+class MyDocument(Document):
+	string = String(strip=False, case=None)
+```
+{% endmethod %}
+
 #### Arguments
 
 <dl class="arguments">
@@ -77,7 +86,7 @@ Subclasses may utilize `super()` to invoke this standaard behaviour within overr
 		<p>
 			If this is <code>True</code> then a bare call to <code>.strip()</code> will be made after unicode string casting. If another truthy value is provided it will be used as the argument to the <code>.strip()</code> call.
 		</p>
-	</dd><dd class="default"><code>False</code></dd>
+	</dd><dd class="default"><label>Default</label><code>False</code></dd>
 	<dt>
 		<h5 id="string-argument-case"><code>case</code></h5>
 		<small>optional</small>
@@ -85,17 +94,8 @@ Subclasses may utilize `super()` to invoke this standaard behaviour within overr
 		<p>
 			Allows for automatic case conversion during value assignment. If <code>case</code> is <code>1</code>, <code>True</code>, <code>'u'</code>, or <code>'upper'</code> then any value assigned will have <code>.upper()</code> called after typecasting. If the value is <code>-1</code>, <code>False</code>, <code>'l'</code>, or <code>'lower'</code> then the value assigned will have <code>.lower()</code> called after typecasting. You may also use <code>'t'</code> or <code>'title'</code> to utilize <code>.title()</code> respectively.
 		</p>
-	</dd><dd class="default"><code>None</code></dd>
+	</dd><dd class="default"><label>Default</label><code>None</code></dd>
 </dl>
-
-{% sample lang="python" -%}
-```python
-from marrow.mongo.field import String
-
-class MyDocument(Document):
-	string = String(strip=False, case=None)
-```
-{% endmethod %}
 
 
 ## TTL
