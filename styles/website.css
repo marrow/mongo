@@ -76,17 +76,22 @@ dl {
 	
 }
 
-dt {
+.markdown-section dl dt {
+	font-style: inherit;
+	font-weight: inherit;
 	text-align: right;
 	float: left;
 	clear: left;
-	width: 0.3vw;
-	min-width: 10rem;
-	max-width: 20rem;
+	width: 10em;
 }
 
-dd {
-	
+.markdown-section dl dt h5 {
+	margin: 0;
+}
+
+.markdown-section dl dd {
+	margin-top: .85em;
+	margin-left: 11em;
 }
 
 dd:after {
