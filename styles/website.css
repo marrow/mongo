@@ -20,6 +20,11 @@
 	margin-top: 0;
 }
 
+.markdown-section h4 {
+	font-weight: 200;
+	text-transform: uppercase;
+}
+
 .markdown-section {
 	padding: 30px;
 }
