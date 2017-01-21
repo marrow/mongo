@@ -72,10 +72,6 @@ nav ul.summary > :nth-child(-n+2), nav ul.summary > :nth-last-child(-n+2) {
 	display: none;
 }
 
-dl {
-	
-}
-
 .markdown-section dl dt {
 	font-style: inherit;
 	font-weight: inherit;
@@ -89,15 +85,29 @@ dl {
 	margin: 0;
 }
 
+.markdown-section dl dt h5 code {
+	font-size: inherit;
+}
+
+.markdown-section dl dt small {
+	padding: .2em;
+	margin: 0;
+	font-size: .85em;
+	font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol' !important;
+	text-transform: uppercase;
+}
+
 .markdown-section dl dd {
 	margin-top: .85em;
 	margin-left: 11em;
 }
 
-dd:after {
+.markdown-section dl dd:after {
 	content: '';
 	display: block;
 	clear: both;
 }
 
-
+.markdown-section dl dd:not(:last-child) {
+	border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
