@@ -41,7 +41,8 @@
 }
 
 .markdown-section h1 strong {
-	font-weight: 200;
+	font-weight: 500;
+	letter-spacing: 0.2ex;
 }
 
 .markdown-section h2 {
