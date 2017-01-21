@@ -33,26 +33,50 @@ class MyDocument(Document):
 
 ## Default Values
 
-{% method -%}
 There are a few attributes of a field that determine what happens when an attempt is made to access a value that currently does not exist in the backing document. If no default is provided and there is no value in the backing store for the field any attempt to read the value of the field through attribute access will result in an `AttributeError` exception.
 
-{% sample lang="python" -%}
-* **`assign`**
-
-  If a default value is provided, automatically assign it to the backing document when a new instance is constructed.
-
-* **`default`**
-
-  A single value to store, or a function called to generate a new value on first access (the default) or on instance construction (if `assign` is `True`).
-
-* **`nullable`**
-
-  If `True`, will store `None`.  If `False`, will store non-`None` values, or not store.
-
-* **`required`**
-
-  This field must have a value assigned; `None` and an empty string are values.
-{% endmethod %}
+<dl>
+	<dt>
+		<h5 id="default-values-assign"><code>assign</code></h5>
+	</dt><dd>
+		<p>
+			If a default value is provided, automatically assign it to the backing document when a new instance is constructed.
+		</p>
+		<p>
+			<label>Default</label><code>False</code>
+		</p>
+	</dd>
+	<dt>
+		<h5 id="default-values-default"><code>default</code></h5>
+	</dt><dd>
+		<p>
+			A single value to store, or a function called to generate a new value on first access (the default) or on instance construction (if <code>assign</code> is <code>True</code>).
+		</p>
+		<p>
+			<label>Default</label><em>No default.</em>
+		</p>
+	</dd>
+	<dt>
+		<h5 id="default-values-nullable"><code>nullable</code></h5>
+	</dt><dd>
+		<p>
+			If <code>True</code>, will store <code>None</code>.  If <code>False</code>, will store non-<code>None</code> values, or not store. (The key will be missing from the backing store.)
+		</p>
+		<p>
+			<label>Default</label><code>False</code>
+		</p>
+	</dd>
+	<dt>
+		<h5 id="default-values-required"><code>required</code></h5>
+	</dt><dd>
+		<p>
+			This field must have a value assigned; <code>None</code> and an empty string are values.
+		</p>
+		<p>
+			<label>Default</label><code>False</code>
+		</p>
+	</dd>
+</dl>
 
 
 ## Limiting Choice
