@@ -20,7 +20,7 @@ Fields which represent scalar (singular) values are referred to as _basic fields
 ## Binary
 
 {% method -%}
-A binary string. In Python 3 this is represented as a `bytes` instance, under Python 2 this reads and writes `str` instances. To support binary serialization, it may be useful to implement callables implementing the Marrow Schema transformer protocol and specify them using the `transformer` argument.
+A binary string. In Python 3 this is represented as a `bytes` instance; under Python 2 this reads and writes `str` instances. To support binary serialization it may be useful to utilize callables implementing the Marrow Schema transformer protocol, and specify them using the `transformer` argument.
 
 Large binary (BLOB) data exceeding a few hundred kilobytes should instead be stored using GridFS.
 
@@ -49,11 +49,11 @@ from marrow.mongo.field import Date
 ## ObjectId
 
 {% method -%}
-MongoDB utilizes a [compound datatype for default primary keys called an ObjectId](https://docs.mongodb.com/manual/reference/method/ObjectId/). Values generated through casting from dates or date-related types should never be utilized as a primary key, as they can not be gaurenteed to be unique, however they can be extremely useful for range querying.
+MongoDB utilizes a [compound datatype for default primary keys](https://docs.mongodb.com/manual/reference/method/ObjectId/). Values generated through casting from dates or date-related types should never be utilized as a primary key, as they can not be gaurenteed to be unique; however they can be extremely useful for range querying.
 
 It is frequently useful to assign this with an overridden MongoDB-side field name, to make accessing the primary key of top-level documents more Pythonic. Additionally, for top-level documents, one might as well assign an ID immediately upon document construction. They are normally constructed client-side by the PyMongo driver anyway.
 
-Subclasses may utilize `super()` to invoke standaard casting behaviour within overridden `to_native` and `to_foreign` methods.
+Subclasses may utilize `super()` to invoke standard casting behaviour within overridden `to_native` and `to_foreign` methods.
 
 {% sample lang="python" -%}
 ```python
@@ -120,9 +120,9 @@ from marrow.mongo.field import Regex
 ## String
 
 {% method -%}
-Unicode text stored as a UTF-8 encoded binary string. In Python 3 this is represented as a `str` instance, under Python 2 this reads and writes `unicode` instances. For additional details, see the [BSON type reference for strings](https://docs.mongodb.com/manual/reference/bson-types/#string) from the MongoDB manual.
+Unicode text stored as a UTF-8 encoded binary string. In Python 3 this is represented as a `str` instance; under Python 2 this reads and writes `unicode` instances. For additional details, see the [BSON type reference for strings](https://docs.mongodb.com/manual/reference/bson-types/#string) from the MongoDB manual.
 
-Subclasses may utilize `super()` to invoke this standaard behaviour within overridden `to_native` and `to_foreign` methods.
+Subclasses may utilize `super()` to invoke this standard behaviour within overridden `to_native` and `to_foreign` methods.
 
 {% sample lang="python" -%}
 ```python
@@ -164,7 +164,9 @@ class MyDocument(Document):
 {% method -%}
 To assist with the use of [MongoDB Time-to-Live indexes](https://docs.mongodb.com/manual/core/index-ttl/) a `TTL` field is provided as a specialization of the general [`Date`](#date) field. It accepts a range of datatypes for automatic casting to an absolute time upon assignment, detailed below.
 
-Subclasses may utilize `super()` to invoke standaard casting behaviour within overridden `to_native` and `to_foreign` methods. For further information, please see the [official tutorial](https://docs.mongodb.com/manual/tutorial/expire-data/).
+Subclasses may utilize `super()` to invoke standard casting behaviour within overridden `to_native` and `to_foreign` methods.
+
+For further information on time-to-live indexes, please see the [official tutorial](https://docs.mongodb.com/manual/tutorial/expire-data/).
 
 {% sample lang="python" -%}
 ```python
@@ -182,14 +184,14 @@ class MyDocument(Document):
 		<h5 id="ttl-value-number"><em>numbers</em></h5>
 	</dt><dd>
 		<p>
-			Assigning any numeric value (i.e. <code>int</code>, <code>float</code>) will interpret that as the <code>days</code> argument to <code>timedelta</code>, applied as per a <code>timedelta</code> described below.
+			Assigning any numeric value (i.e. <code>int</code>, <code>float</code>) will be interpreted as the <code>days</code> argument to <code>timedelta</code>, applied as per <code>timedelta</code> described below.
 		</p>
 	</dd>
 	<dt>
 		<h5 id="ttl-value-timedelta"><code>timedelta</code></h5>
 	</dt><dd>
 		<p>
-			Assignment of a <code>timedelta</code> instance will result in the storage of <code>datetime</code> representing the current time in UTC modified by that delta through addition.
+			Assignment of a <code>timedelta</code> instance will result in the storage of a <code>datetime</code> representing the current time in UTC modified by the delta through addition.
 		</p>
 	</dd>
 	<dt>

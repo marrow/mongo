@@ -33,7 +33,7 @@ class MyDocument(Document):
 
 ## Default Values
 
-There are a few attributes of a field that determine what happens when an attempt is made to access a value that currently does not exist in the backing document. If no default is provided and there is no value in the backing store for the field any attempt to read the value of the field through attribute access will result in an `AttributeError` exception.
+There are a few attributes of a field that determine what happens when an attempt is made to access a value that currently does not exist in the backing document. If no default is provided and there is no value in the backing store for the field, any attempt to read the value of the field through attribute access will result in an `AttributeError` exception.
 
 <dl>
 	<dt>
@@ -81,7 +81,7 @@ There are a few attributes of a field that determine what happens when an attemp
 
 ## Limiting Choice
 
-Passing an iterable of values or a callback producing an iterable of values as the `choices` argument allows you to restrict the acceptable values for the field. If static, this list will be included in the validation document. In this way you can emulate an enum or a set if applied to a field encapsulated in an `Array`.
+Passing either an iterable of values, or a callback producing an iterable of values, as the `choices` argument allows you to restrict the acceptable values for the field. If static, this list will be included in the validation document. In this way you can emulate an enum or a set if applied to a field encapsulated in an `Array`.
 
 The ability to restrict acceptable values this way is available to all types of field. Some, such as `Number` and its more specific subclasses, provide additional methods to restrict allowable values, such as ranges or minimums and maximums.
 
@@ -89,9 +89,9 @@ The ability to restrict acceptable values this way is available to all types of 
 ## Field Exclusivity
 
 {% method -%}
-Occasionally it may be useful to have two distinct fields where it is acceptable to have a value assigned to only one. We model this dependency through exclusion. By passing a (literal) set of field names as the `exclusive` argument you can define the fields that must not be set for the current field to be assignable.
+Occasionally it may be useful to have two distinct fields where it is acceptable to have a value assigned to only one. We model this dependency through exclusion. By passing a `set` of field names as the `exclusive` argument you can define the fields that must not be set for the current field to be assignable.
 
-Similar to this example, if you wish to define mutual exclusivity you must define both sides of the limitation. Here, `MyDocument` declares that if `link` is set `mail` can not be set, and likewise the reverse.
+Similar to this example, if you wish to define mutual exclusivity you must define both sides of the limitation. `MyDocument` declares that if `link` is set, `mail` can not be set, and likewise the reverse.
 
 {% sample lang="python" -%}
 ```python
@@ -112,7 +112,7 @@ As we rely on Marrow Schema we make use of its transformation and validation API
 {% method -%}
 If one wanted to store Python `Decimal` objects within the database and wasn't running the latest MongoDB version which has direct support for this type, you could store them safely as strings. An easy way to accomplish this is to use Marrow Schema's `Decimal` transformer.
 
-When attempting to retrieve the value the string stored in the database will be converted to a `Decimal` object automatically.  When assigning a `Decimal` value to the attribute it will be likewise converted back to a string for storage in MongoDB.
+When attempting to retrieve the value, the string stored in the database will be converted to a `Decimal` object automatically.  When assigning a `Decimal` value to the attribute it will be likewise converted back to a string for storage in MongoDB.
 
 {% sample lang="python" -%}
 ```python
@@ -167,7 +167,7 @@ There are several predicates that apply to all fields. These are callbacks, call
 #### Projection
 
 {% method -%}
-Subclasses of `Document` provide a `__projection__` attribute which provides the default set of fields to project based on field `project` predicates. Behaviour is somewhat complex; all fields excluding those marked for exclusion (`False`) are projected unless any are marked for explicit inclusion (`True`) in which case just those are. Fields whose predicates evaluate to `None` (the default) will only be included in the former case.
+Subclasses of `Document` provide a `__projection__` attribute containing the default set of fields to project based on field `project` predicates. Behaviour is somewhat complex; all fields excluding those marked for exclusion (`False`) are projected unless any are marked for explicit inclusion (`True`) in which case just those are. Fields whose predicates evaluate to `None` (the default) will only be included in the former case.
 
 {% sample lang="python" -%}
 ```python
@@ -184,7 +184,7 @@ MyDocument.__projection__ == {'foo': True, 'bar': True}
 #### Read/Write Permissions
 
 {% method -%}
-The shortcut methods `is_readable(context=None)` and `is_writeable(context=None)` are provided to evaluate the `read` and `write` predicates, which follow a pattern similar to projection. Literal `True` and `False` are allowed as constants to represent "always" and "never", or these may be callbacks (or callable objects) which optionally take a context argument and return `True` or `False`, or an iterable of such objects which may also return `None` to abstain from voting in the access control list (ACL).
+The shortcut methods `is_readable(context=None)` and `is_writeable(context=None)` are provided to evaluate the `read` and `write` predicates, which follow a pattern similar to projection. Literal `True` and `False` are allowed as constants to represent "always" and "never". These may alternatively be callbacks (or callable objects) which optionally take a context argument and return `True` or `False`, or an iterable of such objects which may also return `None` to abstain from voting in the access control list (ACL).
 
 {% sample lang="python" -%}
 ```python
