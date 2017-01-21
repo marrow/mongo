@@ -71,3 +71,28 @@
 nav ul.summary > :nth-child(-n+2), nav ul.summary > :nth-last-child(-n+2) {
 	display: none;
 }
+
+dl {
+	
+}
+
+dt {
+	text-align: right;
+	float: left;
+	clear: left;
+	width: 0.3vw;
+	min-width: 10rem;
+	max-width: 20rem;
+}
+
+dd {
+	
+}
+
+dd:after {
+	content: '';
+	display: block;
+	clear: both;
+}
+
+
