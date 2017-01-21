@@ -85,7 +85,7 @@ class MyDocument(Document):
 
 #### Arguments
 
-<dl class="arguments">
+<dl>
 	<dt>
 		<h5 id="string-argument-strip"><code>strip</code></h5>
 		<small>optional</small>
@@ -114,13 +114,44 @@ class MyDocument(Document):
 ## TTL
 
 {% method -%}
+To assist with the use of [MongoDB Time-to-Live indexes]() a `TTL` field is provided as a specialization of the general [`Date`](#date) field. It accepts a range of datatypes for automatic casting to an absolute time upon assignment, detailed below.
 
+Subclasses may utilize `super()` to invoke standaard casting behaviour within overridden `to_native` and `to_foreign` methods.
 
 {% sample lang="python" -%}
 ```python
 from marrow.mongo.field import TTL
+
+class MyDocument(Document):
+	when = TTL()
 ```
 {% endmethod %}
+
+#### Accepted Values
+
+<dl>
+	<dt>
+		<h5 id="ttl-value-timedelta"><code>timedelta</code></h5>
+	</dt><dd>
+		<p>
+			Assignment of a `timedelta` instance will result in the storage of `datetime` representing the current time in UTC modified by that delta through addition.
+		</p>
+	</dd>
+	<dt>
+		<h5 id="ttl-value-datetime"><code>datetime</code></h5>
+	</dt><dd>
+		<p>
+			Any explicit `datetime` will be utilized unmodified.
+		</p>
+	</dd>
+	<dt>
+		<h5 id="ttl-value-number">numbers</h5>
+	</dt><dd>
+		<p>
+			Assigning any numeric value (i.e. `int`, `float`) will interpret that as the `days` argument to `timedelta`, applied as per a `timedelta` described above.
+		</p>
+	</dd>
+</dl>
 
 
 ## Timestamp
