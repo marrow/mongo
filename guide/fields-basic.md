@@ -164,9 +164,9 @@ class MyDocument(Document):
 ## TTL
 
 {% method -%}
-To assist with the use of [MongoDB Time-to-Live indexes]() a `TTL` field is provided as a specialization of the general [`Date`](#date) field. It accepts a range of datatypes for automatic casting to an absolute time upon assignment, detailed below.
+To assist with the use of [MongoDB Time-to-Live indexes](https://docs.mongodb.com/manual/core/index-ttl/) a `TTL` field is provided as a specialization of the general [`Date`](#date) field. It accepts a range of datatypes for automatic casting to an absolute time upon assignment, detailed below.
 
-Subclasses may utilize `super()` to invoke standaard casting behaviour within overridden `to_native` and `to_foreign` methods.
+Subclasses may utilize `super()` to invoke standaard casting behaviour within overridden `to_native` and `to_foreign` methods. For further information, please see the [official tutorial](https://docs.mongodb.com/manual/tutorial/expire-data/).
 
 {% sample lang="python" -%}
 ```python
