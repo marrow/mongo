@@ -4,6 +4,8 @@
 Fields which represent scalar (singular) values are referred to as _basic fields_.
 
 {% sample lang="python" -%}
+#### Table of Contents
+
 1. [Binary](#binary)
 2. [Date](#date)
 3. [ObjectId](#objectid)
@@ -11,6 +13,7 @@ Fields which represent scalar (singular) values are referred to as _basic fields
 5. [String](#string)
 6. [TTL](#ttl)
 7. [Timestamp](#timestamp)
+
 {% endmethod %}
 
 
