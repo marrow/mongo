@@ -84,7 +84,7 @@ nav ul.summary > :nth-child(-n+2), nav ul.summary > :nth-last-child(-n+2) {
 	text-align: right;
 	float: left;
 	clear: left;
-	width: 10em;
+	width: 11.75em;
 	margin-top: 0;
 }
 
@@ -115,7 +115,7 @@ nav ul.summary > :nth-child(-n+2), nav ul.summary > :nth-last-child(-n+2) {
 
 .markdown-section dl dd {
 	margin-top: .85em;
-	margin-left: 11em;
+	margin-left: 12em;
 }
 
 .markdown-section dl dd:after {
