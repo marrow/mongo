@@ -17,7 +17,9 @@ Fields which represent scalar (singular) values are referred to as _basic fields
 ## Binary
 
 {% method -%}
-A binary string. In Python 3 this is represented as a `bytes` instance, under Python 2 this reads and writes `str` instances.
+A binary string. In Python 3 this is represented as a `bytes` instance, under Python 2 this reads and writes `str` instances. To support binary serialization, it may be useful to implement callables implementing the Marrow Schema transformer protocol and specify them using the `transformer` argument.
+
+Large binary (BLOB) data exceeding a few hundred kilobytes should instead be stored using GridFS.
 
 {% sample lang="python" -%}
 ```python
