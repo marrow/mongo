@@ -46,13 +46,60 @@ from marrow.mongo.field import Date
 ## ObjectId
 
 {% method -%}
+MongoDB utilizes a [compound datatype for default primary keys called an ObjectId](https://docs.mongodb.com/manual/reference/method/ObjectId/). Values generated through casting from dates or date-related types should never be utilized as a primary key, as they can not be gaurenteed to be unique, however they can be extremely useful for range querying.
 
+It is frequently useful to assign this with an overridden MongoDB-side field name, to make accessing the primary key of top-level documents more Pythonic. Additionally, for top-level documents, one might as well assign an ID immediately upon document construction. They are normally constructed client-side by the PyMongo driver anyway.
+
+Subclasses may utilize `super()` to invoke standaard casting behaviour within overridden `to_native` and `to_foreign` methods.
 
 {% sample lang="python" -%}
 ```python
 from marrow.mongo.field import ObjectId
+
+class MyDocument(Document):
+	id = ObjectId('_id', assign=True)
 ```
 {% endmethod %}
+
+#### Accepted Values
+
+<dl>
+	<dt>
+		<h5 id="objectid-value-bson-objectid">BSON <code>ObjectId</code></h5>
+	</dt><dd>
+		<p>
+			Assigning or comparing an existing BSON `ObjectId` instance will utilize it unmodified.
+		</p>
+	</dd>
+	<dt>
+		<h5 id="objectid-value-datetime"><code>datetime</code></h5>
+	</dt><dd>
+		<p>
+			Assignment of or comparison against a `datetime` object will result in the generation of a pseudo-BSON `ObjectId` with only the generation time field filled. This is useful for range comparison, to select for documents based on creation time.
+		</p>
+	</dd>
+	<dt>
+		<h5 id="objectid-value-timedelta"><code>timedelta</code></h5>
+	</dt><dd>
+		<p>
+			As per `datetime` above, utilizing a `datetime` object generated as the addition of the delta to the current time in UTC.
+		</p>
+	</dd>
+	<dt>
+		<h5 id="objectid-value-"><em>MongoDB document</em></h5>
+	</dt><dd>
+		<p>
+			Use of a dictionary or dictionary-alike (such as a `Document` instance) with an assigned `_id` key will utilize the value of that key automatically after casting with the BSON `ObjectId` type.
+		</p>
+	</dd>
+	<dt>
+		<h5 id="objectid-value-"><em>other values</em></h5>
+	</dt><dd>
+		<p>
+			Other values will be cast as unicode strings, then cast using the BSON `ObjectId` type.
+		</p>
+	</dd>
+</dl>
 
 
 ## Regex
@@ -141,7 +188,7 @@ class MyDocument(Document):
 		<h5 id="ttl-value-timedelta"><code>timedelta</code></h5>
 	</dt><dd>
 		<p>
-			Assignment of a <code>timedelta</code> instance will result in the storage of `datetime` representing the current time in UTC modified by that delta through addition.
+			Assignment of a <code>timedelta</code> instance will result in the storage of <code>datetime</code> representing the current time in UTC modified by that delta through addition.
 		</p>
 	</dd>
 	<dt>
