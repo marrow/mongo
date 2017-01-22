@@ -33,46 +33,6 @@ class MyGeoJSONPoint(Document):
 ```
 {% endmethod %}
 
-#### Accepted Values
-
-<dl>
-	<dt>
-		<h5 id="objectid-value-bson-objectid">BSON <code>ObjectId</code></h5>
-	</dt><dd>
-		<p>
-			Assigning or comparing an existing BSON <code>ObjectId</code> instance will utilize it unmodified.
-		</p>
-	</dd>
-	<dt>
-		<h5 id="objectid-value-datetime"><code>datetime</code></h5>
-	</dt><dd>
-		<p>
-			Assignment of or comparison against a <code>datetime</code> object will result in the generation of a pseudo-BSON <code>ObjectId</code> with only the generation time field filled. This is useful for range comparison, to select for documents based on creation time.
-		</p>
-	</dd>
-	<dt>
-		<h5 id="objectid-value-timedelta"><code>timedelta</code></h5>
-	</dt><dd>
-		<p>
-			As per <code>datetime</code> above, utilizing a <code>datetime</code> object generated as the addition of the delta to the current time in UTC.
-		</p>
-	</dd>
-	<dt>
-		<h5 id="objectid-value-"><em>document</em></h5>
-	</dt><dd>
-		<p>
-			Use of a dictionary or dictionary-alike (such as a <code>Document</code> instance) with an assigned <code>_id</code> key will utilize the value of that key automatically after casting with the BSON <code>ObjectId</code> type.
-		</p>
-	</dd>
-	<dt>
-		<h5 id="objectid-value-"><em>other values</em></h5>
-	</dt><dd>
-		<p>
-			Other values will be cast as unicode strings, then cast using the BSON <code>ObjectId</code> type.
-		</p>
-	</dd>
-</dl>
-
 
 ## Array
 
