@@ -41,7 +41,10 @@ class MyGeoJSONPoint(Document):
 
 {% sample lang="python" -%}
 ```python
-from marrow.mongo.field import Array
+from marrow.mongo.field import Array, String
+
+class MyDocument(Document):
+	tags = Array(String(), default=lambda: [], assign=True)
 ```
 {% endmethod %}
 
@@ -49,11 +52,26 @@ from marrow.mongo.field import Array
 ## Embed
 
 {% method -%}
+Embedding allows you to store wholly nested _embedded documents_ within the parent containing document, useful for structuring and grouping related data together.
 
+As per most complex fields the acceptable embedded types may be passed positionally when constructing the field and may either be direct `Document` subclass references or a string containing either the short name of a `marrow.mongo.document` plugin reference or the dot-colon import path to a `Document` subclass such as `myapp.model:Name`.
+
+As per the following example, it is often useful to provide a default constructor and assign the result when constructing a new instance of the containing document. This allows for immediate easy access to the nested fields.
 
 {% sample lang="python" -%}
 ```python
-from marrow.mongo.field import Embed
+from marrow.mongo.field import Embed, String
+
+class Name(Document):
+	surname = String()
+	family = String()
+
+class Person(Document):
+	name = Embed(Name, default=lambda: Name(), assign=True)
+
+alice = Person()
+alice.name.surname = "Alice"
+alice.name.family = "Bevan-McGregor"
 ```
 {% endmethod %}
 
