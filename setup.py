@@ -144,6 +144,8 @@ setup(
 						'Derived = marrow.mongo.core.trait.derived:Derived',
 						'Expires = marrow.mongo.core.trait.expires:Expires',
 						'Heirarchical = marrow.mongo.core.trait.heir:Heirarchical',
+						'Localized = marrow.mongo.core.trait.localized:Localized',
+						'Owned = marrow.mongo.core.trait.owned:Owned',
 						'Published = marrow.mongo.core.trait.published:Published',
 						'Stateful = marrow.mongo.core.trait.stateful:Stateful',
 					],

@@ -4,7 +4,6 @@ from marrow.mongo import Document, Index
 from marrow.mongo.field import PluginReference
 
 
-
 class Derived(Document):
 	"""Access and store the class reference to a particular Document subclass.
 	
