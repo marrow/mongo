@@ -49,7 +49,7 @@ The first step in determining how best to tackle a concern is to ask about it. T
 
 * **Write Some Documentation**
 
-  We like to think that Marrow Mongo's documentation is excellent, but there's always room for improvement. Did you find a typo? Do feel a certain section is unclear? Let us know by leaving a comment on the web version of this document—hover over a paragraph, use the speech bubble on the right—or feel free to contrbute to the [book](https://github.com/marrow/mongo/tree/book).
+  We like to think that Marrow Mongo's documentation is excellent, but there's always room for improvement. Did you find a typo? Do you feel a certain section is unclear? Let us know by leaving a comment on the web version of this document—hover over a paragraph, use the speech bubble on the right—or feel free to contrbute to the [book](https://github.com/marrow/mongo/tree/book).
 
 
 ## Guidelines
