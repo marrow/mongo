@@ -148,6 +148,7 @@ setup(
 						'Owned = marrow.mongo.core.trait.owned:Owned',
 						'Published = marrow.mongo.core.trait.published:Published',
 						'Stateful = marrow.mongo.core.trait.stateful:Stateful',
+						'Identified = marrow.mongo.core.trait.identified:Identified',
 					],
 				# ### WebCore Extensions
 				'web.session': [  # Session Engine
