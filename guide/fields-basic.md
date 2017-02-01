@@ -214,7 +214,7 @@ class MyDocument(Document):
 ## Timestamp
 
 {% method -%}
-Storage of UTC `datetime` instances as BSON UNIX timestamps withing MongoDB.
+Storage of UTC `datetime` instances as BSON UNIX timestamps within MongoDB.
 
 {% sample lang="python" -%}
 ```python
