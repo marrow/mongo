@@ -141,9 +141,9 @@ setup(
 						'Markdown = marrow.mongo.core.field.md:Markdown[markdown]',
 					],
 				'marrow.mongo.trait': [  # Document traits for use as mix-ins.
+						'Derived = marrow.mongo.core.trait.derived:Derived',
 						'Expires = marrow.mongo.core.trait.expires:Expires',
 						'Heirarchical = marrow.mongo.core.trait.heir:Heirarchical',
-						'Owned = marrow.mongo.core.trait.owned:Owned',
 						'Published = marrow.mongo.core.trait.published:Published',
 						'Stateful = marrow.mongo.core.trait.stateful:Stateful',
 					],
