@@ -176,10 +176,11 @@ For further information on time-to-live indexes, please see the [official tutori
 
 {% sample lang="python" -%}
 ```python
+from datetime import timedelta
 from marrow.mongo.field import TTL
 
 class MyDocument(Document):
-	when = TTL()
+	when = TTL(default=timedelta(hours=1))
 ```
 {% endmethod %}
 
