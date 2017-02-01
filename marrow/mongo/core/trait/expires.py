@@ -33,12 +33,12 @@ class Expires(Document):
 	# ## Cooperative Behaviours
 	
 	@classmethod
-	def from_mongo(cls, data):
+	def from_mongo(cls, data, expired=False, **kw):
 		"""In the event a value that has technically already expired is loaded, swap it for None."""
 		
-		value = super(Expires, cls).from_mongo(data)
+		value = super(Expires, cls).from_mongo(data, **kw)
 		
-		if value.is_expired:
+		if not expired and value.is_expired:
 			return None
 		
 		return value

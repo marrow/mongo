@@ -15,5 +15,3 @@ class Localized(Document):
 		language = String(choices=LANGUAGES, default='en')
 	
 	locale = Array(Embed(), default=lambda: [], assign=True)
-	
-	_locale = Index('locale.language')
