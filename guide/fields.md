@@ -9,7 +9,12 @@ The `Field` class is a subclass of Marrow Schema's `Attribute` and all field ins
 
 {% sample lang="python" -%}
 ```python
-from marrow.mongo import Field
+from marrow.mongo import Document, Field
+
+class Sample(Document):
+	name = Field()
+
+assert 'name' in Sample.__fields__
 ```
 {% endmethod %}
 
