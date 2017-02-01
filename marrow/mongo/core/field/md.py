@@ -2,18 +2,18 @@
 
 from __future__ import unicode_literals
 
-from misaka import Markdown, HtmlRenderer, SmartyPants
-from misaka import HTML_ESCAPE, HTML_HARD_WRAP, HTML_SAFELINK
+from misaka import Markdown, HtmlRenderer  # , SmartyPants
+from misaka import HTML_ESCAPE, HTML_HARD_WRAP
 from misaka import EXT_FENCED_CODE, EXT_NO_INTRA_EMPHASIS, EXT_AUTOLINK, EXT_SPACE_HEADERS, EXT_STRIKETHROUGH, EXT_SUPERSCRIPT
 from pygments import highlight, lexers, formatters
 from pygments.lexers import get_lexer_by_name
 from pygments.formatters import HtmlFormatter
 
-from . import String
+from .base import String
 from ....schema.compat import unicode, py3
 
 
-class SourceRenderer(HtmlRenderer, SmartyPants):
+class SourceRenderer(HtmlRenderer):  # , SmartyPants):
 	_formatter = HtmlFormatter()
 	
 	def block_code(self, text, lang):
@@ -30,7 +30,7 @@ class SourceRenderer(HtmlRenderer, SmartyPants):
 		return highlight(text, lexer, self._formatter)
 
 
-renderer = SourceRenderer(flags=HTML_ESCAPE | HTML_HARD_WRAP | HTML_SAFELINK)
+renderer = SourceRenderer(flags=HTML_ESCAPE | HTML_HARD_WRAP)
 md = Markdown(renderer, extensions=EXT_FENCED_CODE | EXT_NO_INTRA_EMPHASIS | EXT_AUTOLINK | EXT_SPACE_HEADERS | \
 		EXT_STRIKETHROUGH | EXT_SUPERSCRIPT)
 
