@@ -82,6 +82,7 @@ setup(
 			'marrow.schema>=1.2.0,<2.0.0',  # Declarative schema support.
 			'marrow.package>=1.1.0,<2.0.0',  # Plugin discovery and loading.
 			'pymongo>=3.2',  # We require modern API.
+			'pathlib2; python_version < "3.4"',  # Path manipulation utility.
 		],
 	
 	extras_require = dict(
@@ -139,16 +140,17 @@ setup(
 						'Decimal = marrow.mongo.core.field.number:Decimal[decimal]',
 						
 						'Markdown = marrow.mongo.core.field.md:Markdown[markdown]',
+						'Path = marrow.mongo.core.field.path:Path',
 					],
 				'marrow.mongo.trait': [  # Document traits for use as mix-ins.
 						'Derived = marrow.mongo.core.trait.derived:Derived',
 						'Expires = marrow.mongo.core.trait.expires:Expires',
 						'Heirarchical = marrow.mongo.core.trait.heir:Heirarchical',
+						'Identified = marrow.mongo.core.trait.identified:Identified',
 						'Localized = marrow.mongo.core.trait.localized:Localized',
 						'Owned = marrow.mongo.core.trait.owned:Owned',
 						'Published = marrow.mongo.core.trait.published:Published',
 						'Stateful = marrow.mongo.core.trait.stateful:Stateful',
-						'Identified = marrow.mongo.core.trait.identified:Identified',
 					],
 				# ### WebCore Extensions
 				'web.session': [  # Session Engine
