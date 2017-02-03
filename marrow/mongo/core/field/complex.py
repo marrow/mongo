@@ -312,8 +312,8 @@ class Alias(Attribute):
 	
 	path = Attribute()
 	
-	def __init__(self, path):
-		super(Alias, self).__init__(path=path)
+	def __init__(self, path, **kw):
+		super(Alias, self).__init__(path=path, **kw)
 	
 	def __fixup__(self, document):
 		"""Called after an instance of our Field class is assigned to a Document."""

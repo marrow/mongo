@@ -1,7 +1,7 @@
 # encoding: utf-8
 
 from ... import Document, Index
-from ...field import ObjectId, String, Array, Alias
+from ...field import ObjectId, String, Path, Array, Alias
 
 
 class Heirarchical(Document):
@@ -10,7 +10,7 @@ class Heirarchical(Document):
 	# ## Heirarchy Field Definition
 	
 	slug = String(required=True)  # A short, lower-case identifier.
-	path = String(required=True)  # The coalesced path to the document.
+	path = Path(required=True)  # The coalesced path to the document.
 	parents = Array(ObjectId(), default=lambda: [], assign=True)
 	
 	parent = Alias('parents.-1', default=None)  # The immediate parent.
