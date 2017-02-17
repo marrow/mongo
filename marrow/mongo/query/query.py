@@ -89,7 +89,23 @@ class Q(object):
 			except AttributeError:
 				pass
 		
+		try:  # Pass through to the field itself as a last resort.
+			return getattr(self._field, name)
+		except AttributeError:
+			pass
+		
 		raise AttributeError()
+	
+	def __setattr__(self, name, value):
+		"""Assign an otherwise unknown attribute on the targeted field instead."""
+		
+		if name.startswith('_'):
+			return super(Q, self).__setattr__(name, value)
+		
+		if self._combining:
+			raise AttributeError()
+		
+		setattr(self._field, name, value)
 	
 	def __getitem__(self, name):
 		"""Allows for referencing specific array elements by index.

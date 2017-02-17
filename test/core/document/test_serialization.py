@@ -2,6 +2,7 @@
 
 from marrow.mongo import Document
 from marrow.mongo.field import Number, String
+from marrow.mongo.trait import Derived
 
 
 class Sample(Document):
@@ -24,7 +25,7 @@ class TestMongoSerialization(object):
 		assert record.number == 27
 	
 	def test_explicit_class(object):
-		record = Sample.from_mongo({'_cls': 'Document', 'foo': 'bar'})
+		record = Derived.from_mongo({'_cls': 'Document', 'foo': 'bar'})
 		assert record.__class__.__name__ == 'Document'
 		assert record['foo'] == 'bar'
 
