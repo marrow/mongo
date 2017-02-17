@@ -80,10 +80,10 @@ class TestDocumentBinding(object):
 		
 		indexes = c.index_information()
 		assert '_field' in indexes
+		del indexes['_field']['v']
 		assert indexes['_field'] == {
 				'background': False,
 				'key': [('field', 1)],
 				'ns': 'test.collection',
 				'sparse': False,
-				'v': 1,
 			}
