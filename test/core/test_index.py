@@ -25,10 +25,10 @@ class TestIndex(object):
 		Sample._field.create_index(coll)
 		indexes = coll.index_information()
 		assert '_field' in indexes
+		del indexes['_field']['v']
 		assert indexes['_field'] == {
 				'background': False,
 				'key': [('field_name', 1)],
 				'ns': 'test.collection',
 				'sparse': False,
-				'v': 1,
 			}
