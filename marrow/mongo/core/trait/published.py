@@ -8,7 +8,7 @@ from ...field import Date
 
 class Published(Document):
 	created = Date(default=utcnow, assign=True, write=False)
-	modified = Date(default=utcnow, assign=True, autoupdate=True, write=False)
+	modified = Date(default=utcnow, assign=True, write=False)
 	published = Date(default=None)
 	retracted = Date(default=None)
 	
@@ -16,7 +16,7 @@ class Published(Document):
 	
 	@property
 	def is_published(self):
-		now = datetime.utcnow()
+		now = utcnow()
 		
 		if self.published and self.published < now:
 			return False

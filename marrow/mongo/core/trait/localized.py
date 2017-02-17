@@ -11,6 +11,8 @@ LANGUAGES |= {'zhs', 'zht'}  # RLP
 
 
 class Localized(Document):
+	"""The annotated Document contains localized data."""
+	
 	class Locale(Document):
 		__pk__ = 'language'
 		
