@@ -266,32 +266,36 @@ class PluginReference(Field):
 			namespace = self.namespace
 		except AttributeError:
 			namespace = None
-			if __debug__:
-				names = plugins = {}
-		else:
-			if __debug__:
-				names = {i.name: i.load() for i in iter_entry_points(namespace)}
-				plugins = {j: i for i, j in names.items()}
 		
 		try:
 			explicit = self.explicit
 		except AttributeError:
 			explicit = not bool(namespace)
 		
-		if isinstance(value, (str, unicode)):
-			if ':' in value:
-				if not explicit:
-					raise ValueError("Explicit object references not allowed.")
+		if not isinstance(value, (str, unicode)):
+			value = canon(value)
+		
+		if namespace and ':' in value:  # Try to reduce to a known plugin short name.
+			for point in iter_entry_points(namespace):
+				qualname = point.module_name
 				
-			elif __debug__ and namespace and value not in names:
-				raise ValueError('Unknown plugin "' + value + '" for namespace "' + namespace + '".')
+				if point.attrs:
+					qualname += ':' + '.'.join(point.attrs)
+				
+				if qualname == value:
+					value = point.name
+					break
+		
+		if ':' in value:
+			if not explicit:
+				raise ValueError("Explicit object references not allowed.")
 			
 			return value
 		
-		if __debug__ and namespace and not explicit and value not in plugins:
-			raise ValueError(repr(value) + ' object is not a known plugin for namespace "' + namespace + '".')
+		if namespace and value not in (i.name for i in iter_entry_points(namespace)):
+			raise ValueError('Unknown plugin "' + value + '" for namespace "' + namespace + '".')
 		
-		return plugins.get(value, canon(value))
+		return value
 
 
 class Alias(Attribute):
