@@ -62,6 +62,7 @@ class Field(Attribute):
 	
 	# Security Properties
 	
+	repr = Attribute(default=True)  # Should this field be included in the programmers' representation?
 	project = Attribute(default=None)  # Predicate to indicate inclusion in the default projection.
 	read = Attribute(default=True)  # Read predicate, either a boolean, callable, or web.security ACL predicate.
 	write = Attribute(default=True)  # Write predicate, either a boolean, callable, or web.security ACL predicate.

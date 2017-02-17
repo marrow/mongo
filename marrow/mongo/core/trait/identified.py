@@ -17,4 +17,6 @@ class Identified(Document):
 	No need for an explicit index on this as MongoDB will provide one automatically.
 	"""
 	
-	id = ObjectId('_id', assign=True)
+	__pk__ = 'id'
+	
+	id = ObjectId('_id', assign=True, write=False, repr=False)

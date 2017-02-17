@@ -4,6 +4,7 @@ from __future__ import unicode_literals
 
 from collections import MutableMapping
 
+from bson import ObjectId
 from bson.binary import STANDARD
 from bson.codec_options import CodecOptions
 from bson.json_util import dumps, loads
@@ -15,8 +16,9 @@ from pymongo.read_preferences import ReadPreference
 from pymongo.write_concern import WriteConcern
 
 from ...package.loader import load
+from ...package.canonical import name as named
 from ...schema import Attributes, Container
-from ...schema.compat import odict
+from ...schema.compat import str, unicode, odict
 from ..util import SENTINEL
 from .field import Field
 from .index import Index
@@ -40,7 +42,8 @@ class Document(Container):
 	# Note: These may be dynamic based on content; always access from an instance where possible.
 	__store__ = odict # For fields, this may be a bson type like Binary, or Code.
 	__foreign__ = {'object'}  # The representation for the database side of things, ref: $type
-	__type_store__ = '_cls'  # The pseudo-field to store embedded document class references as.
+	__type_store__ = None  # The pseudo-field to store embedded document class references as.
+	__pk__ = None  # The primary key of the document, to make searchable if embedded, or the name of the '_id' field.
 	
 	__bound__ = False  # Has this class been "attached" to a live MongoDB connection?
 	__collection__ = None  # The name of the collection to "attach" to using bind().
@@ -99,7 +102,7 @@ class Document(Container):
 			# No positive inclusions given, but negative ones were.
 			projected = neutral
 		
-		return {name: True for name in projected}
+		return {field: True for field in projected}
 	
 	@classmethod
 	def __attributed__(cls):
@@ -174,15 +177,15 @@ class Document(Container):
 		"""
 		
 		if isinstance(target, Collection):
-			name = target.name
+			collection = target.name
 			target = target.database
 		else:
-			name = cls.__collection__
+			collection = cls.__collection__
 		
 		if recreate:
-			target.drop_collection(name)
+			target.drop_collection(collection)
 		
-		collection = target.create_collection(name, **cls._collection_configuration(True))
+		collection = target.create_collection(collection, **cls._collection_configuration(True))
 		
 		if indexes:
 			cls.create_indexes(collection)
@@ -263,6 +266,59 @@ class Document(Container):
 		"""
 		
 		return self  # We're sufficiently dictionary-like to pass muster.
+	
+	# Python Magic Methods
+	
+	def __repr__(self, *args, **kw):
+		"""A generic programmers' representation of documents.
+		
+		We add a little non-standard protocol on top of Python's own `__repr__`, allowing passing of additional
+		positional or keyword paramaters for inclusion in the result. This allows subclasses to define additional
+		information not based on simple field presence.
+		"""
+		
+		parts = []
+		
+		if self.__pk__:
+			pk = getattr(self, self.__pk__, None)
+			
+			if isinstance(pk, ObjectId):
+				pk = unicode(pk)
+			elif isinstance(pk, (str, unicode)):
+				pass
+			else:
+				pk = repr(pk)
+			
+			parts.append(pk)
+		
+		parts.extend(args)
+		
+		for name, field in self.__fields__.items():
+			if name == self.__pk__:
+				continue
+			
+			if field.repr is not None:
+				if callable(field.repr):
+					if not field.repr():
+						continue
+				else:
+					if not field.repr:
+						continue
+			
+			value = getattr(self, name, None)
+			
+			if value:
+				parts.append(name + "=" + repr(value))
+		
+		for k in kw:
+			parts.append(k + "=" + repr(kw[k]))
+		
+		if self.__type_store__:
+			cls = self.get(self.__type_store__, named(self.__class__))
+		else:
+			cls = self.__class__.__name__
+		
+		return "{0}({1})".format(cls, ", ".join(parts))
 	
 	# Mapping Protocol
 	

@@ -12,6 +12,14 @@ LANGUAGES |= {'zhs', 'zht'}  # RLP
 
 class Localized(Document):
 	class Locale(Document):
+		__pk__ = 'language'
+		
 		language = String(choices=LANGUAGES, default='en')
 	
-	locale = Array(Embed(), default=lambda: [], assign=True)
+	locale = Array(Embed(), default=lambda: [], assign=True, repr=False)
+	
+	def __repr__(self):
+		if self.locale:
+			return super(Localized, self).__repr__('{' + ', '.join(i.language for i in self.locale) + '}')
+		
+		return super(Localized, self).__repr__()
