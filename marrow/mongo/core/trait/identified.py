@@ -1,7 +1,7 @@
 # encoding: utf-8
 
-from marrow.mongo import Document
-from marrow.mongo.field import ObjectId
+from ... import Document
+from ...field import ObjectId
 
 
 class Identified(Document):

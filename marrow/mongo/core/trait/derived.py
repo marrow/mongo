@@ -1,7 +1,7 @@
 # encoding: utf-8
 
-from marrow.mongo import Document, Index
-from marrow.mongo.field import PluginReference
+from ... import Document, Index
+from ...field import PluginReference
 
 
 class Derived(Document):

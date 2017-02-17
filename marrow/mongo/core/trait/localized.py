@@ -1,7 +1,7 @@
 # encoding: utf-8
 
-from marrow.mongo import Document, Index
-from marrow.mongo.field import String, Array, Embed
+from ... import Document
+from ...field import String, Array, Embed
 
 
 LANGUAGES = {'en', 'fr', 'it', 'de', 'es', 'pt', 'ru'}  # EFIGSPR, ISO 639-1
