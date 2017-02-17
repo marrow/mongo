@@ -15,3 +15,10 @@ class Derived(Document):
 	cls = PluginReference('marrow.mongo.document', '_cls', explicit=True, repr=False)
 	
 	_cls = Index('cls')
+	
+	def __init__(self, *args, **kw):
+		"""Automatically derive and store the class path or plugin reference name."""
+		
+		super(Derived, self).__init__(*args, **kw)
+		
+		self.cls = self.__class__
