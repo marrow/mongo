@@ -2,17 +2,15 @@
 
 from __future__ import unicode_literals
 
-from datetime import datetime, timedelta
-
 import pytest
 from bson import ObjectId as oid
 from bson import DBRef
-from bson.tz_util import utc
 
 from marrow.mongo import Document
 from marrow.mongo.core.field.complex import _HasKinds
 from marrow.mongo.field import Array, Embed, PluginReference, Reference, String
-from marrow.schema.compat import odict, unicode
+from marrow.mongo.trait import Derived
+from marrow.schema.compat import odict
 
 
 class FieldExam(object):
@@ -27,7 +25,7 @@ class FieldExam(object):
 		return Sample
 
 
-class Concrete(Document):
+class Concrete(Derived, Document):
 	__collection__ = 'collection'
 	
 	foo = String()
@@ -69,7 +67,7 @@ class TestSingularArrayField(FieldExam):
 
 class TestMultipleArrayField(FieldExam):
 	__field__ = Array
-	__args__ = (Document, Document)
+	__args__ = (Document, Concrete)
 	
 	def test_native_cast(self, Sample):
 		inst = Sample.from_mongo({'field': [{'foo': 27, 'bar': 42}]})
@@ -82,8 +80,8 @@ class TestMultipleArrayField(FieldExam):
 			Sample(field=[{}])
 	
 	def test_foreign_reference(self, Sample):
-		inst = Sample(field=[Document()])
-		assert inst.field[0]['_cls'] == 'marrow.mongo.core.document:Document'
+		inst = Sample(field=[Concrete()])
+		assert inst.field[0]['_cls'] == 'test_complex:Concrete'
 
 
 class TestSingularEmbedField(FieldExam):
@@ -103,7 +101,7 @@ class TestSingularEmbedField(FieldExam):
 
 class TestMultipleEmbedField(FieldExam):
 	__field__ = Embed
-	__args__ = (Document, Document)
+	__args__ = (Document, Concrete)
 	
 	def test_native_cast(self, Sample):
 		inst = Sample.from_mongo({'field': {'foo': 27, 'bar': 42}})
@@ -116,8 +114,8 @@ class TestMultipleEmbedField(FieldExam):
 			Sample(field={})
 	
 	def test_foreign_reference(self, Sample):
-		inst = Sample(field=Document())
-		assert inst.field['_cls'] == 'marrow.mongo.core.document:Document'
+		inst = Sample(field=Concrete())
+		assert inst.field['_cls'] == 'test_complex:Concrete'
 
 
 class TestReferenceField(FieldExam):

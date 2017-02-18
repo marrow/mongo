@@ -100,7 +100,7 @@ setup(
 	entry_points = {
 				# ### Marrow Mongo Lookups
 				'marrow.mongo.document': [  # Document classes registered by name.
-						'Document = marrow.mongo.core:Document',
+						'Document = marrow.mongo.core.document:Document',
 						
 						'VerifiedAddress = marrow.mongo.basics.email:VerifiedAddress',
 						'BaseLocation = marrow.mongo.basics.location:BaseLocation',
