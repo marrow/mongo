@@ -9,6 +9,7 @@ from collections import MutableMapping
 from bson import ObjectId as OID
 
 from . import Field
+from ...util import utcnow
 from ....schema import Attribute
 from ....schema.compat import unicode
 
@@ -114,13 +115,13 @@ class TTL(Date):
 	
 	def to_foreign(self, obj, name, value):  # pylint:disable=unused-argument
 		if isinstance(value, timedelta):
-			return datetime.utcnow() + value
+			return utcnow() + value
 		
 		if isinstance(value, datetime):
 			return value
 		
 		if isinstance(value, Number):
-			return datetime.utcnow() + timedelta(days=value)
+			return utcnow() + timedelta(days=value)
 		
 		raise ValueError("Invalid TTL value: " + repr(value))
 

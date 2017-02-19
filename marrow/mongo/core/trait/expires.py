@@ -28,7 +28,7 @@ class Expires(Document):
 		if not self.expires:
 			return None  # None is falsy, preserving the "no, it's not expired" interpretation, but still flagging.
 		
-		return self.expires >= utcnow()
+		return self.expires <= utcnow()
 	
 	# ## Cooperative Behaviours
 	
