@@ -20,6 +20,7 @@ class TestExpires(object):
 	def test_empty_repr(self):
 		inst = self.Sample()
 		assert repr(inst) == 'Sample()'
+		assert inst.is_expired is None
 	
 	def test_integer_assignment(self):
 		now = utcnow()
