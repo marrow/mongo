@@ -279,8 +279,6 @@ class PluginReference(Field):
 				if point.attrs:
 					qualname += ':' + '.'.join(point.attrs)
 				
-				print("value", value, "vs", qualname, "from", point)
-				
 				if qualname == value:
 					value = point.name
 					break
