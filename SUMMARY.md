@@ -19,13 +19,22 @@
 
 ## Guide
 
-* [Defining Documents](guide/documents.md)
-* [Document Instances](guide/instances.md)
+* [Defining Document Models](guide/documents.md)
+* [Working with Instances](guide/instances.md)
 * [Fields](guide/fields.md)
-  * [Basic](guide/fields-basic.md)
-  * [Complex](guide/fields-complex.md)
-  * [Numeric](guide/fields-numeric.md)
-  * [Markdown](guide/fields-markdown.md)
+  * [Basic](guide/field/basic.md)
+  * [Complex](guide/field/complex.md)
+  * [Numeric](guide/field/numeric.md)
+  * [Markdown](guide/field/markdown.md)
+* Traits
+  * [Derived](guide/trait/derived.md)
+  * [Expires](guide/trait/expires.md)
+  * [Heirarchical](guide/trait/heirarchical.md)
+  * [Identified](guide/trait/identified.md)
+  * [Localized](guide/trait/localized.md)
+  * [Owned](guide/trait/owned.md)
+  * [Published](guide/trait/published.md)
+  * [Stateful](guide/trait/stateful.md)
 * [Indexes](guide/indexes.md)
 * [Querying](guide/querying.md)
 * [Parametric Helpers](guide/parametric.md)
