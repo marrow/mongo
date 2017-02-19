@@ -23,13 +23,6 @@ def Sample(request):
 	class Sample(Document):
 		__collection__ = 'collection'
 		__engine__ = {'mmapv1': {}}
-		__collation__ = {
-				'locale': 'fr_CA',
-				'strength': 1,
-				'numericOrdering': True,
-				'normalization': True,
-				'backwards': False
-			}
 		
 		field = Field()
 		other = Field()
@@ -88,21 +81,9 @@ class TestDocumentBinding(object):
 		indexes = c.index_information()
 		assert '_field' in indexes
 		del indexes['_field']['v']
-		del indexes['_field']['collation']['version']
 		assert indexes['_field'] == {
 				'background': False,
 				'key': [('field', 1)],
 				'ns': 'test.collection',
-				'sparse': False,
-				'collation': {
-					'alternate': 'non-ignorable',
-					'backwards': False,
-					'caseFirst': 'off',
-					'caseLevel': False,
-					'locale': 'fr_CA',
-					'maxVariable': 'punct',
-					'normalization': True,
-					'numericOrdering': True,
-					'strength': 1,
-				}
+				'sparse': False
 			}

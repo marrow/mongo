@@ -164,7 +164,7 @@ class Document(Container):
 			config['validator'] = cls.__validator__
 			config['validationLevel'] = 'strict' if cls.__validate__ is True else cls.__validate__
 		
-		if cls.__collation__ is not None:
+		if cls.__collation__ is not None:  # pragma: no cover
 			config['collation'] = cls.__collation__
 		
 		return config
