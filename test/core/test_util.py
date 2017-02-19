@@ -1,7 +1,14 @@
 # encoding: utf-8
 
+import pytest
+
 from marrow.mongo import Document, Field
 from marrow.mongo.util import adjust_attribute_sequence, utcnow
+
+
+def test_utcnow():
+	now = utcnow()
+	assert now.tzinfo
 
 
 class TestSequenceAdjustment(object):
@@ -20,3 +27,12 @@ class TestSequenceAdjustment(object):
 			first = Field()
 		
 		assert Inner('first', 'last').first == 'first'
+	
+	def test_explosion(self):
+		with pytest.raises(TypeError):
+			class Inner(Document):
+				field = Field()
+			
+			@adjust_attribute_sequence('field')
+			class Other(Inner):
+				pass
