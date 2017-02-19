@@ -299,7 +299,7 @@ class Document(Container):
 			
 			if field.repr is not None:
 				if callable(field.repr):
-					if not field.repr():
+					if not field.repr(self, field):
 						continue
 				else:
 					if not field.repr:
@@ -357,10 +357,7 @@ class Document(Container):
 		
 		return self.__data__.items()
 	
-	def iteritems(self):
-		"""Python 2 interation, as per items."""
-		
-		return self.__data__.items()
+	iteritems = items  # Python 2 interation, as per items.
 	
 	def values(self):
 		"""Iterate the values within the backing store."""
