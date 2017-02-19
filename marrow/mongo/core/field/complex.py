@@ -79,9 +79,6 @@ class _CastingKind(Field):
 			
 			value = kind(**value)
 		
-		if isinstance(value, Document) and value.__type_store__ not in value and len(kinds) != 1:
-			value[value.__type_store__] = canon(value.__class__)  # Automatically add the tracking field.
-		
 		return value
 
 
