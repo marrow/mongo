@@ -171,6 +171,9 @@ class TestQueryableQueryableQueryable(object):
 		
 		assert z._field == a._field + b._field
 	
+	def test_combining_setattr(self, S):
+		with pytest.raises(AttributeError):
+			(S.foo & S.bar).xyzzy = 27
 
 
 class TestQueryableFieldCombinations(object):
