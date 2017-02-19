@@ -31,6 +31,7 @@ tests_require = [
 		'pytest-flakes',  # syntax validation
 		'pytest-capturelog',  # log capture
 		'pytest-isort',  # import ordering
+		'misaka', 'pygments',  # Markdown field support
 	]
 
 
