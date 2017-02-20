@@ -21,7 +21,8 @@ class Published(Document):
 	def only_published(cls, at=None):
 		"""Produce a query fragment suitable for selecting documents public.
 		
-		Now (no arguments), at a specific time (datetime argument), or relative to now (timedelta)."""
+		Now (no arguments), at a specific time (datetime argument), or relative to now (timedelta).
+		"""
 		
 		if isinstance(at, timedelta):
 			at = utcnow() + timedelta
@@ -39,10 +40,10 @@ class Published(Document):
 	def is_published(self):
 		now = utcnow()
 		
-		if self.published and self.published < now:
+		if self.published and self.published > now:
 			return False
 		
-		if self.retracted and self.retracted > now:
+		if self.retracted and self.retracted < now:
 			return False
 		
 		return True
