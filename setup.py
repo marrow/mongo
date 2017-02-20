@@ -149,7 +149,6 @@ setup(
 						'Heirarchical = marrow.mongo.core.trait.heir:Heirarchical',
 						'Identified = marrow.mongo.core.trait.identified:Identified',
 						'Localized = marrow.mongo.core.trait.localized:Localized',
-						'Owned = marrow.mongo.core.trait.owned:Owned',
 						'Published = marrow.mongo.core.trait.published:Published',
 						'Stateful = marrow.mongo.core.trait.stateful:Stateful',
 					],
