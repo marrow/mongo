@@ -2,8 +2,11 @@
 
 """Data model trait mix-in for tracking record publication and retraction."""
 
+from datetime import timedelta
+
 from ... import Document, Index, utcnow
 from ...field import Date
+from ...util import utcnow
 
 
 class Published(Document):
@@ -13,6 +16,24 @@ class Published(Document):
 	retracted = Date(default=None)
 	
 	_availability = Index('published', 'retracted')
+	
+	@classmethod
+	def only_published(cls, at=None):
+		"""Produce a query fragment suitable for selecting documents public.
+		
+		Now (no arguments), at a specific time (datetime argument), or relative to now (timedelta)."""
+		
+		if isinstance(at, timedelta):
+			at = utcnow() + timedelta
+		else:
+			at = at or utcnow()
+		
+		pub, ret = cls.published, cls.retracted
+		
+		publication = (-pub) | (pub == None) | (pub <= at)
+		retraction = (-ret) | (ret == None) | (ret > at)
+		
+		return publication & retraction
 	
 	@property
 	def is_published(self):
