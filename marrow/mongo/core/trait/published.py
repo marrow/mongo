@@ -11,7 +11,7 @@ from ...util import utcnow
 
 class Published(Document):
 	created = Date(default=utcnow, assign=True, write=False)
-	modified = Date(default=utcnow, assign=True, write=False)
+	modified = Date(default=None, write=False)
 	published = Date(default=None)
 	retracted = Date(default=None)
 	
@@ -25,7 +25,7 @@ class Published(Document):
 		"""
 		
 		if isinstance(at, timedelta):
-			at = utcnow() + timedelta
+			at = utcnow() + at
 		else:
 			at = at or utcnow()
 		
