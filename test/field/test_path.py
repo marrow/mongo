@@ -2,26 +2,22 @@
 
 from __future__ import unicode_literals
 
-import pytest
-
-from marrow.mongo import Document
+from common import FieldExam
 from marrow.mongo.core.field.path import _Path
 from marrow.mongo.field import Path
 from marrow.schema.compat import unicode
 
 
-class Sample(Document):
-	path = Path()
-
-
-class TestPathField(object):
-	def test_native_conversion(self):
-		inst = Sample.from_mongo({'path': '/foo'})
-		value = inst.path
+class TestPathField(FieldExam):
+	__field__ = Path
+	
+	def test_native_conversion(self, Sample):
+		inst = Sample.from_mongo({'field': '/foo'})
+		value = inst.field
 		assert isinstance(value, _Path)
 		assert unicode(value) == '/foo'
 	
-	def test_foreign_conversion(self):
+	def test_foreign_conversion(self, Sample):
 		inst = Sample(_Path('/bar'))
-		assert isinstance(inst['path'], unicode)
-		assert inst['path'] == '/bar'
+		assert isinstance(inst['field'], unicode)
+		assert inst['field'] == '/bar'

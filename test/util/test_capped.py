@@ -2,6 +2,7 @@
 
 from __future__ import unicode_literals
 
+import os
 from functools import partial
 from random import choice
 from threading import Thread
@@ -12,6 +13,9 @@ from pytest import fixture
 
 from marrow.mongo import Document
 from marrow.mongo.util.capped import _patch, tail
+
+
+pytestmark = pytest.mark.skipif(int(os.environ.get('TEST_SKIP_CAPPED', 0)), reason="Slow tests skipped.")
 
 
 class Uncapped(Document):

@@ -2,39 +2,35 @@
 
 from __future__ import unicode_literals
 
-import pytest
-
-from marrow.mongo import Document
+from common import FieldExam
 from marrow.mongo.field import Markdown
 
 
-
-class TestMarkdownField(object):
-	class Sample(Document):
-		text = Markdown()
+class TestMarkdownField(FieldExam):
+	__field__ = Markdown
 	
-	def test_plain_text(self):
-		inst = self.Sample("This is a test.")
-		assert inst.text == 'This is a test.'
+	def test_plain_text(self, Sample):
+		inst = Sample("This is a test.")
+		assert inst.field == 'This is a test.'
 	
-	def test_formatted_text(self):
-		inst = self.Sample("This is a **test**.")
-		assert inst.text == 'This is a **test**.'
-		assert inst.text.__html__() == '<p>This is a <strong>test</strong>.</p>\n'
+	def test_formatted_text(self, Sample):
+		inst = Sample("This is a **test**.")
+		assert inst.field == 'This is a **test**.'
+		assert inst.field.__html__() == '<p>This is a <strong>test</strong>.</p>\n'
 	
-	def test_cast_protocol_magic(self):
+	def test_cast_protocol_magic(self, Sample):
 		class Inner(object):
 			def __markdown__(self):
 				return "Some Markdown text."
 		
-		inst = self.Sample(Inner())
-		assert inst.text == 'Some Markdown text.'
+		inst = Sample(Inner())
+		assert inst.field == 'Some Markdown text.'
 	
-	def test_cast_protocol_property(self):
+	def test_cast_protocol_property(self, Sample):
 		class Inner(object):
 			@property
 			def as_markdown(self):
 				return "Other Markdown text."
 		
-		inst = self.Sample(Inner())
-		assert inst.text == 'Other Markdown text.'
+		inst = Sample(Inner())
+		assert inst.field == 'Other Markdown text.'

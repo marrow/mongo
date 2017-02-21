@@ -9,6 +9,7 @@ from marrow.mongo.document import (
 		GeometryCollection, LineString, MultiLineString, MultiPoint, MultiPolygon, Point, Polygon)
 from marrow.mongo.field import Embed
 
+'''
 
 class TestPointField(object):
 	D = Point
@@ -245,3 +246,4 @@ class TestGeometryCollectionField(object):
 				}
 			]
 		}
+'''

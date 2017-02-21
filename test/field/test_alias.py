@@ -1,11 +1,12 @@
 # encoding: utf-8
 
+'''
 from __future__ import unicode_literals
 
 import pytest
 
 from marrow.mongo import Document
-from marrow.mongo.field import Alias, Array, Embed, String
+from marrow.mongo.field import Alias
 from marrow.schema.compat import unicode
 
 
@@ -93,3 +94,5 @@ class TestAliasArrayEmbed(object):
 		inst = self.Sample.from_mongo({'field': [{'field': 'foo'}]})
 		inst.alias = 'bar'
 		assert inst.__data__ == {'field': [{'field': 'bar'}]}
+
+'''
