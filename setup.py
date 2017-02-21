@@ -29,7 +29,7 @@ tests_require = [
 		'pytest',  # test collector and extensible runner
 		'pytest-cov',  # coverage reporting
 		'pytest-flakes',  # syntax validation
-		'pytest-capturelog',  # log capture
+		'pytest-catchlog',  # log capture
 		'pytest-isort',  # import ordering
 		'misaka', 'pygments',  # Markdown field support
 	]
