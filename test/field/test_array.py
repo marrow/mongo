@@ -2,12 +2,9 @@
 
 from __future__ import unicode_literals
 
-'''
-from marrow.mongo import Document
-from marrow.mongo.core.field.complex import _HasKinds
-from marrow.mongo.field import Array, String, Embed
-
 from common import FieldExam
+from marrow.mongo import Document
+from marrow.mongo.field import Array
 
 
 class TestSingularArrayField(FieldExam):
@@ -19,4 +16,3 @@ class TestSingularArrayField(FieldExam):
 		assert isinstance(inst.field[0], Document)
 		assert inst.field[0]['foo'] == 27
 		assert inst.field[0]['bar'] == 42
-'''

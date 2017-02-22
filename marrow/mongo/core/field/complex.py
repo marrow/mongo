@@ -17,72 +17,93 @@ from ....schema import Attribute
 from ....schema.compat import odict, str, unicode
 
 
-class _HasKinds(Field):
+class _HasKind(Field):
 	"""A mix-in to provide an easily definable singular or plural set of document types."""
 	
 	kind = Attribute(default=None)  # One or more foreign model references, a string, Document subclass, or set of.
 	
-	def __init__(self, *kinds, **kw):
-		if kinds:
-			kw['kind'] = kinds
+	def __init__(self, *args, **kw):
+		if args:
+			kw['kind'], args = args[0], args[1:]
 		
-		super(_HasKinds, self).__init__(**kw)
+		super(_HasKind, self).__init__(*args, **kw)
+	
+	def __fixup__(self, document):
+		super(_HasKind, self).__fixup__(document)
+		
+		kind = self.kind
+		
+		if not kind:
+			return
+		
+		if isinstance(kind, Field):
+			print("updating child field", self.__name__, repr(kind))
+			kind.__name__ = self.__name__
+			kind.__document__ = proxy(document)
+			kind.__fixup__(document)  # Chain this down to embedded fields.
+	
+	@property
+	def _kind(self):
+		kind = self.kind
+		
+		if isinstance(kind, (str, unicode)):
+			if kind.startswith('.'):
+				kind = traverse(self.__document__, kind[1:])  # This allows the reference to be dynamic.
+				
+				if not isinstance(kind, (str, unicode)):
+					return kind
+			else:
+				kind = load(value, 'marrow.mongo.document')
+		
+		self.__dict__['_kind'] = kind
+		return kind
 	
 	@property
 	def kinds(self):
-		values = self.kind
-		
-		if isinstance(values, (str, unicode)) or not isinstance(values, Iterable):
-			values = (values, )
-		
-		for value in values:
-			if isinstance(value, (str, unicode)):
-				value = load(value, 'marrow.mongo.document')
-			
-			yield value
+		if self._kind:
+			yield self._kind
 
 
 class _CastingKind(Field):
 	def to_native(self, obj, name, value):  # pylint:disable=unused-argument
 		"""Transform the MongoDB value into a Marrow Mongo value."""
 		
-		if not isinstance(value, Document):
-			
-			kinds = list(self.kinds)
-			
-			if len(kinds) == 1:
-				if hasattr(kinds[0], 'transformer'):
-					value = kinds[0].transformer.native(value, (kinds[0], obj))
-				else:
-					value = kinds[0].from_mongo(value)
-			else:
-				value = Document.from_mongo(value)  # TODO: Pass in allowed classes.
+		from marrow.mongo.trait import Derived
 		
-		return value
+		kind = self._kind
+		
+		if isinstance(value, Document):
+			if __debug__ and kind and issubclass(kind, Document) and not isinstance(value, kind):
+				raise ValueError("Not an instance of " + kind.__name__ + " or a sub-class: " + repr(value))
+			
+			return value
+		
+		if isinstance(kind, Field):
+			return kind.transformer.native(value, (kind, obj))
+		
+		return (kind or Derived).from_mongo(value)
 	
 	def to_foreign(self, obj, name, value):  # pylint:disable=unused-argument
 		"""Transform to a MongoDB-safe value."""
 		
-		kinds = list(self.kinds)
+		kind = self._kind
 		
-		if not isinstance(value, Document):
-			if len(kinds) != 1:
-				raise ValueError("Ambigouous assignment, assign an instance of: " + \
-						", ".join(repr(kind) for kind in kinds))
+		if isinstance(value, Document):
+			if __debug__ and kind and issubclass(kind, Document) and not isinstance(value, kind):
+				raise ValueError("Not an instance of " + kind.__name__ + " or a sub-class: " + repr(value))
 			
-			kind = kinds[0]
-			
-			# Attempt to figure out what to do with the value.
-			if isinstance(kind, Field):
-				kind.__name__ = self.__name__
-				return kind.transformer.foreign(value, (kind, obj))
-			
+			return value
+		
+		if isinstance(kind, Field):
+			return kind.transformer.foreign(value, (kind, obj))
+		
+		if kind:
 			value = kind(**value)
 		
 		return value
 
 
-class Array(_HasKinds, _CastingKind, Field):
+class Array(_HasKind, _CastingKind, Field):
 	__foreign__ = 'array'
 	__allowed_operators__ = {'#array', '$elemMatch'}
 	
@@ -106,7 +127,7 @@ class Array(_HasKinds, _CastingKind, Field):
 		return self.List(super(Array, self).to_foreign(obj, name, i) for i in value)
 
 
-class Embed(_HasKinds, _CastingKind, Field):
+class Embed(_HasKind, _CastingKind, Field):
 	__foreign__ = 'object'
 	__allowed_operators__ = {'#document'}
 	
@@ -128,7 +149,7 @@ class Embed(_HasKinds, _CastingKind, Field):
 		return result
 
 
-class Reference(_HasKinds, Field):
+class Reference(_HasKind, Field):
 	concrete = Attribute(default=False)  # If truthy, will store a DBRef instead of ObjectId.
 	cache = Attribute(default=None)  # Attributes to preserve from the referenced object at the reference level.
 	
@@ -212,16 +233,16 @@ class Reference(_HasKinds, Field):
 			except InvalidId:
 				identifier = value
 		
-		kinds = list(self.kinds)
-		
-		if not isinstance(value, Document) and len(kinds) > 1:
-			raise ValueError("Passed an identifier (not a Document instance) when multiple document kinds registered.")
+		kind = self._kind
 		
 		if self.concrete:
-			if isinstance(value, Document):
+			if isinstance(value, Document) and value.__collection__:
 				return DBRef(value.__collection__, identifier)
 			
-			return DBRef(kinds[0].__collection__, identifier)
+			if kind:
+				return DBRef(kind.__collection__, identifier)
+			
+			return DBRef(None, identifier)
 		
 		return identifier
 
@@ -318,6 +339,7 @@ class Alias(Attribute):
 	
 	def __fixup__(self, document):
 		"""Called after an instance of our Field class is assigned to a Document."""
+		
 		self.__document__ = proxy(document)
 	
 	def __get__(self, obj, cls=None):

@@ -1,6 +1,5 @@
 # encoding: utf-8
 
-'''
 from __future__ import unicode_literals
 
 import operator
@@ -304,4 +303,3 @@ class TestQueryableFieldCombinations(object):
 	def test_inversion_fails(self, T):
 		with pytest.raises(TypeError):
 			~(T.id ^ T.reply.id)
-'''

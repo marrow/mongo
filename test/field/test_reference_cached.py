@@ -1,17 +1,15 @@
 # encoding: utf-8
 
-'''
 from __future__ import unicode_literals
 
 import pytest
 from bson import ObjectId as oid
 
+from common import FieldExam
 from marrow.mongo import Document
-from marrow.mongo.field import CachingReference
+from marrow.mongo.field import Reference, String
 from marrow.mongo.trait import Derived
 from marrow.schema.compat import odict
-
-from common import FieldExam
 
 
 class Concrete(Derived, Document):
@@ -22,8 +20,9 @@ class Concrete(Derived, Document):
 
 
 class TestCachingReferenceField(FieldExam):
-	__field__ = CachingReference
-	__args__ = (Concrete, 'foo')
+	__field__ = Reference
+	__args__ = (Concrete,)
+	__kwargs__ = dict(cache=('foo',))
 	
 	def test_foreign(self, Sample):
 		assert Sample.field._field.__foreign__ == 'object'
@@ -38,7 +37,7 @@ class TestCachingReferenceField(FieldExam):
 		
 		assert isinstance(inst.field, odict)
 		assert inst.field['_id'] == val['_id']
-		assert inst.field['_cls'] == 'test_complex:Concrete'
+		assert inst.field['_cls'] == 'test_reference_cached:Concrete'
 		assert inst.field['foo'] == val['foo']
 	
 	def test_foreign_cast_dict(self, Sample):
@@ -102,4 +101,3 @@ class TestCachingReferenceField(FieldExam):
 		inst = Ref(val)
 		
 		assert inst.field['field']['field'] == 27
-'''

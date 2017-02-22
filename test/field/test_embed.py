@@ -1,13 +1,11 @@
 # encoding: utf-8
 
-'''
 from __future__ import unicode_literals
 
-from marrow.mongo import Document
-from marrow.mongo.field import String, Embed
-from marrow.mongo.trait import Derived
-
 from common import FieldExam
+from marrow.mongo import Document
+from marrow.mongo.field import Embed, String
+from marrow.mongo.trait import Derived
 
 
 class Concrete(Derived, Document):
@@ -30,4 +28,3 @@ class TestSingularEmbedField(FieldExam):
 	def test_foreign_cast(self, Sample):
 		inst = Sample(field={})
 		assert isinstance(inst.field, Document)
-'''

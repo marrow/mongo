@@ -1,15 +1,13 @@
 # encoding: utf-8
 
-'''
 from __future__ import unicode_literals
 
 import pytest
 
-from marrow.mongo import Document
-from marrow.mongo.field import Reference
-from marrow.mongo.trait import Derived
-
 from common import FieldExam
+from marrow.mongo import Document
+from marrow.mongo.field import Reference, String
+from marrow.mongo.trait import Derived
 
 
 class Concrete(Derived, Document):
@@ -39,4 +37,3 @@ class TestReferenceField(FieldExam):
 		doc['_id'] = 27
 		inst.field = doc
 		assert inst['field'] == 27
-'''

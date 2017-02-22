@@ -1,16 +1,14 @@
 # encoding: utf-8
 
-'''
 from __future__ import unicode_literals
 
 import pytest
 from bson import ObjectId as oid
 from bson import DBRef
 
-from marrow.mongo import Document
-from marrow.mongo.field import ConcreteReference
-
 from common import FieldExam
+from marrow.mongo import Document
+from marrow.mongo.field import Reference, String
 
 
 class Concrete(Document):
@@ -21,8 +19,9 @@ class Concrete(Document):
 
 
 class TestConcreteReferenceField(FieldExam):
-	__field__ = ConcreteReference
+	__field__ = Reference
 	__args__ = (Concrete, )
+	__kwargs__ = {'concrete': True}
 	
 	def test_foreign(self, Sample):
 		assert Sample.field._field.__foreign__ == 'dbPointer'
@@ -40,4 +39,3 @@ class TestConcreteReferenceField(FieldExam):
 	def test_foreign_cast_reference(self, Sample):
 		inst = Sample('58329b3a927cc647e94153c9')
 		assert isinstance(inst.field, DBRef)
-'''

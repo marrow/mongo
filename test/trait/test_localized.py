@@ -1,6 +1,5 @@
 # encoding: utf-8
 
-'''
 from __future__ import unicode_literals
 
 import pytest
@@ -17,8 +16,6 @@ class TestTranslated(object):
 		word = Translated('word')
 	
 	def test_construction(self):
-		__import__('pudb').set_trace()
-		
 		inst = self.Sample.from_mongo({'locale': [
 				{'language': 'en', 'word': 'hello'},
 				{'language': 'fr', 'word': 'bonjour'}
@@ -36,4 +33,3 @@ class TestLocalized(object):
 	
 	def test_repr(self):
 		pass
-'''

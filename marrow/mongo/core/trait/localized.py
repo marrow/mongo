@@ -35,7 +35,7 @@ class Translated(Alias):
 		if obj is None:
 			return super(Translated, self).__get__(obj, cls)
 		
-		colletion = odict()
+		collection = odict()
 		path = self.path[7:]
 		
 		for locale in obj.locale:
@@ -55,7 +55,7 @@ class Localized(Document):
 		
 		language = String(choices=LANGUAGES, default='en')
 	
-	locale = Array(Embed(), default=lambda: [], assign=True, repr=False)
+	locale = Array(Embed('.Locale'), default=lambda: [], assign=True, repr=False)
 	
 	def __repr__(self):
 		if self.locale:

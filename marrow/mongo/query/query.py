@@ -76,18 +76,18 @@ class Q(object):
 		if self._combining:  # If we are combining fields, we can not dereference further.
 			raise AttributeError()
 		
-		if not hasattr(self._field, 'kinds'):
+		if not hasattr(self._field, '_kind'):
 			return getattr(self._field, name)
 		
-		for kind in self._field.kinds:
-			if hasattr(kind, '__fields__'):
-				if name in kind.__fields__:
-					return self.__class__(self._document, kind.__fields__[name], self._name + '.')
-				
-			try:
-				return getattr(kind, name)
-			except AttributeError:
-				pass
+		kind = self._field._kind
+		
+		if hasattr(kind, '__fields__') and name in kind.__fields__:
+				return self.__class__(self._document, kind.__fields__[name], self._name + '.')
+		
+		try:
+			return getattr(kind, name)
+		except AttributeError:
+			pass
 		
 		try:  # Pass through to the field itself as a last resort.
 			return getattr(self._field, name)
@@ -127,13 +127,13 @@ class Q(object):
 		if not isinstance(name, int) and not name.isdigit():
 			raise KeyError("Must specify an index as either a number or string representation of a number: " + name)
 		
-		field = next(self._field.kinds)
+		field = self._field._kind
 		
 		if isinstance(field, Field):  # Bare simple values.
 			field = copy(field)
 			field.__name__ = self._name + '.' + unicode(name)
 		
-		elif issubclass(field, Document):  # Embedded documents.
+		else:  # Embedded documents.
 			field = Embed(field, name=self._name + '.' + unicode(name))
 		
 		return self.__class__(self._document, field)
