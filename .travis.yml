@@ -23,6 +23,7 @@ python:
   - "3.3"
   - "3.4"
   - "3.5"
+  - "3.6"
 
 install:
   - travis_retry pip install --upgrade setuptools pip pytest pytest-cov codecov 'setuptools_scm>=1.9' cffi
