@@ -55,7 +55,6 @@ class _HasKind(Field):
 			else:
 				kind = load(kind, 'marrow.mongo.document')
 		
-		self.__dict__['_kind'] = kind
 		return kind
 
 

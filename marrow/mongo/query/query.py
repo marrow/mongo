@@ -79,7 +79,9 @@ class Q(object):
 		if not hasattr(self._field, '_kind'):
 			return getattr(self._field, name)
 		
-		kind = self._field._kind
+		kind = self._field
+		while getattr(kind, '_kind', None):
+			kind = kind._kind
 		
 		if hasattr(kind, '__fields__') and name in kind.__fields__:
 				return self.__class__(self._document, kind.__fields__[name], self._name + '.')

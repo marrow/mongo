@@ -44,7 +44,7 @@ class Translated(Alias):
 		return collection
 	
 	def __set__(self, obj, value):
-		raise AttributeError()  # TODO
+		raise TypeError("Can not assign to a translated alias.")  # TODO
 
 
 class Localized(Document):
@@ -56,6 +56,11 @@ class Localized(Document):
 		language = String(choices=LANGUAGES, default='en')
 	
 	locale = Array(Embed('.Locale'), default=lambda: [], assign=True, repr=False)
+	
+	@classmethod
+	def __attributed__(cls):
+		cls.__projection__ = cls._get_default_projection()
+		cls.__fields__['locale'].kind = cls.Locale  # Dynamically replace the referenced class.
 	
 	def __repr__(self):
 		if self.locale:

@@ -22,14 +22,32 @@ class TestTranslated(object):
 			]})
 		
 		assert inst.word == {'en': 'hello', 'fr': 'bonjour'}
+	
+	def test_assignment(self):
+		inst = self.Sample()
+		
+		with pytest.raises(TypeError):
+			inst.word = None
+	
+	def test_query_translated(self):
+		return
+		q = self.Sample.word == 'bonjour'
+		assert q == {'locale.word': 'bonjour'}
 
 
 class TestLocalized(object):
 	class Sample(Localized):
 		class Locale(Localized.Locale):
 			word = String()
-		
-		word = Translated('word')
 	
 	def test_repr(self):
-		pass
+		inst = self.Sample.from_mongo({'locale': [
+				{'language': 'en', 'word': 'hello'},
+				{'language': 'fr', 'word': 'bonjour'}
+			]})
+		
+		assert repr(inst) == "Sample({en, fr})"
+	
+	def test_query(self):
+		q = self.Sample.locale.word == 'bonjour'
+		assert q == {'locale.word': 'bonjour'}
