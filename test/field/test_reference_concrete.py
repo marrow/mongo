@@ -39,3 +39,11 @@ class TestConcreteReferenceField(FieldExam):
 	def test_foreign_cast_reference(self, Sample):
 		inst = Sample('58329b3a927cc647e94153c9')
 		assert isinstance(inst.field, DBRef)
+
+class TestConcreteAbstractReference(FieldExam):
+	__field__ = Reference
+	__kwargs__ = {'concrete': True}
+	
+	def test_unknown_abstract(self, Sample):
+		with pytest.raises(ValueError):
+			Sample('xyzzy')

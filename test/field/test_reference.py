@@ -37,3 +37,7 @@ class TestReferenceField(FieldExam):
 		doc['_id'] = 27
 		inst.field = doc
 		assert inst['field'] == 27
+	
+	def test_oid_failure(self, Sample):
+		inst = Sample(field='z' * 24)
+		assert inst['field'] == 'z' * 24

@@ -53,7 +53,7 @@ class _HasKind(Field):
 				if not isinstance(kind, (str, unicode)):
 					return kind
 			else:
-				kind = load(value, 'marrow.mongo.document')
+				kind = load(kind, 'marrow.mongo.document')
 		
 		self.__dict__['_kind'] = kind
 		return kind
@@ -199,6 +199,8 @@ class Reference(_HasKind, Field):
 		if self.cache:
 			return self._populate_cache(value)
 		
+		identifier = value
+		
 		# First, we handle the typcial Document object case.
 		if isinstance(value, Document):
 			identifier = value.__data__.get('_id', None)
@@ -209,7 +211,7 @@ class Reference(_HasKind, Field):
 			try:
 				identifier = OID(value)
 			except InvalidId:
-				identifier = value
+				pass
 		
 		kind = self._kind
 		
@@ -217,10 +219,10 @@ class Reference(_HasKind, Field):
 			if isinstance(value, Document) and value.__collection__:
 				return DBRef(value.__collection__, identifier)
 			
-			if kind:
+			if kind and kind.__collection__:
 				return DBRef(kind.__collection__, identifier)
 			
-			return DBRef(None, identifier)
+			raise ValueError("Could not infer collection name.")
 		
 		return identifier
 

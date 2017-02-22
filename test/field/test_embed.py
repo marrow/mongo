@@ -51,3 +51,14 @@ class TestSingularEmbedField(FieldExam):
 		
 		with pytest.raises(ValueError):
 			inst.field = Document()
+
+
+class TestEmbedByName(FieldExam):
+	__field__ = Embed
+	__args__ = ('Document', )
+	
+	def test_native_ingress_cast(self, Sample):
+		inst = Sample.from_mongo({'field': {'foo': 27, 'bar': 42}})
+		assert isinstance(inst.field, Document)
+		assert inst.field['foo'] == 27
+		assert inst.field['bar'] == 42
