@@ -30,7 +30,6 @@ class TestTranslated(object):
 			inst.word = None
 	
 	def test_query_translated(self):
-		return
 		q = self.Sample.word == 'bonjour'
 		assert q == {'locale.word': 'bonjour'}
 
