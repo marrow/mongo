@@ -42,13 +42,13 @@ class _HasKind(Field):
 			kind.__document__ = proxy(document)
 			kind.__fixup__(document)  # Chain this down to embedded fields.
 	
-	@property
-	def _kind(self):
+	def _kind(self, document=None):
 		kind = self.kind
 		
 		if isinstance(kind, (str, unicode)):
 			if kind.startswith('.'):
-				kind = traverse(self.__document__, kind[1:])  # This allows the reference to be dynamic.
+				# This allows the reference to be dynamic.
+				kind = traverse(document or self.__document__, kind[1:])
 				
 				if not isinstance(kind, (str, unicode)):
 					return kind
@@ -64,7 +64,7 @@ class _CastingKind(Field):
 		
 		from marrow.mongo.trait import Derived
 		
-		kind = self._kind
+		kind = self._kind(obj.__class__)
 		
 		if isinstance(value, Document):
 			if __debug__ and kind and issubclass(kind, Document) and not isinstance(value, kind):
@@ -80,7 +80,7 @@ class _CastingKind(Field):
 	def to_foreign(self, obj, name, value):  # pylint:disable=unused-argument
 		"""Transform to a MongoDB-safe value."""
 		
-		kind = self._kind
+		kind = self._kind(obj.__class__)
 		
 		if isinstance(value, Document):
 			if __debug__ and kind and issubclass(kind, Document) and not isinstance(value, kind):
@@ -212,7 +212,7 @@ class Reference(_HasKind, Field):
 			except InvalidId:
 				pass
 		
-		kind = self._kind
+		kind = self._kind(obj.__class__)
 		
 		if self.concrete:
 			if isinstance(value, Document) and value.__collection__:

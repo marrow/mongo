@@ -81,7 +81,7 @@ class Q(object):
 		
 		kind = self._field
 		while getattr(kind, '_kind', None):
-			kind = kind._kind
+			kind = kind._kind(self._document)
 		
 		if hasattr(kind, '__fields__') and name in kind.__fields__:
 				return self.__class__(self._document, kind.__fields__[name], self._name + '.')
@@ -129,7 +129,7 @@ class Q(object):
 		if not isinstance(name, int) and not name.isdigit():
 			raise KeyError("Must specify an index as either a number or string representation of a number: " + name)
 		
-		field = self._field._kind
+		field = self._field._kind(self._document)
 		
 		if isinstance(field, Field):  # Bare simple values.
 			field = copy(field)

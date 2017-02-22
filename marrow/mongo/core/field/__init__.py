@@ -40,7 +40,7 @@ class Field(Attribute):
 	#  * #geo -- allow/prevent geographic query operators
 	__allowed_operators__ = set()
 	__disallowed_operators__ = set()
-	__document__ = None  # If we're assigned to a Document, this gets populated with a weak reference proxy.
+	__document__ = None  # The Document subclass the field originates from.
 	__foreign__ = {}
 	__acl__ = []  # Overall document access control list.
 	
@@ -142,7 +142,7 @@ class Field(Attribute):
 		
 		# If this is class attribute (and not instance attribute) access, we return a Queryable interface.
 		if obj is None:
-			return Q(self.__document__, self)
+			return Q(cls, self)
 		
 		result = super(Field, self).__get__(obj, cls)
 		

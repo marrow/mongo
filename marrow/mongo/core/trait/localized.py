@@ -57,11 +57,6 @@ class Localized(Document):
 	
 	locale = Array(Embed('.Locale'), default=lambda: [], assign=True, repr=False)
 	
-	@classmethod
-	def __attributed__(cls):
-		cls.__projection__ = cls._get_default_projection()
-		cls.__fields__['locale'].kind = cls.Locale  # Dynamically replace the referenced class.
-	
 	def __repr__(self):
 		if self.locale:
 			return super(Localized, self).__repr__('{' + ', '.join(i.language for i in self.locale) + '}')

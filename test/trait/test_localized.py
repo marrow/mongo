@@ -48,6 +48,11 @@ class TestLocalized(object):
 		
 		assert repr(inst) == "Sample({en, fr})"
 	
+	def test_empty_repr(self):
+		inst = self.Sample()
+		
+		assert repr(inst) == "Sample()"
+	
 	def test_query(self):
 		q = self.Sample.locale.word == 'bonjour'
 		assert q == {'locale.word': 'bonjour'}
