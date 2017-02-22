@@ -237,7 +237,7 @@ class Document(Container):
 			cls = load(doc[cls.__type_store__], 'marrow.mongo.document')
 		
 		instance = cls(_prepare_defaults=False)
-		instance.__data__ = instance.__store__(doc)
+		instance.__data__ = doc
 		instance._prepare_defaults()  # pylint:disable=protected-access
 		instance.__loaded__ = set(projected) if projected else None
 		

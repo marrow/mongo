@@ -57,11 +57,6 @@ class _HasKind(Field):
 		
 		self.__dict__['_kind'] = kind
 		return kind
-	
-	@property
-	def kinds(self):
-		if self._kind:
-			yield self._kind
 
 
 class _CastingKind(Field):
@@ -130,23 +125,6 @@ class Array(_HasKind, _CastingKind, Field):
 class Embed(_HasKind, _CastingKind, Field):
 	__foreign__ = 'object'
 	__allowed_operators__ = {'#document'}
-	
-	def to_native(self, obj, name, value):
-		"""Transform the MongoDB value into a Marrow Mongo value."""
-		
-		if isinstance(value, Document):
-			return value
-		
-		result = super(Embed, self).to_native(obj, name, value)
-		obj.__data__[self.__name__] = result
-		
-		return result
-	
-	def to_foreign(self, obj, name, value):
-		"""Transform to a MongoDB-safe value."""
-		
-		result = super(Embed, self).to_foreign(obj, name, value)
-		return result
 
 
 class Reference(_HasKind, Field):
