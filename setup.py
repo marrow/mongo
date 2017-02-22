@@ -24,6 +24,7 @@ here = os.path.abspath(os.path.dirname(__file__))
 py2 = sys.version_info < (3,)
 py26 = sys.version_info < (2, 7)
 py32 = sys.version_info > (3,) and sys.version_info < (3, 3)
+pypy = hasattr(sys, 'pypy_version_info')
 
 tests_require = [
 		'pytest',  # test collector and extensible runner
@@ -31,7 +32,6 @@ tests_require = [
 		'pytest-flakes',  # syntax validation
 		'pytest-catchlog',  # log capture
 		'pytest-isort',  # import ordering
-		'pytest-pudb',  # tracing debugger
 		'misaka', 'pygments',  # Markdown field support
 	]
 
