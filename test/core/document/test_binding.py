@@ -58,7 +58,7 @@ class TestDocumentBinding(object):
 		assert Sample.create_collection(db.foo, True, indexes=False).name == 'foo'
 	
 	def test_get_collection_failure(self, Sample):
-		with pytest.raises(TypeError):
+		with pytest.raises(AssertionError):
 			Sample.get_collection(None)
 	
 	def test_validation(self, db, Sample):
