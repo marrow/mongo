@@ -206,8 +206,8 @@ class Document(Container):
 		"""
 		
 		if target is None:
-			assert self.__bound__, "May only retrieve collection without target when Document subclass is bound."
-			return self._collection
+			assert cls.__bound__, "May only retrieve collection without target when Document subclass is bound."
+			return cls._collection
 		
 		if isinstance(target, Collection):
 			return target.with_options(**cls._collection_configuration())
