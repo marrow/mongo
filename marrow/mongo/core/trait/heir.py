@@ -92,18 +92,14 @@ class HChildren(Heirarchical):
 	_children = Index('children')
 	
 	def get_parent(self, *args, **kw):
-		Doc, collection, query, options = self._prepare_find(*args, **kw)
-		
-		query &= Doc.children == self.id
+		Doc, collection, query, options = self._prepare_find(*args, children=self.id, **kw)
 		result = collection.find_one(query, **options)
-		
 		return Doc.from_mongo(result, projected=options.get('projection', None))
 	
 	def find_siblings(self, *args, **kw):
-		Doc, collection, query, options = self._prepare_find(*args, **kw)
+		Doc, collection, query, options = self._prepare_find(*args, id__ne=self.id, **kw)
 		project = options.pop('projection', None)
 		parent = self.get_parent(projection=('children', ), **options)
-		query &= Doc.id != self.id
 		
 		if project:
 			options['projection'] = project
@@ -114,10 +110,10 @@ class HChildren(Heirarchical):
 		return self.find_in_sequence('id', self.children, *args, **kw)
 	
 	def detach(self):
-		Doc = self.__class__
+		Doc, collection, query, options = self._prepare_find(children=self.id)
 		
-		result = self.get_collection().update_one(
-				Doc.children == self.id, {
+		result = collection.update_one(
+				query, {
 				'$pull': {
 					~Doc.children: self.id,
 				},
@@ -154,33 +150,23 @@ class HParent(Heirarchical):
 		if not self.parent:  # We can save time.
 			return None
 		
-		Doc, collection, query, options = self._prepare_find(*args, **kw)
-		
-		query &= D.id == self.parent
+		Doc, collection, query, options = self._prepare_find(*args, id=self.parent, **kw)
 		result = collection.find_one(query, **options)
-		
 		return Doc.from_mongo(result, projected=options.get('projection', None))
 	
 	def find_siblings(self, *args, **kw):
-		Doc, collection, query, options = self._prepare_find(*args, **kw)
-		
-		query &= Doc.parent == self.parent
-		query &= Doc.id != self.id
-		
+		Doc, collection, query, options = self._prepare_find(*args, parent=self.parent, id__ne=self, **kw)
 		return collection.find(query, **options)
 	
 	def find_children(self, *args, **kw):
-		Doc, collection, query, options = self._prepare_find(*args, **kw)
-		
-		query &= Doc.parent == self
-		
+		Doc, collection, query, options = self._prepare_find(*args, parent=self, **kw)
 		return collection.find(query, **options)
 	
 	def detach(self):
-		Doc = self.__class__
+		Doc, collection, query, options = self._prepare_find(id=self.id)
 		
-		result = self.get_collection().update_one(
-				Doc.id == self.id,
+		result = collection.update_one(
+				query,
 				{'$set': {~Doc.parent: None}},
 			)
 		
@@ -217,18 +203,14 @@ class HAncestors(HParent):
 		return self.find_in_sequence('id', self.ancestors, *args, **kw)
 	
 	def find_descendants(self, *args, **kw):
-		Doc, collection, query, options = self._prepare_find(*args, **kw)
-		
-		query &= Doc.ancestors == self
-		
+		Doc, collection, query, options = self._prepare_find(*args, ancestors=self, **kw)
 		return collection.find(query, **options)
 	
 	def detach(self):
 		super(HAncestors, self).detach()
 		
-		Doc = self.__class__
+		Doc, collection, query, options = self._prepare_find(id=self)
 		
-		query = Doc.id == self.id
 		query |= Doc.ancestors == self.id
 		
 		result = self.get_collection().update_many(
@@ -267,16 +249,13 @@ class HPath(Heirarchical):
 	_path = Index('path', unique=True)
 	
 	def get_parent(self, *args, **kw):
-		Doc, collection, query, options = self._prepare_find(*args, **kw)
-		
 		path = self.path.parent
 		
 		if unicode(path) in (path.root, '.'):
 			return None  # No parent, already at root.
 		
-		query &= Doc.path == path
+		Doc, collection, query, options = self._prepare_find(*args, path=path, **kw)
 		result = coll.find_one(query, **options)
-		
 		return Doc.from_mongo(result, projected=options.get('projection', None))
 	
 	def find_ancestors(self, *args, **kw):
@@ -358,35 +337,37 @@ class HNested(Heirarchical):
 	_nested_set = Index('left', 'right')
 	
 	def get_parent(self, *args, **kw):
-		Doc, collection, query, options = self._prepare_find(*args, **kw)
-		
-		query &= Doc.left < self.left
-		query &= Doc.right > self.right
-		
-		options['sort'] = {'left': -1}
+		Doc, collection, query, options = self._prepare_find(
+				*args,
+				left__lt = self.left,
+				right__gt = self.right,
+				sort = ('-left', ),
+				**kw
+			)
 		
 		result = collection.find_one(query, **options)
-		
 		return Doc.from_mongo(result, projected=options.get('projection', None))
 	
 	def find_ancestors(self, *args, **kw):
-		Doc, collection, query, options = self._prepare_find(*args, **kw)
-		
-		query &= Doc.left < self.left
-		query &= Doc.right > self.right
+		Doc, collection, query, options = self._prepare_find(
+				*args,
+				left__lt = self.left,
+				right__gt = self.right,
+				**kw
+			)
 		
 		options.setdefault('sort', [(~Doc.left, 1)])
-		
 		return collection.find(query, **options)
 	
 	def find_descendants(self, *args, **kw):
-		Doc, collection, query, options = self._prepare_find(*args, **kw)
-		
-		query &= Doc.left > self.left
-		query &= Doc.right < self.right
+		Doc, collection, query, options = self._prepare_find(
+				*args,
+				left__gt = self.left,
+				right__lt = self.right,
+				**kw
+			)
 		
 		options.setdefault('sort', [(~Doc.left, 1)])
-		
 		return collection.find(query, **options)
 	
 	def __get_rim_distance(self):
@@ -403,8 +384,6 @@ class HNested(Heirarchical):
 		return Doc, collection, rim['right'] + 1 - self.left
 	
 	def detach(self):
-		# Potential race condition.
-		
 		if not self.left or not self.find_ancestors().count():
 			return False  # Not attached.
 		
@@ -417,15 +396,10 @@ class HNested(Heirarchical):
 		left_updates = Doc.left > self.right
 		right_updates = Doc.right > self.right
 		
-		collection.update_many(detaching, {
-				'$add': {~Doc.left: distance, ~Doc.right: distance},
-			})
-		collection.update_many(left_updates, {
-				'$add': {~Doc.left: -distance},
-			})
-		collection.update_many(right_updates, {
-				'$add': {~Doc.right: -distance},
-			})
+		# TODO: Bulk operation.
+		collection.update_many(detaching, {'$add': {~Doc.left: distance, ~Doc.right: distance}})
+		collection.update_many(left_updates, {'$add': {~Doc.left: -distance}})
+		collection.update_many(right_updates, {'$add': {~Doc.right: -distance}})
 		
 		return True
 	
