@@ -46,6 +46,7 @@ class Document(Container):
 	__pk__ = None  # The primary key of the document, to make searchable if embedded, or the name of the '_id' field.
 	
 	__bound__ = False  # Has this class been "attached" to a live MongoDB connection?
+	_collection = None  # Cached collection.
 	__collection__ = None  # The name of the collection to "attach" to using bind().
 	__read_preference__ = ReadPreference.PRIMARY  # Default read preference to assign when binding.
 	__read_concern__ = ReadConcern()  # Default read concern.
@@ -121,6 +122,9 @@ class Document(Container):
 	def bind(cls, db=None, collection=None):
 		"""Bind a copy of the collection to the class, modified per our class' settings."""
 		
+		if cls.__bound__:
+			return cls
+		
 		if db is collection is None:
 			raise ValueError("Must bind to either a database or explicit collection.")
 		
@@ -193,13 +197,17 @@ class Document(Container):
 		return collection
 	
 	@classmethod
-	def get_collection(cls, target):
+	def get_collection(cls, target=None):
 		"""Retrieve a properly configured collection object as configured by this document class.
 		
 		If given an existing collection, will instead call `collection.with_options`.
 		
 		http://api.mongodb.com/python/current/api/pymongo/database.html#pymongo.database.Database.get_collection
 		"""
+		
+		if target is None:
+			assert self.__bound__, "May only retrieve collection without target when Document subclass is bound."
+			return self._collection
 		
 		if isinstance(target, Collection):
 			return target.with_options(**cls._collection_configuration())
@@ -229,6 +237,9 @@ class Document(Container):
 	@classmethod
 	def from_mongo(cls, doc, projected=None):
 		"""Convert data coming in from the MongoDB wire driver into a Document instance."""
+		
+		if doc is None:
+			return None
 		
 		if isinstance(doc, Document):
 			return doc
