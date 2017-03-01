@@ -86,7 +86,7 @@ class JSONFormatter(logging.Formatter):
 		self.indent = indent
 	
 	def _default(self, value):
-		if hasattr('decode'):
+		if hasattr(value, 'decode'):
 			return value.decode('utf-8')
 		
 		try:
