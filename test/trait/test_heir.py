@@ -165,9 +165,9 @@ class TestHChildren(HeirarchicalTest):
 		node = Sample("Operating System")
 		node.insert_one()
 		
-		assert node.attach_before(sibling)
+		assert node.attach_after(sibling)
 		
 		parent.reload('children')
 		assert node.id in parent.children
 		assert node.get_parent() == parent
-		assert parent.children.index(sibling.id) > parent.children.index(node.id)
+		assert parent.children.index(sibling.id) < parent.children.index(node.id)
