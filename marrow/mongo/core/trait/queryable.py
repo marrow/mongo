@@ -6,6 +6,8 @@ from collections import Mapping
 from functools import reduce
 from operator import and_
 
+from pymongo.cursor import CursorType
+
 from ... import F, Filter, P, S
 from ...trait import Identified
 from ....schema.compat import odict
@@ -121,7 +123,7 @@ class Queryable(Identified):
 			raise TypeError("Can not combine cursor_type and tail/await arguments.")
 		
 		elif options.pop('tail', False):
-			options['cursor_type'] = ... if options.pop('await', True) else ...
+			options['cursor_type'] = CursorType.TAILABLE_AWAIT if options.pop('await', True) else CursorType.TAILABLE
 		
 		elif 'await' in options:
 			raise TypeError("Await option only applies to tailing cursors.")
