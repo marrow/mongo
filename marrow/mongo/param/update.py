@@ -4,6 +4,7 @@
 
 from __future__ import unicode_literals
 
+from collections import Mapping
 from operator import __neg__
 
 from ...schema.compat import unicode
@@ -11,6 +12,23 @@ from ..query import Update
 from .common import _bit, _current_date, _process_arguments
 
 DEFAULT_UPDATE = 'set'  # If no prefix is found, this will be the default operation.
+
+
+def _push_each(value):
+	return {'$each': [(i.to_mongo() if hasattr(i, 'to_mongo') else i) for i in value]}
+
+
+def _push_slice(value):
+	return {'$slice': int(value)}
+
+
+def _push_sort(value):
+	return {'$sort': value}
+
+
+def _push_position(value):
+	return {'$position': int(value)}
+
 
 # These allow us to easily override the interpretation of any particular operation and introduce new ones.
 # The keys represent prefixes, the values may be either a string (which will be prefixed with '$' automatically) or
@@ -32,6 +50,11 @@ UPDATE_ALIASES = {
 		'set_on_insert': 'setOnInsert',  # Underscore to camel case conversion.
 		'soi': 'setOnInsert',  # A shortcut for the longer form.
 		'sub': ('inc', __neg__),  # "Subtract"; invert the value and use $inc.
+		'push_each': ('push', _push_each),  # The longer form: value(s) to push.
+		'push_slice': ('push', _push_slice),  # The longer form: limit number of elements.
+		'push_sort': ('push', _push_sort),  # The longer form: order the results after modification.
+		'push_position': ('push', _push_position),  # The longer form: push at a specific index.
+		'push_pos': ('push', _push_position),  # The longer form: push at a specific index.
 	}
 
 # Update with passthrough values.
@@ -39,7 +62,7 @@ UPDATE_ALIASES.update({i: i for i in {'bit', 'inc', 'max', 'min', 'mul', 'pull',
 		'rename', 'set', 'setOnInsert', 'unset'}})
 
 # These should not utilize field to_foreign typecasting.
-UPDATE_PASSTHROUGH = {'rename', 'unset', 'pull', 'push', 'bit', 'currentDate'}
+UPDATE_PASSTHROUGH = {'rename', 'unset', 'pull', 'push', 'bit', 'currentDate', 'push_slice', 'push_sort', 'push_position', 'push_pos'}
 
 
 def U(Document, __raw__=None, **update):
@@ -59,10 +82,18 @@ def U(Document, __raw__=None, **update):
 		if not operation:
 			operation = DEFAULT_UPDATE
 		
-		if isinstance(operation, tuple):
-			operation, cast = operation
-			value = cast(value)
 		
-		ops &= Update({'$' + operation: {~field: value}})
+		if isinstance(operation, tuple):
+			operation, cast = ('$' + operation[0]), operation[1]
+			value = cast(value)
+			
+			if operation in ops and ~field in ops[operation] and isinstance(value, Mapping):
+				ops[operation][~field].update(value)
+				continue
+		
+		else:
+			operation = '$' + operation
+		
+		ops &= Update({operation: {~field: value}})
 	
 	return ops
