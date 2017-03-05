@@ -2,7 +2,7 @@
 
 from __future__ import unicode_literals
 
-from ... import Document, Index
+from ... import Document, Index, U
 from ...field import ObjectId, String, Path, Array, Alias, Reference, Number
 from ...trait import Queryable
 from ....schema.compat import unicode
@@ -31,15 +31,13 @@ class Heirarchical(Queryable):
 		then children excluding the current document in no particular order.
 		"""
 		
-		Doc, collection, query, options = self._prepare_find(*args, **kw)
+		Doc, collection, query, options = self._prepare_find(*args, id__ne=self, **kw)
 		project = options.pop('projection', None)
 		
 		parent = self.get_parent(**options)
 		
 		if project:
 			options['projection'] = project
-		
-		query &= Doc.id != self.id
 		
 		return parent.find_children(query, **options)
 	
@@ -55,27 +53,31 @@ class Heirarchical(Queryable):
 	
 	def detach(self):
 		"""Detach this document from its tree, forming the root of a new tree containing this document and its children."""
-		raise NotImplementedError()
+		
+		return None
 	
 	def attach(self, child):
 		"""Attach the given child document (with any descendants) to this document."""
 		
-		raise NotImplementedError()
+		return None
 	
 	def attach_to(self, parent):
 		"""Attach this document (with any descendants) to the given parent."""
 		
-		raise NotImplementedError()
+		if isinstance(parent, Document):
+			return parent.attach(child)
+		
+		return self.find_one(parent).attach(child)
 	
 	def attach_before(self, sibling):
 		"""Attach this document (with any descendants) to the same parent as the target sibling, prior to that sibling."""
 		
-		return sibling.get_parent().attach(self)
+		return None
 	
 	def attach_after(self, sibling):
 		"""Attach this document (with any descendants) to the same parent as the target sibling, after that sibling."""
 		
-		return sibling.get_parent().attach(self)
+		return None
 
 
 class HChildren(Heirarchical):
@@ -92,46 +94,83 @@ class HChildren(Heirarchical):
 	_children = Index('children')
 	
 	def get_parent(self, *args, **kw):
-		Doc, collection, query, options = self._prepare_find(*args, children=self.id, **kw)
-		result = collection.find_one(query, **options)
-		return Doc.from_mongo(result, projected=options.get('projection', None))
+		return self.find_one(*args, children=self.id, **kw)
 	
 	def find_siblings(self, *args, **kw):
-		Doc, collection, query, options = self._prepare_find(*args, id__ne=self.id, **kw)
-		project = options.pop('projection', None)
-		parent = self.get_parent(projection=('children', ), **options)
-		
-		if project:
-			options['projection'] = project
-		
-		return parent.find_children(query, **options)
+		parent = self.get_parent(projection=('children', ))
+		return parent.find_children(*args, id__ne=self.id, **kw)
 	
 	def find_children(self, *args, **kw):
 		return self.find_in_sequence('id', self.children, *args, **kw)
 	
 	def detach(self):
 		Doc, collection, query, options = self._prepare_find(children=self.id)
-		
-		result = collection.update_one(
-				query, {
-				'$pull': {
-					~Doc.children: self.id,
-				},
-			})
+		update = U(Doc, pull__children=self.id)
+		result = collection.update_one(query, update, **options)
 		
 		return bool(result.modified_count)
 	
 	def attach(self, child):
-		pass
+		if not isinstance(child, Document):
+			child = self.find_one(child, projection=('id', ))
+		
+		child.detach()
+		
+		Doc, collection, query, options = self._prepare_find(id=self.id)
+		update = U(Doc, push__children=child.id)
+		result = collection.update_one(query, update, **options)
+		
+		return bool(result.modified_count)
 	
 	def attach_to(self, parent):
-		pass
+		if not isinstance(parent, Document):
+			parent = self.find_one(parent, projection=('id', ))
+		
+		self.detach()
+		
+		Doc, collection, query, options = self._prepare_find(id=parent.id)
+		update = U(Doc, push__children=self.id)
+		result = collection.update_one(query, update, **options)
+		
+		return bool(result.modified_count)
 	
 	def attach_before(self, sibling):
-		pass
+		self.detach()
+		
+		if isinstance(sibling, Document):
+			sibling = sibling.id
+		
+		parent = self.find_one(children=sibling, projection=('children', ))
+		
+		if not parent:
+			raise ValueError("Can not attach aside a detached sibling: " + repr(sibling))
+		
+		index = parent.children.index(sibling)
+		
+		Doc, collection, query, options = self._prepare_find(id=parent.id)
+		update = U(Doc, push_each__children=[self.id], push_position__children=index)
+		result = collection.update_one(query, update, **options)
+		
+		return bool(result.modified_count)
 	
 	def attach_after(self, sibling):
-		pass
+		self.detach()
+		
+		if isinstance(sibling, Document):
+			sibling = sibling.id
+		
+		parent = self.find_one(children=sibling, projection=('children', ))
+		
+		if not parent:
+			raise ValueError("Can not attach aside a detached sibling: " + repr(sibling))
+		
+		index = parent.children.index(sibling) + 1
+		
+		Doc, collection, query, options = self._prepare_find(id=parent.id)
+		update = U(Doc, push_each__children=[self.id], push_position__children=index)
+		result = collection.update_one(query, update, **options)
+		
+		return bool(result.modified_count)
 
 
 class HParent(Heirarchical):

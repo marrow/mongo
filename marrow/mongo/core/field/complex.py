@@ -99,7 +99,7 @@ class _CastingKind(Field):
 
 class Array(_HasKind, _CastingKind, Field):
 	__foreign__ = 'array'
-	__allowed_operators__ = {'#array', '$elemMatch'}
+	__allowed_operators__ = {'#array', '$elemMatch', '$eq'}
 	
 	class List(list):
 		pass

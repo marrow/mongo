@@ -20,3 +20,19 @@ class Identified(Document):
 	__pk__ = 'id'
 	
 	id = ObjectId('_id', assign=True, write=False, repr=False)
+	
+	def __eq__(self, other):
+		"""Equality comparison between the IDs of the respective documents."""
+		
+		if isinstance(other, Document):
+			return self.id == other.id
+		
+		return self.id == other
+	
+	def __ne__(self, other):
+		"""Inverse equality comparison between the backing store and other value."""
+		
+		if isinstance(other, Document):
+			return self.id != other.id
+		
+		return self.id != other

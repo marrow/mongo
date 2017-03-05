@@ -6,7 +6,7 @@ from collections import Mapping
 from functools import reduce
 from operator import and_
 
-from ...param import F, P, S
+from ... import F, Filter, P, S
 from ...trait import Identified
 from ....schema.compat import odict
 from ....package.loader import traverse
@@ -77,8 +77,10 @@ class Queryable(Identified):
 		
 		collection = cls.get_collection(kw.pop('source', None))
 		query = Filter(document=cls, collection=collection)
-		query &= reduce(and_, args)
 		options = {}
+		
+		if args:
+			query &= reduce(and_, args)
 		
 		# Gather any valid options.
 		for key in tuple(kw):
@@ -182,6 +184,24 @@ class Queryable(Identified):
 		return cls, collection, stages, options
 	
 	@classmethod
+	def find(cls, *args, **kw):
+		Doc, collection, query, options = cls._prepare_find(*args, **kw)
+		return collection.find(query, **options)
+	
+	@classmethod
+	def find_one(cls, *args, **kw):
+		if len(args) == 1 and not isinstance(args[0], Filter):
+			args = (cls.id == args[0], )
+		
+		Doc, collection, query, options = cls._prepare_find(*args, **kw)
+		result = collection.find_one(query, **options)
+		
+		if result:
+			result = Doc.from_mongo(result, projected=options.get('projection', None))
+		
+		return result
+	
+	@classmethod
 	def find_in_sequence(cls, field, order, *args, **kw):
 		"""Return a QuerySet iterating the results of a query in a defined order. Technically an aggregate.
 		
@@ -198,12 +218,36 @@ class Queryable(Identified):
 		
 		cls, collection, stages, options = cls._prepare_aggregate(
 				field.any(order),
-				{'$addFields': {'__order': {'$indexOfArray': [order, '$' + ~traverse(cls, field)]}}},
+				{'$addFields': {'__order': {'$indexOfArray': [order, '$' + ~field]}}},
 				*args,
 				**kw
 			)
 		
-		if tuple(collection.database.connection.server_info()['versionArray'][:2]) < (3, 4):
+		if tuple(collection.database.client.server_info()['versionArray'][:2]) < (3, 4):
 			raise RuntimeError("Queryable.find_in_sequence only works against MongoDB server versions 3.4 or newer.")
 		
 		return collection.aggregate(stages, **options)
+	
+	def reload(self, *fields, **kw):
+		"""Reload the entire document from the database, or refresh specific named top-level fields."""
+		
+		Doc, collection, query, options = self._prepare_find(id=self.id, projection=fields, **kw)
+		result = collection.find_one(query, **options)
+		
+		if fields:  # Refresh only the requested data.
+			for k in result:  # TODO: Better merge algorithm.
+				if k == ~Doc.id: continue
+				self.__data__[k] = result[k]
+		else:
+			self.__data__ = result
+		
+		return self
+	
+	def insert_one(self, *args, **kw):
+		collection = self.get_collection(kw.pop('source', None))
+		return collection.insert_one(self, *args, **kw)
+	
+	@classmethod
+	def insert_many(cls, *args, **kw):
+		collection = cls.get_collection(kw.pop('source', None))
+		return collection.insert_many(*args, **kw)

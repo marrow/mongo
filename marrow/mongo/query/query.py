@@ -9,10 +9,11 @@ For internal construction only.
 from __future__ import unicode_literals
 
 from copy import copy
+from collections import Iterable
 from functools import reduce
 from operator import __and__, __or__, __xor__
 
-from ...schema.compat import py3, unicode
+from ...schema.compat import py3, str, unicode
 from .ops import Filter
 
 if __debug__:
@@ -218,6 +219,11 @@ class Q(object):
 		# Optimize this away in production; diagnosic aide.
 		if __debug__ and _simple_safety_check(self._field, '$eq'):  # pragma: no cover
 			raise NotImplementedError("{self!r} does not allow $eq comparison.".format(self=self))
+		
+		if '#array' in self._field.__allowed_operators__:
+			if not isinstance(other, Iterable) or isinstance(other, (str, unicode)):
+				other = self._field.transformer.foreign([other], (self._field, self._document))
+				return Filter({self._name: other[0]})
 		
 		return Filter({self._name: self._field.transformer.foreign(other, (self._field, self._document))})
 	
