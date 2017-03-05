@@ -17,7 +17,8 @@ veryclean: clean
 	rm -rvf *.egg-info .packaging
 
 test: develop
-	./setup.py test
+	@clear
+	@pytest
 
 release:
 	./setup.py register sdist bdist_wheel upload ${RELEASE_OPTIONS}
