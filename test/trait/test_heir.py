@@ -6,7 +6,7 @@ import pytest
 
 from marrow.mongo import Document
 from marrow.mongo.field import String
-from marrow.mongo.trait import HChildren, Heirarchical
+from marrow.mongo.trait import HChildren, Heirarchical, HParent
 
 TREE = {"Books": [{"Programming": [{"Databases": ["MongoDB", "dbm"]}, "Languages"]}]}
 
@@ -15,7 +15,6 @@ TREE = {"Books": [{"Programming": [{"Databases": ["MongoDB", "dbm"]}, "Languages
 def db(connection):
 	connection.drop_database('test')
 	return connection.test
-
 
 
 class HeirarchicalTest(object):
@@ -63,8 +62,6 @@ class HeirarchicalTest(object):
 class TestHeirarchical(HeirarchicalTest):
 	class _Sample(Heirarchical):
 		__collection__ = 'heir'
-	
-	pass
 
 
 class TestHChildren(HeirarchicalTest):
@@ -171,3 +168,84 @@ class TestHChildren(HeirarchicalTest):
 		assert node.id in parent.children
 		assert node.get_parent() == parent
 		assert parent.children.index(sibling.id) < parent.children.index(node.id)
+
+
+class TestHParent(HeirarchicalTest):
+	class _Sample(HParent):
+		__collection__ = 'heir_parent'
+		
+		id = String('_id')
+	
+	def _populate(self, Sample):  # Algorithm differs from tree structure to tree structure.
+		Sample.insert_many([
+				Sample("Books"),
+				Sample("Programming", parent="Books"),
+				Sample("Databases", parent="Programming"),
+				Sample("Languages", parent="Programming"),
+				Sample("dbm", parent="Databases"),
+				Sample("MongoDB", parent="Databases"),
+			])
+	
+	def test_get_root(self, Sample):
+		root = Sample.find_one('Books')
+		assert isinstance(root, Sample)
+		assert root.id == "Books"
+		assert root.parent is None
+	
+	def test_get_parent(self, Sample):
+		node = Sample.find_one("Languages")
+		parent = node.get_parent()
+		assert isinstance(parent, Sample)
+		assert parent.id == "Programming"
+	
+	def test_find_siblings(self, Sample):
+		node = Sample.find_one("Databases")
+		siblings = list(Sample.from_mongo(i) for i in node.find_siblings())
+		assert len(siblings) == 1
+		
+		sibling, = siblings
+		assert isinstance(sibling, Sample)
+		assert sibling.id == "Languages"
+	
+	def test_find_children(self, Sample):
+		node = Sample.find_one("Programming")
+		children = list(sorted(i['_id'] for i in node.find_children()))
+		assert children == ["Databases", "Languages"]
+	
+	def test_detach(self, Sample):
+		node = Sample.find_one("dbm")
+		parent = node.get_parent()
+		assert node.parent == parent.id
+		
+		assert node.detach()
+		assert node.parent is None
+		
+		node.reload('parent')
+		assert node.parent is None
+		assert node.get_parent() is None
+	
+	def test_attach(self, Sample):
+		parent = Sample.find_one("Languages")
+		
+		node = Sample("Python")
+		node.insert_one()
+		
+		assert parent.attach(node)
+		assert node.parent == parent.id
+		
+		node.reload('parent')
+		assert node.parent == parent.id
+		assert node.get_parent() == parent
+	
+	def test_attach_to(self, Sample):
+		parent = Sample.find_one("Languages")
+		
+		node = Sample("Objective-C")
+		node.insert_one()
+		
+		assert node.attach_to(parent)
+		assert node.parent == parent.id
+		
+		node.reload('parent')
+		assert node.parent == parent.id
+		assert node.get_parent() == parent

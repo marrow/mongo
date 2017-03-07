@@ -189,12 +189,10 @@ class HParent(Heirarchical):
 		if not self.parent:  # We can save time.
 			return None
 		
-		Doc, collection, query, options = self._prepare_find(*args, id=self.parent, **kw)
-		result = collection.find_one(query, **options)
-		return Doc.from_mongo(result, projected=options.get('projection', None))
+		return self.find_one(self.parent, *args, **kw)
 	
 	def find_siblings(self, *args, **kw):
-		Doc, collection, query, options = self._prepare_find(*args, parent=self.parent, id__ne=self, **kw)
+		Doc, collection, query, options = self._prepare_find(*args, parent=self.parent, id__ne=self.id, **kw)
 		return collection.find(query, **options)
 	
 	def find_children(self, *args, **kw):
@@ -203,27 +201,31 @@ class HParent(Heirarchical):
 	
 	def detach(self):
 		Doc, collection, query, options = self._prepare_find(id=self.id)
-		
-		result = collection.update_one(
-				query,
-				{'$set': {~Doc.parent: None}},
-			)
-		
+		result = collection.update_one(query, U(Doc, parent=None))
 		self.parent = None  # Clean up to save needing to reload the record.
-		
 		return bool(result.modified_count)
 	
 	def attach(self, child):
-		pass
+		child_id = child.id if isinstance(child, Document) else child
+		
+		Doc, collection, query, options = self._prepare_find(id=child_id)
+		result = collection.update_one(query, U(Doc, parent=self.id))
+		
+		if isinstance(child, Document):
+			child.parent = self.id  # Clean up to save needing to reload the record.
+		
+		return bool(result.modified_count)
 	
 	def attach_to(self, parent):
-		pass
-	
-	def attach_before(self, sibling):
-		pass
-	
-	def attach_after(self, sibling):
-		pass
+		if isinstance(parent, Document):
+			parent = parent.id
+		
+		Doc, collection, query, options = self._prepare_find(id=self.id)
+		result = collection.update_one(query, U(Doc, parent=parent))
+		
+		self.parent = parent  # Clean up to save needing to reload the record.
+		
+		return bool(result.modified_count)
 
 
 class HAncestors(HParent):
