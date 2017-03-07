@@ -93,7 +93,7 @@ class Queryable(Identified):
 		
 		# Support parametric projection via the use of iterables of strings in the form 'field' or '-field',
 		# with name resolution. See the documentation for P for details.
-		if 'projection' in options and not isinstance(options, Mapping):
+		if 'projection' in options and not isinstance(options['projection'], Mapping):
 			options['projection'] = P(cls, *options['projection'])
 		
 		# Support parametric sorting via the use of iterables of strings. See the documentation for S for details.
