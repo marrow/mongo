@@ -6,7 +6,7 @@ import pytest
 
 from marrow.mongo import Document
 from marrow.mongo.field import String
-from marrow.mongo.trait import HChildren, Heirarchical, HParent
+from marrow.mongo.trait import HAncestors, HChildren, Heirarchical, HParent
 
 TREE = {"Books": [{"Programming": [{"Databases": ["MongoDB", "dbm"]}, "Languages"]}]}
 
@@ -45,23 +45,6 @@ class HeirarchicalTest(object):
 	def test_find_descendants(self, Sample):
 		with pytest.raises(NotImplementedError):
 			Sample().find_descendants()
-	
-	def test_detach(self, Sample):
-		assert Sample().detach() is None
-	
-	def test_attach(self, Sample):
-		assert Sample().attach(Sample()) is None
-	
-	def test_attach_before(self, Sample):
-		assert Sample().attach_before(Sample()) is None
-	
-	def test_attach_after(self, Sample):
-		assert Sample().attach_after(Sample()) is None
-
-
-class TestHeirarchical(HeirarchicalTest):
-	class _Sample(Heirarchical):
-		__collection__ = 'heir'
 
 
 class TestHChildren(HeirarchicalTest):
@@ -249,3 +232,109 @@ class TestHParent(HeirarchicalTest):
 		node.reload('parent')
 		assert node.parent == parent.id
 		assert node.get_parent() == parent
+
+
+class TestHAncestors(HeirarchicalTest):
+	class _Sample(HAncestors):
+		__collection__ = 'heir_ancestors'
+		
+		id = String('_id')
+	
+	def _populate(self, Sample):  # Algorithm differs from tree structure to tree structure.
+		Sample.insert_many([
+				Sample("Books"),
+				Sample("Programming", parent="Books", ancestors=["Books"]),
+				Sample("Databases", parent="Programming", ancestors=["Books", "Programming"]),
+				Sample("Languages", parent="Programming", ancestors=["Books", "Programming"]),
+				Sample("dbm", parent="Databases", ancestors=["Books", "Programming", "Databases"]),
+				Sample("MongoDB", parent="Databases", ancestors=["Books", "Programming", "Databases"]),
+			])
+	
+	def test_get_root(self, Sample):
+		root = Sample.find_one('Books')
+		assert isinstance(root, Sample)
+		assert root.id == "Books"
+		assert root.parent is None
+		assert root.ancestors == []
+	
+	def test_get_parent(self, Sample):
+		node = Sample.find_one("Languages")
+		assert node.ancestors == ["Books", "Programming"]
+		parent = node.get_parent()
+		assert isinstance(parent, Sample)
+		assert parent.id == "Programming"
+		assert parent.ancestors == ["Books"]
+	
+	def test_find_ancestors(self, Sample):
+		node = Sample.find_one("Databases")
+		ancestors = node.find_ancestors(projection=('id', ))
+		ancestors = list(i['_id'] for i in ancestors)
+		assert ancestors == node.ancestors
+	
+	def test_find_siblings(self, Sample):
+		node = Sample.find_one("Databases")
+		siblings = list(Sample.from_mongo(i) for i in node.find_siblings())
+		assert len(siblings) == 1
+		
+		sibling, = siblings
+		assert isinstance(sibling, Sample)
+		assert sibling.id == "Languages"
+	
+	def test_find_children(self, Sample):
+		node = Sample.find_one("Programming")
+		children = list(sorted(i['_id'] for i in node.find_children()))
+		assert children == ["Databases", "Languages"]
+	
+	def test_find_descendants(self, Sample):
+		node = Sample.find_one("Databases")
+		descendants = list(sorted(i['_id'] for i in node.find_descendants()))
+		assert descendants == ["MongoDB", "dbm"]
+	
+	def test_detach(self, Sample):
+		node = Sample.find_one("dbm")
+		parent = node.get_parent()
+		assert node.parent == parent.id
+		assert node.ancestors[:len(parent.ancestors) + 1] == parent.ancestors + [parent.id]
+		
+		assert node.detach()
+		assert node.parent is None
+		assert node.ancestors == []
+		
+		node.reload('parent', 'ancestors')
+		assert node.parent is None
+		assert node.get_parent() is None
+		assert node.ancestors == []
+	
+	def test_attach(self, Sample):
+		parent = Sample.find_one("Languages")
+		
+		node = Sample("Python")
+		node.insert_one()
+		
+		assert parent.attach(node)
+		assert node.parent == parent.id
+		assert parent.id in node.ancestors
+		assert len(node.ancestors) == len(parent.ancestors) + 1
+		
+		node.reload('parent', 'ancestors')
+		assert node.parent == parent.id
+		assert node.get_parent() == parent
+		assert parent.id in node.ancestors
+		assert len(node.ancestors) == len(parent.ancestors) + 1
+	
+	def test_attach_to(self, Sample):
+		parent = Sample.find_one("Languages")
+		
+		node = Sample("Objective-C")
+		node.insert_one()
+		
+		assert node.attach_to(parent)
+		assert node.parent == parent.id
+		assert parent.id in node.ancestors
+		assert len(node.ancestors) == len(parent.ancestors) + 1
+		
+		node.reload('parent', 'ancestors')
+		assert node.parent == parent.id
+		assert node.get_parent() == parent
+		assert parent.id in node.ancestors
+		assert len(node.ancestors) == len(parent.ancestors) + 1

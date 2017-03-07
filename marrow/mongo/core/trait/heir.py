@@ -54,12 +54,12 @@ class Heirarchical(Queryable):
 	def detach(self):
 		"""Detach this document from its tree, forming the root of a new tree containing this document and its children."""
 		
-		return None
+		return self
 	
 	def attach(self, child):
 		"""Attach the given child document (with any descendants) to this document."""
 		
-		return None
+		return self
 	
 	def attach_to(self, parent):
 		"""Attach this document (with any descendants) to the given parent."""
@@ -72,12 +72,12 @@ class Heirarchical(Queryable):
 	def attach_before(self, sibling):
 		"""Attach this document (with any descendants) to the same parent as the target sibling, prior to that sibling."""
 		
-		return None
+		return self
 	
 	def attach_after(self, sibling):
 		"""Attach this document (with any descendants) to the same parent as the target sibling, after that sibling."""
 		
-		return None
+		return self
 
 
 class HChildren(Heirarchical):
@@ -108,7 +108,7 @@ class HChildren(Heirarchical):
 		update = U(Doc, pull__children=self.id)
 		result = collection.update_one(query, update, **options)
 		
-		return bool(result.modified_count)
+		return self
 	
 	def attach(self, child):
 		if not isinstance(child, Document):
@@ -120,7 +120,7 @@ class HChildren(Heirarchical):
 		update = U(Doc, push__children=child.id)
 		result = collection.update_one(query, update, **options)
 		
-		return bool(result.modified_count)
+		return self
 	
 	def attach_to(self, parent):
 		if not isinstance(parent, Document):
@@ -132,7 +132,7 @@ class HChildren(Heirarchical):
 		update = U(Doc, push__children=self.id)
 		result = collection.update_one(query, update, **options)
 		
-		return bool(result.modified_count)
+		return self
 	
 	def attach_before(self, sibling):
 		self.detach()
@@ -151,7 +151,7 @@ class HChildren(Heirarchical):
 		update = U(Doc, push_each__children=[self.id], push_position__children=index)
 		result = collection.update_one(query, update, **options)
 		
-		return bool(result.modified_count)
+		return self
 	
 	def attach_after(self, sibling):
 		self.detach()
@@ -170,7 +170,7 @@ class HChildren(Heirarchical):
 		update = U(Doc, push_each__children=[self.id], push_position__children=index)
 		result = collection.update_one(query, update, **options)
 		
-		return bool(result.modified_count)
+		return self
 
 
 class HParent(Heirarchical):
@@ -200,32 +200,41 @@ class HParent(Heirarchical):
 		return collection.find(query, **options)
 	
 	def detach(self):
+		if not self.parent:
+			return self
+		
 		Doc, collection, query, options = self._prepare_find(id=self.id)
 		result = collection.update_one(query, U(Doc, parent=None))
+		
 		self.parent = None  # Clean up to save needing to reload the record.
-		return bool(result.modified_count)
+		
+		return self
 	
 	def attach(self, child):
-		child_id = child.id if isinstance(child, Document) else child
+		if not isinstance(child, Document):
+			child = self.find_one(child, projection=('id', ))
 		
-		Doc, collection, query, options = self._prepare_find(id=child_id)
+		child.detach()
+		
+		Doc, collection, query, options = self._prepare_find(id=child.id)
 		result = collection.update_one(query, U(Doc, parent=self.id))
 		
-		if isinstance(child, Document):
-			child.parent = self.id  # Clean up to save needing to reload the record.
+		child.parent = self.id  # Clean up to save needing to reload the record.
 		
-		return bool(result.modified_count)
+		return self
 	
 	def attach_to(self, parent):
 		if isinstance(parent, Document):
 			parent = parent.id
+		
+		self.detach()
 		
 		Doc, collection, query, options = self._prepare_find(id=self.id)
 		result = collection.update_one(query, U(Doc, parent=parent))
 		
 		self.parent = parent  # Clean up to save needing to reload the record.
 		
-		return bool(result.modified_count)
+		return self
 
 
 class HAncestors(HParent):
@@ -244,36 +253,49 @@ class HAncestors(HParent):
 		return self.find_in_sequence('id', self.ancestors, *args, **kw)
 	
 	def find_descendants(self, *args, **kw):
-		Doc, collection, query, options = self._prepare_find(*args, ancestors=self, **kw)
+		Doc, collection, query, options = self._prepare_find(*args, ancestors=self.id, **kw)
 		return collection.find(query, **options)
 	
 	def detach(self):
+		if not self.parent:
+			return self
+		
 		super(HAncestors, self).detach()
 		
-		Doc, collection, query, options = self._prepare_find(id=self)
-		
+		Doc, collection, query, options = self._prepare_find(id=self.id)
 		query |= Doc.ancestors == self.id
-		
-		result = self.get_collection().update_many(
-				query,
-				{'$pullAll': {~Doc.ancestors: self.ancestors}}
-			)
+		update = U(Doc, pull_all__ancestors=self.ancestors)
+		result = self.get_collection().update_many(query, update)
 		
 		self.ancestors = []  # Clean up to save needing to reload the record.
 		
-		return bool(result.modified_count)
+		return self
 	
 	def attach(self, child):
-		pass
+		if not isinstance(child, Document):
+			child = self.find_one(child, projection=('id', 'ancestors'))
+		
+		super(HAncestors, self).attach(child)
+		
+		ancestors = self.ancestors + [self.id]
+		
+		Doc, collection, query, options = self._prepare_find(id=child.id)
+		query |= Doc.ancestors == child.id
+		update = U(Doc, push_each__ancestors=ancestors, push_position__ancestors=0)
+		result = collection.update_many(query, update)
+		
+		if isinstance(child, Document):
+			child.ancestors = ancestors  # Clean up to save needing to reload the record.
+		
+		return self
 	
 	def attach_to(self, parent):
-		pass
-	
-	def attach_before(self, sibling):
-		pass
-	
-	def attach_after(self, sibling):
-		pass
+		if not isinstance(parent, Document):
+			parent = self.find_one(parent, projection=('id', 'ancestors'))
+		
+		parent.attach(self)
+		
+		return self
 
 
 class HPath(Heirarchical):
