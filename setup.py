@@ -158,7 +158,7 @@ setup(
 						'Heirarchical = marrow.mongo.core.trait.heir:Heirarchical',
 						'HChildren = marrow.mongo.core.trait.heir:HChildren',
 						'HParent = marrow.mongo.core.trait.heir:HParent',
-						'HAncestors = marrow.mongo.core.trait.heir:HANcestors',
+						'HAncestors = marrow.mongo.core.trait.heir:HAncestors',
 						'HPath = marrow.mongo.core.trait.heir:HPath',
 						'HNested = marrow.mongo.core.trait.heir:HNested',
 						'Taxonomy = marrow.mongo.core.trait.heir:Taxonomy',
