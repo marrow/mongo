@@ -415,15 +415,14 @@ class TestHPath(HeirarchicalTest):
 		assert unicode(node.path) == '/Books/Programming/Languages/Python'
 	
 	def test_attach_to(self, Sample):
-		return
 		parent = Sample.find_one(slug="Languages")
 		
 		node = Sample(slug="Objective-C", path="Objective-C")  # Obvious TODO
 		node.insert_one()
 		
 		assert node.attach_to(parent)
-		assert node.parent == parent.id
+		assert unicode(node.path) == '/Books/Programming/Languages/Objective-C'
 		
-		node.reload('parent')
-		assert node.parent == parent.id
+		node.reload('path')
+		assert unicode(node.path) == '/Books/Programming/Languages/Objective-C'
 		assert node.get_parent() == parent
