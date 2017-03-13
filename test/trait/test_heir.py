@@ -428,7 +428,7 @@ class TestHPath(HeirarchicalTest):
 
 class TestHNested(HeirarchicalTest):
 	class _Sample(HNested):
-		__collection__ = 'heir_path'
+		__collection__ = 'heir_nested'
 		
 		id = String('_id')
 	
@@ -468,12 +468,16 @@ class TestHNested(HeirarchicalTest):
 		assert descendants == ["MongoDB", "dbm"]
 	
 	def test_detach(self, Sample):
-		return
-		node = Sample.find_one(slug="dbm")
+		node = Sample.find_one("dbm")
 		
 		assert node.detach()
 		assert node.get_parent() is None
-		assert unicode(node.path) == node.slug
+		assert node.left == 11
+		assert node.right == 12
+		
+		root = Sample.find_one("Books")
+		assert root.left == 1
+		assert root.right == 10
 	
 	def test_attach(self, Sample):
 		return

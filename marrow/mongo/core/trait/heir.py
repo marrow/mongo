@@ -422,6 +422,8 @@ class HNested(Heirarchical):
 		return Doc, collection, rim['right'] + 1 - self.left
 	
 	def detach(self):
+		self = super(HNested, self).detach()
+		
 		if not self.left or not self.find_ancestors().count():
 			return False  # Not attached.
 		
@@ -434,12 +436,15 @@ class HNested(Heirarchical):
 		left_updates = Doc.left > self.right
 		right_updates = Doc.right > self.right
 		
-		# TODO: Bulk operation.
-		collection.update_many(detaching, {'$add': {~Doc.left: distance, ~Doc.right: distance}})
-		collection.update_many(left_updates, {'$add': {~Doc.left: -distance}})
-		collection.update_many(right_updates, {'$add': {~Doc.right: -distance}})
+		bulk = collection.initialize_ordered_bulk_op()
 		
-		return True
+		bulk.find(detaching).update(U(Doc, inc__left=distance, inc__right=distance))
+		bulk.find(left_updates).update(U(Doc, dec__left=1 + self.right - self.left))
+		bulk.find(right_updates).update(U(Doc, dec__right=1 + self.right - self.left))
+		
+		result = bulk.execute()
+		
+		return self.reload('left', 'right')
 	
 	def attach(self, child):
 		pass
