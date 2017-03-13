@@ -425,13 +425,14 @@ class HNested(Heirarchical):
 		self = super(HNested, self).detach()
 		
 		if not self.left or not self.find_ancestors().count():
-			return False  # Not attached.
+			return self  # Not attached.
 		
 		Doc, collection, distance = self.__get_rim_distance()
 		
 		if distance is None:
-			return False
+			return self
 		
+		gap = 1 + self.right - self.left
 		detaching = (Doc.left >= self.left) & (Doc.right <= self.right)
 		left_updates = Doc.left > self.right
 		right_updates = Doc.right > self.right
@@ -439,15 +440,55 @@ class HNested(Heirarchical):
 		bulk = collection.initialize_ordered_bulk_op()
 		
 		bulk.find(detaching).update(U(Doc, inc__left=distance, inc__right=distance))
-		bulk.find(left_updates).update(U(Doc, dec__left=1 + self.right - self.left))
-		bulk.find(right_updates).update(U(Doc, dec__right=1 + self.right - self.left))
+		bulk.find(left_updates).update(U(Doc, dec__left=gap))
+		bulk.find(right_updates).update(U(Doc, dec__right=gap))
 		
 		result = bulk.execute()
 		
 		return self.reload('left', 'right')
 	
 	def attach(self, child):
-		pass
+		if not self.left and not self.right:
+			raise ValueError("Can only attach to a node already present in the graph.")
+		
+		child = super(HNested, self).attach(child)
+		self.reload('left', 'right')  # In case things were detached.
+		child.reload('left', 'right')
+		
+		Doc = self.__class__
+		collection = self.get_collection()
+		bulk = collection.initialize_ordered_bulk_op()
+		
+		# Step 1: Determine the size gap to create, and create it.
+		
+		gap = (1 + child.right - child.left) if child.left and child.right else 2
+		
+		bulk.find(Doc.left >= self.right).update(U(Doc, inc__left=gap))
+		bulk.find(Doc.right >= self.right).update(U(Doc, inc__right=gap))
+		
+		self.right += gap  # Update our internal value.
+		
+		# Step 2: Move the child into position.
+		
+		if child.left and child.right:
+			if child.left >= self.right: child.left += gap
+			if child.right >= self.right: child.right += gap
+			
+			distance = (self.right - 2) - child.left
+			attaching = (Doc.left >= child.left) & (Doc.right <= child.right)
+			bulk.find(attaching).update(U(Doc, inc__left=distance, inc__right=distance))
+			
+			# Step 2b: Close any gap left behind in the structure.
+			bulk.find(Doc.left > child.right).update(U(Doc, dec__left=gap))
+			bulk.find(Doc.right > child.right).update(U(Doc, dec__right=gap))
+		
+		else:
+			bulk.find(Doc.id == child.id).update(U(Doc, left=self.right - 2, right=self.right - 1))
+		
+		result = bulk.execute()
+		
+		self.reload('left', 'right')
+		return child.reload('left', 'right')
 	
 	def attach_before(self, sibling):
 		pass

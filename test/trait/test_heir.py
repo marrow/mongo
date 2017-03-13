@@ -480,28 +480,21 @@ class TestHNested(HeirarchicalTest):
 		assert root.right == 10
 	
 	def test_attach(self, Sample):
-		return
-		parent = Sample.find_one(slug="Languages")
+		parent = Sample.find_one("Languages")
 		
-		node = Sample(slug="Python", path="Python")  # Obvious TODO
+		node = Sample("Python")
 		node.insert_one()
 		
 		assert parent.attach(node)
-		assert unicode(node.path) == '/Books/Programming/Languages/Python'
-		
-		node.reload('path')
-		assert unicode(node.path) == '/Books/Programming/Languages/Python'
+		assert node.get_parent() == parent
 	
 	def test_attach_to(self, Sample):
-		return
-		parent = Sample.find_one(slug="Languages")
+		parent = Sample.find_one("Languages")
 		
-		node = Sample(slug="Objective-C", path="Objective-C")  # Obvious TODO
+		rim = Sample.find_one(sort=('-right', ), projection=('-id', 'right'))['right']
+		
+		node = Sample("Objective-C", left=rim + 1, right=rim + 2)
 		node.insert_one()
 		
 		assert node.attach_to(parent)
-		assert unicode(node.path) == '/Books/Programming/Languages/Objective-C'
-		
-		node.reload('path')
-		assert unicode(node.path) == '/Books/Programming/Languages/Objective-C'
 		assert node.get_parent() == parent
