@@ -6,7 +6,8 @@ import pytest
 
 from marrow.mongo import Document
 from marrow.mongo.field import String
-from marrow.mongo.trait import HAncestors, HChildren, Heirarchical, HParent
+from marrow.mongo.trait import HAncestors, HChildren, Heirarchical, HParent, HPath
+from marrow.schema.compat import unicode
 
 TREE = {"Books": [{"Programming": [{"Databases": ["MongoDB", "dbm"]}, "Languages"]}]}
 
@@ -269,7 +270,7 @@ class TestHAncestors(HeirarchicalTest):
 		node = Sample.find_one("Databases")
 		ancestors = node.find_ancestors(projection=('id', ))
 		ancestors = list(i['_id'] for i in ancestors)
-		assert ancestors == node.ancestors
+		assert ancestors == list(reversed(node.ancestors))
 	
 	def test_find_siblings(self, Sample):
 		node = Sample.find_one("Databases")
@@ -338,3 +339,91 @@ class TestHAncestors(HeirarchicalTest):
 		assert node.get_parent() == parent
 		assert parent.id in node.ancestors
 		assert len(node.ancestors) == len(parent.ancestors) + 1
+
+
+class TestHPath(HeirarchicalTest):
+	class _Sample(HPath):
+		__collection__ = 'heir_path'
+	
+	def _populate(self, Sample):  # Algorithm differs from tree structure to tree structure.
+		Sample.insert_many([
+				Sample(slug="Books", path='/Books'),
+				Sample(slug="Programming", path="/Books/Programming"),
+				Sample(slug="Databases", path="/Books/Programming/Databases"),
+				Sample(slug="Languages", path="/Books/Programming/Languages"),
+				Sample(slug="dbm", path="/Books/Programming/Databases/dbm"),
+				Sample(slug="MongoDB", path="/Books/Programming/Databases/MongoDB"),
+			])
+	
+	def test_get_root(self, Sample):
+		root = Sample.find_one(path='/Books')
+		assert isinstance(root, Sample)
+		assert root.slug == "Books"
+		assert root.get_parent() is None
+	
+	def test_get_parent(self, Sample):
+		node = Sample.find_one(path="/Books/Programming/Languages")
+		parent = node.get_parent()
+		assert isinstance(parent, Sample)
+		assert parent.slug == "Programming"
+		assert parent.path == node.path.parent
+	
+	def test_find_ancestors(self, Sample):
+		node = Sample.find_one(path="/Books/Programming/Databases")
+		ancestors = node.find_ancestors(projection=('path', ))
+		ancestors = list(i['path'] for i in ancestors)
+		
+		for i in ancestors:
+			assert unicode(node.path).startswith(unicode(i))
+	
+	def test_find_siblings(self, Sample):
+		node = Sample.find_one(path="/Books/Programming/Databases")
+		siblings = list(Sample.from_mongo(i) for i in node.find_siblings())
+		assert len(siblings) == 1
+		
+		sibling, = siblings
+		assert isinstance(sibling, Sample)
+		assert sibling.slug == "Languages"
+	
+	def test_find_children(self, Sample):
+		node = Sample.find_one(path="/Books/Programming")
+		children = list(sorted(i['slug'] for i in node.find_children()))
+		assert children == ["Databases", "Languages"]
+	
+	def test_find_descendants(self, Sample):
+		node = Sample.find_one(path="/Books/Programming/Databases")
+		descendants = list(sorted(i['slug'] for i in node.find_descendants()))
+		assert descendants == ["MongoDB", "dbm"]
+	
+	def test_detach(self, Sample):
+		node = Sample.find_one(slug="dbm")
+		
+		assert node.detach()
+		assert node.get_parent() is None
+		assert unicode(node.path) == node.slug
+	
+	def test_attach(self, Sample):
+		parent = Sample.find_one(slug="Languages")
+		
+		node = Sample(slug="Python", path="Python")  # Obvious TODO
+		node.insert_one()
+		
+		assert parent.attach(node)
+		assert unicode(node.path) == '/Books/Programming/Languages/Python'
+		
+		node.reload('path')
+		assert unicode(node.path) == '/Books/Programming/Languages/Python'
+	
+	def test_attach_to(self, Sample):
+		return
+		parent = Sample.find_one(slug="Languages")
+		
+		node = Sample(slug="Objective-C", path="Objective-C")  # Obvious TODO
+		node.insert_one()
+		
+		assert node.attach_to(parent)
+		assert node.parent == parent.id
+		
+		node.reload('parent')
+		assert node.parent == parent.id
+		assert node.get_parent() == parent
