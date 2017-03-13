@@ -6,10 +6,8 @@ import pytest
 
 from marrow.mongo import Document
 from marrow.mongo.field import String
-from marrow.mongo.trait import HAncestors, HChildren, Heirarchical, HParent, HPath
+from marrow.mongo.trait import HAncestors, HChildren, Heirarchical, HNested, HParent, HPath
 from marrow.schema.compat import unicode
-
-TREE = {"Books": [{"Programming": [{"Databases": ["MongoDB", "dbm"]}, "Languages"]}]}
 
 
 @pytest.fixture(scope='module')
@@ -415,6 +413,83 @@ class TestHPath(HeirarchicalTest):
 		assert unicode(node.path) == '/Books/Programming/Languages/Python'
 	
 	def test_attach_to(self, Sample):
+		parent = Sample.find_one(slug="Languages")
+		
+		node = Sample(slug="Objective-C", path="Objective-C")  # Obvious TODO
+		node.insert_one()
+		
+		assert node.attach_to(parent)
+		assert unicode(node.path) == '/Books/Programming/Languages/Objective-C'
+		
+		node.reload('path')
+		assert unicode(node.path) == '/Books/Programming/Languages/Objective-C'
+		assert node.get_parent() == parent
+
+
+class TestHNested(HeirarchicalTest):
+	class _Sample(HNested):
+		__collection__ = 'heir_path'
+		
+		id = String('_id')
+	
+	def _populate(self, Sample):  # Algorithm differs from tree structure to tree structure.
+		Sample.insert_many([
+				Sample("Books", left=1, right=12),
+				Sample("Programming", left=2, right=11),
+				Sample("Languages", left=3, right=4),
+				Sample("Databases", left=5, right=10),
+				Sample("MongoDB", left=6, right=7),
+				Sample("dbm", left=8, right=9),
+			])
+	
+	def test_get_root(self, Sample):
+		root = Sample.find_one('Books')
+		assert isinstance(root, Sample)
+	
+	def test_get_parent(self, Sample):
+		node = Sample.find_one("Languages")
+		
+		parent = node.get_parent()
+		assert isinstance(parent, Sample)
+		
+		assert parent.id == "Programming"
+	
+	def test_find_ancestors(self, Sample):
+		node = Sample.find_one("Databases")
+		ancestors = node.find_ancestors(projection=('id', ))
+		ancestors = list(i['_id'] for i in ancestors)
+		
+		assert ancestors == ['Books', 'Programming']
+	
+	def test_find_descendants(self, Sample):
+		node = Sample.find_one("Databases")
+		descendants = list(sorted(i['_id'] for i in node.find_descendants()))
+		assert len(descendants) == (node.right - node.left - 1) / 2  # Internal consistency.
+		assert descendants == ["MongoDB", "dbm"]
+	
+	def test_detach(self, Sample):
+		return
+		node = Sample.find_one(slug="dbm")
+		
+		assert node.detach()
+		assert node.get_parent() is None
+		assert unicode(node.path) == node.slug
+	
+	def test_attach(self, Sample):
+		return
+		parent = Sample.find_one(slug="Languages")
+		
+		node = Sample(slug="Python", path="Python")  # Obvious TODO
+		node.insert_one()
+		
+		assert parent.attach(node)
+		assert unicode(node.path) == '/Books/Programming/Languages/Python'
+		
+		node.reload('path')
+		assert unicode(node.path) == '/Books/Programming/Languages/Python'
+	
+	def test_attach_to(self, Sample):
+		return
 		parent = Sample.find_one(slug="Languages")
 		
 		node = Sample(slug="Objective-C", path="Objective-C")  # Obvious TODO
