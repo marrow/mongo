@@ -375,38 +375,21 @@ class HNested(Heirarchical):
 	_nested_set = Index('left', 'right')
 	
 	def get_parent(self, *args, **kw):
-		Doc, collection, query, options = self._prepare_find(
-				*args,
-				left__lt = self.left,
-				right__gt = self.right,
-				sort = ('-left', ),
-				**kw
-			)
+		kw['sort'] = ('-left', )  # We require this sort order to fetch the correct record.
 		
-		result = collection.find_one(query, **options)
-		return Doc.from_mongo(result, projected=options.get('projection', None))
+		return self.find_one(*args, left__lt=self.left, right__gt=self.right, **kw)
 	
 	def find_ancestors(self, *args, **kw):
-		Doc, collection, query, options = self._prepare_find(
-				*args,
-				left__lt = self.left,
-				right__gt = self.right,
-				**kw
-			)
+		kw.setdefault('sort', ('left', ))  # This sort is optional, to preserve ancestor order.
 		
-		options.setdefault('sort', [(~Doc.left, 1)])
-		return collection.find(query, **options)
+		# As a special note: see how this avoids the use of the fancy ordered aggregate query?
+		# A result of this will be that this tree structure is more backwards compatible.
+		return self.find(*args, left__lt=self.left, right__gt=self.right, **kw)
 	
 	def find_descendants(self, *args, **kw):
-		Doc, collection, query, options = self._prepare_find(
-				*args,
-				left__gt = self.left,
-				right__lt = self.right,
-				**kw
-			)
+		kw.setdefault('sort', ('left', ))
 		
-		options.setdefault('sort', [(~Doc.left, 1)])
-		return collection.find(query, **options)
+		return self.find(*args, left__gt=self.left, right__lt=self.right, **kw)
 	
 	def __get_rim_distance(self):
 		Doc, collection, query, options = self._prepare_find(
@@ -417,7 +400,7 @@ class HNested(Heirarchical):
 		rim = collection.find_one(query, **options)
 		
 		if not rim:
-			return None
+			return Doc, collection, None
 		
 		return Doc, collection, rim['right'] + 1 - self.left
 	

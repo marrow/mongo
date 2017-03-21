@@ -16,8 +16,8 @@ def db(connection):
 	return connection.test
 
 
-class HeirarchicalTest(object):
-	class _Sample(Document):
+class TestHeirarchical(object):
+	class _Sample(Heirarchical):
 		__collection__ = 'heir'
 	
 	@pytest.fixture(scope='class')
@@ -46,7 +46,7 @@ class HeirarchicalTest(object):
 			Sample().find_descendants()
 
 
-class TestHChildren(HeirarchicalTest):
+class TestHChildren(TestHeirarchical):
 	class _Sample(HChildren):
 		__collection__ = 'heir_children'
 		
@@ -152,7 +152,7 @@ class TestHChildren(HeirarchicalTest):
 		assert parent.children.index(sibling.id) < parent.children.index(node.id)
 
 
-class TestHParent(HeirarchicalTest):
+class TestHParent(TestHeirarchical):
 	class _Sample(HParent):
 		__collection__ = 'heir_parent'
 		
@@ -233,7 +233,7 @@ class TestHParent(HeirarchicalTest):
 		assert node.get_parent() == parent
 
 
-class TestHAncestors(HeirarchicalTest):
+class TestHAncestors(TestHeirarchical):
 	class _Sample(HAncestors):
 		__collection__ = 'heir_ancestors'
 		
@@ -339,7 +339,7 @@ class TestHAncestors(HeirarchicalTest):
 		assert len(node.ancestors) == len(parent.ancestors) + 1
 
 
-class TestHPath(HeirarchicalTest):
+class TestHPath(TestHeirarchical):
 	class _Sample(HPath):
 		__collection__ = 'heir_path'
 	
@@ -426,7 +426,7 @@ class TestHPath(HeirarchicalTest):
 		assert node.get_parent() == parent
 
 
-class TestHNested(HeirarchicalTest):
+class TestHNested(TestHeirarchical):
 	class _Sample(HNested):
 		__collection__ = 'heir_nested'
 		
