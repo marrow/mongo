@@ -31,7 +31,7 @@ class FieldTransform(BaseTransform):
 		return value
 
 
-@adjust_attribute_sequence(1000, 'transformer', 'validator', 'translated', 'assign', 'project', 'read', 'write')
+@adjust_attribute_sequence(1000, 'transformer', 'validator', 'positional', 'assign', 'repr', 'project', 'read', 'write', 'sort')
 class Field(Attribute):
 	# Possible values for operators include any literal $-prefixed operator, or one of:
 	#  * #rel -- allow/prevent all relative comparison such as $gt, $gte, $lt, etc.
@@ -57,7 +57,7 @@ class Field(Attribute):
 	
 	transformer = Attribute(default=FieldTransform())  # A Transformer class to use when loading/saving values.
 	validator = Attribute(default=Validator())  # The Validator class to use when validating values.
-	translated = Attribute(default=False)  # If truthy this field should be stored in the per-language subdocument.
+	positional = Attribute(default=True)  # If True, will be accepted positionally.
 	assign = Attribute(default=False)  # If truthy attempt to access and store resulting variable when instantiated.
 	
 	# Security Properties
