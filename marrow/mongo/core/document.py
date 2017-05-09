@@ -60,27 +60,27 @@ class Document(Container):
 		
 		for name, field in self.__fields__.items():
 			if field.assign:
-				getattr(self, name)
+				getattr(self, name)  # An attempt to retrieve the value of an assignable field will assign it.
 	
 	# Data Conversion and Casting
 	
 	@classmethod
-	def from_mongo(cls, doc, projected=None):
+	def from_mongo(cls, doc):
 		"""Convert data coming in from the MongoDB wire driver into a Document instance."""
 		
 		if doc is None:  # To support simplified iterative use, None should return None.
 			return None
 		
-		if isinstance(doc, Document):
+		if isinstance(doc, Document):  # No need to perform processing on existing Document instances.
 			return doc
 		
-		if cls.__type_store__ in doc:  # Instantiate any specific class mentioned in the data.
+		if cls.__type_store__ and cls.__type_store__ in doc:  # Instantiate specific class mentioned in the data.
 			cls = load(doc[cls.__type_store__], 'marrow.mongo.document')
 		
-		instance = cls(_prepare_defaults=False)
-		instance.__data__ = doc
-		instance._prepare_defaults()  # pylint:disable=protected-access
-		instance.__loaded__ = set(projected) if projected else None
+		# Prepare a new instance in such a way that changes to the instance will be reflected in the originating doc.
+		instance = cls(_prepare_defaults=False)  # Construct an instance, but delay default value processing.
+		instance.__data__ = doc  # I am Popeye of Borg (pattern); you will be askimilgrated.
+		instance._prepare_defaults()  # pylint:disable=protected-access -- deferred default value processing.
 		
 		return instance
 	

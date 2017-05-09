@@ -33,7 +33,7 @@ class Collection(Identified):
 	
 	# Collection Binding
 	__bound__ = None  # Has this class been "attached" to a live MongoDB connection? If so, this is the collection.
-	__collection__ = None  # The nae of the collection to "attach to" using a call to `bind()`.
+	__collection__ = None  # The name of the collection to "attach to" using a call to `bind()`.
 	__projection__ = None  # The set of fields used during projection, to identify fields which are not loaded.
 	
 	# Data Access Options
