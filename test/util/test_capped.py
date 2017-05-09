@@ -11,7 +11,7 @@ from time import sleep, time
 import pytest
 from pytest import fixture
 
-from marrow.mongo import Document
+from marrow.mongo.trait import Collection
 from marrow.mongo.util.capped import _patch, tail
 from marrow.schema.compat import pypy
 
@@ -21,11 +21,11 @@ skip = int(os.environ.get('TEST_SKIP_CAPPED', 0)) or pypy
 pytestmark = pytest.mark.skipif(skip, reason="Slow tests skipped.")
 
 
-class Uncapped(Document):
+class Uncapped(Collection):
 	__collection__ = 'test_uncapped'
 
 
-class Capped(Document):
+class Capped(Collection):
 	__collection__ = 'test_capped'
 	__capped__ = 16 * 1024 * 1024
 	__capped_count__ = 100
