@@ -154,14 +154,14 @@ setup(
 						'Stateful = marrow.mongo.core.trait.stateful:Stateful',
 						'Queryable = marrow.mongo.core.trait.queryable:Queryable',
 						
-						# This one gets a bit intense.
-						'Heirarchical = marrow.mongo.core.trait.heir:Heirarchical',
-						'HChildren = marrow.mongo.core.trait.heir:HChildren',
-						'HParent = marrow.mongo.core.trait.heir:HParent',
-						'HAncestors = marrow.mongo.core.trait.heir:HAncestors',
-						'HPath = marrow.mongo.core.trait.heir:HPath',
-						'HNested = marrow.mongo.core.trait.heir:HNested',
-						'Taxonomy = marrow.mongo.core.trait.heir:Taxonomy',
+						# Taxonomy traits get a bit intense.
+						#'Heirarchical = marrow.mongo.core.trait.heir:Heirarchical',
+						#'HChildren = marrow.mongo.core.trait.heir:HChildren',
+						#'HParent = marrow.mongo.core.trait.heir:HParent',
+						#'HAncestors = marrow.mongo.core.trait.heir:HAncestors',
+						#'HPath = marrow.mongo.core.trait.heir:HPath',
+						#'HNested = marrow.mongo.core.trait.heir:HNested',
+						#'Taxonomy = marrow.mongo.core.trait.heir:Taxonomy',
 					],
 				# ### WebCore Extensions
 				'web.session': [  # Session Engine
