@@ -5,15 +5,7 @@ from __future__ import unicode_literals
 from collections import MutableMapping
 
 from bson import ObjectId
-from bson.binary import STANDARD
-from bson.codec_options import CodecOptions
 from bson.json_util import dumps, loads
-from bson.tz_util import utc
-from pymongo.collection import Collection
-from pymongo.database import Database
-from pymongo.read_concern import ReadConcern
-from pymongo.read_preferences import ReadPreference
-from pymongo.write_concern import WriteConcern
 
 from ...package.loader import load
 from ...package.canonical import name as named
@@ -45,22 +37,8 @@ class Document(Container):
 	__type_store__ = None  # The pseudo-field to store embedded document class references as.
 	__pk__ = None  # The primary key of the document, to make searchable if embedded, or the name of the '_id' field.
 	
-	__bound__ = False  # Has this class been "attached" to a live MongoDB connection?
-	_collection = None  # Cached collection.
-	__collection__ = None  # The name of the collection to "attach" to using bind().
-	__read_preference__ = ReadPreference.PRIMARY  # Default read preference to assign when binding.
-	__read_concern__ = ReadConcern()  # Default read concern.
-	__write_concern__ = WriteConcern(w=1)  # Default write concern.
-	__capped__ = False  # The size of the capped collection to create in bytes.
-	__capped_count__ = None  # The optional number of records to limit the capped collection to.
-	__engine__ = None  # Override the default storage engine (and configuration) as a mapping of `{name: options}`.
-	__validate__ = 'off'  # Control validation strictness: off, strict, or moderate.
-	__collation__ = None  # A pymongo.collation.Collation object to control collation during creation.
-	
-	__projection__ = None  # The set of fields used during projection, to identify fields which are not loaded.
-	__validator__ = None  # The MongoDB Validation document matching these records.
 	__fields__ = Attributes(only=Field)  # An ordered mapping of field names to their respective Field instance.
-	__fields__.__sequence__ = 10000
+	__fields__.__sequence__ = 10000  # TODO: project=False
 	__indexes__ = Attributes(only=Index)  # An ordered mapping of index names to their respective Index instance.
 	__indexes__.__sequence__ = 10000
 	
@@ -79,158 +57,12 @@ class Document(Container):
 		if prepare_defaults:
 			self._prepare_defaults()
 	
-	@classmethod
-	def _get_default_projection(cls):
-		"""Construct the default projection document."""
-		
-		projected = []  # The fields explicitly requested for inclusion.
-		neutral = []  # Fields returning neutral (None) status.
-		omitted = False  # Have any fields been explicitly omitted?
-		
-		for name, field in cls.__fields__.items():
-			if field.project is None:
-				neutral.append(name)
-			elif field.project:
-				projected.append(name)
-			else:
-				omitted = True
-		
-		if not projected and not omitted:
-			# No preferences specified.
-			return None
-			
-		elif not projected and omitted:
-			# No positive inclusions given, but negative ones were.
-			projected = neutral
-		
-		return {field: True for field in projected}
-	
-	@classmethod
-	def __attributed__(cls):
-		"""Executed after each new subclass is constructed."""
-		
-		cls.__projection__ = cls._get_default_projection()
-	
 	def _prepare_defaults(self):
 		"""Trigger assignment of default values."""
 		
 		for name, field in self.__fields__.items():
 			if field.assign:
 				getattr(self, name)
-	
-	@classmethod
-	def bind(cls, db=None, collection=None):
-		"""Bind a copy of the collection to the class, modified per our class' settings."""
-		
-		if cls.__bound__:
-			return cls
-		
-		if db is collection is None:
-			raise ValueError("Must bind to either a database or explicit collection.")
-		
-		collection = cls.get_collection(db or collection)
-		
-		cls.__bound__ = True
-		cls._collection = collection
-		
-		return cls
-	
-	# Database Operations
-	
-	@classmethod
-	def _collection_configuration(cls, creation=False):
-		config = {
-				'codec_options': CodecOptions(
-						document_class = cls.__store__,
-						tz_aware = True,
-						uuid_representation = STANDARD,
-						tzinfo = utc,
-					),
-				'read_preference': cls.__read_preference__,
-				'read_concern': cls.__read_concern__,
-				'write_concern': cls.__write_concern__,
-			}
-		
-		if not creation:
-			return config
-		
-		if cls.__capped__:
-			config['size'] = cls.__capped__
-			config['capped'] = True
-			
-			if cls.__capped_count__:
-				config['max'] = cls.__capped_count__
-		
-		if cls.__engine__:
-			config['storageEngine'] = cls.__engine__
-		
-		if cls.__validate__ != 'off':
-			config['validator'] = cls.__validator__
-			config['validationLevel'] = 'strict' if cls.__validate__ is True else cls.__validate__
-		
-		if cls.__collation__ is not None:  # pragma: no cover
-			config['collation'] = cls.__collation__
-		
-		return config
-	
-	@classmethod
-	def create_collection(cls, target, recreate=False, indexes=True):
-		"""Ensure the collection identified by this document class exists, creating it if not.
-		
-		http://api.mongodb.com/python/current/api/pymongo/database.html#pymongo.database.Database.create_collection
-		"""
-		
-		if isinstance(target, Collection):
-			collection = target.name
-			target = target.database
-		else:
-			collection = cls.__collection__
-		
-		if recreate:
-			target.drop_collection(collection)
-		
-		collection = target.create_collection(collection, **cls._collection_configuration(True))
-		
-		if indexes:
-			cls.create_indexes(collection)
-		
-		return collection
-	
-	@classmethod
-	def get_collection(cls, target=None):
-		"""Retrieve a properly configured collection object as configured by this document class.
-		
-		If given an existing collection, will instead call `collection.with_options`.
-		
-		http://api.mongodb.com/python/current/api/pymongo/database.html#pymongo.database.Database.get_collection
-		"""
-		
-		if target is None:
-			assert cls.__bound__, "May only retrieve collection without target when Document subclass is bound."
-			return cls._collection
-		
-		if isinstance(target, Collection):
-			return target.with_options(**cls._collection_configuration())
-		
-		elif isinstance(target, Database):
-			return target.get_collection(cls.__collection__, **cls._collection_configuration())
-		
-		raise TypeError("Can not retrieve collection from: " + repr(target))
-	
-	@classmethod
-	def create_indexes(cls, target, recreate=False):
-		"""Iterate all known indexes and construct them."""
-		
-		results = []
-		collection = cls.get_collection(target)
-		
-		if recreate:
-			collection.drop_indexes()
-		
-		for index in cls.__indexes__.values():
-			results.append(index.create_index(collection))
-		
-		return results
 	
 	# Data Conversion and Casting
 	

@@ -146,15 +146,19 @@ setup(
 						'Translated = marrow.mongo.core.trait.localized:Translated',
 					],
 				'marrow.mongo.trait': [  # Document traits for use as mix-ins.
+						# Active Collection Traits
+						'Collection = marrow.mongo.core.trait.collection:Collection',
+						'Queryable = marrow.mongo.core.trait.queryable:Queryable',
+						
+						# Behavioural Traits
 						'Derived = marrow.mongo.core.trait.derived:Derived',
 						'Expires = marrow.mongo.core.trait.expires:Expires',
 						'Identified = marrow.mongo.core.trait.identified:Identified',
 						'Localized = marrow.mongo.core.trait.localized:Localized',
 						'Published = marrow.mongo.core.trait.published:Published',
 						'Stateful = marrow.mongo.core.trait.stateful:Stateful',
-						'Queryable = marrow.mongo.core.trait.queryable:Queryable',
 						
-						# Taxonomy traits get a bit intense.
+						# Taxonomic Traits
 						#'Heirarchical = marrow.mongo.core.trait.heir:Heirarchical',
 						#'HChildren = marrow.mongo.core.trait.heir:HChildren',
 						#'HParent = marrow.mongo.core.trait.heir:HParent',

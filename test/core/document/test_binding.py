@@ -5,7 +5,8 @@ from __future__ import unicode_literals
 import pytest
 from pymongo.errors import WriteError
 
-from marrow.mongo import Document, Field, Index
+from marrow.mongo import Field, Index
+from marrow.mongo.trait import Collection
 
 
 @pytest.fixture
@@ -20,10 +21,11 @@ def coll(request, db):
 
 @pytest.fixture
 def Sample(request):
-	class Sample(Document):
+	class Sample(Collection):
 		__collection__ = 'collection'
 		__engine__ = {'mmapv1': {}}
 		
+		id = None  # Remove the default identifier.
 		field = Field()
 		other = Field()
 		
@@ -34,13 +36,13 @@ def Sample(request):
 
 class TestDocumentBinding(object):
 	def test_bind_fail(self, Sample):
-		with pytest.raises(ValueError):
+		with pytest.raises(TypeError):
 			Sample.bind()
 	
 	def test_bind_specific_collection(self, coll, Sample):
 		assert not Sample.__bound__
 		
-		Sample.bind(collection=coll)
+		Sample.bind(coll)
 		
 		assert Sample.__bound__
 	

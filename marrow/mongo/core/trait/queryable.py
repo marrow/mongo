@@ -9,12 +9,14 @@ from operator import and_
 from pymongo.cursor import CursorType
 
 from ... import F, Filter, P, S
-from ...trait import Identified
+from ...trait import Collection
 from ....schema.compat import odict
 from ....package.loader import traverse
 
 
-class Queryable(Identified):
+class Queryable(Collection):
+	"""Extend active collection behaviours to include querying."""
+	
 	UNIVERSAL_OPTIONS = {
 			'collation',
 			'limit',
