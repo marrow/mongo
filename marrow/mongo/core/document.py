@@ -23,12 +23,10 @@ class Document(Container):
 	
 	This is the top-level class your own document schemas should subclass. They may also subclass eachother; field
 	declaration order is preserved, with subclass fields coming after those provided by the parent class(es). Any
-	fields redefined will have their original position preserved.
+	fields redefined will have their original position preserved. Fields may be disabled in subclasses by assigning
+	`None` to the attribute within the subclass; this is not recommended, though supported to ease testing.
 	
-	Documents may be bound to a PyMongo `Collection` instance, allowing for easier identification of where a document
-	has been loaded from, and to allow reloading and loading of previously un-projected data. This is not meant to
-	implement a full Active Record pattern; no `save` method or similar is provided. (You are free to add one
-	yourself, of course!)
+	Traits, Document sub-classes to be used as mix-ins, are provided to augment and specialize behaviour.
 	"""
 	
 	# Note: These may be dynamic based on content; always access from an instance where possible.
@@ -70,7 +68,7 @@ class Document(Container):
 	def from_mongo(cls, doc, projected=None):
 		"""Convert data coming in from the MongoDB wire driver into a Document instance."""
 		
-		if doc is None:
+		if doc is None:  # To support simplified iterative use, None should return None.
 			return None
 		
 		if isinstance(doc, Document):

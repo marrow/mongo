@@ -20,7 +20,7 @@ __all__ = ['Collection']
 class Collection(Identified):
 	"""Allow this Document class to be bound to a real MongoDB database and collection.
 	
-	This extracts all "active-record" like patterns from basic Document classes, eliminates the need to declare as a
+	This extracts all "active-record"-like patterns from basic Document classes, eliminates the need to declare as a
 	sub-class of Identified (all top-level Collection objects are identified by default), and generally helps break
 	things apart into discrete groups of logical tasks.
 	

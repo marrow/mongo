@@ -156,7 +156,7 @@ setup(
 						'Identified = marrow.mongo.core.trait.identified:Identified',
 						'Localized = marrow.mongo.core.trait.localized:Localized',
 						'Published = marrow.mongo.core.trait.published:Published',
-						'Stateful = marrow.mongo.core.trait.stateful:Stateful',
+						# 'Stateful = marrow.mongo.core.trait.stateful:Stateful',
 						
 						# Taxonomic Traits
 						#'Heirarchical = marrow.mongo.core.trait.heir:Heirarchical',

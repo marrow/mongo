@@ -64,6 +64,11 @@ class TestMongoSerialization(object):
 		record = Sample("a", 1)
 		assert Sample.from_mongo(record) is record
 	
+	def test_none_fallback(self):
+		# To support iterative use of from_mongo attempting to deserialize None should return None, not explode.
+		record = Sample.from_mongo(None)
+		assert record is None
+	
 	def test_rest_passthrough(self):
 		record = Sample("a", 1)
 		assert record.as_rest is record
