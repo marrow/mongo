@@ -60,19 +60,35 @@ class TestQueryableTrait(object):
 		assert doc.string == 'pre'
 		assert doc.integer is None
 	
-	def test_find_in_sequence(self, Sample):
-		pass
+	def test_find_in_sequence(self, db, Sample):
+		if tuple((int(i) for i in db.client.server_info()['version'].split('.')[:3])) < (3, 4):
+			pytest.xfail("Test expected to fail on MongoDB versions prior to 3.4.")
+		
+		results = Sample.find_in_sequence('integer', [42, 27])
+		results = list(results)
+		
+		assert [i['string'] for i in results] == ['baz', 'bar']
 	
-	def test_reload(self, Sample):
+	def test_reload_all(self, Sample):
 		doc = Sample.find_one(integer=42)
 		assert doc.string == 'baz'
-		Sample.get_collection().update(Sample.id == doc, U(Sample, string="hoi"))
+		Sample.get_collection().update(Sample.id == doc, U(Sample, integer=1337, string="hoi"))
 		assert doc.string == 'baz'
 		doc.reload()
 		assert doc.string == 'hoi'
+		assert doc.integer == 1337
+	
+	def test_reload_specific(self, Sample):
+		doc = Sample.find_one(integer=42)
+		assert doc.string == 'baz'
+		Sample.get_collection().update(Sample.id == doc, U(Sample, integer=1337, string="hoi"))
+		assert doc.string == 'baz'
+		doc.reload('string')
+		assert doc.string == 'hoi'
+		assert doc.integer == 42
 	
 	def test_insert_one(self, Sample):
-		pass
-	
-	def test_insert_many(self, Sample):
-		pass
+		doc = Sample(string='diz', integer=2029)
+		assert doc.id
+		doc.insert_one()
+		assert Sample.get_collection().count() == 5

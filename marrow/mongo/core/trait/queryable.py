@@ -15,7 +15,7 @@ from ....package.loader import traverse
 
 
 class Queryable(Collection):
-	"""Extend active collection behaviours to include querying."""
+	"""EXPERIMENTAL: Extend active collection behaviours to include querying."""
 	
 	UNIVERSAL_OPTIONS = {
 			'collation',
@@ -286,7 +286,7 @@ class Queryable(Collection):
 		"""
 		
 		collection = self.get_collection(kw.pop('source', None))
-		return collection.insert_one(self, *args, **kw)
+		return collection.insert_one(self, **kw)
 	
 	# https://api.mongodb.com/python/current/api/pymongo/collection.html#pymongo.collection.Collection.insert_many
 	
