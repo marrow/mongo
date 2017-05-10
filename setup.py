@@ -104,9 +104,6 @@ setup(
 				'marrow.mongo.document': [  # Document classes registered by name.
 						'Document = marrow.mongo.core.document:Document',
 						
-						'VerifiedAddress = marrow.mongo.basics.email:VerifiedAddress',
-						'BaseLocation = marrow.mongo.basics.location:BaseLocation',
-						
 						'GeoJSON = marrow.mongo.geo:GeoJSON',
 						'GeoJSONCoord = marrow.mongo.geo:GeoJSONCoord',
 						'Point = marrow.mongo.geo:Point',
