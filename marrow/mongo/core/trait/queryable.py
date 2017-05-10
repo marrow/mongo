@@ -201,7 +201,7 @@ class Queryable(Collection):
 		"""
 		
 		Doc, collection, query, options = cls._prepare_find(*args, **kw)
-		return collection.find(query.as_query, **options)  # Note: `.as_query` usage to satisfy Pypy.
+		return collection.find(query, **options)
 	
 	@classmethod
 	def find_one(cls, *args, **kw):
@@ -220,7 +220,7 @@ class Queryable(Collection):
 			args = (cls.id == args[0], )
 		
 		Doc, collection, query, options = cls._prepare_find(*args, **kw)
-		result = Doc.from_mongo(collection.find_one(query.as_query, **options))
+		result = Doc.from_mongo(collection.find_one(query, **options))
 		
 		return result
 	
@@ -268,7 +268,7 @@ class Queryable(Collection):
 		"""Reload the entire document from the database, or refresh specific named top-level fields."""
 		
 		Doc, collection, query, options = self._prepare_find(id=self.id, projection=fields, **kw)
-		result = collection.find_one(query.as_query, **options)
+		result = collection.find_one(query, **options)
 		
 		if fields:  # Refresh only the requested data.
 			for k in result:  # TODO: Better merge algorithm.
