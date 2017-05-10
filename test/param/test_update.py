@@ -47,3 +47,8 @@ class TestParametricUpdateConstructor(object):
 		q = U(D, now__field='ts')
 		assert isinstance(q, Update)
 		assert q.operations == {'$currentDate': {'field': {'$type': 'timestamp'}}}
+	
+	def test_push_each(self, D):
+		q = U(D, push_each__array=[1, 2, 3])
+		
+		assert q.operations == {'$push': {'array': {'$each': ["1", "2", "3"]}}}
