@@ -101,9 +101,6 @@ class Ops(object):
 	
 	def setdefault(self, key, value=None):
 		return self.operations.setdefault(key, value)
-	
-	def copy(self):
-		return self.__class__(self.operations, self.collection, self.document)
 
 
 MutableMapping.register(Ops)  # Metaclass conflict if we subclass.

@@ -220,11 +220,6 @@ class Q(object):
 		if __debug__ and _simple_safety_check(self._field, '$eq'):  # pragma: no cover
 			raise NotImplementedError("{self!r} does not allow $eq comparison.".format(self=self))
 		
-		if '#array' in self._field.__allowed_operators__:
-			if not isinstance(other, Iterable) or isinstance(other, (str, unicode)):
-				other = self._field.transformer.foreign([other], (self._field, self._document))
-				return Filter({self._name: other[0]})
-		
 		return Filter({self._name: self._field.transformer.foreign(other, (self._field, self._document))})
 	
 	def __gt__(self, other):
