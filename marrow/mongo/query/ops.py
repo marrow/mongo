@@ -14,7 +14,7 @@ from ...schema.compat import odict, py3
 from ..util import SENTINEL
 
 
-class Ops(object):
+class Ops(MutableMapping):
 	__slots__ = ('operations', 'collection', 'document')
 	
 	def __init__(self, operations=None, collection=None, document=None):
@@ -102,8 +102,6 @@ class Ops(object):
 	def setdefault(self, key, value=None):
 		return self.operations.setdefault(key, value)
 
-
-MutableMapping.register(Ops)  # Metaclass conflict if we subclass.
 
 
 class Filter(Ops):

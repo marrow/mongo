@@ -88,9 +88,7 @@ class Index(Attribute):
 		
 		return collection.create_index(self.fields, **options)
 	
-	def create_index(self, collection, **kw):
-		"""Create this index in the specified collection; deprecated, use `create` instead."""
-		return self.create(collection, **kw)
+	create_index = create
 	
 	def drop(self, collection):
 		"""Drop this index from the specified collection.
@@ -99,3 +97,5 @@ class Index(Attribute):
 		"""
 		
 		collection.drop_index(self.__name__)
+	
+	drop_index = drop
