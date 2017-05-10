@@ -102,7 +102,17 @@ class Array(_HasKind, _CastingKind, Field):
 	__allowed_operators__ = {'#array', '$elemMatch', '$eq'}
 	
 	class List(list):
-		pass
+		"""Placeholder list shadow class to identify already-cast arrays."""
+		
+		@classmethod
+		def new(cls):
+			return cls()
+	
+	def __init__(self, *args, **kw):
+		if kw.get('assign', False):
+			kw.setdefault('default', self.List.new)
+		
+		super(Array, self).__init__(*args, **kw)
 	
 	def to_native(self, obj, name, value):
 		"""Transform the MongoDB value into a Marrow Mongo value."""
@@ -124,6 +134,13 @@ class Array(_HasKind, _CastingKind, Field):
 class Embed(_HasKind, _CastingKind, Field):
 	__foreign__ = 'object'
 	__allowed_operators__ = {'#document'}
+	
+	def __init__(self, *args, **kw):
+		if args:
+			kw['kind'], args = args[0], args[1:]
+			kw.setdefault('default', lambda: self._kind()())
+		
+		super(Embed, self).__init__(*args, **kw)
 
 
 class Reference(_HasKind, Field):

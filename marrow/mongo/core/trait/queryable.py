@@ -149,6 +149,8 @@ class Queryable(Collection):
 		This provides a find-like interface for generating aggregate pipelines with a few shortcuts that make
 		aggregates behave more like "find, optionally with more steps". Positional arguments that are not Filter
 		instances are assumed to be aggregate pipeline stages.
+		
+		https://api.mongodb.com/python/current/api/pymongo/collection.html#pymongo.collection.Collection.aggregate
 		"""
 		
 		stages = []
@@ -189,21 +191,42 @@ class Queryable(Collection):
 	
 	@classmethod
 	def find(cls, *args, **kw):
+		"""Query the collection this class is bound to.
+		
+		Additional arguments are processed according to `_prepare_find` prior to passing to PyMongo, where positional
+		parameters are interpreted as query fragments, parametric keyword arguments combined, and other keyword
+		arguments passed along with minor transformation.
+		
+		https://api.mongodb.com/python/current/api/pymongo/collection.html#pymongo.collection.Collection.find
+		"""
+		
 		Doc, collection, query, options = cls._prepare_find(*args, **kw)
 		return collection.find(query, **options)
 	
 	@classmethod
 	def find_one(cls, *args, **kw):
+		"""Get a single document from the collection this class is bound to.
+		
+		Additional arguments are processed according to `_prepare_find` prior to passing to PyMongo, where positional
+		parameters are interpreted as query fragments, parametric keyword arguments combined, and other keyword
+		arguments passed along with minor transformation.
+		
+		Automatically calls `to_mongo` with the retrieved data.
+		
+		https://api.mongodb.com/python/current/api/pymongo/collection.html#pymongo.collection.Collection.find_one
+		"""
+		
 		if len(args) == 1 and not isinstance(args[0], Filter):
 			args = (cls.id == args[0], )
 		
 		Doc, collection, query, options = cls._prepare_find(*args, **kw)
-		result = collection.find_one(query, **options)
-		
-		if result:
-			result = Doc.from_mongo(result, projected=options.get('projection', None))
+		result = Doc.from_mongo(collection.find_one(query, **options))
 		
 		return result
+	
+	# https://api.mongodb.com/python/current/api/pymongo/collection.html#pymongo.collection.Collection.find_one_and_delete
+	# https://api.mongodb.com/python/current/api/pymongo/collection.html#pymongo.collection.Collection.find_one_and_replace
+	# https://api.mongodb.com/python/current/api/pymongo/collection.html#pymongo.collection.Collection.find_one_and_update
 	
 	@classmethod
 	def find_in_sequence(cls, field, order, *args, **kw):
@@ -227,10 +250,19 @@ class Queryable(Collection):
 				**kw
 			)
 		
-		if tuple(collection.database.client.server_info()['versionArray'][:2]) < (3, 4):
+		if tuple(collection.database.client.server_info()['versionArray'][:2]) < (3, 4):  # noqa
 			raise RuntimeError("Queryable.find_in_sequence only works against MongoDB server versions 3.4 or newer.")
 		
 		return collection.aggregate(stages, **options)
+	
+	# https://api.mongodb.com/python/current/api/pymongo/collection.html#pymongo.collection.Collection.count
+	# https://api.mongodb.com/python/current/api/pymongo/collection.html#pymongo.collection.Collection.distinct
+	# https://api.mongodb.com/python/current/api/pymongo/collection.html#pymongo.collection.Collection.group
+	# https://api.mongodb.com/python/current/api/pymongo/collection.html#pymongo.collection.Collection.map_reduce
+	# https://api.mongodb.com/python/current/api/pymongo/collection.html#pymongo.collection.Collection.inline_map_reduce
+	# https://api.mongodb.com/python/current/api/pymongo/collection.html#pymongo.collection.Collection.parallel_scan
+	# https://api.mongodb.com/python/current/api/pymongo/collection.html#pymongo.collection.Collection.initialize_unordered_bulk_op
+	# https://api.mongodb.com/python/current/api/pymongo/collection.html#pymongo.collection.Collection.initialize_ordered_bulk_op
 	
 	def reload(self, *fields, **kw):
 		"""Reload the entire document from the database, or refresh specific named top-level fields."""
@@ -247,11 +279,32 @@ class Queryable(Collection):
 		
 		return self
 	
-	def insert_one(self, *args, **kw):
+	def insert_one(self, **kw):
+		"""Insert this document, passing any additional arguments to PyMongo.
+		
+		https://api.mongodb.com/python/current/api/pymongo/collection.html#pymongo.collection.Collection.insert_one
+		"""
+		
 		collection = self.get_collection(kw.pop('source', None))
 		return collection.insert_one(self, *args, **kw)
 	
-	@classmethod
-	def insert_many(cls, *args, **kw):
-		collection = cls.get_collection(kw.pop('source', None))
-		return collection.insert_many(*args, **kw)
+	# https://api.mongodb.com/python/current/api/pymongo/collection.html#pymongo.collection.Collection.insert_many
+	
+	#def replace(self, *args, **kw):
+	#	"""Replace a single document matching the filter with this document, passing additional arguments to PyMongo.
+	#	
+	#	**Warning:** Be careful if the current document has only been partially projected, as the omitted fields will
+	#	either be dropped or have their default values saved where `assign` is `True`.
+	#	
+	#	https://api.mongodb.com/python/current/api/pymongo/collection.html#pymongo.collection.Collection.replace_one
+	#	"""
+	#	pass
+	# https://api.mongodb.com/python/current/api/pymongo/collection.html#pymongo.collection.Collection.replace_one
+	
+	# update
+	# https://api.mongodb.com/python/current/api/pymongo/collection.html#pymongo.collection.Collection.update_one
+	# https://api.mongodb.com/python/current/api/pymongo/collection.html#pymongo.collection.Collection.update_many
+	
+	# delete
+	# https://api.mongodb.com/python/current/api/pymongo/collection.html#pymongo.collection.Collection.delete_one
+	# https://api.mongodb.com/python/current/api/pymongo/collection.html#pymongo.collection.Collection.delete_many

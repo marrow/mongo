@@ -26,7 +26,12 @@ class Collection(Identified):
 	
 	Currently true Active Record pattern access is not supported, nor encouraged. This provides a shortcut, as
 	mentioned above, and access to common collection-level activites in ways utilizing positional and parametric
-	helpers.
+	helpers. Not all collection manipulating methods are proxied here; only the ones benefitting from assistance
+	from Marrow Mongo in terms of binding or index awareness.
+	
+	For other operations (such as `drop`, `reindex`, etc.) it is recommended to `get_collection()` and explicitly
+	utilize the PyMongo API. This helps reduce the liklihood of a given interface breaking with changes to PyMongo,
+	avoids clutter, and allows you to use some of these method names yourself.
 	"""
 	
 	# Metadata Defaults
@@ -75,7 +80,7 @@ class Collection(Identified):
 		
 		return cls
 	
-	# Database Operations
+	# Collection Management
 	
 	@classmethod
 	def get_collection(cls, target=None):
@@ -129,9 +134,14 @@ class Collection(Identified):
 		
 		return collection
 	
+	# Index Management
+	
 	@classmethod
 	def create_indexes(cls, target=None, recreate=False):
-		"""Iterate all known indexes and construct them."""
+		"""Iterate all known indexes and construct them.
+		
+		https://api.mongodb.com/python/current/api/pymongo/collection.html#pymongo.collection.Collection.create_indexes
+		"""
 		
 		# TODO: Nested indexes.
 		
@@ -142,7 +152,7 @@ class Collection(Identified):
 			collection.drop_indexes()
 		
 		for index in cls.__indexes__.values():
-			results.append(index.create_index(collection))
+			results.append(index.create(collection))
 		
 		return results
 	
