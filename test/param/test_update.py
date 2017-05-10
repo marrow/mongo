@@ -52,3 +52,18 @@ class TestParametricUpdateConstructor(object):
 		q = U(D, push_each__array=[1, 2, 3])
 		
 		assert q.operations == {'$push': {'array': {'$each': ["1", "2", "3"]}}}
+	
+	def test_complex_push(self, D):
+		q = U(D,
+				push_each__array = [1, 2, 3],
+				push_sort__array = -1,
+				push_slice__array = 2,
+				push_position__array = 1,
+			)
+		
+		assert q.operations == {'$push': {'array': {
+					'$each': ["1", "2", "3"],
+					'$sort': -1,
+					'$slice': 2,
+					'$position': 1
+				}}}
