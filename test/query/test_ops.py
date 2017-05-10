@@ -165,3 +165,11 @@ class TestOperationsCombination(object):
 		
 		comb = comb | Filter({'bar': 'baz'})
 		assert comb.as_query == {'$or': [{'roll': 27}, {'foo': 42}, {'bar': 'baz'}]}
+	
+	def test_operations_hard_and(self):
+		comb = Filter({'$and': [{'a': 1}, {'b': 2}]}) & Filter({'$and': [{'c': 3}]})
+		assert comb.as_query == {'$and': [{'a': 1}, {'b': 2}, {'c': 3}]}
+	
+	def test_operations_soft_and(self):
+		comb = Filter({'$and': [{'a': 1}, {'b': 2}]}) & Filter({'c': 3})
+		assert comb.as_query == {'$and': [{'a': 1}, {'b': 2}], 'c': 3}

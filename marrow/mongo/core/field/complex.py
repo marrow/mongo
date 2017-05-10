@@ -17,80 +17,102 @@ from ....schema import Attribute
 from ....schema.compat import odict, str, unicode
 
 
-class _HasKinds(Field):
+class _HasKind(Field):
 	"""A mix-in to provide an easily definable singular or plural set of document types."""
 	
 	kind = Attribute(default=None)  # One or more foreign model references, a string, Document subclass, or set of.
 	
-	def __init__(self, *kinds, **kw):
-		if kinds:
-			kw['kind'] = kinds
+	def __init__(self, *args, **kw):
+		if args:
+			kw['kind'], args = args[0], args[1:]
 		
-		super(_HasKinds, self).__init__(**kw)
+		super(_HasKind, self).__init__(*args, **kw)
 	
-	@property
-	def kinds(self):
-		values = self.kind
+	def __fixup__(self, document):
+		super(_HasKind, self).__fixup__(document)
 		
-		if isinstance(values, (str, unicode)) or not isinstance(values, Iterable):
-			values = (values, )
+		kind = self.kind
 		
-		for value in values:
-			if isinstance(value, (str, unicode)):
-				value = load(value, 'marrow.mongo.document')
-			
-			yield value
+		if not kind:
+			return
+		
+		if isinstance(kind, Field):
+			print("updating child field", self.__name__, repr(kind))
+			kind.__name__ = self.__name__
+			kind.__document__ = proxy(document)
+			kind.__fixup__(document)  # Chain this down to embedded fields.
+	
+	def _kind(self, document=None):
+		kind = self.kind
+		
+		if isinstance(kind, (str, unicode)):
+			if kind.startswith('.'):
+				# This allows the reference to be dynamic.
+				kind = traverse(document or self.__document__, kind[1:])
+				
+				if not isinstance(kind, (str, unicode)):
+					return kind
+			else:
+				kind = load(kind, 'marrow.mongo.document')
+		
+		return kind
 
 
 class _CastingKind(Field):
 	def to_native(self, obj, name, value):  # pylint:disable=unused-argument
 		"""Transform the MongoDB value into a Marrow Mongo value."""
 		
-		if not isinstance(value, Document):
-			
-			kinds = list(self.kinds)
-			
-			if len(kinds) == 1:
-				if hasattr(kinds[0], 'transformer'):
-					value = kinds[0].transformer.native(value, (kinds[0], obj))
-				else:
-					value = kinds[0].from_mongo(value)
-			else:
-				value = Document.from_mongo(value)  # TODO: Pass in allowed classes.
+		from marrow.mongo.trait import Derived
 		
-		return value
+		kind = self._kind(obj.__class__)
+		
+		if isinstance(value, Document):
+			if __debug__ and kind and issubclass(kind, Document) and not isinstance(value, kind):
+				raise ValueError("Not an instance of " + kind.__name__ + " or a sub-class: " + repr(value))
+			
+			return value
+		
+		if isinstance(kind, Field):
+			return kind.transformer.native(value, (kind, obj))
+		
+		return (kind or Derived).from_mongo(value)
 	
 	def to_foreign(self, obj, name, value):  # pylint:disable=unused-argument
 		"""Transform to a MongoDB-safe value."""
 		
-		kinds = list(self.kinds)
+		kind = self._kind(obj.__class__)
 		
-		if not isinstance(value, Document):
-			if len(kinds) != 1:
-				raise ValueError("Ambigouous assignment, assign an instance of: " + \
-						", ".join(repr(kind) for kind in kinds))
+		if isinstance(value, Document):
+			if __debug__ and kind and issubclass(kind, Document) and not isinstance(value, kind):
+				raise ValueError("Not an instance of " + kind.__name__ + " or a sub-class: " + repr(value))
 			
-			kind = kinds[0]
-			
-			# Attempt to figure out what to do with the value.
-			if isinstance(kind, Field):
-				kind.__name__ = self.__name__
-				return kind.transformer.foreign(value, (kind, obj))
-			
+			return value
+		
+		if isinstance(kind, Field):
+			return kind.transformer.foreign(value, (kind, obj))
+		
+		if kind:
 			value = kind(**value)
-		
-		if isinstance(value, Document) and value.__type_store__ not in value and len(kinds) != 1:
-			value[value.__type_store__] = canon(value.__class__)  # Automatically add the tracking field.
 		
 		return value
 
 
-class Array(_HasKinds, _CastingKind, Field):
+class Array(_HasKind, _CastingKind, Field):
 	__foreign__ = 'array'
-	__allowed_operators__ = {'#array', '$elemMatch'}
+	__allowed_operators__ = {'#array', '$elemMatch', '$eq'}
 	
 	class List(list):
-		pass
+		"""Placeholder list shadow class to identify already-cast arrays."""
+		
+		@classmethod
+		def new(cls):
+			return cls()
+	
+	def __init__(self, *args, **kw):
+		if kw.get('assign', False):
+			kw.setdefault('default', self.List.new)
+		
+		super(Array, self).__init__(*args, **kw)
 	
 	def to_native(self, obj, name, value):
 		"""Transform the MongoDB value into a Marrow Mongo value."""
@@ -109,29 +131,19 @@ class Array(_HasKinds, _CastingKind, Field):
 		return self.List(super(Array, self).to_foreign(obj, name, i) for i in value)
 
 
-class Embed(_HasKinds, _CastingKind, Field):
+class Embed(_HasKind, _CastingKind, Field):
 	__foreign__ = 'object'
 	__allowed_operators__ = {'#document'}
 	
-	def to_native(self, obj, name, value):
-		"""Transform the MongoDB value into a Marrow Mongo value."""
+	def __init__(self, *args, **kw):
+		if args:
+			kw['kind'], args = args[0], args[1:]
+			kw.setdefault('default', lambda: self._kind()())
 		
-		if isinstance(value, Document):
-			return value
-		
-		result = super(Embed, self).to_native(obj, name, value)
-		obj.__data__[self.__name__] = result
-		
-		return result
-	
-	def to_foreign(self, obj, name, value):
-		"""Transform to a MongoDB-safe value."""
-		
-		result = super(Embed, self).to_foreign(obj, name, value)
-		return result
+		super(Embed, self).__init__(*args, **kw)
 
 
-class Reference(_HasKinds, Field):
+class Reference(_HasKind, Field):
 	concrete = Attribute(default=False)  # If truthy, will store a DBRef instead of ObjectId.
 	cache = Attribute(default=None)  # Attributes to preserve from the referenced object at the reference level.
 	
@@ -203,6 +215,8 @@ class Reference(_HasKinds, Field):
 		if self.cache:
 			return self._populate_cache(value)
 		
+		identifier = value
+		
 		# First, we handle the typcial Document object case.
 		if isinstance(value, Document):
 			identifier = value.__data__.get('_id', None)
@@ -213,18 +227,18 @@ class Reference(_HasKinds, Field):
 			try:
 				identifier = OID(value)
 			except InvalidId:
-				identifier = value
+				pass
 		
-		kinds = list(self.kinds)
-		
-		if not isinstance(value, Document) and len(kinds) > 1:
-			raise ValueError("Passed an identifier (not a Document instance) when multiple document kinds registered.")
+		kind = self._kind(obj.__class__)
 		
 		if self.concrete:
-			if isinstance(value, Document):
+			if isinstance(value, Document) and value.__collection__:
 				return DBRef(value.__collection__, identifier)
 			
-			return DBRef(kinds[0].__collection__, identifier)
+			if kind and kind.__collection__:
+				return DBRef(kind.__collection__, identifier)
+			
+			raise ValueError("Could not infer collection name.")
 		
 		return identifier
 
@@ -266,32 +280,36 @@ class PluginReference(Field):
 			namespace = self.namespace
 		except AttributeError:
 			namespace = None
-			if __debug__:
-				names = plugins = {}
-		else:
-			if __debug__:
-				names = {i.name: i.load() for i in iter_entry_points(namespace)}
-				plugins = {j: i for i, j in names.items()}
 		
 		try:
 			explicit = self.explicit
 		except AttributeError:
 			explicit = not bool(namespace)
 		
-		if isinstance(value, (str, unicode)):
-			if ':' in value:
-				if not explicit:
-					raise ValueError("Explicit object references not allowed.")
+		if not isinstance(value, (str, unicode)):
+			value = canon(value)
+		
+		if namespace and ':' in value:  # Try to reduce to a known plugin short name.
+			for point in iter_entry_points(namespace):
+				qualname = point.module_name
 				
-			elif __debug__ and namespace and value not in names:
-				raise ValueError('Unknown plugin "' + value + '" for namespace "' + namespace + '".')
+				if point.attrs:
+					qualname += ':' + '.'.join(point.attrs)
+				
+				if qualname == value:
+					value = point.name
+					break
+		
+		if ':' in value:
+			if not explicit:
+				raise ValueError("Explicit object references not allowed.")
 			
 			return value
 		
-		if __debug__ and namespace and not explicit and value not in plugins:
-			raise ValueError(repr(value) + ' object is not a known plugin for namespace "' + namespace + '".')
+		if namespace and value not in (i.name for i in iter_entry_points(namespace)):
+			raise ValueError('Unknown plugin "' + value + '" for namespace "' + namespace + '".')
 		
-		return plugins.get(value, canon(value))
+		return value
 
 
 class Alias(Attribute):
@@ -312,11 +330,12 @@ class Alias(Attribute):
 	
 	path = Attribute()
 	
-	def __init__(self, path):
-		super(Alias, self).__init__(path=path)
+	def __init__(self, path, **kw):
+		super(Alias, self).__init__(path=path, **kw)
 	
 	def __fixup__(self, document):
 		"""Called after an instance of our Field class is assigned to a Document."""
+		
 		self.__document__ = proxy(document)
 	
 	def __get__(self, obj, cls=None):

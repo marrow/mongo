@@ -27,13 +27,12 @@ def tail(collection, filter=None, projection=None, limit=0, timeout=None, aggreg
 	with an empty or otherwise unimportant record before attempting to use this feature.
 	"""
 	
-	if __debug__:  # Completely delete this section if Python is run with optimizations enabled.
-		if not collection.options().get('capped', False):
-			raise TypeError("Can only tail capped collections.")
-		
-		# Similarly, verify that the collection isn't empty.  Empty is bad.  (Busy loop.)
-		if not collection.count():
-			raise ValueError("Cowardly refusing to tail an empty collection.")
+	if not collection.options().get('capped', False):
+		raise TypeError("Can only tail capped collections.")
+	
+	# Similarly, verify that the collection isn't empty.  Empty is bad.  (Busy loop.)
+	if not collection.count():
+		raise ValueError("Cowardly refusing to tail an empty collection.")
 	
 	cursor = collection.find(filter, projection, limit=limit, cursor_type=CursorType.TAILABLE_AWAIT)
 	

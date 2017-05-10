@@ -24,13 +24,15 @@ here = os.path.abspath(os.path.dirname(__file__))
 py2 = sys.version_info < (3,)
 py26 = sys.version_info < (2, 7)
 py32 = sys.version_info > (3,) and sys.version_info < (3, 3)
+pypy = hasattr(sys, 'pypy_version_info')
 
 tests_require = [
 		'pytest',  # test collector and extensible runner
 		'pytest-cov',  # coverage reporting
 		'pytest-flakes',  # syntax validation
-		'pytest-capturelog',  # log capture
+		'pytest-catchlog',  # log capture
 		'pytest-isort',  # import ordering
+		'misaka', 'pygments',  # Markdown field support
 	]
 
 
@@ -82,6 +84,7 @@ setup(
 			'marrow.schema>=1.2.0,<2.0.0',  # Declarative schema support.
 			'marrow.package>=1.1.0,<2.0.0',  # Plugin discovery and loading.
 			'pymongo>=3.2',  # We require modern API.
+			'pathlib2; python_version < "3.4"',  # Path manipulation utility.
 		],
 	
 	extras_require = dict(
@@ -89,6 +92,7 @@ setup(
 			development = tests_require + ['pre-commit'],  # Development-time dependencies.
 			scripting = ['javascripthon<1.0'],  # Allow map/reduce functions and "stored functions" to be Python.
 			logger = ['tzlocal'],  # Timezone support to store log times in UTC like a sane person.
+			markdown = ['misaka', 'pygments'],  # Markdown text storage.
 		),
 	
 	tests_require = tests_require,
@@ -98,7 +102,8 @@ setup(
 	entry_points = {
 				# ### Marrow Mongo Lookups
 				'marrow.mongo.document': [  # Document classes registered by name.
-						'Document = marrow.mongo.core:Document',
+						'Document = marrow.mongo.core.document:Document',
+						
 						'GeoJSON = marrow.mongo.geo:GeoJSON',
 						'GeoJSONCoord = marrow.mongo.geo:GeoJSONCoord',
 						'Point = marrow.mongo.geo:Point',
@@ -111,6 +116,7 @@ setup(
 					],
 				'marrow.mongo.field': [  # Field classes registered by (optionaly namespaced) name.
 						'Field = marrow.mongo.core.field:Field',
+						
 						'String = marrow.mongo.core.field.base:String',
 						'Binary = marrow.mongo.core.field.base:Binary',
 						'ObjectId = marrow.mongo.core.field.base:ObjectId',
@@ -119,16 +125,44 @@ setup(
 						'TTL = marrow.mongo.core.field.base:TTL',
 						'Regex = marrow.mongo.core.field.base:Regex',
 						'Timestamp = marrow.mongo.core.field.base:Timestamp',
+						
 						'Array = marrow.mongo.core.field.complex:Array',
 						'Embed = marrow.mongo.core.field.complex:Embed',
 						'Reference = marrow.mongo.core.field.complex:Reference',
 						'PluginReference = marrow.mongo.core.field.complex:PluginReference',
 						'Alias = marrow.mongo.core.field.complex:Alias',
+						
 						'Number = marrow.mongo.core.field.number:Number',
 						'Double = marrow.mongo.core.field.number:Double',
 						'Integer = marrow.mongo.core.field.number:Integer',
 						'Long = marrow.mongo.core.field.number:Long',
 						'Decimal = marrow.mongo.core.field.number:Decimal[decimal]',
+						
+						'Markdown = marrow.mongo.core.field.md:Markdown[markdown]',
+						'Path = marrow.mongo.core.field.path:Path',
+						'Translated = marrow.mongo.core.trait.localized:Translated',
+					],
+				'marrow.mongo.trait': [  # Document traits for use as mix-ins.
+						# Active Collection Traits
+						'Collection = marrow.mongo.core.trait.collection:Collection',
+						'Queryable = marrow.mongo.core.trait.queryable:Queryable',
+						
+						# Behavioural Traits
+						'Derived = marrow.mongo.core.trait.derived:Derived',
+						'Expires = marrow.mongo.core.trait.expires:Expires',
+						'Identified = marrow.mongo.core.trait.identified:Identified',
+						'Localized = marrow.mongo.core.trait.localized:Localized',
+						'Published = marrow.mongo.core.trait.published:Published',
+						# 'Stateful = marrow.mongo.core.trait.stateful:Stateful',
+						
+						# Taxonomic Traits
+						#'Heirarchical = marrow.mongo.core.trait.heir:Heirarchical',
+						#'HChildren = marrow.mongo.core.trait.heir:HChildren',
+						#'HParent = marrow.mongo.core.trait.heir:HParent',
+						#'HAncestors = marrow.mongo.core.trait.heir:HAncestors',
+						#'HPath = marrow.mongo.core.trait.heir:HPath',
+						#'HNested = marrow.mongo.core.trait.heir:HNested',
+						#'Taxonomy = marrow.mongo.core.trait.heir:Taxonomy',
 					],
 				# ### WebCore Extensions
 				'web.session': [  # Session Engine

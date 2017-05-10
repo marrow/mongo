@@ -21,7 +21,9 @@ def S(Document, *fields):
 			continue
 		
 		direction = ASCENDING
-		field = field.replace('__', '.')
+		
+		if not field.startswith('__'):
+			field = field.replace('__', '.')
 		
 		if field[0] == '-':
 			direction = DESCENDING
@@ -29,6 +31,8 @@ def S(Document, *fields):
 		if field[0] in ('+', '-'):
 			field = field[1:]
 		
-		result.append((~traverse(Document, field), direction))
+		_field = traverse(Document, field, default=None)
+		
+		result.append(((~_field) if _field else field, direction))
 	
 	return result

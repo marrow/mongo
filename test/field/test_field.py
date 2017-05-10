@@ -2,6 +2,7 @@
 
 import pytest
 
+from common import FieldExam
 from marrow.mongo import Document, field
 from marrow.mongo.core.field import Field, FieldTransform
 
@@ -114,7 +115,6 @@ class TestField(object):
 		
 		del inst.field
 		assert inst.__data__ == {}
-
 
 
 class TestFieldSecurity(object):

@@ -63,7 +63,6 @@ class TestQueryable(object):  # TODO: Properly use pytest fixtures for this...
 	def test_attribute_access(self):
 		assert Sample.number.default == 27
 		assert Sample.array.default == 42
-		assert Sample.embed.name.__name__ == 'name'
 		
 		with pytest.raises(AttributeError):
 			Sample.number.asdfasdf
@@ -171,6 +170,9 @@ class TestQueryableQueryableQueryable(object):
 		
 		assert z._field == a._field + b._field
 	
+	def test_combining_setattr(self, S):
+		with pytest.raises(AttributeError):
+			(S.foo & S.bar).xyzzy = 27
 
 
 class TestQueryableFieldCombinations(object):

@@ -9,6 +9,7 @@ from collections import MutableMapping
 from bson import ObjectId as OID
 
 from . import Field
+from ...util import utcnow
 from ....schema import Attribute
 from ....schema.compat import unicode
 
@@ -17,8 +18,27 @@ class String(Field):
 	__foreign__ = 'string'
 	__disallowed_operators__ = {'#array'}
 	
+	strip = Attribute(default=False)
+	case = Attribute(default=None)
+	
 	def to_foreign(self, obj, name, value):  # pylint:disable=unused-argument
-		return unicode(value)
+		value = unicode(value)
+		
+		if self.strip is True:
+			value = value.strip()
+		elif self.strip:
+			value = value.strip(self.strip)
+		
+		if self.case in (1, True, 'u', 'upper'):
+			value = value.upper()
+		
+		elif self.case in (-1, False, 'l', 'lower'):
+			value = value.lower()
+		
+		elif self.case == 'title':
+			value = value.title()
+		
+		return value
 
 
 class Binary(Field):
@@ -95,13 +115,13 @@ class TTL(Date):
 	
 	def to_foreign(self, obj, name, value):  # pylint:disable=unused-argument
 		if isinstance(value, timedelta):
-			return datetime.utcnow() + value
+			return utcnow() + value
 		
 		if isinstance(value, datetime):
 			return value
 		
 		if isinstance(value, Number):
-			return datetime.utcnow() + timedelta(days=value)
+			return utcnow() + timedelta(days=value)
 		
 		raise ValueError("Invalid TTL value: " + repr(value))
 

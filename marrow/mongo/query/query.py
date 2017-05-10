@@ -9,10 +9,11 @@ For internal construction only.
 from __future__ import unicode_literals
 
 from copy import copy
+from collections import Iterable
 from functools import reduce
 from operator import __and__, __or__, __xor__
 
-from ...schema.compat import py3, unicode
+from ...schema.compat import py3, str, unicode
 from .ops import Filter
 
 if __debug__:
@@ -76,20 +77,38 @@ class Q(object):
 		if self._combining:  # If we are combining fields, we can not dereference further.
 			raise AttributeError()
 		
-		if not hasattr(self._field, 'kinds'):
+		if not hasattr(self._field, '_kind'):
 			return getattr(self._field, name)
 		
-		for kind in self._field.kinds:
-			if hasattr(kind, '__fields__'):
-				if name in kind.__fields__:
-					return self.__class__(self._document, kind.__fields__[name], self._name + '.')
-				
-			try:
-				return getattr(kind, name)
-			except AttributeError:
-				pass
+		kind = self._field
+		while getattr(kind, '_kind', None):
+			kind = kind._kind(self._document)
+		
+		if hasattr(kind, '__fields__') and name in kind.__fields__:
+				return self.__class__(self._document, kind.__fields__[name], self._name + '.')
+		
+		try:
+			return getattr(kind, name)
+		except AttributeError:
+			pass
+		
+		try:  # Pass through to the field itself as a last resort.
+			return getattr(self._field, name)
+		except AttributeError:
+			pass
 		
 		raise AttributeError()
+	
+	def __setattr__(self, name, value):
+		"""Assign an otherwise unknown attribute on the targeted field instead."""
+		
+		if name.startswith('_'):
+			return super(Q, self).__setattr__(name, value)
+		
+		if self._combining:
+			raise AttributeError()
+		
+		setattr(self._field, name, value)
 	
 	def __getitem__(self, name):
 		"""Allows for referencing specific array elements by index.
@@ -111,13 +130,13 @@ class Q(object):
 		if not isinstance(name, int) and not name.isdigit():
 			raise KeyError("Must specify an index as either a number or string representation of a number: " + name)
 		
-		field = next(self._field.kinds)
+		field = self._field._kind(self._document)
 		
 		if isinstance(field, Field):  # Bare simple values.
 			field = copy(field)
 			field.__name__ = self._name + '.' + unicode(name)
 		
-		elif issubclass(field, Document):  # Embedded documents.
+		else:  # Embedded documents.
 			field = Embed(field, name=self._name + '.' + unicode(name))
 		
 		return self.__class__(self._document, field)

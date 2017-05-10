@@ -14,7 +14,7 @@ from ...schema.compat import odict, py3
 from ..util import SENTINEL
 
 
-class Ops(object):
+class Ops(MutableMapping):
 	__slots__ = ('operations', 'collection', 'document')
 	
 	def __init__(self, operations=None, collection=None, document=None):
@@ -103,8 +103,6 @@ class Ops(object):
 		return self.operations.setdefault(key, value)
 
 
-MutableMapping.register(Ops)  # Metaclass conflict if we subclass.
-
 
 class Filter(Ops):
 	__slots__ = ('operations', 'collection', 'document')
@@ -112,24 +110,36 @@ class Filter(Ops):
 	# Binary Operator Protocols
 	
 	def __and__(self, other):
+		"""Boolean AND joining of filter operations."""
 		operations = deepcopy(self.operations)
-		other = self.__class__(
-				operations = other.as_query if hasattr(other, 'as_query') else other,
-				collection = self.collection,
-				document = self.document
-			)
+		other = other.as_query if hasattr(other, 'as_query') else other
 		
-		for k, v in getattr(other, 'operations', {}).items():
+		for k, v in other.items():
 			if k not in operations:
 				operations[k] = v
-			else:
-				if not isinstance(operations[k], Mapping):
-					operations[k] = odict((('$eq', operations[k]), ))
+				continue
+			
+			if k == '$and':
+				operations.setdefault('$and', [])
+				operations['$and'].extend(v)
+				continue
+			
+			elif k == '$or':
+				operations.setdefault('$and', [])
+				operations['$and'].append(odict(((k, v), )))
 				
-				if not isinstance(v, Mapping):
-					v = odict((('$eq', v), ))
+				if '$or' in operations:
+					operations['$and'].append(odict((('$or', operations.pop('$or')), )))
 				
-				operations[k].update(v)
+				continue
+			
+			if not isinstance(operations[k], Mapping):
+				operations[k] = odict((('$eq', operations[k]), ))
+			
+			if not isinstance(v, Mapping):
+				v = odict((('$eq', v), ))
+			
+			operations[k].update(v)
 		
 		return self.__class__(operations=operations, collection=self.collection, document=self.document)
 	
