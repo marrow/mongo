@@ -32,3 +32,18 @@ class TestIndex(object):
 				'ns': 'test.collection',
 				'sparse': False,
 			}
+	
+	def test_removal(self, coll):
+		Sample._field.create(coll)
+		indexes = coll.index_information()
+		assert '_field' in indexes
+		del indexes['_field']['v']
+		assert indexes['_field'] == {
+				'background': False,
+				'key': [('field_name', 1)],
+				'ns': 'test.collection',
+				'sparse': False,
+			}
+		Sample._field.drop(coll)
+		indexes = coll.index_information()
+		assert '_field' not in indexes
