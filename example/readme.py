@@ -1,35 +1,56 @@
 # encoding: utf-8
 
+# Imports.
+
 from pymongo import MongoClient
 
-from marrow.mongo import Document, Index
+from marrow.mongo import Index
 from marrow.mongo.field import Array, Number, ObjectId, String
-
-collection = MongoClient().test.collection
-collection.drop()
+from marrow.mongo.trait import Queryable
 
 
-class Account(Document):
+# Connect to the test database on the local machine.
+
+db = MongoClient().test
+
+
+# Define an Account object model and associated metadata.
+
+class Account(Queryable):
+	__collection__ = 'collection'
+	
 	username = String(required=True)
 	name = String()
 	locale = String(default='en-CA-u-tz-cator-cu-CAD', assign=True)
 	age = Number()
 	
-	id = ObjectId('_id', assign=True)
-	tag = Array(String(), default=lambda: [], assign=True)
+	tag = Array(String(), assign=True)
 	
 	_username = Index('username', unique=True)
 
 
+# Bind it to a database, then (re-)create the collection including indexes.
+
+collection = Account.bind(db).create_collection(drop=True)
+
+
+# Create a new record; this record is unsaved...
+
 alice = Account('amcgregor', "Alice Bevan-McGregor", age=27)
-print(alice.id)  # Already has an ID.
-print(alice.id.generation_time)  # This even includes the creation time.
 
-Account._username.create_index(collection)
+print(alice.id)  # It already has an ID, however!
+print(alice.id.generation_time)  # This includes the creation time.
 
-result = collection.insert_one(alice)
-assert result.acknowledged and result.inserted_id == alice.id
 
-record = collection.find_one(Account.username == 'amcgregor')
-record = Account.from_mongo(record)
-print(record.name)  # Alice Bevan-McGregor
+# Inserting it will add it to the storage back-end; the MongoDB database.
+
+result = alice.insert_one()
+
+assert result.acknowledged and result.inserted_id == alice
+
+
+# Now you can query Account objects for one with an appropriate username.
+
+record = Account.find_one(username='amcgregor')
+
+print(record.name)  # Alice Bevan-McGregor; it's already an Account instance.
