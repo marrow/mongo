@@ -37,7 +37,6 @@ class _HasKind(Field):
 			return
 		
 		if isinstance(kind, Field):
-			print("updating child field", self.__name__, repr(kind))
 			kind.__name__ = self.__name__
 			kind.__document__ = proxy(document)
 			kind.__fixup__(document)  # Chain this down to embedded fields.
