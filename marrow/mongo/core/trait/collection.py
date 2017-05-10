@@ -99,7 +99,7 @@ class Collection(Identified):
 		raise TypeError("Can not retrieve collection from: " + repr(target))
 	
 	@classmethod
-	def create_collection(cls, target=None, recreate=False, indexes=True):
+	def create_collection(cls, target=None, drop=False, indexes=True):
 		"""Ensure the collection identified by this document class exists, creating it if not, also creating indexes.
 		
 		**Warning:** enabling the `recreate` option **will drop the collection, erasing all data within**.
@@ -119,7 +119,7 @@ class Collection(Identified):
 		else:
 			raise TypeError("Can not retrieve database from: " + repr(target))
 		
-		if recreate:
+		if drop:
 			target.drop_collection(collection)  # TODO: If drop fails, try just emptying?
 		
 		collection = target.create_collection(collection, **cls._collection_configuration(True))

@@ -68,10 +68,10 @@ class TestDocumentBinding(object):
 		assert Sample.__bound__
 	
 	def test_create_collection(self, db, Sample):
-		assert Sample.create_collection(db, recreate=True, indexes=False).name == 'collection'
+		assert Sample.create_collection(db, drop=True, indexes=False).name == 'collection'
 	
 	def test_create_bound_collection(self, db, Sample):
-		assert Sample.bind(db).create_collection(recreate=True, indexes=False).name == 'collection'
+		assert Sample.bind(db).create_collection(drop=True, indexes=False).name == 'collection'
 	
 	def test_create_collection_failure(self, Sample):
 		with pytest.raises(AssertionError):
