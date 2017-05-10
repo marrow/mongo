@@ -46,6 +46,20 @@ class TestDocumentBinding(object):
 		
 		assert Sample.__bound__
 	
+	def test_bind_specific_collection_twice(self, coll, Sample):
+		assert not Sample.__bound__
+		
+		Sample.bind(coll)
+		
+		assert Sample.__bound__
+		
+		first = Sample.__bound__
+		Sample.bind(coll)
+		
+		assert Sample.__bound__ is first
+		
+		assert Sample.get_collection() is first
+	
 	def test_bind_database(self, db, Sample):
 		assert not Sample.__bound__
 		
@@ -54,14 +68,27 @@ class TestDocumentBinding(object):
 		assert Sample.__bound__
 	
 	def test_create_collection(self, db, Sample):
-		assert Sample.create_collection(db, indexes=False).name == 'collection'
+		assert Sample.create_collection(db, recreate=True, indexes=False).name == 'collection'
+	
+	def test_create_bound_collection(self, db, Sample):
+		assert Sample.bind(db).create_collection(recreate=True, indexes=False).name == 'collection'
+	
+	def test_create_collection_failure(self, Sample):
+		with pytest.raises(AssertionError):
+			Sample.create_collection()
+		
+		with pytest.raises(TypeError):
+			Sample.create_collection("Hoi.")
 	
 	def test_create_collection_collection(self, db, Sample):
-		assert Sample.create_collection(db.foo, True, indexes=False).name == 'foo'
+		assert Sample.create_collection(db.foo, True).name == 'foo'
 	
 	def test_get_collection_failure(self, Sample):
 		with pytest.raises(AssertionError):
 			Sample.get_collection(None)
+		
+		with pytest.raises(TypeError):
+			Sample.get_collection("Hoi.")
 	
 	def test_validation(self, db, Sample):
 		if tuple((int(i) for i in db.client.server_info()['version'].split('.')[:3])) < (3, 2):
