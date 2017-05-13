@@ -3,7 +3,7 @@
 from __future__ import unicode_literals
 
 from collections import OrderedDict
-from datetime import datetime
+from datetime import datetime, timedelta
 from operator import attrgetter
 from bson.tz_util import utc
 
@@ -61,4 +61,24 @@ class Registry(object):
 
 
 def utcnow():
+	"""Return the current time in UTC, with timezone information applied."""
 	return datetime.utcnow().replace(tzinfo=utc)
+
+
+def datetime_period(base=None, hours=None, minutes=None, seconds=None):
+	"""Round a datetime object down to the start of a defined period.
+	
+	The `base` argument may be used to find the period start for an arbitrary datetime, defaults to `utcnow()`.
+	"""
+	
+	if base is None:
+		base = utcnow()
+	
+	base -= timedelta(
+			hours = 0 if hours is None else (base.hour % hours),
+			minutes = (base.minute if hours else 0) if minutes is None else (base.minute % minutes),
+			seconds = (base.second if minutes or hours else 0) if seconds is None else (base.second % seconds),
+			microseconds = base.microsecond
+		)
+	
+	return base

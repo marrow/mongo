@@ -9,7 +9,7 @@ from collections import MutableMapping
 from bson import ObjectId as OID
 
 from . import Field
-from ...util import utcnow
+from ...util import utcnow, datetime_period
 from ....schema import Attribute
 from ....schema.compat import unicode
 
@@ -103,8 +103,24 @@ class Date(Field):
 	__foreign__ = 'date'
 	__disallowed_operators__ = {'#array'}
 	
-	now = Attribute(default=False)
-	autoupdate = Attribute(default=False)
+	def to_foreign(self, obj, name, value):  # pylint:disable=unused-argument
+		if isinstance(value, OID):
+			return value.generation_time
+		
+		return value
+
+
+class Period(Date):
+	"""A specialized Date field used to store dates rounded down to the start of a given period."""
+	
+	hours = Attribute(default=None)
+	minutes = Attribute(default=None)
+	seconds = Attribute(default=None)
+	
+	def to_foreign(self, obj, name, value):
+		value = super(Period, self).to_foreign(obj, name, value)
+		
+		return datetime_period(value, hours=self.hours, minutes=self.minutes, seconds=self.seconds)
 
 
 class TTL(Date):
@@ -113,7 +129,9 @@ class TTL(Date):
 	__foreign__ = 'date'
 	__disallowed_operators__ = {'#array'}
 	
-	def to_foreign(self, obj, name, value):  # pylint:disable=unused-argument
+	def to_foreign(self, obj, name, value):
+		value = super(TTL, self).to_foreign(obj, name, value)
+		
 		if isinstance(value, timedelta):
 			return utcnow() + value
 		

@@ -123,6 +123,7 @@ setup(
 						'Boolean = marrow.mongo.core.field.base:Boolean',
 						'Date = marrow.mongo.core.field.base:Date',
 						'TTL = marrow.mongo.core.field.base:TTL',
+						'Period = marrow.mongo.core.field.base:Period',
 						'Regex = marrow.mongo.core.field.base:Regex',
 						'Timestamp = marrow.mongo.core.field.base:Timestamp',
 						
