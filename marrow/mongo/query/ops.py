@@ -101,6 +101,10 @@ class Ops(MutableMapping):
 	
 	def setdefault(self, key, value=None):
 		return self.operations.setdefault(key, value)
+	
+	def copy(self):
+		"""Return a shallow copy."""
+		return self.__class__(self.operations.copy(), self.collection, self.document)
 
 
 
