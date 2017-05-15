@@ -1,10 +1,8 @@
 # encoding: utf-8
 
-
-class Person(Document):
-	name = String()
-	age = Number()
-	tag = Array(String())
+from marrow.mongo import Document, Index, utcnow
+from marrow.mongo.field import String, Integer, Array, Embed, Boolean
+from marrow.mongo.trait import Identified, Queryable
 
 
 class Statistics(Document):
@@ -14,12 +12,25 @@ class Statistics(Document):
 	views = Integer()
 
 
-class Forum(Document):
-	id = String('_id')  # Slug
+class Reply(Document):
+	pass
+
+
+class Person(Queryable):
+	__collection__ = 'people'
+	
+	name = String()
+	tag = Array(String())
+
+
+class Forum(Queryable):
+	__collection__ = 'forums'
+	
+	id = String('_id')  # Redefine the primary key as a string slug.
 	name = String()
 	summary = String()
 	
-	# Permission tags.
+	# Permission tagsefer
 	read = String()
 	write = String()
 	moderate = String()
@@ -29,39 +40,37 @@ class Forum(Document):
 	modified = Date()
 
 
-class Votes(Document):
-	count = Long()
-	who = Array(ObjectId())
-
-
-class Comment(Document):
-	id = ObjectId(generate=True)
-	message = String()
-	vote = Embed(Votes)
-	creator = ObjectId()  # User is, ah, defined somewhere else.  Yeah.  We'll go with that.
-	updated = Date(now=True)
-	uploads = Array(ObjectId())  # GridFS files.
-
-
-class Continuation(Document):
-	continued = Reference()
-
-
-class Flags(Document):
-	locked = Boolean()
-	sticky = Boolean()
-	hidden = Boolean()
-	uploads = Boolean()
-
-
-class Thread(Document):
+class Thread(Queryable):
+	__collection__ = 'threads'
+	
+	class Flags(Document):
+		locked = Boolean()
+		sticky = Boolean()
+		hidden = Boolean()
+		uploads = Boolean()
+	
+	class Comment(Identified, Reply):
+		class Votes(Document):
+			count = Integer()
+			who = Array(ObjectId())
+		
+		id = ObjectId('_id')
+		message = String()
+		vote = Embed(Votes)
+		creator = ObjectId()
+		updated = Date(default=utcnow, assign=True)
+		uploads = Array(ObjectId())  # GridFS file references.
+	
+	class Continuation(Reply):
+		continued = Reference()
+	
 	title = String()
 	forum = Reference()
 	
-	comments = Array(Embed(Comment, Continuation))
+	replies = Array(Embed(Reply))
 	
 	flag = Embed(Flags)
 	stat = Embed(Statistics)
 	
-	subs = Array(ObjectId())
-	updated = Date(now=True)
+	subscribers = Array(ObjectId())
+	updated = Date(default=utcnow, assign=True)
