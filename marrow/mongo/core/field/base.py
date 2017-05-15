@@ -117,6 +117,10 @@ class Period(Date):
 	minutes = Attribute(default=None)
 	seconds = Attribute(default=None)
 	
+	@property
+	def delta(self):
+		return timedelta(hours=self.hours or 0, minutes=self.minutes or 0, seconds=self.seconds or 0)
+	
 	def to_foreign(self, obj, name, value):
 		value = super(Period, self).to_foreign(obj, name, value)
 		
