@@ -141,6 +141,9 @@ class TestOpsMapping(object):
 		empty_ops.setdefault('fnord', 27)
 		assert len(empty_ops.operations) == 1
 		assert empty_ops.operations['fnord'] == 42
+	
+	def test_ops_shallow_copy(self, single_ops):
+		assert single_ops.operations == single_ops.copy().operations
 
 
 class TestOperationsCombination(object):
