@@ -1,5 +1,5 @@
 -   repo: https://github.com/pre-commit/pre-commit-hooks.git
-    sha: 46251c9523506b68419aefdf5ff6ff2fbc4506a4
+    sha: 5bf6c09bfa1297d3692cadd621ef95f1284e33c0
     hooks:
     -   id: check-added-large-files
     -   id: check-ast
