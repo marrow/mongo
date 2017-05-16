@@ -26,5 +26,5 @@
     -   id: py.test
         name: py.test
         language: system
-        entry: sh -c py.test
+        entry: sh -c 'TEST_SKIP_CAPPED=1 py.test'
         files: ''
