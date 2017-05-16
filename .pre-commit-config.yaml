@@ -10,6 +10,7 @@
     -   id: debug-statements
     -   id: detect-private-key
     -   id: end-of-file-fixer
+    -   id: forbid-new-submodules
     -   id: check-json
     -   id: check-xml
     -   id: check-yaml
