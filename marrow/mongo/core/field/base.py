@@ -4,10 +4,12 @@ from __future__ import unicode_literals
 
 from datetime import datetime, timedelta
 from numbers import Number
+from collections import MutableMapping
 
 from bson import ObjectId as OID
 
 from . import Field
+from ...util import utcnow, datetime_period
 from ....schema import Attribute
 from ....schema.compat import unicode
 
@@ -16,8 +18,27 @@ class String(Field):
 	__foreign__ = 'string'
 	__disallowed_operators__ = {'#array'}
 	
+	strip = Attribute(default=False)
+	case = Attribute(default=None)
+	
 	def to_foreign(self, obj, name, value):  # pylint:disable=unused-argument
-		return unicode(value)
+		value = unicode(value)
+		
+		if self.strip is True:
+			value = value.strip()
+		elif self.strip:
+			value = value.strip(self.strip)
+		
+		if self.case in (1, True, 'u', 'upper'):
+			value = value.upper()
+		
+		elif self.case in (-1, False, 'l', 'lower'):
+			value = value.lower()
+		
+		elif self.case == 'title':
+			value = value.title()
+		
+		return value
 
 
 class Binary(Field):
@@ -53,6 +74,9 @@ class ObjectId(Field):
 		if isinstance(value, timedelta):
 			return OID.from_datetime(datetime.utcnow() + value)
 		
+		if isinstance(value, MutableMapping) and '_id' in value:
+			return OID(value['_id'])
+		
 		return OID(unicode(value))
 
 
@@ -79,8 +103,28 @@ class Date(Field):
 	__foreign__ = 'date'
 	__disallowed_operators__ = {'#array'}
 	
-	now = Attribute(default=False)
-	autoupdate = Attribute(default=False)
+	def to_foreign(self, obj, name, value):  # pylint:disable=unused-argument
+		if isinstance(value, OID):
+			return value.generation_time
+		
+		return value
+
+
+class Period(Date):
+	"""A specialized Date field used to store dates rounded down to the start of a given period."""
+	
+	hours = Attribute(default=None)
+	minutes = Attribute(default=None)
+	seconds = Attribute(default=None)
+	
+	@property
+	def delta(self):
+		return timedelta(hours=self.hours or 0, minutes=self.minutes or 0, seconds=self.seconds or 0)
+	
+	def to_foreign(self, obj, name, value):
+		value = super(Period, self).to_foreign(obj, name, value)
+		
+		return datetime_period(value, hours=self.hours, minutes=self.minutes, seconds=self.seconds)
 
 
 class TTL(Date):
@@ -89,15 +133,17 @@ class TTL(Date):
 	__foreign__ = 'date'
 	__disallowed_operators__ = {'#array'}
 	
-	def to_foreign(self, obj, name, value):  # pylint:disable=unused-argument
+	def to_foreign(self, obj, name, value):
+		value = super(TTL, self).to_foreign(obj, name, value)
+		
 		if isinstance(value, timedelta):
-			return datetime.utcnow() + value
+			return utcnow() + value
 		
 		if isinstance(value, datetime):
 			return value
 		
 		if isinstance(value, Number):
-			return datetime.utcnow() + timedelta(days=value)
+			return utcnow() + timedelta(days=value)
 		
 		raise ValueError("Invalid TTL value: " + repr(value))
 

@@ -4,14 +4,15 @@ from __future__ import unicode_literals
 
 import pytest
 
-from marrow.mongo import Document, Field, P
+from marrow.mongo import Field, P
 from marrow.mongo.field import Array, Number
+from marrow.mongo.trait import Collection
 
 
 class TestParametricProjectionConstructor(object):
 	@pytest.fixture()
 	def D(self):
-		class Sample(Document):
+		class Sample(Collection):
 			field = Field(project=True)
 			number = Number('other')
 		

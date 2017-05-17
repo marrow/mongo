@@ -24,7 +24,7 @@ def P(Document, *fields, **kw):
 			projected.add(field)
 	
 	if not projected:  # We only have exclusions from the default projection.
-		names = set(Document.__projection__.keys() if Document.__projection__ else Document.__fields__.keys())
+		names = set(getattr(Document, '__projection__', Document.__fields__) or Document.__fields__)
 		projected = {name for name in (names - omitted)}
 	
 	projected |= __always__

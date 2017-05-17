@@ -62,10 +62,8 @@ class Index(Attribute):
 		
 		return result
 	
-	def create_index(self, collection, **kw):
-		"""Perform the translation needed to return the arguments for `Collection.create_index`.
-		
-		This is where final field name resolution happens, via the reference we have to the containing document class.
+	def create(self, collection, **kw):
+		"""Create this index in the specified collection; keyword arguments are passed to PyMongo.
 		
 		http://api.mongodb.com/python/current/api/pymongo/collection.html#pymongo.collection.Collection.create_index
 		"""
@@ -89,3 +87,15 @@ class Index(Attribute):
 				del options[key]
 		
 		return collection.create_index(self.fields, **options)
+	
+	create_index = create
+	
+	def drop(self, collection):
+		"""Drop this index from the specified collection.
+		
+		https://api.mongodb.com/python/current/api/pymongo/collection.html#pymongo.collection.Collection.drop_index
+		"""
+		
+		collection.drop_index(self.__name__)
+	
+	drop_index = drop

@@ -31,7 +31,7 @@ class FieldTransform(BaseTransform):
 		return value
 
 
-@adjust_attribute_sequence(1000, 'transformer', 'validator', 'translated', 'assign', 'project', 'read', 'write')
+@adjust_attribute_sequence(1000, 'transformer', 'validator', 'positional', 'assign', 'repr', 'project', 'read', 'write', 'sort')
 class Field(Attribute):
 	# Possible values for operators include any literal $-prefixed operator, or one of:
 	#  * #rel -- allow/prevent all relative comparison such as $gt, $gte, $lt, etc.
@@ -40,7 +40,7 @@ class Field(Attribute):
 	#  * #geo -- allow/prevent geographic query operators
 	__allowed_operators__ = set()
 	__disallowed_operators__ = set()
-	__document__ = None  # If we're assigned to a Document, this gets populated with a weak reference proxy.
+	__document__ = None  # The Document subclass the field originates from.
 	__foreign__ = {}
 	__acl__ = []  # Overall document access control list.
 	
@@ -57,11 +57,12 @@ class Field(Attribute):
 	
 	transformer = Attribute(default=FieldTransform())  # A Transformer class to use when loading/saving values.
 	validator = Attribute(default=Validator())  # The Validator class to use when validating values.
-	translated = Attribute(default=False)  # If truthy this field should be stored in the per-language subdocument.
+	positional = Attribute(default=True)  # If True, will be accepted positionally.
 	assign = Attribute(default=False)  # If truthy attempt to access and store resulting variable when instantiated.
 	
 	# Security Properties
 	
+	repr = Attribute(default=True)  # Should this field be included in the programmers' representation?
 	project = Attribute(default=None)  # Predicate to indicate inclusion in the default projection.
 	read = Attribute(default=True)  # Read predicate, either a boolean, callable, or web.security ACL predicate.
 	write = Attribute(default=True)  # Write predicate, either a boolean, callable, or web.security ACL predicate.
@@ -141,7 +142,7 @@ class Field(Attribute):
 		
 		# If this is class attribute (and not instance attribute) access, we return a Queryable interface.
 		if obj is None:
-			return Q(self.__document__, self)
+			return Q(cls, self)
 		
 		result = super(Field, self).__get__(obj, cls)
 		

@@ -1,18 +1,22 @@
 # encoding: utf-8
 
 from marrow.mongo import Document, Field
+from marrow.mongo.trait import Collection
 
 
-class NoProjection(Document):
+class NoProjection(Collection):
+	id = None
 	default = Field()
 
 
-class OnlyProjected(Document):
+class OnlyProjected(Collection):
+	id = None
 	default = Field()
 	always = Field(project=True)
 
 
-class RejectOnly(Document):
+class RejectOnly(Collection):
+	id = None
 	default = Field()
 	never = Field(project=False)
 

@@ -63,7 +63,6 @@ class TestQueryable(object):  # TODO: Properly use pytest fixtures for this...
 	def test_attribute_access(self):
 		assert Sample.number.default == 27
 		assert Sample.array.default == 42
-		assert Sample.embed.name.__name__ == 'name'
 		
 		with pytest.raises(AttributeError):
 			Sample.number.asdfasdf
@@ -130,7 +129,7 @@ class TestQueryable(object):  # TODO: Properly use pytest fixtures for this...
 	
 	def test_operator_re(self):
 		result = Sample.field.re(r'^', 'foo', r'\.')
-		assert result.as_query == {'field_name': {'$re': r'^foo\.'}}
+		assert result.as_query == {'field_name': {'$regex': r'^foo\.'}}
 	
 	def test_operator_size(self):
 		result = Sample.array.size(10)
@@ -171,6 +170,9 @@ class TestQueryableQueryableQueryable(object):
 		
 		assert z._field == a._field + b._field
 	
+	def test_combining_setattr(self, S):
+		with pytest.raises(AttributeError):
+			(S.foo & S.bar).xyzzy = 27
 
 
 class TestQueryableFieldCombinations(object):
@@ -243,8 +245,8 @@ class TestQueryableFieldCombinations(object):
 		comb = S.foo & S.bar
 		q = comb.re('^', 'foo', '$')
 		
-		assert q.operations['foo']['$re'] == '^foo$'
-		assert q.operations['bar']['$re'] == '^foo$'
+		assert q.operations['foo']['$regex'] == '^foo$'
+		assert q.operations['bar']['$regex'] == '^foo$'
 	
 	def test_match_op(self, E):
 		comb = E.foo & E.bar
