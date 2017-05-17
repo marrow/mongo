@@ -4,9 +4,10 @@ from __future__ import unicode_literals
 
 import pytest
 from bson import ObjectId
+from pymongo.cursor import CursorType
 from pymongo.errors import WriteError
 
-from marrow.mongo import Field, Index, U
+from marrow.mongo import Index, U
 from marrow.mongo.field import Integer, String
 from marrow.mongo.trait import Queryable
 
@@ -37,6 +38,47 @@ def Sample(request, db):
 		])
 	
 	return Sample
+
+
+
+class TestQueryableCore(object):
+	def test_prepare_find_cursor_type_explicit(self, Sample):
+		cls, collection, query, options = Sample._prepare_find(cursor_type=CursorType.TAILABLE)
+		assert options['cursor_type'] == CursorType.TAILABLE
+	
+	def test_prepare_find_cursor_conflict(self, Sample):
+		with pytest.raises(TypeError):
+			Sample._prepare_find(cursor_type=CursorType.TAILABLE, tail=True)
+		
+		with pytest.raises(TypeError):
+			Sample._prepare_find(cursor_type=CursorType.TAILABLE, await=True)
+		
+		with pytest.raises(TypeError):
+			Sample._prepare_find(cursor_type=CursorType.TAILABLE, tail=True, await=True)
+	
+	def test_prepare_find_cursor_type_tail(self, Sample):
+		cls, collection, query, options = Sample._prepare_find(tail=True)
+		assert options['cursor_type'] == CursorType.TAILABLE_AWAIT
+	
+	def test_prepare_find_cursor_type_tail_not_await(self, Sample):
+		cls, collection, query, options = Sample._prepare_find(tail=True, await=False)
+		assert options['cursor_type'] == CursorType.TAILABLE
+	
+	def test_prepare_find_cursor_type_await_conflict(self, Sample):
+		with pytest.raises(TypeError):
+			Sample._prepare_find(await=False)
+	
+	def test_prepare_find_max_time_modifier(self, Sample):
+		cls, collection, query, options = Sample._prepare_find(max_time_ms=1000)
+		assert options['modifiers'] == {'$maxTimeMS': 1000}
+	
+	def test_prepare_aggregate_skip_limit(self, Sample):
+		cls, collection, stages, options = Sample._prepare_aggregate(skip=10, limit=10)
+		
+		assert stages == [
+				{'$skip': 10},
+				{'$limit': 10},
+			]
 
 
 class TestQueryableTrait(object):

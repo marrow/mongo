@@ -184,9 +184,6 @@ class Queryable(Collection):
 		if 'projection' in options:
 			stages.append({'$project': options.pop('projection')})
 		
-		if 'skip' in options:
-			stages.append({'$skip': options.pop('skip')})
-		
 		return cls, collection, stages, options
 	
 	@classmethod
@@ -250,8 +247,10 @@ class Queryable(Collection):
 				**kw
 			)
 		
-		if tuple(collection.database.client.server_info()['versionArray'][:2]) < (3, 4):  # noqa
-			raise RuntimeError("Queryable.find_in_sequence only works against MongoDB server versions 3.4 or newer.")
+		if __debug__:  # noqa
+			# This "foot shot avoidance" check requires a server round-trip, potentially, so we only do this in dev.
+			if tuple(collection.database.client.server_info()['versionArray'][:2]) < (3, 4):  # pragma: no cover
+				raise RuntimeError("Queryable.find_in_sequence only works against MongoDB server versions 3.4 or newer.")
 		
 		return collection.aggregate(stages, **options)
 	
