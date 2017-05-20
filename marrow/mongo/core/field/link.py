@@ -5,6 +5,7 @@ from pathlib import PurePosixPath
 
 from .base import String
 from ..compat import str, py2
+from ....schema import Attribute
 
 try:
 	from html import escape
@@ -206,6 +207,10 @@ class URLString(MutableMapping):
 			
 			query[k].append(v)
 	
+	@property
+	def relative(self):
+		return not (self.scheme and self.host and self._path and self._path.is_absolute())
+	
 	# Internal Methods
 	
 	def _compile(self):
@@ -240,10 +245,25 @@ class Link(String):
 		//example.com/protocol/relative
 		/host/relative
 		local/relative
+		#fragment-only
+	
+	You can prevent relative links from being assignable by setting `absolute`, or restrict the allowed `protocols`
+	(schemes) by defining them as a set of schemes, e.g. `{'http', 'https', 'mailto'}`.
 	"""
 	
+	absolute = Attribute(default=False)  # Only allow absolute addressing.
+	protocols = Attribute(default=set())  # Only allow the given protocols, e.g. {'http', 'https', 'mailto'}.
+	
 	def to_foreign(self, obj, name, value):  # pylint:disable=unused-argument
-		return URLString(value).url
+		value = URLString(value)
+		
+		if self.protocols and value.scheme not in self.protocols:
+			raise ValueError("Link utilizes invaid scheme: " + value.scheme)
+		
+		if self.absolute and value.relative:
+			raise ValueError("Link must be absolute.")
+		
+		return value.url
 	
 	def to_native(self, obj, name, value):  # pylint:disable=unused-argument
 		return URLString(value)
