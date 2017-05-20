@@ -142,6 +142,7 @@ setup(
 						'Markdown = marrow.mongo.core.field.md:Markdown[markdown]',
 						'Path = marrow.mongo.core.field.path:Path',
 						'Translated = marrow.mongo.core.trait.localized:Translated',
+						'Link = marrow.mongo.core.field.link:Link',
 					],
 				'marrow.mongo.trait': [  # Document traits for use as mix-ins.
 						# Active Collection Traits
