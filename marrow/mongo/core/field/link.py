@@ -29,6 +29,9 @@ class URLString(MutableMapping):
 	# Basic Protocols
 	
 	def __init__(self, url=None, **parts):
+		if hasattr(url, '__link__'):
+			url = url.__link__
+		
 		if isinstance(url, URLString):
 			url = url.url
 		
@@ -227,6 +230,18 @@ class URLString(MutableMapping):
 
 
 class Link(String):
+	"""A field capable of storing and richly accessing URI links, inclding absolute or relative URL.
+	
+	Example valid values:
+	
+		http://user:pass@host:port/path?query#fragment
+		mailto:user@example.com
+		urn:ISBN0-486-27557-4
+		//example.com/protocol/relative
+		/host/relative
+		local/relative
+	"""
+	
 	def to_foreign(self, obj, name, value):  # pylint:disable=unused-argument
 		return URLString(value).url
 	
