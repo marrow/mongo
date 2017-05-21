@@ -8,12 +8,12 @@ from ....schema.compat import unicode, py2
 
 try:
 	from html import escape
-except ImportError:  # Adapt to Python 2 locations on legacy versions.
+except ImportError:  # Adapt to locations on legacy versions.
 	from cgi import escape
 
 try:
 	from urllib.parse import urlsplit, quote_plus, unquote_plus, parse_qsl
-except ImportError:  # Adapt to Python 2 locations on legacy versions.
+except ImportError:  # Adapt to locations on legacy versions.
 	from urllib import urlsplit, quote_plus, unquote_plus, parse_qsl
 
 try:
