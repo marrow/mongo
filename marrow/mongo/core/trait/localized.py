@@ -55,7 +55,7 @@ class Localized(Document):
 		
 		language = String(choices=LANGUAGES, default='en')
 	
-	locale = Array(Embed('.Locale'), default=lambda: [], assign=True, repr=False)
+	locale = Array(Embed('.Locale'), default=lambda: [], assign=True, repr=False, positional=False)
 	
 	def __repr__(self):
 		if self.locale:

@@ -9,7 +9,7 @@ class Expires(Document):
 	
 	# ## Expiry Field Definition
 	
-	expires = TTL(default=None, write=False)  # The exact time the record should be considered "expired".
+	expires = TTL(default=None, write=False, positional=False)  # The exact time the record should be "expired".
 	
 	# ## TTL Index Definition
 	
