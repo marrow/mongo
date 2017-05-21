@@ -134,6 +134,7 @@ setup(
 						'PluginReference = marrow.mongo.core.field.plugin:PluginReference',
 						'Reference = marrow.mongo.core.field.reference:Reference',
 						'Regex = marrow.mongo.core.field.regex:Regex',
+						'Set = marrow.mongo.core.field.set_:Set',
 						'String = marrow.mongo.core.field.string:String',
 						'TTL = marrow.mongo.core.field.ttl:TTL',
 						'Timestamp = marrow.mongo.core.field.timestamp:Timestamp',
