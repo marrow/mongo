@@ -2,7 +2,7 @@
 
 from __future__ import unicode_literals
 
-from .base import String
+from .string import String
 from ....schema.compat import unicode, py3
 
 try:

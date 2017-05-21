@@ -1,9 +1,8 @@
 # encoding: utf-8
 
 from collections import MutableMapping, OrderedDict
-from pathlib import PurePosixPath
 
-from .base import String
+from .string import String
 from ..compat import str, py2
 from ....schema import Attribute
 
@@ -13,6 +12,11 @@ try:
 except ImportError:  # Adapt to Python 2 locations on legacy versions.
 	from cgi import escape
 	from urllib import urlsplit, quote_plus, unquote_plus, parse_qsl
+
+try:
+	from pathlib import PurePosixPath as _Path
+except ImportError:
+	from pathlib2 import PurePosixPath as _Path
 
 
 class URLString(MutableMapping):
