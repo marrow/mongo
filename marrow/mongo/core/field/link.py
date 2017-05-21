@@ -3,8 +3,8 @@
 from collections import MutableMapping, OrderedDict
 
 from .string import String
-from ..compat import str, py2
 from ....schema import Attribute
+from ....schema.compat import unicode, py2
 
 try:
 	from html import escape
@@ -19,7 +19,7 @@ except ImportError:
 	from pathlib2 import PurePosixPath as _Path
 
 
-class URLString(MutableMapping):
+class URIString(MutableMapping):
 	"""An object representing a URL (absolute or relative) and its components.
 	
 	Acts as a mutable mapping for manipulation of query string arguments. If the query string is not URL
@@ -29,18 +29,20 @@ class URLString(MutableMapping):
 	
 	# Skip allocation of a dictionary per instance by pre-defining available slots.
 	__slots__ = ('_url', 'scheme', 'user', 'password', 'host', 'port', '_path', '_query', 'fragment')
-	__parts__ = {'scheme', 'user', 'password', 'host', 'port', 'path', 'query', 'fragment', 'hostname'}
+	__parts__ = {'scheme', 'user', 'password', 'host', 'port', 'path', 'query', 'fragment', 'username', 'hostname'}
 	
 	# Basic Protocols
 	
 	def __init__(self, url=None, **parts):
+		self._query = {}
+		
 		if hasattr(url, '__link__'):
 			url = url.__link__
 		
-		if isinstance(url, URLString):
+		if isinstance(url, URIString):
 			url = url.url
 		
-		self._url = url  # If None, this will also handle setting defaults.
+		self.url = url  # If None, this will also handle setting defaults.
 		
 		if parts:  # If not given a base URL, defines a new URL, otherwise update the given URL.
 			for part, value in parts.items():
@@ -50,6 +52,9 @@ class URLString(MutableMapping):
 				setattr(self, part, value)
 	
 	# String Protocols
+	
+	def __repr__(self):
+		return 'URI({0!s})'.format(self)
 	
 	def __str__(self):
 		"""Return the Unicode text representation of this URL."""
@@ -68,16 +73,23 @@ class URLString(MutableMapping):
 	def __html__(self):
 		return '<a href="{address}">{summary}</a>'.format(
 				address = escape(self.url),
-				summary = escape(self.host + str(self.path)),
+				summary = escape(self.host + unicode(self.path)),
 			)
 	
 	# Comparison Protocols
 	
 	def __eq__(self, other):
-		return self.url == str(other)
+		if not isinstance(other, self.__class__):
+			other = self.__class__(other)
+		
+		for part in self.__parts__:
+			if getattr(self, part) != getattr(other, part):
+				return False
+		
+		return True
 	
 	def __ne__(self, other):
-		return not self.__eq__(other)
+		return not self == other
 	
 	# Mapping Protocols
 	
@@ -114,6 +126,14 @@ class URLString(MutableMapping):
 	# Accessor Properties
 	
 	@property
+	def username(self):
+		return self.user
+	
+	@username.setter
+	def username(self, value):
+		self.user = value
+	
+	@property
 	def hostname(self):
 		return self.host
 	
@@ -128,7 +148,7 @@ class URLString(MutableMapping):
 	@path.setter
 	def path(self, value):
 		if value:
-			self._path = PurePosixPath(value)
+			self._path = _Path(value)
 		else:
 			self._path = None
 	
@@ -180,11 +200,11 @@ class URLString(MutableMapping):
 		
 		for k, v in self._query.items():
 			if isinstance(v, str):
-				parts.extend(("&" if parts else "", quote_plus(k), "=", quote_plus(str(v))))
+				parts.extend(("&" if parts else "", quote_plus(k), "=", quote_plus(unicode(v))))
 				continue
 			
 			for s in v:
-				parts.extend(("&" if parts else "", quote_plus(k), "=", quote_plus(str(s))))
+				parts.extend(("&" if parts else "", quote_plus(k), "=", quote_plus(unicode(s))))
 		
 		return "".join(parts)
 	
@@ -193,13 +213,16 @@ class URLString(MutableMapping):
 		query = self._query
 		
 		try:
-			value = parse_qsl(str(value), strict_parsing=True)
+			value = parse_qsl(unicode(value), strict_parsing=True)
 		except ValueError:
 			# Better to preserve than to explode; URLs with qs like `?foo` do exist.
-			self.query = value  # This will make dictionary manipulation explode.
+			self._query = value  # This will make dictionary manipulation explode.
 			return
 		
-		query.clear()
+		if not isinstance(query, dict):
+			query = self._query = {}
+		else:
+			query.clear()
 		
 		for k, v in value:
 			if k not in query:
@@ -224,8 +247,8 @@ class URLString(MutableMapping):
 				(":" + quote_plus(self.password)) if self.user and self.password else "",
 				"@" if self.user else "",
 				self.host or "",
-				(":" + str(self.port)) if self.host and self.port else "",
-				str(self._path),
+				(":" + unicode(self.port)) if self.host and self.port else "",
+				unicode(self._path),
 				("?" + self.qs) if self._query else "",
 				("#" + quote_plus(self.fragment)) if self.fragment else "",
 			))
@@ -255,11 +278,13 @@ class Link(String):
 	(schemes) by defining them as a set of schemes, e.g. `{'http', 'https', 'mailto'}`.
 	"""
 	
+	URI = URIString
+	
 	absolute = Attribute(default=False)  # Only allow absolute addressing.
 	protocols = Attribute(default=None)  # Only allow the given protocols, e.g. {'http', 'https', 'mailto'}.
 	
 	def to_foreign(self, obj, name, value):  # pylint:disable=unused-argument
-		value = URLString(value)
+		value = self.URI(value)
 		
 		if self.protocols and value.scheme not in self.protocols:
 			raise ValueError("Link utilizes invaid scheme: " + value.scheme)
@@ -270,4 +295,4 @@ class Link(String):
 		return value.url
 	
 	def to_native(self, obj, name, value):  # pylint:disable=unused-argument
-		return URLString(value)
+		return self.URI(value)
