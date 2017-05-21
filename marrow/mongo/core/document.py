@@ -13,6 +13,7 @@ from ...schema import Attributes, Container
 from ...schema.compat import str, unicode, odict
 from ..util import SENTINEL
 from .field import Field
+from .field.alias import Alias
 from .index import Index
 
 __all__ = ['Document']
@@ -50,7 +51,19 @@ class Document(Container):
 		
 		prepare_defaults = kw.pop('_prepare_defaults', True)
 		
-		super(Document, self).__init__(*args, **kw)
+		fields = iter((k, v) for k, v in self.__fields__.items() if not k.startswith('__') and isinstance(v, Field) and v.positional)
+		
+		# We translate positional to keyword arguments ourselves to facilitate per-field inclusion.
+		# Also to correct for accidental inclusion of Attributes instances, etc.
+		for arg in args:
+			for name, field in fields:
+				if name in kw:
+					raise TypeError("Positional value overridden by keyword argument: " + name)
+				
+				kw[name] = arg
+				break
+		
+		super(Document, self).__init__(**kw)
 		
 		if prepare_defaults:
 			self._prepare_defaults()
