@@ -205,7 +205,7 @@ class URIString(MutableMapping):
 		parts = []
 		
 		for k, v in self._query.items():
-			if isinstance(v, str):
+			if isinstance(v, unicode):
 				parts.extend(("&" if parts else "", quote_plus(k), "=", quote_plus(unicode(v))))
 				continue
 			
