@@ -46,7 +46,7 @@ class URIString(MutableMapping):
 		
 		if parts:  # If not given a base URL, defines a new URL, otherwise update the given URL.
 			for part, value in parts.items():
-				if part not in parts:
+				if part not in self.__parts__:
 					raise TypeError("Unknown URL component: " + part)
 				
 				setattr(self, part, value)
@@ -83,7 +83,7 @@ class URIString(MutableMapping):
 			other = self.__class__(other)
 		
 		for part in self.__parts__:
-			if getattr(self, part) != getattr(other, part):
+			if not getattr(self, part, None) == getattr(other, part, None):
 				return False
 		
 		return True
@@ -103,12 +103,14 @@ class URIString(MutableMapping):
 		if not isinstance(self._query, dict):
 			raise ValueError("Query string is not manipulatable.")
 		
-		self._query[name] = value
+		self._url = None  # Invalidate the cached string.
+		self._query[name] = unicode(value)
 	
 	def __delitem__(self, name):
 		if not isinstance(self._query, dict):
 			raise ValueError("Query string is not manipulatable.")
 		
+		self._url = None  # Invalidate the cached string.
 		del self._query[name]
 	
 	def __iter__(self):
@@ -158,11 +160,11 @@ class URIString(MutableMapping):
 	
 	@query.setter
 	def query(self, value):
-		if isinstance(value, str):
+		if isinstance(value, unicode):
 			self.qs = value
 			return
 		
-		self._query = dict(value)
+		self._query = {k: unicode(v) for k, v in dict(value).items()}
 	
 	@property
 	def url(self):
@@ -186,14 +188,14 @@ class URIString(MutableMapping):
 		self.port = None
 		self._path = None
 		self._query = {}
-		self.fragment = None
+		self.fragment = ''
 	
 	@property
 	def qs(self):
 		if not self._query:
 			return ""
 		
-		if isinstance(self._query, str):
+		if isinstance(self._query, unicode):
 			return self._query  # Handle "preserved" edge cases.
 		
 		parts = []
@@ -212,17 +214,15 @@ class URIString(MutableMapping):
 	def qs(self, value):
 		query = self._query
 		
-		try:
-			value = parse_qsl(unicode(value), strict_parsing=True)
-		except ValueError:
-			# Better to preserve than to explode; URLs with qs like `?foo` do exist.
-			self._query = value  # This will make dictionary manipulation explode.
-			return
+		if value:
+			try:
+				value = parse_qsl(unicode(value), strict_parsing=True)
+			except ValueError:
+				# Better to preserve than to explode; URLs with qs like `?foo` do exist.
+				self._query = value  # This will make dictionary manipulation explode.
+				return
 		
-		if not isinstance(query, dict):
-			query = self._query = {}
-		else:
-			query.clear()
+		query.clear()
 		
 		for k, v in value:
 			if k not in query:
@@ -236,6 +236,9 @@ class URIString(MutableMapping):
 	
 	@property
 	def relative(self):
+		if self.scheme not in {None, '', 'http', 'https'}:
+			return False
+		
 		return not (self.scheme and self.host and self._path and self._path.is_absolute())
 	
 	# Internal Methods
