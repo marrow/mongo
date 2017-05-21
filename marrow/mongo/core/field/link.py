@@ -14,7 +14,10 @@ except ImportError:  # Adapt to locations on legacy versions.
 try:
 	from urllib.parse import urlsplit, quote_plus, unquote_plus, parse_qsl
 except ImportError:  # Adapt to locations on legacy versions.
-	from urllib import urlsplit, quote_plus, unquote_plus, parse_qsl
+	try:
+		from urllib import urlsplit, quote_plus, unquote_plus, parse_qsl
+	except ImportError:
+		from urllib import urlparse as urlsplit, quote_plus, unquote_plus, parse_qsl
 
 try:
 	from pathlib import PurePosixPath as _Path
