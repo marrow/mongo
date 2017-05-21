@@ -53,6 +53,8 @@ class TestIndex(object):
 		class Updated(Sample):
 			_field = Sample._field.adapt('other', sparse=True)
 		
+		assert Sample._field.fields == [('field_name', 1)]
 		assert Updated._field.fields == [('field_name', 1), ('other_field', 1)]
+		
 		assert not Sample._field.sparse
 		assert Updated._field.sparse
