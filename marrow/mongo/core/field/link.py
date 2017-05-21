@@ -252,7 +252,7 @@ class Link(String):
 	"""
 	
 	absolute = Attribute(default=False)  # Only allow absolute addressing.
-	protocols = Attribute(default=set())  # Only allow the given protocols, e.g. {'http', 'https', 'mailto'}.
+	protocols = Attribute(default=None)  # Only allow the given protocols, e.g. {'http', 'https', 'mailto'}.
 	
 	def to_foreign(self, obj, name, value):  # pylint:disable=unused-argument
 		value = URLString(value)
