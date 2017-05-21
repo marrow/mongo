@@ -45,6 +45,18 @@ class Index(Attribute):
 				i[1]  # Preserve the field order.
 			) for i in self.fields]
 	
+	def adapt(self, *args, **kw):
+		if args:
+			kw['fields'] = self.fields + self.process_fields(args)
+		
+		instance = self.__class__()
+		instance.__data__ = self.__data__.copy()
+		
+		for k, v in kw.items():
+			setattr(instance, k, v)
+		
+		return instance
+	
 	def process_fields(self, fields):
 		"""Process a list of simple string field definitions and assign their order based on prefix."""
 		

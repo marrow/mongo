@@ -68,6 +68,15 @@ class Field(Attribute):
 	write = Attribute(default=True)  # Write predicate, either a boolean, callable, or web.security ACL predicate.
 	sort = Attribute(default=True)  # Sort predicate, either a boolean, callable, or web.security ACL predicate.
 	
+	def adapt(self, **kw):
+		instance = self.__class__()
+		instance.__data__ = self.__data__.copy()
+		
+		for k, v in kw.items():
+			setattr(instance, k, v)
+		
+		return instance
+	
 	def __repr__(self):
 		fields = []
 		
