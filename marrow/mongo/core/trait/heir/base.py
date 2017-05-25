@@ -75,6 +75,9 @@ class Heirarchical(Queryable):
 	# Internal Use Methods
 	
 	def _find_heirarchical(self, accessor, *args, **kw):
+		# TODO: Refactor as callable class level accessor object.
+		# Queryable.objects([pk or sequence or fragment]=None, *fragment, **kw)
+		
 		try:
 			query = getattr(self, accessor)
 			
@@ -97,6 +100,8 @@ class Heirarchical(Queryable):
 	
 	@contextmanager
 	def _heir_update(self):
+		# TODO: Refactor as Queryable.objects.bulk(ordered=False) method.
+		
 		ops = self.get_collection().initialize_ordered_bulk_op()
 		
 		yield ops
@@ -105,7 +110,7 @@ class Heirarchical(Queryable):
 			ops.execute()
 		except:
 			__import__('pprint').pprint(e.details)
-			raise
+			raise  # TODO: We can do better than the above.
 	
 	# Active Collection Methods
 	
@@ -147,8 +152,16 @@ class Heirarchical(Queryable):
 		return self
 	
 	def _attach(self, child, ops, project=None):
+		"""Perform the work of attaching this document, to be overridden in subclasses.
+		
+		Subclasses should super() early and utilize the result in order to benefit from automatic casting. Provided
+		a reference to the child to attach, an ordered bulk operations object, and optional default projection.
+		"""
+		
+		# TODO: Refactor to isolate this as common to all cooperative attachment methods.
+		
 		if not isinstance(child, Document):
-			child = Doc.find_one(child, project=project)
+			child = Doc.find_one(child, project=project)  # TODO: Utilize Queryable default projection.
 		
 		return child
 	
@@ -164,15 +177,17 @@ class Heirarchical(Queryable):
 		"""Attach this document (with any descendants) to the given parent."""
 		
 		if not isinstance(parent, Document):
-			parent = self.find_one(parent)
+			parent = self.find_one(parent)  # TODO: Utilize Queryable default projection.
 		
 		return parent.attach(self)
 	
 	def attach_before(self, sibling):
 		"""Attach this document (with any descendants) to the same parent as the target sibling, prior to that sibling."""
 		
+		# TODO: Utilize _attach/attach refactor.
+		
 		if not isinstance(sibling, Document):
-			sibling = self.find_one(sibling, project=('parent', ))
+			sibling = self.find_one(sibling)  # TODO: Utilize Queryable default projection.
 		
 		self.attach_to(sibling.parent)
 		
@@ -181,8 +196,10 @@ class Heirarchical(Queryable):
 	def attach_after(self, sibling):
 		"""Attach this document (with any descendants) to the same parent as the target sibling, after that sibling."""
 		
+		# TODO: Utilize _attach/attach refactor.
+		
 		if not isinstance(sibling, Document):
-			sibling = self.find_one(sibling, project=('parent', ))
+			sibling = self.find_one(sibling)  # TODO: Utilize Queryable default projection.
 		
 		self.attach_to(sibling.parent)
 		
