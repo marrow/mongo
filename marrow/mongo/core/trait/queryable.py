@@ -218,7 +218,7 @@ class Queryable(Collection):
 		"""
 		
 		if len(args) == 1 and not isinstance(args[0], Filter):
-			args = (cls.id == args[0], )
+			args = (getattr(cls, cls.__pk__) == args[0], )
 		
 		Doc, collection, query, options = cls._prepare_find(*args, **kw)
 		result = Doc.from_mongo(collection.find_one(query, **options))
