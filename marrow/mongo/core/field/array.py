@@ -2,7 +2,7 @@
 
 from __future__ import unicode_literals
 
-from ... import Document, Field
+from ... import Field
 from .base import _HasKind, _CastingKind
 
 
@@ -29,6 +29,9 @@ class Array(_HasKind, _CastingKind, Field):
 		if isinstance(value, self.List):
 			return value
 		
+		if value is None:
+			return None
+		
 		result = self.List(super(Array, self).to_native(obj, name, i) for i in value)
 		obj.__data__[self.__name__] = result
 		
@@ -36,5 +39,8 @@ class Array(_HasKind, _CastingKind, Field):
 	
 	def to_foreign(self, obj, name, value):
 		"""Transform to a MongoDB-safe value."""
+		
+		if value is None:
+			return None
 		
 		return self.List(super(Array, self).to_foreign(obj, name, i) for i in value)
