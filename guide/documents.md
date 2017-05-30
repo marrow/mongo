@@ -13,7 +13,7 @@ from marrow.mongo.field import ObjectId, String, Number, Array
 {% endmethod %}
 
 {% method -%}
-Let us now define a ``Document`` subclass, in this example to store information about user accounts, and populate it with a few different types of field.
+Let us now define a ``Document`` subclass, in this example to store information about user accounts, and populate it with a few different types of field. Note that it is very common to utilize _mix-in traits_ rather than just subclassing `Document` directly, espcially using the `Identified` trait for documents with identifiers, and the `Collection` or `Queryable` traits for _top-level documents_; this is simplified for demonstration purposes.
 
 {% sample lang="python" -%}
 ```python
@@ -24,7 +24,7 @@ class Account(Document):
 	age = Number()
 	
 	id = ObjectId('_id', assign=True)
-	tag = Array(String(), default=lambda: [], assign=True)
+	tag = Array(String(), assign=True)
 	
 	_username = Index('username', unique=True)
 ```
@@ -55,15 +55,15 @@ This allows storage of any numeric value, either integer or floating point. Now 
 id = ObjectId('_id', assign=True)
 ```
 
-Marrow Mongo does not assume your documents contain IDs; there is no separation internally between top-level documents and *embedded documents*, leaving the declaration of an ID up to you. You might not always wish to use an ObjectID, either; please see MongoDB's documentation for discussion of general modelling practices. The first positional parameter for most non-complex fields is the name of the MongoDB-side field. Underscores imply an attribute is _protected_ in Python, so we remap it by assigning it to just `id`. The `assign` argument here ensures whenever a new `Account` is instantiated an ObjectID will be immediately generated and assigned.
+Marrow Mongo does not assume your documents contain IDs; there is no separation at the top level between documents for storage within a collection and _embedded documents_, leaving the declaration of an ID up to you. You might not always wish to use an ObjectID, either; please see MongoDB's documentation for discussion of general modelling practices. The first positional parameter for most non-complex fields is the name of the MongoDB-side field. Underscores imply an attribute is _protected_ in Python, so we remap it by assigning it to just `id`. The `assign` argument here ensures whenever a new `Account` is instantiated an ObjectID will be immediately generated and assigned.
 
 Finally there is an array of tags:
 
 ```python
-tag = Array(String(), default=lambda: [], assign=True)
+tag = Array(String(), assign=True)
 ```
 
-This combines what we've been using so far into one field. An `Array` is a *complex field* (a container) and as such the types of values allowed to be contained therein may be defined positionally. If you want to override the field's database-side name, pass in a `name` as a keyword argument. A default is defined as an anonymous callback function which constructs a new list on each request. The default will be executed and the result assigned automatically during initialization as per `id` or `locale`.
+This combines what we've been using so far into one field. An `Array` is a *complex field* (a container) and as such the types of values allowed to be contained therein may be defined positionally. If you want to override the field's database-side name, pass in a `name` as a keyword argument. As we tell Marrow Mongo to `assign` the defualt value, a new array (`list` in Python) will be constructed and assigned with each new instance, ensuring we always have a place to put additional data.
 
 Lastly we define a unique index on the username to speed up any queries involving that field:
 
