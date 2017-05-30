@@ -22,6 +22,7 @@ class PluginReference(Field):
 	
 	namespace = Attribute()  # The plugin namespace to use when loading.
 	explicit = Attribute()  # Allow explicit, non-plugin references.
+	dynamic = Attribute(default=False)  # Allow variable replacements within the namespace name.
 	
 	__foreign__ = {'string'}
 	
@@ -32,34 +33,38 @@ class PluginReference(Field):
 		
 		super(PluginReference, self).__init__(*args, **kw)
 	
-	def to_native(self, obj, name, value):  # pylint:disable=unused-argument
-		"""Transform the MongoDB value into a Marrow Mongo value."""
-		
+	@property
+	def _namespace(self):
 		try:
 			namespace = self.namespace
 		except AttributeError:
 			namespace = None
+		else:
+			if self.dynamic and '${' in namespace:
+				namespace = namespace.format(self=obj, cls=cls, field=self)
 		
-		return load(value, namespace) if namespace else load(value)
+		return namespace
+	
+	def to_native(self, obj, name, value):  # pylint:disable=unused-argument
+		"""Transform the MongoDB value into a Marrow Mongo value."""
+		
+		return load(value, self._namespace)
 	
 	def to_foreign(self, obj, name, value):  # pylint:disable=unused-argument
 		"""Transform to a MongoDB-safe value."""
 		
-		try:
-			namespace = self.namespace
-		except AttributeError:
-			namespace = None
+		namespace = self._namespace
 		
 		try:
 			explicit = self.explicit
 		except AttributeError:
-			explicit = not bool(namespace)
+			explicit = not namespace
 		
 		if not isinstance(value, (str, unicode)):
 			value = canon(value)
 		
 		if namespace and ':' in value:  # Try to reduce to a known plugin short name.
-			for point in iter_entry_points(namespace):
+			for point in iter_entry_points(namespace):  # TODO: Isolate.
 				qualname = point.module_name
 				
 				if point.attrs:
