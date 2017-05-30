@@ -199,7 +199,7 @@ class Field(Attribute):
 class _HasKind(Field):
 	"""A mix-in to provide an easily definable singular or plural set of document types."""
 	
-	kind = Attribute(default=None)  # One or more foreign model references, a string, Document subclass, or set of.
+	kind = Attribute(default=None)  # A reference to a document class (explicitly, or by string name) or field instance.
 	
 	def __init__(self, *args, **kw):
 		if args:
