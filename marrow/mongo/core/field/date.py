@@ -70,10 +70,13 @@ class Date(Field):
 				t = localtz
 			
 			if not isinstance(t, tzinfo):
+				if __debug__ and not localtz:
+					raise ValueError("The `pytz` package must be installed to look up timezone: " + repr(t))
+				
 				t = get_tz(t)
 			
-			if not hasattr(t, 'normalize'):  # Attempt to handle non-pytz tzinfo.
-				t = get_tz(t.tzname())
+			if not hasattr(t, 'normalize') and get_tz:  # Attempt to handle non-pytz tzinfo.
+				t = get_tz(t.tzname(dt))
 			
 			return t
 		
@@ -81,10 +84,18 @@ class Date(Field):
 		tz = _tz(tz)
 		
 		if not dt.tzinfo and naive:
-			dt = naive.localize(dt)
+			if hasattr(naive, 'localize'):
+				dt = naive.localize(dt)
+			elif naive == utc:
+				dt = dt.replace(tzinfo=naive)
+			else:
+				raise ValueError("Must install `pytz` package for timezone support.")
 		
 		if tz:
-			dt = tz.normalize(dt.astimezone(tz))
+			if hasattr(tz, 'normalize'):
+				dt = tz.normalize(dt.astimezone(tz))
+			else:
+				dt = dt.astimezone(tz)  # Warning: this might not always be entirely correct!
 		
 		return dt
 	
