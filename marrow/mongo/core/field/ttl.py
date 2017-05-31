@@ -16,15 +16,13 @@ class TTL(Date):
 	__disallowed_operators__ = {'#array'}
 	
 	def to_foreign(self, obj, name, value):
-		value = super(TTL, self).to_foreign(obj, name, value)
-		
 		if isinstance(value, timedelta):
-			return utcnow() + value
+			value = utcnow() + value
+		elif isinstance(value, datetime):
+			value = value
+		elif isinstance(value, Number):
+			value = utcnow() + timedelta(days=value)
+		else:
+			raise ValueError("Invalid TTL value: " + repr(value))
 		
-		if isinstance(value, datetime):
-			return value
-		
-		if isinstance(value, Number):
-			return utcnow() + timedelta(days=value)
-		
-		raise ValueError("Invalid TTL value: " + repr(value))
+		return super(TTL, self).to_foreign(obj, name, value)
