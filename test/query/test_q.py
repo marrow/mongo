@@ -128,8 +128,8 @@ class TestQueryable(object):  # TODO: Properly use pytest fixtures for this...
 		assert unicode(Sample.generic) == ~Sample.generic == 'generic'
 	
 	def test_operator_re(self):
-		result = Sample.field.re(r'^', 'foo', r'\.')
-		assert result.as_query == {'field_name': {'$regex': r'^foo\.'}}
+		result = Sample.field.re(r'^', 'foo', r'.')
+		assert result.as_query == {'field_name': {'$regex': r'^foo.'}}
 	
 	def test_operator_size(self):
 		result = Sample.array.size(10)
