@@ -22,7 +22,7 @@ env:
 matrix:
   include:
     - python: "3.5"
-      env: NO_PYTZ=1
+      env: NO_PYTZ=1 MONGODB_VERSION=3.4.4
     - python: "3.5"
       env: MONGODB_VERSION=3.2.13
 
