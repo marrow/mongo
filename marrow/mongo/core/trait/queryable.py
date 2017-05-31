@@ -45,6 +45,7 @@ class Queryable(Collection):
 			'maxTimeMs': 'max_time_ms',  # Common typo.
 			'noCursorTimeout': 'no_cursor_timeout',
 			'oplogReplay': 'oplog_replay',
+			'wait': 'await',  # XXX: 'await' will be reserved in 3.7+
 		}
 	
 	AGGREGATE_OPTIONS = UNIVERSAL_OPTIONS | {
