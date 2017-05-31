@@ -55,27 +55,27 @@ _PRIORITY = (-2, -1, 0, 1, 2)
 
 
 def gen_log_entries(collection, count=1000):
-	collection.insert({'message': 'first'})  # To avoid immediate exit of the tail.ddddd
+	collection.insert_one({'message': 'first'})  # To avoid immediate exit of the tail.ddddd
 	
 	for i in range(count-2):
 		sleep(3.0/count)  # If we go too fast, the test might not be able to keep up.
-		collection.insert({'message': 'test #' + str(i) + ' of ' + str(count), 'priority': choice(_PRIORITY)})
+		collection.insert_one({'message': 'test #' + str(i) + ' of ' + str(count), 'priority': choice(_PRIORITY)})
 	
-	collection.insert({'message': 'last'})
+	collection.insert_one({'message': 'last'})
 
 
 class TestCappedQueries(object):
 	def test_single(self, capped):
 		assert capped.count() == 0
-		result = capped.insert({'message': 'first'})
+		result = capped.insert_one({'message': 'first'})
 		assert capped.count() == 1
 		
 		first = next(tail(capped))
 		assert first['message'] == 'first'
-		assert first['_id'] == result
+		assert first['_id'] == result.inserted_id
 	
 	def test_basic_timeout(self, capped):
-		capped.insert({'message': 'first'})
+		capped.insert_one({'message': 'first'})
 		
 		start = time()
 		
@@ -96,7 +96,7 @@ class TestCappedQueries(object):
 	def test_patch(self, capped):
 		_patch()
 		
-		capped.insert({})
+		capped.insert_one({})
 		
 		assert len(list(capped.tail(timeout=0.25))) == 1
 	
