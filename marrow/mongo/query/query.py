@@ -154,15 +154,20 @@ class Q(object):
 	def _op(self, operation, other, *allowed):
 		"""A basic operation operating on a single value."""
 		
+		f = self._field
+		
 		if self._combining:  # We are a field-compound query fragment, e.g. (Foo.bar & Foo.baz).
 			return reduce(self._combining,
-					(q._op(operation, other, *allowed) for q in self._field))  # pylint:disable=protected-access
+					(q._op(operation, other, *allowed) for q in f))  # pylint:disable=protected-access
 		
 		# Optimize this away in production; diagnosic aide.
-		if __debug__ and _complex_safety_check(self._field, {operation} | set(allowed)):  # pragma: no cover
+		if __debug__ and _complex_safety_check(f, {operation} | set(allowed)):  # pragma: no cover
 			raise NotImplementedError("{self!r} does not allow {op} comparison.".format(self=self, op=operation))
 		
-		return Filter({self._name: {operation: self._field.transformer.foreign(other, (self._field, self._document))}})
+		if other is not None:
+			other = f.transformer.foreign(other, (f, self._document))
+		
+		return Filter({self._name: {operation: other}})
 	
 	def _iop(self, operation, other, *allowed):
 		"""An iterative operation operating on multiple values.
@@ -170,17 +175,23 @@ class Q(object):
 		Consumes iterators to construct a concrete list at time of execution.
 		"""
 		
+		f = self._field
+		
 		if self._combining:  # We are a field-compound query fragment, e.g. (Foo.bar & Foo.baz).
 			return reduce(self._combining,
-					(q._iop(operation, other, *allowed) for q in self._field))  # pylint:disable=protected-access
+					(q._iop(operation, other, *allowed) for q in f))  # pylint:disable=protected-access
 		
 		# Optimize this away in production; diagnosic aide.
-		if __debug__ and _complex_safety_check(self._field, {operation} | set(allowed)):  # pragma: no cover
+		if __debug__ and _complex_safety_check(f, {operation} | set(allowed)):  # pragma: no cover
 			raise NotImplementedError("{self!r} does not allow {op} comparison.".format(
 					self=self, op=operation))
 		
+		def _t(o):
+			for value in o:
+				yield None if value is None else f.transformer.foreign(value, (f, self._document))
+		
 		other = other if len(other) > 1 else other[0]
-		values = [self._field.transformer.foreign(value, (self._field, self._document)) for value in other]
+		values = list(_t(other))
 		
 		return Filter({self._name: {operation: values}})
 	
@@ -213,14 +224,16 @@ class Q(object):
 		Documentation: https://docs.mongodb.org/manual/reference/operator/query/eq/#op._S_eq
 		"""
 		
+		f = self._field
+		
 		if self._combining:  # We are a field-compound query fragment, e.g. (Foo.bar & Foo.baz).
-			return reduce(self._combining, (q.__eq__(other) for q in self._field))
+			return reduce(self._combining, (q.__eq__(other) for q in f))
 		
 		# Optimize this away in production; diagnosic aide.
 		if __debug__ and _simple_safety_check(self._field, '$eq'):  # pragma: no cover
 			raise NotImplementedError("{self!r} does not allow $eq comparison.".format(self=self))
 		
-		return Filter({self._name: self._field.transformer.foreign(other, (self._field, self._document))})
+		return Filter({self._name: None if other is None else f.transformer.foreign(other, (f, self._document))})
 	
 	def __gt__(self, other):
 		"""Matches values that are greater than a specified value.
