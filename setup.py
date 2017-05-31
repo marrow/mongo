@@ -33,6 +33,7 @@ tests_require = [
 		'pytest-catchlog',  # log capture
 		'pytest-isort',  # import ordering
 		'misaka', 'pygments',  # Markdown field support
+		'pytz', 'tzlocal>=1.4',  # timezone support, logger support
 	]
 
 

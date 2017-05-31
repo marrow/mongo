@@ -22,7 +22,7 @@ env:
 matrix:
   include:
     - python: "3.5"
-      env: NO_PYTZ=1 MONGODB_VERSION=3.4.4
+      env: MONGODB_VERSION=3.4.4 NO_PYTZ=1
     - python: "3.5"
       env: MONGODB_VERSION=3.2.13
 
@@ -34,8 +34,8 @@ before_install:
 
 install:
   - 'travis_retry pip install --upgrade setuptools pip pytest pytest-cov codecov "setuptools_scm>=1.9" cffi'
-  - 'pip install -e ".[development,logger]"'
-  - '[[ -e $NO_PYTZ ]] && pip uninstall --quiet --yes pytz tzlocal'
+  - 'pip install -e ".[development]"'
+  - 'test -n $NO_PYTZ && pip uninstall --quiet --yes pytz tzlocal'
 
 script:
     python setup.py test
