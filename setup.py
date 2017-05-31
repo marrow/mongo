@@ -34,6 +34,7 @@ tests_require = [
 		'pytest-isort',  # import ordering
 		'misaka', 'pygments',  # Markdown field support
 		'futures; python_version < "3.4"',  # futures support
+		'pytz', 'tzlocal>=1.4',  # timezone support, logger support
 	]
 
 
@@ -91,7 +92,7 @@ setup(
 	
 	extras_require = dict(
 			decimal = ['pymongo>=3.4'],  # More modern version required for Decimal128 support.
-			development = tests_require + ['pre-commit'],  # Development-time dependencies.
+			development = tests_require + ['pre-commit', 'bandit'],  # Development-time dependencies.
 			logger = ['tzlocal>=1.4'],  # Timezone support to store log times in UTC like a sane person.
 			markdown = ['misaka', 'pygments'],  # Markdown text storage.
 			scripting = ['javascripthon<1.0'],  # Allow map/reduce functions and "stored functions" to be Python.
