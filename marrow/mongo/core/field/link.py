@@ -40,11 +40,11 @@ class URIString(MutableMapping):
 	def __init__(self, url=None, **parts):
 		self._query = {}
 		
-		if hasattr(url, '__link__'):
+		if hasattr(url, '__link__'):  # We utilize a custom object protocol to retrieve links to things.
 			url = url.__link__
 		
 		if isinstance(url, URIString):
-			url = url.url
+			url = unicode(url)
 		
 		self.url = url  # If None, this will also handle setting defaults.
 		
@@ -58,7 +58,7 @@ class URIString(MutableMapping):
 	# String Protocols
 	
 	def __repr__(self):
-		return 'URI({0!s})'.format(self)
+		return 'URI({0})'.format(self._compile(True))
 	
 	def __str__(self):
 		"""Return the Unicode text representation of this URL."""
@@ -173,15 +173,14 @@ class URIString(MutableMapping):
 	@property
 	def url(self):
 		if not self._url:
-			self._compile()
+			self._url = self._compile()
 		
 		return self._url
 	
 	@url.setter
 	def url(self, value):
 		if value:
-			self._url = value
-			self._decompile()
+			self._decompile(value)
 			return
 		
 		self._url = None
@@ -247,11 +246,11 @@ class URIString(MutableMapping):
 	
 	# Internal Methods
 	
-	def _compile(self):
-		self._url = "".join((
+	def _compile(self, safe=False):
+		return "".join((
 				(self.scheme + "://") if self.scheme else ("//" if self.host else ""),
 				quote_plus(self.user) if self.user else "",
-				(":" + quote_plus(self.password)) if self.user and self.password else "",
+				(":" + ("" if safe else quote_plus(self.password))) if self.user and self.password else "",
 				"@" if self.user else "",
 				self.host or "",
 				(":" + unicode(self.port)) if self.host and self.port else "",
@@ -260,8 +259,9 @@ class URIString(MutableMapping):
 				("#" + quote_plus(self.fragment)) if self.fragment else "",
 			))
 	
-	def _decompile(self):
-		result = urlsplit(self._url)
+	def _decompile(self, value):
+		self._url = value
+		result = urlsplit(value)
 		
 		for part in self.__parts__:
 			if not hasattr(result, part): continue
