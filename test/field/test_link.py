@@ -172,6 +172,15 @@ class TestURLString(object):
 		uri = "http://user:pass@host:8088/path?query#fragment"
 		link = Link.URI(uri)
 		assert link == Link.URI(link)
+	
+	def test_relative_resolution(self):
+		uri = "https://example.com/about/"
+		link = Link.URI(uri)
+		
+		assert unicode(link.resolve('/')) == 'https://example.com/'
+		assert unicode(link.resolve('us')) == 'https://example.com/about/us'
+		assert unicode(link.resolve('../img/banner.jpeg')) == 'https://example.com/img/banner.jpeg'
+		assert unicode(link.resolve('//cdn.example.com/asset')) == 'https://cdn.example.com/asset'
 
 
 class TestLinkField(FieldExam):
