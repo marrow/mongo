@@ -24,7 +24,7 @@ except ImportError:
 
 
 class URIString(MutableMapping):
-	"""An object representing a URI or URL (absolute or relative) and its components.
+	"""An object representing a URI (absolute or relative) and its components.
 	
 	Acts as a mutable mapping for manipulation of query string arguments. If the query string is not URL
 	"form encoded" attempts at mapping access or manipulation will fail with a ValueError. No effort is made to
@@ -32,41 +32,48 @@ class URIString(MutableMapping):
 	"""
 	
 	# Skip allocation of a dictionary per instance by pre-defining available slots.
-	__slots__ = ('_url', 'scheme', 'user', 'password', 'host', 'port', '_path', '_query', 'fragment')
+	__slots__ = ('_uri', 'scheme', 'user', 'password', 'host', 'port', '_path', '_query', 'fragment')
 	__parts__ = {'scheme', 'user', 'password', 'host', 'port', 'path', 'query', 'fragment', 'username', 'hostname'}
 	
 	# Basic Protocols
 	
-	def __init__(self, url=None, **parts):
+	def __init__(self, _uri=None, **parts):
+		"""Initialize a new URI from a passed in string or named parts.
+		
+		If both a base URI and parts are supplied than the parts will override those present in the URI.
+		"""
+		
 		self._query = {}
 		
-		if hasattr(url, '__link__'):  # We utilize a custom object protocol to retrieve links to things.
-			url = url.__link__
+		if hasattr(_uri, '__link__'):  # We utilize a custom object protocol to retrieve links to things.
+			_uri = _uri.__link__
+			
+			# To allow for simpler cases, this attribute does not need to be callable.
+			if callable(_uri): _uri = _uri()
 		
-		if isinstance(url, URIString):
-			url = unicode(url)
+		self.url = _uri  # If None, this will also handle setting defaults.
 		
-		self.url = url  # If None, this will also handle setting defaults.
-		
-		if parts:  # If not given a base URL, defines a new URL, otherwise update the given URL.
+		if parts:  # If not given a base URI, defines a new URI, otherwise update the given URI.
 			for part, value in parts.items():
 				if part not in self.__parts__:
-					raise TypeError("Unknown URL component: " + part)
+					raise TypeError("Unknown URI component: " + part)
 				
 				setattr(self, part, value)
 	
 	# String Protocols
 	
 	def __repr__(self):
+		"""Return a "safe" programmers' representation that omits passwords."""
+		
 		return "URI('{0}')".format(self._compile(True))
 	
 	def __str__(self):
-		"""Return the Unicode text representation of this URL."""
+		"""Return the Unicode text representation of this URI, including passwords."""
 		
 		return self.url
 	
 	def __bytes__(self):
-		"""Return the binary string representation of this URL."""
+		"""Return the binary string representation of this URI, including passwords."""
 		
 		return self.url.encode('utf-8')
 	
@@ -75,6 +82,13 @@ class URIString(MutableMapping):
 		__str__ = __bytes__
 	
 	def __html__(self):
+		"""Return an HTML representation of this link.
+		
+		A link to http://example.com/foo/bar will result in:
+		
+			<a href="http://example.com/foo/bar">example.com/foo/bar</a>
+		"""
+		
 		return '<a href="{address}">{summary}</a>'.format(
 				address = escape(self.url),
 				summary = escape(self.host + unicode(self.path)),
@@ -83,9 +97,12 @@ class URIString(MutableMapping):
 	# Comparison Protocols
 	
 	def __eq__(self, other):
+		"""Compare this URI against another value."""
+		
 		if not isinstance(other, self.__class__):
 			other = self.__class__(other)
 		
+		# Because things like query string argument order may differ, but still be equivalent...
 		for part in self.__parts__:
 			if not getattr(self, part, None) == getattr(other, part, None):
 				return False
@@ -93,37 +110,57 @@ class URIString(MutableMapping):
 		return True
 	
 	def __ne__(self, other):
+		"""Inverse comparison support."""
+		
 		return not self == other
 	
 	# Mapping Protocols
 	
 	def __getitem__(self, name):
+		"""Shortcut for retrieval of a query string argument."""
+		
 		if not isinstance(self._query, dict):
 			raise ValueError("Query string is not manipulatable.")
 		
 		return self._query[name]
 	
 	def __setitem__(self, name, value):
+		"""Shortcut for (re)assignment of query string arguments."""
+		
 		if not isinstance(self._query, dict):
 			raise ValueError("Query string is not manipulatable.")
 		
-		self._url = None  # Invalidate the cached string.
+		self._uri = None  # Invalidate the cached string.
 		self._query[name] = unicode(value)
 	
 	def __delitem__(self, name):
+		"""Shortcut for removal of a query string argument."""
+		
 		if not isinstance(self._query, dict):
 			raise ValueError("Query string is not manipulatable.")
 		
-		self._url = None  # Invalidate the cached string.
+		self._uri = None  # Invalidate the cached string.
 		del self._query[name]
 	
 	def __iter__(self):
+		"""Retrieve the query string argument names."""
+		
 		if not isinstance(self._query, dict):
 			raise ValueError("Query string is not manipulatable.")
 		
 		return iter(self._query)
 	
+	def __bool__(self):
+		"""Truthyness comparison."""
+		
+		return bool(self._uri)
+	
+	if py2:
+		__nonzero__ = __bool__
+	
 	def __len__(self):
+		"""Determine the number of query string arguments."""
+		
 		if not isinstance(self._query, dict):
 			raise ValueError("Query string is not manipulatable.")
 		
@@ -133,26 +170,38 @@ class URIString(MutableMapping):
 	
 	@property
 	def username(self):
+		"""Alias for compatibility with urlsplit results."""
+		
 		return self.user
 	
 	@username.setter
 	def username(self, value):
+		"""Alias for compatibility with urlsplit results."""
+		
 		self.user = value
 	
 	@property
 	def hostname(self):
+		"""Alias for compatibility with urlsplit results."""
+		
 		return self.host
 	
 	@hostname.setter
 	def hostname(self, value):
+		"""Alias for compatibility with urlsplit results."""
+		
 		self.host = value
 	
 	@property
 	def path(self):
+		"""The path referenced by this URI."""
+		
 		return self._path
 		
 	@path.setter
 	def path(self, value):
+		"""Cast path assignments to our native path representation."""
+		
 		if value:
 			self._path = _Path(value)
 		else:
@@ -160,10 +209,14 @@ class URIString(MutableMapping):
 	
 	@property
 	def query(self):
+		"""Retrieve the "query string arguments" for this URI."""
+		
 		return self._query
 	
 	@query.setter
 	def query(self, value):
+		"""Assign query string arguments to this URI."""
+		
 		if isinstance(value, unicode):
 			self.qs = value
 			return
@@ -172,18 +225,22 @@ class URIString(MutableMapping):
 	
 	@property
 	def url(self):
-		if not self._url:
-			self._url = self._compile()
+		"""Retrieve the "compiled" URL."""
 		
-		return self._url
+		if not self._uri:
+			self._uri = self._compile()
+		
+		return self._uri
 	
 	@url.setter
 	def url(self, value):
+		"""Assign and replace the entire URI with a new URL."""
+		
 		if value:
-			self._decompile(value)
+			self._decompile(unicode(value))
 			return
 		
-		self._url = None
+		self._uri = None
 		self.scheme = None
 		self.user = None
 		self.password = None
@@ -195,6 +252,8 @@ class URIString(MutableMapping):
 	
 	@property
 	def qs(self):
+		"""Retrieve the query string as a string, not a mapping, while preserving unprocessable values."""
+		
 		if not self._query:
 			return ""
 		
@@ -215,6 +274,8 @@ class URIString(MutableMapping):
 	
 	@qs.setter
 	def qs(self, value):
+		"""Assign a new query string as a string, not a mapping, while preserving unprocessable values."""
+		
 		query = self._query
 		
 		if value:
@@ -239,6 +300,11 @@ class URIString(MutableMapping):
 	
 	@property
 	def relative(self):
+		"""Identify if this URI is relative to some "current context".
+		
+		For example, if the protocol is missing, it's protocol-relative. If the host is missing, it's host-relative, etc.
+		"""
+		
 		if self.scheme not in {None, '', 'http', 'https'}:
 			return False
 		
@@ -252,14 +318,19 @@ class URIString(MutableMapping):
 		else:
 			result = URIString(self)
 		
-		for k, v in parts.items():
-			setattr(result, k, v)
+		for part, value in parts.items():
+			if part not in self.__parts__:
+				raise TypeError("Unknown URI component: " + part)
+			
+			setattr(result, part, value)
 		
 		return result
 	
 	# Internal Methods
 	
 	def _compile(self, safe=False):
+		"""Compile the parts of a URI down into a string representation."""
+		
 		return "".join((
 				(self.scheme + "://") if self.scheme else ("//" if self.host else ""),
 				quote_plus(self.user) if self.user else "",
@@ -273,7 +344,9 @@ class URIString(MutableMapping):
 			))
 	
 	def _decompile(self, value):
-		self._url = value
+		"""Store the original and process parts from a URI string."""
+		
+		self._uri = value
 		result = urlsplit(value)
 		
 		for part in self.__parts__:
