@@ -28,7 +28,7 @@ class TestURLString(object):
 		
 		assert not link.relative
 		
-		assert repr(link) == "URI(" + uri.replace('pass', '') + ")"
+		assert repr(link) == "URI('" + uri.replace('pass', '') + "')"
 		
 		with pytest.raises(ValueError):
 			link['query']

@@ -12,9 +12,9 @@ except ImportError:  # Adapt to locations on legacy versions.
 	from cgi import escape
 
 try:
-	from urllib.parse import urlsplit, quote_plus, unquote_plus, parse_qsl
+	from urllib.parse import urljoin, urlsplit, quote_plus, unquote_plus, parse_qsl
 except ImportError:  # Adapt to locations on legacy versions.
-	from urlparse import urlsplit, parse_qsl
+	from urlparse import urljoin, urlsplit, parse_qsl
 	from urllib import quote_plus, unquote_plus
 
 try:
@@ -24,7 +24,7 @@ except ImportError:
 
 
 class URIString(MutableMapping):
-	"""An object representing a URL (absolute or relative) and its components.
+	"""An object representing a URI or URL (absolute or relative) and its components.
 	
 	Acts as a mutable mapping for manipulation of query string arguments. If the query string is not URL
 	"form encoded" attempts at mapping access or manipulation will fail with a ValueError. No effort is made to
@@ -58,7 +58,7 @@ class URIString(MutableMapping):
 	# String Protocols
 	
 	def __repr__(self):
-		return 'URI({0})'.format(self._compile(True))
+		return "URI('{0}')".format(self._compile(True))
 	
 	def __str__(self):
 		"""Return the Unicode text representation of this URL."""
@@ -243,6 +243,19 @@ class URIString(MutableMapping):
 			return False
 		
 		return not (self.scheme and self.host and self._path and self._path.is_absolute())
+	
+	def resolve(self, uri=None, **parts):
+		"""Attempt to resolve a new URI given an updated URI or URIString, partial or complete."""
+		
+		if uri:
+			result = URIString(urljoin(unicode(self), unicode(uri)))
+		else:
+			result = URIString(self)
+		
+		for k, v in parts.items():
+			setattr(result, k, v)
+		
+		return result
 	
 	# Internal Methods
 	
