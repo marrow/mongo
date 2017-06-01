@@ -15,7 +15,6 @@ from marrow.mongo.trait import Collection
 from marrow.mongo.util.capped import _patch, tail
 from marrow.schema.compat import pypy
 
-
 skip = int(os.environ.get('TEST_SKIP_CAPPED', 0)) or pypy
 
 pytestmark = pytest.mark.skipif(skip, reason="Slow tests skipped.")
