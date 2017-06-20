@@ -4,19 +4,6 @@
 * [Installation](installation.md)
 * [Contributing](contributing.md)
 
-## Tutorial
-
-* [Getting Started](tutorial/README.md)
-* [Developing a Wiki](tutorial/wiki/README.md)
-  * [Defining a Model](tutorial/wiki/model.md)
-  * [Working with Pages](tutorial/wiki/page.md)
-
-* [Developing a Forum](tutorial/forum/README.md)
-  * [Defining a Model](tutorial/forum/model.md)
-  * [Working with Threads](tutorial/forum/thread.md)
-  * [Working with Replies](tutorial/forum/reply.md)
-  * [Common Front-End Operations](tutorial/forum/front-end.md)
-
 ## Guide
 
 * [Defining Document Models](guide/documents.md)
@@ -26,7 +13,7 @@
   * [Complex](guide/field/complex.md)
   * [Numeric](guide/field/numeric.md)
   * [Markdown](guide/field/markdown.md)
-* Traits
+* [Traits](guide/trait/README.md)
   * [Derived](guide/trait/derived.md)
   * [Expires](guide/trait/expires.md)
   * [Heirarchical](guide/trait/heirarchical.md)
@@ -38,6 +25,7 @@
 * [Indexes](guide/indexes.md)
 * [Querying](guide/querying.md)
 * [Parametric Helpers](guide/parametric.md)
+* [Plugin Namespaces](guide/plugins.md)
 * [Geospatial](guide/geospatial.md)
 
 ## API
