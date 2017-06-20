@@ -11,11 +11,25 @@ This is a living document, evolving as the framework evolves.  You can always [b
 {% method -%}
 ## Overview
 
-[![version](https://img.shields.io/pypi/v/marrow.mongo.svg?style=flat "Latest version.")](https://pypi.python.org/pypi/marrow.mongo) 
-[![tag](https://img.shields.io/github/tag/marrow/mongo.svg "Latest tag.")](https://github.com/marrow/mongo/releases/latest) 
+[![version](https://img.shields.io/pypi/v/marrow.mongo.svg?style=flat "Latest version.")](https://pypi.python.org/pypi/marrow.mongo)
+[![tag](https://img.shields.io/github/tag/marrow/mongo.svg "Latest tag.")](https://github.com/marrow/mongo/releases/latest)  
 [![watch](https://img.shields.io/github/watchers/marrow/mongo.svg?style=social&label=Watch "Subscribe to project activity on Github.")](https://github.com/marrow/mongo/subscription)
 [![star](https://img.shields.io/github/stars/marrow/mongo.svg?style=social&label=Star "Star this project on Github.")](https://github.com/marrow/mongo/subscription)
 [![fork](https://img.shields.io/github/forks/marrow/mongo.svg?style=social&label=Fork "Fork this project on Github.")](https://github.com/marrow/mongo/fork)
+
+
+##### Plugin Package Namespaces
+
+Explicit is better than implicit, with fields, traits, and document classes registered as ``entry_point`` plugins and made accessible through the standard import mechanism.
+
+[Learn more about plugin registration and discovery.](guide/plugins.md)
+
+```python
+from marrow.mongo import Document, Index
+from marrow.mongo.field import String
+from marrow.mongo.trait import Queryable
+```
+
 
 ##### Declarative document modeling.
 
@@ -28,6 +42,7 @@ class Television(Document):
 	model = String()
 ```
 
+
 ##### Refined, Pythonic _data access object_ interactions.
 
 Utilize `Document` instances as attribute access mutable mappings with value typecasting, directly usable with PyMongo APIs. Attention is paid to matching Python language expectations, such as allowing instantiation using positional arguments. Values are always stored in the PyMongo-preferred MongoDB native format, and cast on attribute access as needed.
@@ -36,8 +51,12 @@ Utilize `Document` instances as attribute access mutable mappings with value typ
 
 ```python
 tv = Television('D50u-D1')
-assert tv.model == tv['model'] == 'D50u-D1'
+assert tv.model == \
+	tv[~Television.model] == \
+	tv['model'] == \
+	'D50u-D1'
 ```
+
 
 ##### Collection and index metadata, and creation shortcuts.
 
@@ -46,15 +65,18 @@ Keep information about your data model with your data model and standardize acce
 [Learn more about indexing.](guide/indexes.md)
 
 ```python
-class Television(Document):
+class Television(Queryable):
 	__collection__ = 'tv'
+	
 	model = String()
 	brand = String()
+	
 	_model = Index('model')
 
 collection = Television.create_collection(database)
-collection.insert_one(Television('D50u-D1'))
+Television('D50u-D1').insert_one()
 ```
+
 
 ##### Filter construction through rich comparison.
 
@@ -66,8 +88,8 @@ Construct filter documents through comparison of (or method calls on) field inst
 exact = Television.model == 'D50u-D1'
 prefix = Television.model.re(r'^D50\w')
 
-tv_a = Television.from_mongo(collection.find_one(exact))
-tv_b = Television.from_mongo(collection.find_one(prefix))
+tv_a = Television.find_one(exact)
+tv_b = Television.find_one(prefix)
 
 assert tv_a.model == tv_b.model == 'D50u-D1'
 assert tv_a['_id'] == tv_b['_id']
@@ -80,14 +102,10 @@ Many Python _active record_ object relational mappers (ORMs) and object document
 [Learn more about the parametric helpers.](guide/parametric.md)
 
 ```python
-collection.update_one(
-	F(Television, model__ne='XY-zzy'),
-	U(Television, set__brand='Vizio'))
+filter_doc = F(Television, model__ne='XY-zzy')
+update_doc = U(Television, set__brand='Vizio')
 
-tv = Television.from_mongo(collection.find_one(
-		F(Television, model='D50u-D1'),
-		P(Television, 'brand')
-	))
+tv = Television.find_one(model='D50u-D1')
 
 assert tv.brand == 'Vizio'
 ```
