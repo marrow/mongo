@@ -13,7 +13,7 @@ class Sample(Document):
 		reference = ObjectId()
 	
 	id = ObjectId('_id')
-	nested = Embed(Nested, default=lambda: Nested(), assign=True)
+	nested = Embed(Nested, assign=True)
 
 
 
