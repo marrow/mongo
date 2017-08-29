@@ -2,6 +2,7 @@
 
 from __future__ import unicode_literals
 
+from warnings import warn
 from weakref import proxy
 
 from ....package.loader import traverse
@@ -22,9 +23,13 @@ class Alias(Attribute):
 	
 	You can now read and write `latitude` and `longitude` on instances of `Point`, as well as query the nested values
 	through class attribute access.
+	
+	Another common use case for these types of aliases is deprecation; if deprecate is truthy, attemps to get or set
+	the field will raise a DeprecationWarning, and if non-boolean, the string value will be added to the message.
 	"""
 	
 	path = Attribute()
+	deprecate = Attribute(default=False)
 	
 	def __init__(self, path, **kw):
 		super(Alias, self).__init__(path=path, **kw)
@@ -35,12 +40,30 @@ class Alias(Attribute):
 		self.__document__ = proxy(document)
 	
 	def __get__(self, obj, cls=None):
+		if self.deprecate:
+			name = [n for n, field in obj.__fields__.iteritems() if field is self][0]  # XXX: Possibly unneeded?
+			message = "Retrieval of " + self.path + " via " + name + " (" + self.__name__ + ") is deprecated."
+			
+			if not isinstance(self.deprecate, bool):
+				message += "\n" + str(self.deprecate)
+			
+			warn(message, stacklevel=2)
+		
 		if obj is None:
 			return traverse(self.__document__, self.path)
 		
 		return traverse(obj, self.path)
 	
 	def __set__(self, obj, value):
+		if self.deprecate:
+			name = [n for n, field in obj.__fields__.iteritems() if field is self][0]  # XXX: Possibly unneeded?
+			message = "Assignment of " + self.path + " via " + name + " (" + self.__name__ + ") is deprecated."
+			
+			if not isinstance(self.deprecate, bool):
+				message += "\n" + str(self.deprecate)
+			
+			warn(message, stacklevel=2)
+		
 		parts = self.path.split('.')
 		final = parts.pop()
 		current = obj
