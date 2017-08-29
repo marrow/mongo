@@ -278,14 +278,6 @@ class Queryable(Collection):
 		
 		return self
 	
-	def insert_one(self, **kw):
-		"""Insert this document, passing any additional arguments to PyMongo.
-		
-		https://api.mongodb.com/python/current/api/pymongo/collection.html#pymongo.collection.Collection.insert_one
-		"""
-		
-		collection = self.get_collection(kw.pop('source', None))
-		return collection.insert_one(self, **kw)
 	
 	# https://api.mongodb.com/python/current/api/pymongo/collection.html#pymongo.collection.Collection.insert_many
 	
