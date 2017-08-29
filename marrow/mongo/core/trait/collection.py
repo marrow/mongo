@@ -219,3 +219,12 @@ class Collection(Identified):
 			projected = neutral
 		
 		return {field: True for field in projected}
+	
+	def insert_one(self, **kw):
+		"""Insert this document, passing any additional arguments to PyMongo.
+		
+		https://api.mongodb.com/python/current/api/pymongo/collection.html#pymongo.collection.Collection.insert_one
+		"""
+		
+		collection = self.get_collection(kw.pop('source', None))
+		return collection.insert_one(self, **kw)
