@@ -139,6 +139,7 @@ setup(
 						'TTL = marrow.mongo.core.field.ttl:TTL',
 						'Timestamp = marrow.mongo.core.field.timestamp:Timestamp',
 						'Translated = marrow.mongo.core.trait.localized:Translated',
+						'Lockable= marrow.mongo.core.trait.lockable:Lockable',
 					],
 				'marrow.mongo.trait': [  # Document traits for use as mix-ins.
 						'Collection = marrow.mongo.core.trait.collection:Collection',
