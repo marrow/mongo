@@ -16,7 +16,7 @@ pip install marrow.mongo
 
 ## Dependencies
 
-> #### info::Dependecy Isolation
+> #### info::Dependency Isolation
 > 
 > We strongly recommend always using a container, virtualization, or sandboxing environment of some kind when developing using Python; installing things system-wide is yucky \(for a variety of reasons\) nine times out of ten.
 > 
