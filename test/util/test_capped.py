@@ -82,7 +82,7 @@ class TestCappedQueries(object):
 		
 		delta = time() - start
 		assert len(result) == capped.count()
-		assert 0.4 < delta < 0.6
+		assert 0.25 < delta < 0.75
 	
 	def test_capped_trap(self, uncapped):
 		with pytest.raises(TypeError):
