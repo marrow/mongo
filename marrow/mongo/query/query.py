@@ -374,7 +374,7 @@ class Q(object):
 	def re(self, *parts):
 		"""Matches string values against a regular expression compiled of individual parts.
 		
-			Document.field.re(r'^', variable_part, r'\.')
+			Document.field.re(r'^', variable_part, r'\\.')
 		
 		Regex operator: {$regex: value}
 		Documentation: https://docs.mongodb.com/manual/reference/operator/query/regex/
