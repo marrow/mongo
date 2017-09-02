@@ -139,7 +139,7 @@ setup(
 						'TTL = marrow.mongo.core.field.ttl:TTL',
 						'Timestamp = marrow.mongo.core.field.timestamp:Timestamp',
 						'Translated = marrow.mongo.core.trait.localized:Translated',
-						'Lockable= marrow.mongo.core.trait.lockable:Lockable',
+						'Mapping = marrow.mongo.core.field.mapping:Mapping',
 					],
 				'marrow.mongo.trait': [  # Document traits for use as mix-ins.
 						'Collection = marrow.mongo.core.trait.collection:Collection',
@@ -149,6 +149,7 @@ setup(
 						'Localized = marrow.mongo.core.trait.localized:Localized',
 						'Published = marrow.mongo.core.trait.published:Published',
 						'Queryable = marrow.mongo.core.trait.queryable:Queryable',
+						'Lockable = marrow.mongo.core.trait.lockable:Lockable',
 					],
 				# ### WebCore Extensions
 				'web.session': [  # Session Engine
