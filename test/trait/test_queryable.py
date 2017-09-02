@@ -114,7 +114,7 @@ class TestQueryableTrait(object):
 	def test_reload_all(self, Sample):
 		doc = Sample.find_one(integer=42)
 		assert doc.string == 'baz'
-		Sample.get_collection().update(Sample.id == doc, U(Sample, integer=1337, string="hoi"))
+		Sample.get_collection().update_one(Sample.id == doc, U(Sample, integer=1337, string="hoi"))
 		assert doc.string == 'baz'
 		doc.reload()
 		assert doc.string == 'hoi'
@@ -123,7 +123,7 @@ class TestQueryableTrait(object):
 	def test_reload_specific(self, Sample):
 		doc = Sample.find_one(integer=42)
 		assert doc.string == 'baz'
-		Sample.get_collection().update(Sample.id == doc, U(Sample, integer=1337, string="hoi"))
+		Sample.get_collection().update_one(Sample.id == doc, U(Sample, integer=1337, string="hoi"))
 		assert doc.string == 'baz'
 		doc.reload('string')
 		assert doc.string == 'hoi'

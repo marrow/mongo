@@ -3,6 +3,7 @@
 from __future__ import unicode_literals
 
 from decimal import Decimal as dec
+
 from bson.decimal128 import Decimal128
 
 from common import FieldExam
