@@ -216,7 +216,7 @@ class Lockable(Queryable):
 			lock = getattr(self.find_one(self, projection={~D.lock: True}), 'lock', None)
 			
 			if lock and lock.expires <= identity.time:
-				previous.expired(self)
+				lock.expired(self)
 			
 			raise self.Locked("Unable to prolong lock.", lock)
 		
@@ -243,11 +243,12 @@ class Lockable(Queryable):
 		
 		if previous is None:
 			lock = getattr(self.find_one(self, projection={~D.lock: True}), 'lock', None)
-			
-			if lock and lock.expires <= identity.time:
-				previous.expired(self)
-			
 			raise self.Locked("Unable to release lock.", lock)
+		
+		lock = self.Lock.from_mongo(previous[~D.lock])
+		
+		if lock and lock.expires <= identity.time:
+			lock.expired(self)
 		
 		identity.released(self, force)
 	
@@ -264,9 +265,10 @@ class Lockable(Queryable):
 		try:
 			self.release()
 		
-		except:
-			reference = DBRef(self.__collection__, self.id)
-			log.critical("Encountered error attempting to release mutex lock.", exc_info=True, extra={
+		except self.Locked as e:
+			if e.lock is not None:
+				reference = DBRef(self.__collection__, self.id)
+				log.critical("Encountered error attempting to release mutex lock.", exc_info=True, extra={
 					'agent': self.lock.instance, 'expires': self.lock.expires, 'mutex': reference})
 		
 		else:
