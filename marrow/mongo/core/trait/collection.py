@@ -245,7 +245,7 @@ class Collection(Identified):
 		"""Update this document in the database. Local representations will not be affected.
 		
 		A single positional parameter, `update`, may be provided as a mapping. Keyword arguments (other than those
-		identified in the UPDATE_MAPPING) are interpreted as parametric updates, added to any `update` passed in.
+		identified in UPDATE_MAPPING) are interpreted as parametric updates, added to any `update` passed in.
 		
 		https://api.mongodb.com/python/current/api/pymongo/collection.html#pymongo.collection.Collection.update_one
 		"""

@@ -1,13 +1,15 @@
 # encoding: utf-8
 
+from __future__ import unicode_literals
+
 from binascii import hexlify
 from bson import ObjectId as OID, DBRef
 from datetime import timedelta
 from os import getenv, getpid
 
+from ....package.canonical import name
 from ... import Document, Index, utcnow
-from ...document import MappedPluginReference, Company
-from ...field import Date, String
+from ...field import Date, String, Embed, Reference, Integer
 from ...trait import Queryable
 
 
@@ -16,7 +18,7 @@ log = __import__('logging').getLogger(__name__)
 
 # We default to the same algorithm PyMongo uses to generate hardware and process ID portions of ObjectIds.
 _identifier = getenv('INSTANCE_ID', '{:06x}{:04x}'.format(
-		int(hexlify(OID._machine_bytes, 16)),
+		int(hexlify(OID._machine_bytes), 16),
 		getpid() % 0xFFFF,
 	))
 
@@ -30,27 +32,45 @@ class Lockable(Queryable):
 			lockable_instance.acquire()
 		except lockable_instance.Locked:
 			... # Failure scenario.
-		
-		... # Critical section.
-		
-		try:
-			lockable_instance.release()
-		except lockable_instance.Locked:
-			... # Failure scenario.
+		else:
+			try:
+				... # Critical section.
+			
+			finally:
+				try:
+					lockable_instance.release()
+				except lockable_instance.Locked:
+					... # Failure scenario.
 	
-	You can use instances utilizing this trait as context managers, where the lock will be released even in the event
-	of an exception, without additional code on your part. For example:
+	You can use instances utilizing this trait as context managers where the lock will be released in the event of an
+	exception, without additional code on your part. For example:
 	
 		try:
 			with lockable_instance:
 				... # Critical section.
+		
 		except lockable_instance.Locked:
 			... # Failure scenario.
 	
-	The locking process is accomplished in two distinct parts. First, there is the object (and collection) the lock is
-	defined for. The lock is acquired and released using atomic MongoDB updates. On releases processes waiting for a
-	held lock are notified using a shadow "capped collection" utilized just for this purpose. This allows waiting for
-	a mutex to be released to be a push notification, rather than polling process.
+	General locking is accomplished through atomic compare-and-swap, also referred to as "update if not different". We
+	rely on the fact that MongoDB database operations are serilized in the operation log. If there is a dogpile on the
+	lock, the first operation reaching the log will "win" and the compare operations on the subsequent attempts will
+	prevent further modification.
+	
+	Awaiting locks requires that a Queue collection be defined, to be used for pushing messages. There are use-cases
+	involving a queue per collection, a shared application queue, or even access of such queues on a different
+	connection. To avoid bad assumptions on our part, it's easy (if possibly a little strange) to define your own:
+	
+		class Thing(Lockable):
+			__collection__ = 'things'
+			
+			class Queue(Lockable.Queue):
+				__collection__ = 'locks'
+				__capped__ = 16 * 1024 * 1024  # 16 MiB
+	
+	Class closures are used to customize behaviours; you can, of course, just assign an external class to the Queue
+	attribute if you wish. It should still subclass Lockable.Queue or must otherwise provide the same field
+	attributes.
 	
 	Locks are held for a specific duration after acquisition. If the lock hasn't been prolonged before the locking
 	period expires, the lock will be automatically freed on the next attempt to acquire it.
@@ -59,11 +79,24 @@ class Lockable(Queryable):
 	lock = Embed('.Lock', default=None)
 	
 	class Locked(Exception):
-		"""Raised when unable to acquire the lock."""
-		pass
+		"""An exception raised when unable to acquire a lock."""
+		
+		def __init__(self, message, lock=None, *args, **kw):
+			if lock:
+				args = tuple(args) + tuple(args)
+			
+			super(self.__class__, self).__init__(message, *args, **kw)
+			
+			self.message = message
+			self.lock = lock  # Implementation note: optional to not break pickling serialization.
+	
+	class Queue(Queryable):
+		"""A prototype for a capped collection tracking lock releases."""
+		
+		lock_released = Reference(Document, concrete=True)
 	
 	class Lock(Document):
-		period = timedelta(minutes=1)
+		__period__ = timedelta(minutes=1)
 		
 		time = Date(default=utcnow, assign=True)
 		instance = String(default=_identifier, assign=True)
@@ -106,13 +139,16 @@ class Lockable(Queryable):
 		def released(self, document, forced=False):
 			"""A callback triggered in the event this mutex is released."""
 			
+			if document.Queue.__collection__:
+				document.Queue(lock_released=document).insert_one()
+			
 			if __debug__:
 				reference = DBRef(document.__collection__, document.id)
 				log.debug("Released lock held on {!r}.".format(document), extra={
 					'agent': self.instance, 'mutex': reference, 'forced': forced})
 		
 		def expired(self, document):
-			"""A callback triggered in the event this record's lock has been expired, prior to re-locking."""
+			"""A callback triggered in the event this record's lock has been expired."""
 			
 			if __debug__:
 				expires = self.expires
@@ -120,16 +156,16 @@ class Lockable(Queryable):
 				log.debug("Expired stale lock on {!r}.".format(document, expires.isoformat()), extra={
 					'agent': self.instance, 'expires': expires, 'mutex': reference})
 	
-	def acquire(self, await=0, force=False):
+	def acquire(self, timeout=0, force=False):
 		"""Attempt to acquire an exclusive lock on this record.
 		
-		TBD: If an await time is given (in seconds) then the acquire call will block for up to that much time
-		attempting to get the lock. If the lock can not be acquired (either because it is already set or we time out)
-		a Locked exception will be raised.
+		If a timeout is given (in seconds) then the acquire call will block for up to that much time attempting to
+		acquire the lock. If the lock can not be acquired (either because it is already set or we time out) a Locked
+		exception will be raised.
 		"""
 		
-		if await:
-			raise NotImplementedError()
+		if timeout and not (self.Queue.__collection__ and self.Queue.__capped__):
+			raise NotImplementedError(name(self.__class__) + ".Queue has not been prepared.")
 		
 		D = self.__class__
 		collection = self.get_collection()
@@ -141,7 +177,7 @@ class Lockable(Queryable):
 		else:
 			query = D.lock == None
 			query |= D.lock.instance == identity.instance
-			query |= D.lock.time < (identity.time - identity.period)
+			query |= D.lock.time < (identity.time - identity.__period__)
 			query &= D.id == self
 		
 		previous = collection.find_one_and_update(query, {'$set': {~D.lock: identity}}, {~D.lock: True})
@@ -150,10 +186,10 @@ class Lockable(Queryable):
 			lock = getattr(self.find_one(self, projection={~D.lock: True}), 'lock', None)
 			raise self.Locked("Unable to acquire lock.", lock)
 		
-		if not force:
-			previous = self.Lock.from_mongo(previous[~D.lock])
+		if not force and ~D.lock in previous:
+			previous = self.Lock.from_mongo(previous.get(~D.lock))
 			
-			if previous.expires < identity.time:
+			if previous and previous.expires < identity.time:
 				previous.expired(self)
 		
 		identity.acquired(self, force)
@@ -172,7 +208,7 @@ class Lockable(Queryable):
 		
 		query = D.id == self
 		query &= D.lock.instance == identity.instance
-		query &= D.lock.time >= (identity.time - identity.period)
+		query &= D.lock.time >= (identity.time - identity.__period__)
 		
 		previous = collection.find_one_and_update(query, {'$set': {~D.lock.time: identity.time}}, {~D.lock: True})
 		
@@ -203,7 +239,7 @@ class Lockable(Queryable):
 		if not force:
 			query &= D.lock.instance == identity.instance
 		
-		previous = collection.find_one_and_update(query, {'$set': {~D.lock: None}}, {~D.lock: True})
+		previous = collection.find_one_and_update(query, {'$unset': {~D.lock: True}}, {~D.lock: True})
 		
 		if previous is None:
 			lock = getattr(self.find_one(self, projection={~D.lock: True}), 'lock', None)
@@ -218,9 +254,20 @@ class Lockable(Queryable):
 	def __enter__(self):
 		"""Lockable documents may be used as a context manager to naturally acquire and free the lock."""
 		
-		self.lock = self.acquire()
+		result = self.acquire()
 		
-		return self
+		self.lock = result
+		
+		return result
 	
 	def __exit__(self, exc_type, exc_value, traceback):
-		self.lock = self.release()
+		try:
+			self.release()
+		
+		except:
+			reference = DBRef(self.__collection__, self.id)
+			log.critical("Encountered error attempting to release mutex lock.", exc_info=True, extra={
+					'agent': self.lock.instance, 'expires': self.lock.expires, 'mutex': reference})
+		
+		else:
+			self.lock = None
