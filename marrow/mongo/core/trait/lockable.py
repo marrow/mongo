@@ -9,11 +9,19 @@ from os import getenv, getpid
 
 from ....package.canonical import name
 from ... import Document, Index, utcnow
-from ...field import Date, String, Embed, Reference, Integer
+from ...field import Date, String, Embed, Reference, Integer, ObjectId
 from ...trait import Queryable
+from ...util.capped import tail
 
 
 log = __import__('logging').getLogger(__name__)
+
+
+try:
+	TimeoutError = TimeoutError
+except:
+	class TimeoutError(Exception):
+		pass
 
 
 # We default to the same algorithm PyMongo uses to generate hardware and process ID portions of ObjectIds.
@@ -93,7 +101,9 @@ class Lockable(Queryable):
 	class Queue(Queryable):
 		"""A prototype for a capped collection tracking lock releases."""
 		
-		lock_released = Reference(Document, concrete=True)
+		id = ObjectId('_id', positional=False)
+		mutex = Reference(concrete=True)
+		event = String(choices={'acquired', 'prolonged', 'released', 'expired'})
 	
 	class Lock(Document):
 		__period__ = timedelta(minutes=1)
@@ -121,6 +131,9 @@ class Lockable(Queryable):
 		def acquired(self, document, forced=False):
 			"""A callback triggered in the event this mutex is acquired."""
 			
+			if document.Queue.__collection__:
+				document.Queue(document, 'acquired').insert_one()
+			
 			if __debug__:
 				expires = self.expires
 				reference = DBRef(document.__collection__, document.id)
@@ -129,6 +142,9 @@ class Lockable(Queryable):
 		
 		def prolonged(self, document):
 			"""A callback triggered in the event this this mutex is prolonged."""
+			
+			if document.Queue.__collection__:
+				document.Queue(document, 'prolonged').insert_one()
 			
 			if __debug__:
 				expires = self.expires
@@ -140,7 +156,7 @@ class Lockable(Queryable):
 			"""A callback triggered in the event this mutex is released."""
 			
 			if document.Queue.__collection__:
-				document.Queue(lock_released=document).insert_one()
+				document.Queue(document, 'released').insert_one()
 			
 			if __debug__:
 				reference = DBRef(document.__collection__, document.id)
@@ -150,11 +166,35 @@ class Lockable(Queryable):
 		def expired(self, document):
 			"""A callback triggered in the event this record's lock has been expired."""
 			
+			if document.Queue.__collection__:
+				document.Queue(document, 'expired').insert_one()
+			
 			if __debug__:
 				expires = self.expires
 				reference = DBRef(document.__collection__, document.id)
 				log.debug("Expired stale lock on {!r}.".format(document, expires.isoformat()), extra={
 					'agent': self.instance, 'expires': expires, 'mutex': reference})
+	
+	def wait(self, timeout, since=None):
+		D = self.Queue
+		collection = D.get_collection()
+		since = since or utcnow()
+		
+		#filter = D.mutex == self
+		#filter &= D.id > since
+		filter = None
+		
+		for event in tail(collection, filter, timeout=timeout, aggregate=True):
+			event = D.from_mongo(event)
+			
+			if tuple(event.__data__) == ('_id', ) or event.mutex != self:
+				continue
+			
+			if event.event == 'released':
+				break
+		
+		else:
+			raise TimeoutError("Mutex lock not released in time.")
 	
 	def acquire(self, timeout=0, force=False):
 		"""Attempt to acquire an exclusive lock on this record.
@@ -183,6 +223,14 @@ class Lockable(Queryable):
 		previous = collection.find_one_and_update(query, {'$set': {~D.lock: identity}}, {~D.lock: True})
 		
 		if previous is None:
+			if timeout:
+				try:
+					self.wait(timeout, identity.time)
+				except TimeoutError:
+					pass
+				
+				return self.acquire()
+			
 			lock = getattr(self.find_one(self, projection={~D.lock: True}), 'lock', None)
 			raise self.Locked("Unable to acquire lock.", lock)
 		
@@ -190,6 +238,7 @@ class Lockable(Queryable):
 			previous = self.Lock.from_mongo(previous.get(~D.lock))
 			
 			if previous and previous.expires < identity.time:
+				
 				previous.expired(self)
 		
 		identity.acquired(self, force)

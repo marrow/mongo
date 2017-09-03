@@ -3,11 +3,12 @@
 from __future__ import unicode_literals
 
 from datetime import timedelta
-from time import sleep
+from time import sleep, time
 
 import pytest
 
 from marrow.mongo.core.trait.lockable import _identifier as us
+from marrow.mongo.core.trait.lockable import TimeoutError
 from marrow.mongo.trait import Lockable
 from marrow.mongo.util import utcnow
 
@@ -65,6 +66,7 @@ class TestSimpleLockable(object):
 		try:
 			if Sample.Queue.__collection__:
 				Sample.Queue.bind(db).create_collection()
+				Sample.Queue().insert_one()
 		except:
 			pass
 		
@@ -232,3 +234,14 @@ class TestAwaitableLockable(TestSimpleLockable):
 	
 	def test_acquire_wait(self, sample):
 		pass
+	
+	def test_wait_timeout(self, sample):
+		start = time()
+		
+		with pytest.raises(TimeoutError):
+			sample.wait(5)
+		
+		end = time()
+		delta = end - start
+		
+		assert 2.5 < delta < 7.5
