@@ -113,9 +113,6 @@ class TestQueryable(object):  # TODO: Properly use pytest fixtures for this...
 	
 	def test_op_failure(self):
 		with pytest.raises(NotImplementedError):
-			self.do_operator(*self.advanced[2], mock_queryable=Sample.array)
-		
-		with pytest.raises(NotImplementedError):
 			self.do_operator(*self.advanced[4])
 		
 		with pytest.raises(NotImplementedError):
