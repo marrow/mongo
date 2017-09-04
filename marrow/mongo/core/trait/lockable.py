@@ -237,11 +237,12 @@ class Lockable(Queryable):
 		if not force and ~D.lock in previous:
 			previous = self.Lock.from_mongo(previous.get(~D.lock))
 			
-			if previous and previous.expires < identity.time:
+			if previous:
+				if previous.expires < identity.time:
+					previous.expired(self)
 				
-				previous.expired(self)
-		
-		identity.acquired(self, force)
+				if previous.instance != identity.instance:  # Dont re-broadcast acquisition of an already-held lock.
+					identity.acquired(self, force)
 		
 		return identity
 	

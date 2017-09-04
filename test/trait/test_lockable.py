@@ -2,6 +2,7 @@
 
 from __future__ import unicode_literals
 
+import os
 from datetime import timedelta
 from time import sleep, time
 
@@ -11,6 +12,10 @@ from marrow.mongo.core.trait.lockable import _identifier as us
 from marrow.mongo.core.trait.lockable import TimeoutError
 from marrow.mongo.trait import Lockable
 from marrow.mongo.util import utcnow
+from marrow.schema.compat import pypy
+
+skip = int(os.environ.get('TEST_SKIP_CAPPED', 0)) or pypy
+skip_slow = pytest.mark.skipif(skip, reason="Slow tests skipped.")
 
 
 class TestLockBehaviours(object):
@@ -226,20 +231,35 @@ class TestSimpleLockable(object):
 			sample.update_one(set__lock=sample.Lock(instance='xyzzy'))
 
 
+@skip_slow
 class TestAwaitableLockable(TestSimpleLockable):
 	class Sample(TestSimpleLockable.Sample):
 		class Queue(Lockable.Queue):
 			__collection__ = 'lockable_locks'
 			__capped__ = 4 * 1024 * 1024
 	
-	def test_acquire_wait(self, sample):
-		pass
-	
 	def test_wait_timeout(self, sample):
 		start = time()
 		
 		with pytest.raises(TimeoutError):
 			sample.wait(5)
+		
+		end = time()
+		delta = end - start
+		
+		assert 2.5 < delta < 7.5
+	
+	def test_acquire_wait(self, sample):
+		pass
+	
+	def test_acquire_timeout(self, sample):
+		sample.update_one(set__lock=sample.Lock(instance='xyzzy'))
+		start = time()
+		
+		try:
+			sample.acquire(5)
+		except sample.Locked as e:
+			assert e.lock.instance == 'xyzzy'
 		
 		end = time()
 		delta = end - start
