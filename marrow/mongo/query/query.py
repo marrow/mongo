@@ -159,7 +159,7 @@ class Q(object):
 					(q._op(operation, other, *allowed) for q in self._field))  # pylint:disable=protected-access
 		
 		# Optimize this away in production; diagnosic aide.
-		if __debug__ and _complex_safety_check(self._field, {operation} & set(allowed)):  # pragma: no cover
+		if __debug__ and _complex_safety_check(self._field, {operation} | set(allowed)):  # pragma: no cover
 			raise NotImplementedError("{self!r} does not allow {op} comparison.".format(self=self, op=operation))
 		
 		return Filter({self._name: {operation: self._field.transformer.foreign(other, (self._field, self._document))}})
@@ -175,7 +175,7 @@ class Q(object):
 					(q._iop(operation, other, *allowed) for q in self._field))  # pylint:disable=protected-access
 		
 		# Optimize this away in production; diagnosic aide.
-		if __debug__ and _complex_safety_check(self._field, {operation} & set(allowed)):  # pragma: no cover
+		if __debug__ and _complex_safety_check(self._field, {operation} | set(allowed)):  # pragma: no cover
 			raise NotImplementedError("{self!r} does not allow {op} comparison.".format(
 					self=self, op=operation))
 		
