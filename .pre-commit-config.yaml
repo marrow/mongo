@@ -18,10 +18,13 @@
     sha: v1.1.0
     hooks:
     -   id: python-safety-dependencies-check
--   repo: https://github.com/Lucas-C/pre-commit-hooks-bandit
-    sha: v1.0.3
+-   repo: local
     hooks:
     -   id: python-bandit-vulnerability-check
+        entry: bandit
+        args: [-lll, --recursive, marrow, web, test]
+        language: system
+        files: ''
 -   repo: local
     hooks:
     -   id: py.test
