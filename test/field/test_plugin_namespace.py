@@ -38,3 +38,13 @@ class TestNamespacedPluginReferenceField(FieldExam):
 	def test_foreign_fail_object(self, Sample):
 		with pytest.raises(ValueError):
 			Sample(object)
+
+
+class TestNamespaceMappedPluginReferenceField(FieldExam):
+	__field__ = PluginReference
+	__args__ = ('marrow.mongo.document', )
+	__kwargs__ = {'mapping': {'Bob': 'Document'}}
+	
+	def test_native_cast(self, Sample):
+		inst = Sample.from_mongo({'field': 'Bob'})
+		assert inst.field is Document
