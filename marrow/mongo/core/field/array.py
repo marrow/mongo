@@ -42,6 +42,9 @@ class Array(_HasKind, _CastingKind, Field):
 	def to_foreign(self, obj, name, value):
 		"""Transform to a MongoDB-safe value."""
 		
+		if value is None:
+			return None
+		
 		if isinstance(value, Iterable) and not isinstance(value, Mapping):
 			return self.List(super(Array, self).to_foreign(obj, name, i) for i in value)
 		
