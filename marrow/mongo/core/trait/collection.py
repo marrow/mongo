@@ -58,12 +58,6 @@ class Collection(Identified):
 	__validate__ = 'off'  # Control validation strictness: `off`, `strict`, or `moderate`. TODO: bool/None equiv.
 	__validator__ = None  # The MongoDB Validation document matching these records.
 	
-	UPDATE_MAPPING = {
-			'upsert': 'upsert',
-			'validate': '!bypass_document_validation',
-			'collation': 'collation',
-		}
-	
 	@classmethod
 	def __attributed__(cls):
 		"""Executed after each new subclass is constructed."""
@@ -241,7 +235,7 @@ class Collection(Identified):
 		collection = self.get_collection(kw.pop('source', None))
 		return collection.insert_one(self, **kw)
 	
-	def update_one(self, update=None, **kw):
+	def update_one(self, update=None, validate=True, **kw):
 		"""Update this document in the database. Local representations will not be affected.
 		
 		A single positional parameter, `update`, may be provided as a mapping. Keyword arguments (other than those
@@ -253,17 +247,6 @@ class Collection(Identified):
 		D = self.__class__
 		collection = self.get_collection(kw.pop('source', None))
 		
-		map = self.UPDATE_MAPPING
-		options = {}
-		
-		for opt in set(kw) & set(map):
-			target = map[opt]
-			
-			if target[0] == '!':
-				options[target[1:]] = not kw.pop(opt)
-			else:
-				options[target] = kw.pop(opt)
-		
 		update = Update(update or {})
 		
 		if kw:
@@ -272,7 +255,7 @@ class Collection(Identified):
 		if not update:
 			raise ValueError("Must provide an update operation.")
 		
-		return collection.update_one(D.id == self, update, **options)
+		return collection.update_one(D.id == self, update, bypass_document_validation=not validate)
 	
 	def delete_one(self, source=None, **kw):
 		"""Remove this document from the database, passing additional arguments through to PyMongo.
