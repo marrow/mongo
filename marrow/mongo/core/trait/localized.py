@@ -1,7 +1,7 @@
 # encoding: utf-8
 
 from ... import Document
-from ...field import String, Array, Embed, Alias
+from ...field import String, Mapping, Embed, Alias
 from ....package.loader import traverse
 from ....schema.compat import odict
 
@@ -38,8 +38,8 @@ class Translated(Alias):
 		collection = odict()
 		path = self.path[7:]
 		
-		for locale in obj.locale:
-			collection[locale.language] = traverse(locale, path)
+		for lang, locale in obj.locale.items():
+			collection[lang] = traverse(locale, path)
 		
 		return collection
 	
@@ -55,10 +55,10 @@ class Localized(Document):
 		
 		language = String(choices=LANGUAGES, default='en')
 	
-	locale = Array(Embed('.Locale'), default=lambda: [], assign=True, repr=False, positional=False)
+	locale = Mapping('.Locale', key='language', default=lambda: [], assign=True, repr=False, positional=False)
 	
 	def __repr__(self):
 		if self.locale:
-			return super(Localized, self).__repr__('{' + ', '.join(i.language for i in self.locale) + '}')
+			return super(Localized, self).__repr__('{' + ', '.join(self.locale) + '}')
 		
 		return super(Localized, self).__repr__()

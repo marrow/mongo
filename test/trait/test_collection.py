@@ -116,3 +116,9 @@ class TestDocumentBinding(object):
 				'ns': 'test.collection',
 				'sparse': False
 			}
+	
+	def test_update_empty(self, db, Sample):
+		Sample.bind(db).create_collection(drop=True)
+		
+		with pytest.raises(ValueError):
+			Sample().update_one()

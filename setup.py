@@ -32,6 +32,8 @@ tests_require = [
 		'pytest-flakes',  # syntax validation
 		'pytest-catchlog',  # log capture
 		'pytest-isort',  # import ordering
+		'misaka', 'pygments',  # Markdown field support
+		'futures; python_version < "3.4"',  # futures support
 	]
 
 
@@ -80,6 +82,7 @@ setup(
 		] if {'pytest', 'test', 'ptr'}.intersection(sys.argv) else [],
 	
 	install_requires = [
+			'uri>=2.0.0,<3.0.0',  # Generic URI datastructure.
 			'marrow.schema>=1.2.0,<2.0.0',  # Declarative schema support.
 			'marrow.package>=1.1.0,<2.0.0',  # Plugin discovery and loading.
 			'pymongo>=3.2',  # We require modern API.
@@ -88,14 +91,10 @@ setup(
 	
 	extras_require = dict(
 			decimal = ['pymongo>=3.4'],  # More modern version required for Decimal128 support.
-			development = tests_require + [
-					'pre-commit',  # Development-time dependencies.
-					'misaka', 'pygments',  # Markdown field support
-					'pytz', 'tzlocal>=1.4',  # timezone support, logger support
-				],
+			development = tests_require + ['pre-commit', 'bandit', 'pytz'],  # Development-time dependencies.
+			scripting = ['javascripthon<1.0'],  # Allow map/reduce functions and "stored functions" to be Python.
 			logger = ['tzlocal>=1.4'],  # Timezone support to store log times in UTC like a sane person.
 			markdown = ['misaka', 'pygments'],  # Markdown text storage.
-			scripting = ['javascripthon<1.0'],  # Allow map/reduce functions and "stored functions" to be Python.
 			timezone = ['pytz', 'tzlocal>=1.4'],  # Support for timezones.
 		),
 	
@@ -143,6 +142,7 @@ setup(
 						'TTL = marrow.mongo.core.field.ttl:TTL',
 						'Timestamp = marrow.mongo.core.field.timestamp:Timestamp',
 						'Translated = marrow.mongo.core.trait.localized:Translated',
+						'Mapping = marrow.mongo.core.field.mapping:Mapping',
 					],
 				'marrow.mongo.trait': [  # Document traits for use as mix-ins.
 						'Collection = marrow.mongo.core.trait.collection:Collection',
@@ -152,6 +152,7 @@ setup(
 						'Localized = marrow.mongo.core.trait.localized:Localized',
 						'Published = marrow.mongo.core.trait.published:Published',
 						'Queryable = marrow.mongo.core.trait.queryable:Queryable',
+						'Lockable = marrow.mongo.core.trait.lockable:Lockable',
 					],
 				# ### WebCore Extensions
 				'web.session': [  # Session Engine

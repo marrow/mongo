@@ -20,9 +20,9 @@ class PluginReference(Field):
 	defined) object assignments and literal paths will be allowed.
 	"""
 	
-	namespace = Attribute()  # The plugin namespace to use when loading.
+	namespace = Attribute(default=None)  # The plugin namespace to use when loading.
 	explicit = Attribute()  # Allow explicit, non-plugin references.
-	dynamic = Attribute(default=False)  # Allow variable replacements within the namespace name.
+	mapping = Attribute(default=None)  # To ease support for legacy records, textual replacements.
 	
 	__foreign__ = {'string'}
 	
@@ -33,27 +33,19 @@ class PluginReference(Field):
 		
 		super(PluginReference, self).__init__(*args, **kw)
 	
-	@property
-	def _namespace(self):
-		try:
-			namespace = self.namespace
-		except AttributeError:
-			namespace = None
-		else:
-			if self.dynamic and '${' in namespace:
-				namespace = namespace.format(self=obj, cls=cls, field=self)
-		
-		return namespace
-	
 	def to_native(self, obj, name, value):  # pylint:disable=unused-argument
 		"""Transform the MongoDB value into a Marrow Mongo value."""
 		
-		return load(value, self._namespace)
+		if self.mapping:
+			for original, new in self.mapping.items():
+				value = value.replace(original, new)
+		
+		return load(value, self.namespace)
 	
 	def to_foreign(self, obj, name, value):  # pylint:disable=unused-argument
 		"""Transform to a MongoDB-safe value."""
 		
-		namespace = self._namespace
+		namespace = self.namespace
 		
 		try:
 			explicit = self.explicit

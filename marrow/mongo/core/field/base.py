@@ -2,6 +2,7 @@
 
 from __future__ import unicode_literals
 
+from inspect import isclass
 from weakref import proxy
 
 from ....package.loader import traverse, load
@@ -261,7 +262,10 @@ class _CastingKind(Field):
 		
 		from marrow.mongo import Document
 		
-		kind = self._kind(obj.__class__)
+		if value is None:
+			return None
+		
+		kind = self._kind(obj if isclass(obj) else obj.__class__)
 		
 		if isinstance(value, Document):
 			if __debug__ and kind and issubclass(kind, Document) and not isinstance(value, kind):

@@ -6,9 +6,12 @@ from .array import Array
 
 
 class Set(Array):
-	class List(set):
-		"""Placeholder set shadow class to identify already-cast sets."""
+	List = list
+	
+	def to_native(self, obj, name, value):  # pylint:disable=unused-argument
+		result = super(Set, self).to_native(obj, name, value)
 		
-		@classmethod
-		def new(cls):
-			return cls()
+		if result is not None:
+			result = set(result)
+		
+		return result

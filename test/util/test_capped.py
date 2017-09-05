@@ -32,7 +32,7 @@ class Capped(Collection):
 
 @pytest.fixture
 def uncapped(request, connection):
-	db = connection.get_default_database()
+	db = connection.get_database()
 	request.addfinalizer(partial(db.drop_collection, Uncapped.__collection__))
 	
 	return Uncapped.create_collection(db, True)
@@ -40,7 +40,7 @@ def uncapped(request, connection):
 
 @pytest.fixture(autouse=True)
 def capped(request, connection):
-	db = connection.get_default_database()
+	db = connection.get_database()
 	
 	if tuple((int(i) for i in connection.server_info()['version'].split('.')[:3])) < (3, 2):
 		pytest.xfail("Test expected to fail on MongoDB versions prior to 3.2.")
@@ -54,7 +54,7 @@ _PRIORITY = (-2, -1, 0, 1, 2)
 
 
 def gen_log_entries(collection, count=1000):
-	collection.insert_one({'message': 'first'})  # To avoid immediate exit of the tail.ddddd
+	collection.insert_one({'message': 'first'})  # To avoid immediate exit of the tail.
 	
 	for i in range(count-2):
 		sleep(3.0/count)  # If we go too fast, the test might not be able to keep up.
@@ -66,7 +66,7 @@ def gen_log_entries(collection, count=1000):
 class TestCappedQueries(object):
 	def test_single(self, capped):
 		assert capped.count() == 0
-		result = capped.insert_one({'message': 'first'})
+		result = capped.insert_one({'message': 'first'}).inserted_id
 		assert capped.count() == 1
 		
 		first = next(tail(capped))
@@ -82,7 +82,7 @@ class TestCappedQueries(object):
 		
 		delta = time() - start
 		assert len(result) == capped.count()
-		assert 0.4 < delta < 0.6
+		assert 0.25 < delta < 0.75
 	
 	def test_capped_trap(self, uncapped):
 		with pytest.raises(TypeError):

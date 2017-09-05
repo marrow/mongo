@@ -7,7 +7,7 @@ from .base import _HasKind, _CastingKind, Field
 
 class Embed(_HasKind, _CastingKind, Field):
 	__foreign__ = 'object'
-	__allowed_operators__ = {'#document'}
+	__allowed_operators__ = {'#document', '$eq', '#rel'}
 	
 	def __init__(self, *args, **kw):
 		if args:

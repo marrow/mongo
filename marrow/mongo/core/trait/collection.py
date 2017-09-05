@@ -11,6 +11,7 @@ from pymongo.read_concern import ReadConcern
 from pymongo.read_preferences import ReadPreference
 from pymongo.write_concern import WriteConcern
 
+from ... import U, Update
 from ...trait import Identified
 
 
@@ -219,3 +220,48 @@ class Collection(Identified):
 			projected = neutral
 		
 		return {field: True for field in projected}
+	
+	def insert_one(self, validate=True):
+		"""Insert this document.
+		
+		The `validate` argument translates to the inverse of the `bypass_document_validation` PyMongo option.
+		
+		https://api.mongodb.com/python/current/api/pymongo/collection.html#pymongo.collection.Collection.insert_one
+		"""
+		
+		kw = {}
+		kw['bypass_document_validation'] = not validate
+		
+		collection = self.get_collection(kw.pop('source', None))
+		return collection.insert_one(self, **kw)
+	
+	def update_one(self, update=None, validate=True, **kw):
+		"""Update this document in the database. Local representations will not be affected.
+		
+		A single positional parameter, `update`, may be provided as a mapping. Keyword arguments (other than those
+		identified in UPDATE_MAPPING) are interpreted as parametric updates, added to any `update` passed in.
+		
+		https://api.mongodb.com/python/current/api/pymongo/collection.html#pymongo.collection.Collection.update_one
+		"""
+		
+		D = self.__class__
+		collection = self.get_collection(kw.pop('source', None))
+		
+		update = Update(update or {})
+		
+		if kw:
+			update &= U(D, **kw)
+		
+		if not update:
+			raise ValueError("Must provide an update operation.")
+		
+		return collection.update_one(D.id == self, update, bypass_document_validation=not validate)
+	
+	def delete_one(self, source=None, **kw):
+		"""Remove this document from the database, passing additional arguments through to PyMongo.
+		
+		https://api.mongodb.com/python/current/api/pymongo/collection.html#pymongo.collection.Collection.delete_one
+		"""
+		
+		collection = self.get_collection(source)
+		return collection.delete_one(self.__class__.id == self, **kw)

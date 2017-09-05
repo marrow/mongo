@@ -2,13 +2,15 @@
 
 from __future__ import unicode_literals
 
-from ... import Field
+from collections import Iterable, Mapping
+
+from ... import Document, Field
 from .base import _HasKind, _CastingKind
 
 
 class Array(_HasKind, _CastingKind, Field):
 	__foreign__ = 'array'
-	__allowed_operators__ = {'#array', '$elemMatch', '$eq'}
+	__allowed_operators__ = {'#array', '$elemMatch', '#rel', '$eq'}
 	
 	class List(list):
 		"""Placeholder list shadow class to identify already-cast arrays."""
@@ -37,4 +39,7 @@ class Array(_HasKind, _CastingKind, Field):
 	def to_foreign(self, obj, name, value):
 		"""Transform to a MongoDB-safe value."""
 		
-		return self.List(super(Array, self).to_foreign(obj, name, i) for i in value)
+		if isinstance(value, Iterable) and not isinstance(value, Mapping):
+			return self.List(super(Array, self).to_foreign(obj, name, i) for i in value)
+		
+		return super(Array, self).to_foreign(obj, name, value)

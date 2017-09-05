@@ -35,7 +35,7 @@ class TestObjectIdField(FieldExam):
 		assert inst.__data__['field'] is v
 	
 	def test_cast_datetime(self, Sample):
-		v = utcnow().replace(microsecond=0)
+		v = utcnow()
 		inst = Sample(v)
 		
 		assert isinstance(inst.__data__['field'], oid)
@@ -43,7 +43,7 @@ class TestObjectIdField(FieldExam):
 	
 	def test_cast_timedelta(self, Sample):
 		v = -timedelta(days=7)
-		r = (utcnow() + v).replace(microsecond=0)
+		r = (utcnow() + v)
 		inst = Sample(v)
 		
 		assert isinstance(inst.__data__['field'], oid)

@@ -68,7 +68,7 @@ class Registry(object):
 
 def utcnow():
 	"""Return the current time in UTC, with timezone information applied."""
-	return datetime.utcnow().replace(tzinfo=utc)
+	return datetime.utcnow().replace(microsecond=0, tzinfo=utc)
 
 
 def datetime_period(base=None, hours=None, minutes=None, seconds=None):

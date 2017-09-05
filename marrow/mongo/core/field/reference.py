@@ -110,7 +110,7 @@ class Reference(_HasKind, Field):
 			if isinstance(value, Document) and value.__collection__:
 				return DBRef(value.__collection__, identifier)
 			
-			if kind and kind.__collection__:
+			if getattr(kind, '__collection__', None):
 				return DBRef(kind.__collection__, identifier)
 			
 			raise ValueError("Could not infer collection name.")

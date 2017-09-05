@@ -35,6 +35,7 @@ class Queryable(Collection):
 			'no_cursor_timeout',
 			'oplog_replay',
 			'tail',
+			'wait',
 		}
 	
 	FIND_MAPPING = {
@@ -122,14 +123,17 @@ class Queryable(Collection):
 				**kw
 			)
 		
-		if 'cursor_type' in options and {'tail', 'await'} & set(options):
-			raise TypeError("Can not combine cursor_type and tail/await arguments.")
+		if 'await' in options:
+			raise TypeError("Await is hard-deprecated as reserved keyword in Python 3.7, use wait instead.")
+		
+		if 'cursor_type' in options and {'tail', 'wait'} & set(options):
+			raise TypeError("Can not combine cursor_type and tail/wait arguments.")
 		
 		elif options.pop('tail', False):
-			options['cursor_type'] = CursorType.TAILABLE_AWAIT if options.pop('await', True) else CursorType.TAILABLE
+			options['cursor_type'] = CursorType.TAILABLE_AWAIT if options.pop('wait', True) else CursorType.TAILABLE
 		
-		elif 'await' in options:
-			raise TypeError("Await option only applies to tailing cursors.")
+		elif 'wait' in options:
+			raise TypeError("Wait option only applies to tailing cursors.")
 		
 		modifiers = options.get('modifiers', dict())
 		
@@ -279,14 +283,6 @@ class Queryable(Collection):
 		
 		return self
 	
-	def insert_one(self, **kw):
-		"""Insert this document, passing any additional arguments to PyMongo.
-		
-		https://api.mongodb.com/python/current/api/pymongo/collection.html#pymongo.collection.Collection.insert_one
-		"""
-		
-		collection = self.get_collection(kw.pop('source', None))
-		return collection.insert_one(self, **kw)
 	
 	# https://api.mongodb.com/python/current/api/pymongo/collection.html#pymongo.collection.Collection.insert_many
 	
