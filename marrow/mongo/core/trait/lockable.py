@@ -176,20 +176,17 @@ class Lockable(Queryable):
 				log.debug("Expired stale lock on {!r}.".format(document, expires.isoformat()), extra={
 					'agent': self.instance, 'expires': expires, 'mutex': reference})
 	
-	def wait(self, timeout, since=None):
+	def wait(self, timeout):
 		D = self.Queue
 		collection = D.get_collection()
-		since = (since or utcnow()) - timedelta(seconds=5)
 		
 		expect = DBRef(self.__collection__, self.id)
 		
-		for event in tail(collection, D.id > since, timeout=timeout, aggregate=True):
-			event = D.from_mongo(event)
-			
-			if tuple(event.__data__) == ('_id', ) or event.mutex != expect:
+		for event in tail(collection, {}, timeout=timeout, aggregate=True):
+			if ~D.mutex not in event or event[~D.mutex] != expect:
 				continue
 			
-			if event.event == 'released':
+			if event[~D.event] == 'released':
 				break
 		
 		else:
@@ -224,7 +221,7 @@ class Lockable(Queryable):
 		if previous is None:
 			if timeout:
 				try:
-					self.wait(timeout, identity.time)
+					self.wait(timeout)
 				except TimeoutError:
 					pass
 				
