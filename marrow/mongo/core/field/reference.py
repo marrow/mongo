@@ -113,9 +113,6 @@ class Reference(_HasKind, Field):
 			if getattr(kind, '__collection__', None):
 				return DBRef(kind.__collection__, identifier)
 			
-			if getattr(obj, '__collection__', None):
-				return DBRef(obj.__collection__, identifier)
-			
 			raise ValueError("Could not infer collection name.")
 		
 		return identifier
