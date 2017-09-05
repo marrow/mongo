@@ -25,10 +25,11 @@ except:
 
 
 # We default to the same algorithm PyMongo uses to generate hardware and process ID portions of ObjectIds.
-_identifier = getenv('INSTANCE_ID', '{:06x}{:04x}'.format(
-		int(hexlify(OID._machine_bytes), 16),
-		getpid() % 0xFFFF,
-	))
+def _identifier():
+	return getenv('INSTANCE_ID', '{:06x}{:04x}'.format(
+			int(hexlify(OID._machine_bytes), 16),
+			getpid() % 0xFFFF,
+		))
 
 
 class Lockable(Queryable):
@@ -178,16 +179,14 @@ class Lockable(Queryable):
 	def wait(self, timeout, since=None):
 		D = self.Queue
 		collection = D.get_collection()
-		since = since or utcnow()
+		since = (since or utcnow()) - timedelta(seconds=5)
 		
-		#filter = D.mutex == self
-		#filter &= D.id > since
-		filter = None
+		expect = DBRef(self.__collection__, self.id)
 		
-		for event in tail(collection, filter, timeout=timeout, aggregate=True):
+		for event in tail(collection, D.id > since, timeout=timeout, aggregate=True):
 			event = D.from_mongo(event)
 			
-			if tuple(event.__data__) == ('_id', ) or event.mutex != self:
+			if tuple(event.__data__) == ('_id', ) or event.mutex != expect:
 				continue
 			
 			if event.event == 'released':

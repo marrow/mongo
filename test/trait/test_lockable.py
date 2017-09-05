@@ -3,6 +3,7 @@
 from __future__ import unicode_literals
 
 import os
+from concurrent.futures import ProcessPoolExecutor
 from datetime import timedelta
 from time import sleep, time
 
@@ -84,7 +85,7 @@ class TestSimpleLockable(object):
 		
 		sample.reload('lock')
 		
-		assert lock.instance is us
+		assert lock.instance == us()
 		assert sample.lock == lock
 	
 	def test_acquire_removed(self, sample):
@@ -103,7 +104,7 @@ class TestSimpleLockable(object):
 		sample.acquire()
 		sample.reload('lock')
 		
-		assert sample.lock.instance == us
+		assert sample.lock.instance == us()
 		assert sample.did_expire
 	
 	def test_acquire_twice(self, sample):
@@ -137,7 +138,7 @@ class TestSimpleLockable(object):
 			lock2 = sample.prolong()
 		
 		assert lock.time < lock2.time
-		assert lock.instance is lock2.instance is us
+		assert lock.instance == lock2.instance == us()
 	
 	def test_prolong_expired(self, sample):
 		then = utcnow() - timedelta(days=30)
@@ -205,7 +206,7 @@ class TestSimpleLockable(object):
 	
 	def test_release_expired(self, sample):
 		then = utcnow() - timedelta(days=30)
-		lock = sample.Lock(then, us)
+		lock = sample.Lock(then)
 		sample.update_one(set__lock=lock)
 		
 		try:
@@ -231,6 +232,19 @@ class TestSimpleLockable(object):
 			sample.update_one(set__lock=sample.Lock(instance='xyzzy'))
 
 
+def worker(cls, id):
+	from pymongo import MongoClient
+	from marrow.mongo.core.trait.lockable import _identifier as ustoo
+	
+	db = MongoClient("mongodb://localhost/test").get_database()
+	cls.bind(db)
+	cls.Queue.bind(db)
+	inst = cls.find_one(id)
+	inst.acquire()
+	sleep(5)
+	inst.release()
+
+
 @skip_slow
 class TestAwaitableLockable(TestSimpleLockable):
 	class Sample(TestSimpleLockable.Sample):
@@ -250,7 +264,21 @@ class TestAwaitableLockable(TestSimpleLockable):
 		assert 2.5 < delta < 7.5
 	
 	def test_acquire_wait(self, sample):
-		pass
+		with ProcessPoolExecutor() as executor:
+			executor.submit(worker, self.Sample, sample.id)
+			start = time()
+			sleep(0.5)
+			
+			sample.reload('lock')
+			assert sample.lock.instance != us()
+			
+			lock = sample.acquire(10)
+			
+			end = time()
+			delta = end - start
+			
+			assert lock.instance == us()
+			assert 2.5 < delta < 7.5
 	
 	def test_acquire_timeout(self, sample):
 		sample.update_one(set__lock=sample.Lock(instance='xyzzy'))
