@@ -33,6 +33,7 @@ tests_require = [
 		'pytest-catchlog',  # log capture
 		'pytest-isort',  # import ordering
 		'misaka', 'pygments',  # Markdown field support
+		'futures; python_version < "3.4"',  # futures support
 	]
 
 
