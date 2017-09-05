@@ -60,9 +60,13 @@ class TestQueryableCore(object):
 		cls, collection, query, options = Sample._prepare_find(tail=True)
 		assert options['cursor_type'] == CursorType.TAILABLE_AWAIT
 	
-	def test_prepare_find_cursor_type_tail_not_await(self, Sample):
+	def test_prepare_find_cursor_type_tail_not_wait(self, Sample):
 		cls, collection, query, options = Sample._prepare_find(tail=True, wait=False)
 		assert options['cursor_type'] == CursorType.TAILABLE
+	
+	def test_prepare_find_cursor_type_tail_await_error(self, Sample):
+		with pytest.raises(TypeError):
+			cls, collection, query, options = Sample._prepare_find(tail=True, await=False)
 	
 	def test_prepare_find_cursor_type_await_conflict(self, Sample):
 		with pytest.raises(TypeError):
