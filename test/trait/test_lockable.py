@@ -3,6 +3,7 @@
 from __future__ import unicode_literals
 
 import os
+import sys
 from concurrent.futures import ProcessPoolExecutor
 from datetime import timedelta
 from time import sleep, time
@@ -263,6 +264,7 @@ class TestAwaitableLockable(TestSimpleLockable):
 		
 		assert 2.5 < delta < 7.5
 	
+	@pytest.mark.skipif(sys.version_info < (3, 5), reason="Potential race condition.")
 	def test_acquire_wait(self, sample):
 		with ProcessPoolExecutor() as executor:
 			executor.submit(worker, self.Sample, sample.id)
