@@ -41,13 +41,12 @@ class Alias(Attribute):
 	
 	def __get__(self, obj, cls=None):
 		if self.deprecate:
-			name = [n for n, field in obj.__fields__.iteritems() if field is self][0]  # XXX: Possibly unneeded?
-			message = "Retrieval of " + self.path + " via " + name + " (" + self.__name__ + ") is deprecated."
+			message = "Retrieval of " + self.path + " via " + self.__name__ + ") is deprecated."
 			
 			if not isinstance(self.deprecate, bool):
 				message += "\n" + str(self.deprecate)
 			
-			warn(message, stacklevel=2)
+			warn(message, DeprecationWarning, stacklevel=2)
 		
 		if obj is None:
 			return traverse(self.__document__, self.path)
@@ -56,13 +55,12 @@ class Alias(Attribute):
 	
 	def __set__(self, obj, value):
 		if self.deprecate:
-			name = [n for n, field in obj.__fields__.iteritems() if field is self][0]  # XXX: Possibly unneeded?
-			message = "Assignment of " + self.path + " via " + name + " (" + self.__name__ + ") is deprecated."
+			message = "Assignment of " + self.path + " via " + self.__name__ + " is deprecated."
 			
 			if not isinstance(self.deprecate, bool):
 				message += "\n" + str(self.deprecate)
 			
-			warn(message, stacklevel=2)
+			warn(message, DeprecationWarning, stacklevel=2)
 		
 		parts = self.path.split('.')
 		final = parts.pop()
