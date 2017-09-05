@@ -71,7 +71,7 @@ class TestCappedQueries(object):
 		
 		first = next(tail(capped))
 		assert first['message'] == 'first'
-		assert first['_id'] == result
+		assert first['_id'] == result.inserted_id
 	
 	def test_basic_timeout(self, capped):
 		capped.insert_one({'message': 'first'})

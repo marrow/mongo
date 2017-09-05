@@ -91,10 +91,11 @@ setup(
 	
 	extras_require = dict(
 			decimal = ['pymongo>=3.4'],  # More modern version required for Decimal128 support.
-			development = tests_require + ['pre-commit', 'bandit'],  # Development-time dependencies.
+			development = tests_require + ['pre-commit', 'bandit', 'pytz'],  # Development-time dependencies.
 			scripting = ['javascripthon<1.0'],  # Allow map/reduce functions and "stored functions" to be Python.
-			logger = ['tzlocal'],  # Timezone support to store log times in UTC like a sane person.
+			logger = ['tzlocal>=1.4'],  # Timezone support to store log times in UTC like a sane person.
 			markdown = ['misaka', 'pygments'],  # Markdown text storage.
+			timezone = ['pytz', 'tzlocal>=1.4'],  # Support for timezones.
 		),
 	
 	tests_require = tests_require,
