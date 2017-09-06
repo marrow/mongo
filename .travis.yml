@@ -38,7 +38,7 @@ install:
   - 'test -n "${NO_PYTZ}" && pip uninstall --yes pytz tzlocal || true'
 
 script:
-    python setup.py test
+    pytest
 
 after_script:
     bash <(curl -s https://codecov.io/bash)
