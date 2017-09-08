@@ -81,21 +81,11 @@ Finally there is an array of free-form string tags. This is a complex field whos
 ```
 {% endmethod %}
 {% method -%}
-{% sample lang="python" -%}
-```python
-```
-{% endmethod %}
-{% method -%}
 Lastly we define a unique index on the username to speed up any queries involving that field, and to enforce uniqueness. Because MongoDB's index capabilities are quite expressive, we do not define index features on fields themselves. It is generally a good idea to underscore-prefix non-field attributes. This helps keep fields distinct from non-fields in a visual way and implies they are "protected" or "private" as is customary in Python, though not enforced.
 {% sample lang="python" -%}
 ```python
 	
 	_username = Index('username', unique=True)
-```
-{% endmethod %}
-{% method -%}
-{% sample lang="python" -%}
-```python
 ```
 {% endmethod %}
 
