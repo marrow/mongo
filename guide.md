@@ -99,7 +99,7 @@ Now that we have a document defined we can move on to exploring how to interact 
 
 ## Collection Management
 
-`Document` subclasses utilizing the `Collection` trait (which `Queryable` inherits) gain class-level _active record_ behaviours. Additionally, `Collection` inherits `Identified` as well, providing an automatically generated ObjectId field named `id` which maps to the stored `_id` key. There is a fairly substantial number of collection metadata and calculated properties available.
+`Document` subclasses utilizing the `Collection` trait (which `Queryable` inherits) gain class-level _active record_ behaviours. Additionally, `Collection` inherits `Identified` as well, providing an automatically generated ObjectId field named `id` which maps to the stored `_id` key. There is a fairly substantial number of [collection metadata and calculated properties](reference/trait/collection.md#metadata) available.
 
 
 
