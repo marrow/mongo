@@ -3,18 +3,16 @@
 * [Introduction](README.md)
 * [Installation](installation.md)
 * [Contributing](contributing.md)
-* [History](history.md)
 
 ## Guide
 
-* [Defining Document Models](guide/documents.md)
-* [Working with Instances](guide/instances.md)
-* [Fields](guide/fields.md)
-* [Traits](guide/trait/README.md)
-* [Indexes](guide/indexes.md)
-* [Querying](guide/querying.md)
-* [Plugin Namespaces](guide/plugins.md)
-* [Geospatial](guide/geospatial.md)
+* [Introduction](guide.md#introduction)
+* [Modelling](guide.md#document-modelling)
+* [Interaction](guide.md#document-interaction)
+* [Fields](guide.md#fields)
+* [Indexes](guide.md#indexes)
+* [Trait Mix-Ins](guide.md#trait-mix-ins)
+* [Plugin Namespaces](guide.md#plugin-namespaces)
 
 ## Reference
 
@@ -60,3 +58,4 @@
 
 * [Colophon](colophon.md)
 * [License](license.md)
+* [History](history.md)
