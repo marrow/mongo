@@ -13,7 +13,6 @@
 * [Traits](guide/trait/README.md)
 * [Indexes](guide/indexes.md)
 * [Querying](guide/querying.md)
-* [Parametric Helpers](guide/parametric.md)
 * [Plugin Namespaces](guide/plugins.md)
 * [Geospatial](guide/geospatial.md)
 

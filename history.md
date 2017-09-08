@@ -1,11 +1,8 @@
-# Version History
-
-**Latest:** [![version](https://img.shields.io/pypi/v/marrow.mongo.svg?style=flat "Latest version.")](https://pypi.python.org/pypi/marrow.mongo)
-[![tag](https://img.shields.io/github/tag/marrow/mongo.svg "Latest tag.")](https://github.com/marrow/mongo/releases/latest)  
+## Release History
 
 <!-- timeline -->
 
-## 1.1.1 [_Refinement Release_](https://github.com/marrow/mongo/releases/tag/1.1.1)
+### 1.1.1 [_Refinement Release_](https://github.com/marrow/mongo/releases/tag/1.1.1)
 
 `2017-05-17` **Mirthra**
 
@@ -51,7 +48,7 @@ Traits are new, see #26, including:
 <!-- /timeline -->
 <!-- timeline -->
 
-## 1.1.0 [_Feature Release_](https://github.com/marrow/mongo/releases/tag/1.1.0)
+### 1.1.0 [_Feature Release_](https://github.com/marrow/mongo/releases/tag/1.1.0)
 
 `2016-11-27` **Oranir**
 
@@ -113,7 +110,7 @@ Traits are new, see #26, including:
 <!-- /timeline -->
 <!-- timeline -->
 
-## 1.0.0 [_Initial Release_](https://github.com/marrow/mongo/releases/tag/1.0.0)
+### 1.0.0 [_Initial Release_](https://github.com/marrow/mongo/releases/tag/1.0.0)
 
 `2016-11-21` **Turmiel**
 
