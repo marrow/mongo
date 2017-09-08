@@ -7,7 +7,7 @@
 
 ## [_Refinement Release_](https://github.com/marrow/mongo/releases/tag/1.1.1) 1.1.1
 
-** ** `2017-05-17`
+`2017-05-17` **Mirthra**
 
 __Please note that due to Pypi stupidity, version `1.1.1.1` there is actually `1.1.1`.__
 
@@ -54,7 +54,7 @@ Traits are new, see #26, including:
 
 ## [_Feature Release_](https://github.com/marrow/mongo/releases/tag/1.1.0) 1.1.0
 
-** ** `2016-11-27`
+`2016-11-27` **Oranir**
 
 - Add Landscape.io integration.
 - Improve overall code health. [#14](https://github.com/marrow/mongo/issues/14)
@@ -118,7 +118,7 @@ Traits are new, see #26, including:
 
 ## [_Initial Release_](https://github.com/marrow/mongo/releases/tag/1.0.0) 1.0.0
 
-** ** `2016-11-21`
+`2016-11-21` **Turmiel**
 
 * Initial release of basic field mapping functionality.
 
