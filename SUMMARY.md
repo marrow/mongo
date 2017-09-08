@@ -21,7 +21,7 @@
 * [Index](reference/index.md)
 * ---
 * Fields
-  * Simple
+  * ### Simple
   * [Binary](reference/field/binary.md)
   * [Boolean](reference/field/boolean.md)
   * [Date](reference/field/date.md)
@@ -35,11 +35,12 @@
   * [Set](reference/field/set.md)
   * [String](reference/field/string.md)
   * [Timestamp](reference/field/timestamp.md)
-  * Complex
+  * <h3>Complex</h3>
   * [Array](reference/field/array.md)
   * [Embed](reference/field/embed.md)
   * [Mapping](reference/field/mapping.md)
-  * Complicated
+
+### Complicated
   * [Alias](reference/field/alias.md)
   * [Link](reference/field/link.md)
   * [Markdown](reference/field/markdown.md)
