@@ -21,33 +21,30 @@
 * [Index](reference/index.md)
 * ---
 * Fields
-  * Simple
-    * [Binary](reference/field/binary.md)
-    * [Boolean](reference/field/boolean.md)
-    * [Date](reference/field/date.md)
-    * [Decimal](reference/field/decimal.md)
-    * [Double](reference/field/double.md)
-    * [Integer](reference/field/integer.md)
-    * [Long](reference/field/long.md)
-    * [Number](reference/field/number.md)
-    * [ObjectId](reference/field/objectid.md)
-    * [Regex](reference/field/regex.md)
-    * [Set](reference/field/set.md)
-    * [String](reference/field/string.md)
-    * [Timestamp](reference/field/timestamp.md)
-  * Complex
-    * [Array](reference/field/array.md)
-    * [Embed](reference/field/embed.md)
-    * [Mapping](reference/field/mapping.md)
-  * Complicated
-    * [Alias](reference/field/alias.md)
-    * [Link](reference/field/link.md)
-    * [Markdown](reference/field/markdown.md)
-    * [Path](reference/field/path.md)
-    * [Period](reference/field/period.md)
-    * [Plugin](reference/field/plugin.md)
-    * [Reference](reference/field/reference.md)
-    * [TTL](reference/field/ttl.md)
+  * [Alias](reference/field/alias.md) `Complicated`
+  * [Array](reference/field/array.md) `Complex`
+  * [Binary](reference/field/binary.md) `Simple`
+  * [Boolean](reference/field/boolean.md) `Simple`
+  * [Date](reference/field/date.md) `Simple`
+  * [Decimal](reference/field/decimal.md) `Simple`
+  * [Double](reference/field/double.md) `Simple`
+  * [Embed](reference/field/embed.md) `Complex`
+  * [Integer](reference/field/integer.md) `Simple`
+  * [Link](reference/field/link.md) `Complicated`
+  * [Long](reference/field/long.md) `Simple`
+  * [Mapping](reference/field/mapping.md) `Complex`
+  * [Markdown](reference/field/markdown.md) `Complicated`
+  * [Number](reference/field/number.md) `Simple`
+  * [ObjectId](reference/field/objectid.md) `Simple`
+  * [Path](reference/field/path.md) `Complicated`
+  * [Period](reference/field/period.md) `Complicated`
+  * [Plugin](reference/field/plugin.md) `Complicated`
+  * [Reference](reference/field/reference.md) `Complicated`
+  * [Regex](reference/field/regex.md) `Simple`
+  * [Set](reference/field/set.md) `Simple`
+  * [String](reference/field/string.md) `Simple`
+  * [TTL](reference/field/ttl.md) `Complicated`
+  * [Timestamp](reference/field/timestamp.md) `Simple`
 * Parametric
   * [F \(Filter\)](reference/parametric.md#filtering)
   * [P \(Project\)](reference/parametric.md#projection)
