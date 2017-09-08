@@ -31,15 +31,20 @@
 }
 
 .markdown-section h1 {
-	text-align: center;
 	font-weight: 100;
 	margin-bottom: 30px;
 	font-size: 2.25em;
 }
 
+.markdown-section h1#the-marrow-mongo-document-mapper {
+	text-align: center;
+}
+
+/*
 .markdown-section h1:not(#the-marrow-mongo-document-mapper) {
 	display: none;
 }
+*/
 
 .markdown-section h1 strong {
 	font-weight: 300;
