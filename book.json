@@ -11,7 +11,9 @@
 		"book-summary-scroll-position-saver",
 		"wide-page",
 		"theme-api",
-		"timeline"
+		"timeline",
+		"marginal",
+		"betterpagetitles"
 	],
 	"pluginsConfig": {
 		"editlink": {

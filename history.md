@@ -5,7 +5,7 @@
 
 <!-- timeline -->
 
-## [_Refinement Release_](https://github.com/marrow/mongo/releases/tag/1.1.1) 1.1.1
+## 1.1.1 [_Refinement Release_](https://github.com/marrow/mongo/releases/tag/1.1.1)
 
 `2017-05-17` **Mirthra**
 
@@ -49,10 +49,9 @@ Traits are new, see #26, including:
 * `Queryable` — Encapsulation of collection-level record management.  (**Not** an Active Record pattern.)
 
 <!-- /timeline -->
-
 <!-- timeline -->
 
-## [_Feature Release_](https://github.com/marrow/mongo/releases/tag/1.1.0) 1.1.0
+## 1.1.0 [_Feature Release_](https://github.com/marrow/mongo/releases/tag/1.1.0)
 
 `2016-11-27` **Oranir**
 
@@ -111,12 +110,10 @@ Traits are new, see #26, including:
     - `__engine__` - override storage engine options
     - `__validate__` - one of 'off' (the default), 'strict', or 'moderate'.
 
-
 <!-- /timeline -->
-
 <!-- timeline -->
 
-## [_Initial Release_](https://github.com/marrow/mongo/releases/tag/1.0.0) 1.0.0
+## 1.0.0 [_Initial Release_](https://github.com/marrow/mongo/releases/tag/1.0.0)
 
 `2016-11-21` **Turmiel**
 
