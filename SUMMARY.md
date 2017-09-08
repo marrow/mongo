@@ -51,8 +51,8 @@
   * [S \(Sort\)](reference/parametric.md#sorting)
   * [U \(Update\)](reference/parametric.md#updates)
 * Query
-  * [Ops](api/query/ops.md)
-  * [Q](api/query/query.md)
+  * [Ops](reference/query/ops.md)
+  * [Q](reference/query/q.md)
 * Traits
   * [Collection](reference/trait/collection.md)
   * [Derived](reference/trait/derived.md)
