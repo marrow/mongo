@@ -74,7 +74,7 @@ We technically allow storage of any numeric value, either integer or floating po
 ```
 {% endmethod %}
 {% method -%}
-Finally there is an array of free-form string tags. This is a complex field whose first argument is the type of value it contains and defaults to an empty version of the complex type it represents if assignment is enabled to eliminate the need for boilerplate code.
+The last field we will define is an array of free-form string tags. This is a complex field whose first argument is the type of value it contains and defaults to an empty version of the complex type it represents if assignment is enabled to eliminate the need for boilerplate code.
 {% sample lang="python" -%}
 ```python
 	tag = Array(String(), assign=True)
@@ -90,3 +90,8 @@ Lastly we define a unique index on the username to speed up any queries involvin
 {% endmethod %}
 
 Now that we have a document defined we can move on to [exploring how to interact with them](instances.md).
+
+
+## See Also
+
+* 
