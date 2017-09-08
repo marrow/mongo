@@ -8,6 +8,7 @@
 
 * [Introduction](guide.md#introduction)
 * [Modelling](guide.md#document-modelling)
+* [Management](guide.md#collection-management)
 * [Interaction](guide.md#document-interaction)
 * [Fields](guide.md#fields)
 * [Indexes](guide.md#indexes)

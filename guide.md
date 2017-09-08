@@ -19,9 +19,9 @@ Within this guide fields are broadly organized into three categories:
 
 ## Document Modelling
 
-The `Document` class heirarchy is organized to structure both data and the code manipulating it into clearly defined problems, with composable components focused on the principle of least concern. As such, the base class assumes very little; by itself it is a [`MutableMapping`](https://docs.python.org/3/library/collections.abc.html?highlight=abc#collections.abc.MutableMapping) abstract base class-compatible ordered dictionary proxy or wrapper, usable anywhere a mapping is usable.
+The `Document` class heirarchy is organized to structure both data and the code manipulating it into clearly defined problems, with composable components focused on the principle of least concern. As such, the base class assumes very little; by itself it is a [`MutableMapping`](https://docs.python.org/3/library/collections.abc.html?highlight=abc#collections.abc.MutableMapping) abstract base class-compatible ordered dictionary proxy or wrapper, usable anywhere a mapping is usable. A notable difference is that the constructor only accepts arguments which have discrete fields associated with them.
 
-There is no need for a specialized "dynamic" variant. Similarly, we have the philosophy that all documents are embeddable. Top-level documents in a collection, which expect an identifier, utilize the specialization—_trait_—`Identified`. 
+There is no need for a specialized "dynamic" variant. Similarly, we have the philosophy that all documents are embeddable. Top-level documents in a collection, which expect an identifier, should utilize the specialization—_trait_—`Identified`.
 
 {% method -%}
 Begin by importing various components from the `marrow.mongo` package or one of the namespace packages for fields and traits, respectively.
@@ -95,6 +95,13 @@ Lastly we define a unique index on the username to speed up any queries involvin
 {% endmethod %}
 
 Now that we have a document defined we can move on to exploring how to interact with them.
+
+
+## Collection Management
+
+`Document` subclasses utilizing the `Collection` trait (which `Queryable` inherits) gain class-level _active record_ behaviours. Additionally, `Collection` inherits `Identified` as well, providing an automatically generated ObjectId field named `id` which maps to the stored `_id` key. There is a fairly substantial number of collection metadata and calculated properties available.
+
+
 
 
 ## Document Interaction
