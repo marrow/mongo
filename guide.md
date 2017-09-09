@@ -461,10 +461,6 @@ MyDocument.foo.is_writeable() == False
 Virtually identical to the read and write access permissions, the `sort` predicate follows the same rules and provides an `is_sortable(context=None)` evaluation method.
 
 
-
-
-
-
 ## Indexes
 
 
