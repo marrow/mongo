@@ -101,7 +101,36 @@ Now that we have a document defined we can move on to exploring how to interact 
 
 `Document` subclasses utilizing the `Collection` trait (which `Queryable` inherits) gain class-level _active record_ behaviours. Additionally, `Collection` inherits `Identified` as well, providing an automatically generated ObjectId field named `id` which maps to the stored `_id` key. There is a fairly substantial number of [collection metadata and calculated properties](reference/trait/collection.md#metadata) available.
 
-
+{% method -%}
+Before much can be done, it will be necessary to get a reference to a MongoDB connection or database object. Begin by importing the client object from the `pymongo` package.
+{% sample lang="python" -%}
+```python
+from pymongo import MongoClient
+```
+{% endmethod %}
+{% method -%}
+Then, open a connection to a MongoDB server, here, running locally. We can save some space by defining the database to utilize at the same time, and requesting a handle to the default database back without needing to refer to it by name a second time.
+{% sample lang="python" -%}
+```python
+client = MongoClient('mongodb://localhost/test')
+db = client.get_database()
+```
+{% endmethod %}
+{% method -%}
+Binding our `Account` class to a database will automatically look up the collection name to use. Alternatively you could bind directly to a specific collection. Either way, binding will automatically apply the metadata options for data access and validation and enable the `get_collection` method to provide you the correct, configured object.
+{% sample lang="python" -%}
+```python
+Account.bind(db)
+```
+{% endmethod %}
+{% method -%}
+Two class methods are provided for collection management requiring awareness of our metadata: `create_collection` and `create_indexes`. Creating the collection will create any declared indexes automatically by default. For other collection-level management operations it is recommended to utilize `get_collection` and issue calls to the PyMongo API directly.
+{% sample lang="python" -%}
+```python
+Account.create_collection()
+```
+{% endmethod %}
+{% method -%}
 
 
 ## Document Interaction
@@ -134,8 +163,6 @@ assert result.acknowledged and result.inserted_id == alice.id
 Yup, that's it. Instances of `Document` are directly usable in place of a dictionary argument to `pymongo` methods. We then validate that the document we wanted inserted was, in fact, inserted. Using an assertion in this way, this validation will not be run in production code executed with the `-O` option passed (or `PYTHONOPTIMIZE` environment variable set) in the invocation to Python.
 
 
-## Querying and Management
-
 Given the `Account` model defined in above, a PyMongo collection object, and a record stored in the database we can retrieve it back out and get the result as an ``Account`` instance:
 
 {% method -%}
@@ -153,6 +180,38 @@ print(record.name) # Alice Bevan-McGregor
 You can use standard Python comparison operators, bitwise operators, and several additional querying methods through class-level access to the defined fields. The result of one of these operations or method calls is a dictionary-like object that is the query. They may be combined through bitwise and (`&`) and bitwise or (`|`) operations. Due to Python's order of operations individual field comparisons must be wrapped in parenthesis if combining.
 
 Combining produces a new `Ops` instance; it is possible to use these to pre-construct parts of queries for later use. It can save time (and visual clutter) to assign the document class to a short, single-character variable name to make repeated reference easier.
+
+
+{% sample lang="python" -%}
+```python
+```
+{% endmethod %}
+{% method -%}
+{% sample lang="python" -%}
+```python
+```
+{% endmethod %}
+{% method -%}
+{% sample lang="python" -%}
+```python
+```
+{% endmethod %}
+{% method -%}
+{% sample lang="python" -%}
+```python
+```
+{% endmethod %}
+{% method -%}
+{% sample lang="python" -%}
+```python
+```
+{% endmethod %}
+{% method -%}
+{% sample lang="python" -%}
+```python
+```
+{% endmethod %}
+{% method -%}
 
 
 ## Fields
