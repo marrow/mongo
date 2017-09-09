@@ -126,7 +126,7 @@ db = client.get_database()
 ```
 {% endmethod %}
 {% method -%}
-Binding our `Account` class to a database will automatically look up the collection name to use. Alternatively you could bind directly to a specific collection. Either way, binding will automatically apply the metadata options for data access and validation and enable the `get_collection` method to provide you the correct, configured object.
+Binding our `Account` class to a database will look up the collection name to use from the `__collection__` attribute. Alternatively you could bind directly to a specific collection. Either way, binding will automatically apply the metadata options for data access and validation and enable the `get_collection` method to provide you the correct, configured object.
 
 {% sample lang="python" -%}
 ```python
