@@ -29,7 +29,7 @@ Begin by importing various components from the `marrow.mongo` package or one of 
 {% sample lang="python" -%}
 ```python
 from marrow.mongo import Index
-from marrow.mongo.field import ObjectId, String, Number, Array
+from marrow.mongo.field import Array, Number, String, ObjectId
 from marrow.mongo.trait import Queryable
 ```
 {% endmethod %}
@@ -84,11 +84,19 @@ We technically allow storage of any numeric value, either integer or floating po
 ```
 {% endmethod %}
 {% method -%}
-The last field we will define is an array of free-form string tags. This is a complex field whose first argument is the type of value it contains and defaults to an empty version of the complex type it represents if assignment is enabled to eliminate the need for boilerplate code.
+Now we define an array of free-form strings to utilize as tags. This is a complex field whose first argument is the type of value it contains and defaults to an empty version of the complex type it represents if assignment is enabled to eliminate the need for boilerplate code.
 
 {% sample lang="python" -%}
 ```python
 	tag = Array(String(), assign=True)
+```
+{% endmethod %}
+{% method -%}
+Even though `Account` inherits `Identified`, we don't want to gum up construction of new instances by allowing the ID to be defined positionally, so we redefine it. Redefined fields maintain their original order/position.
+
+{% sample lang="python" -%}
+```python
+	id = ObjectId('_id', assign=True, positional=False)
 ```
 {% endmethod %}
 {% method -%}
@@ -142,86 +150,107 @@ Account.create_collection()
 ```
 {% endmethod %}
 
+With the class bound you can now more easily interact with your documents in the collection.
+
 
 ## Document Interaction
 
-With a document schema defined we can now begin populating data:
-
-{% label %}Python REPL{% endlabel %}
-```python
-alice = Account('amcgregor', "Alice Bevan-McGregor", age=27)
-print(alice.id)  # Already has an ID.
-print(alice.id.generation_time)  # This even includes the creation time.
-```
-As can be seen above construction accepts positional and keyword parameters. Fields will be filled, positionally, in the order they were defined, unless otherwise adjusted using the `adjust_attribute_sequence` decorator.
-
-Assuming a `pymongo` collection is accessible by the variable name `collection` we can construct our index:
-
-```python
-Account.create_indexes(collection)
-```
-
-There is no need to run this command more than once unless the collection is dropped.
-
-Let's insert our record:
-
-```python
-result = collection.insert_one(alice)
-assert result.acknowledged and result.inserted_id == alice.id
-```
-
-Yup, that's it. Instances of `Document` are directly usable in place of a dictionary argument to `pymongo` methods. We then validate that the document we wanted inserted was, in fact, inserted. Using an assertion in this way, this validation will not be run in production code executed with the `-O` option passed (or `PYTHONOPTIMIZE` environment variable set) in the invocation to Python.
+Binding the class is not strictly needed in order to interact with them. You can instantiate, manipulate, and utilize as a mapping without it. Binding does, however, allow you to easily save the result and fetch records back out.
 
 
-Given the `Account` model defined in above, a PyMongo collection object, and a record stored in the database we can retrieve it back out and get the result as an ``Account`` instance:
+### Record Creation
 
 {% method -%}
-Several things are going on here. First it's important to note that Marrow Mongo isn't making the query happen for you, and does not automatically cast dictionaries to `Document` subclasses when querying. The first line demonstrates the native approach to building *filter documents*, the first argument to `find` or `find_one`.
+When constructing an instance you may pass field values positionally as well as by name. Fields will be filled, positionally, in the order they were defined, skipping fields whose `positional` predicate is falsy.
 
 {% sample lang="python" -%}
 ```python
-record = collection.find_one(Account.username == 'amcgregor')
-record = Account.from_mongo(record)
+alice = Account("Alice Bevan-McGregor", 'amcgregor', age=27)
+```
+{% endmethod %}
+{% method -%}
+The record has not even been persisted to the database yet and it has an identifier. This would allow you to create a batch of records, possibly with relationships, that can be committed at once. A read-only calculated property is provided to pull a creation time from the record's ObjectId creation time.
 
-print(record.name) # Alice Bevan-McGregor
+{% sample lang="python" -%}
+```python
+print(alice.id)  # Already there.
+print(alice.created)  # Creation time from ID.
+```
+{% endmethod %}
+{% method -%}
+We can now insert our record into the database. We can verify the operation (we pass the return value of the PyMongo API call back to you) by ensuring the server acknowledged the write and double-checking the record's inserted ID. This second step is for illustrative purposes and is not generally needed in the wild.
+
+{% sample lang="python" -%}
+```python
+result = alice.insert_one()
+assert result.acknowledged
+assert result.inserted_id == alice.id
 ```
 {% endmethod %}
 
-You can use standard Python comparison operators, bitwise operators, and several additional querying methods through class-level access to the defined fields. The result of one of these operations or method calls is a dictionary-like object that is the query. They may be combined through bitwise and (`&`) and bitwise or (`|`) operations. Due to Python's order of operations individual field comparisons must be wrapped in parenthesis if combining.
-
-Combining produces a new `Ops` instance; it is possible to use these to pre-construct parts of queries for later use. It can save time (and visual clutter) to assign the document class to a short, single-character variable name to make repeated reference easier.
+Using an assertion in this way, this validation will not be run in production code executed with the `-O` option passed (or `PYTHONOPTIMIZE` environment variable set) in the invocation to Python.
 
 
+### Record Retrieval
+
+With a record stored in the database we can now issue queries and expect some form of result.
+
 {% method -%}
+Retrieving a record by its identifier, is simplified.  As there's an oddly large amount of weird in this line, we'll break it down a bit.
+
+A call to `find_one` accepts a few different argument specifications to more flexibly serve the needs of queries simple to complex. The most basic form, taking one positional parameter, is that of querying by ID. Because our ID field is an ObjectId, it's aware that documents might have one and will pull it from a document if one is supplied.
+
 {% sample lang="python" -%}
 ```python
+alice = Account.find_one(alice)  # Wait... what?
+
+print(alice.name) # Alice Bevan-McGregor
+```
+{% endmethod %}
+
+All of the following are equivalent to the first.
+
+{% method -%}
+You can explicitly pass in a PyMongo ObjectId, or even a string representation of one.
+
+{% sample lang="python" -%}
+```python
+alice = Account.find_one(alice.id)
 ```
 {% endmethod %}
 {% method -%}
+More complex queries can be built from comparisons directly against the fields, resulting in a `Filter` mapping. Again, ObjectId fields know how to be compared against documents which contain IDs. This comparison does not have to be inline, and you can pass in any mapping representing a MongoDB filter document if you wish.
+
 {% sample lang="python" -%}
 ```python
+alice = Account.find_one(Account.id == alice)
+alice = Account.find_one(Account.id == alice.id)
 ```
 {% endmethod %}
 {% method -%}
+Using parametric querying, you can potentially save some typing. Multiple keyword arguments are combined using "and" logic. Note that this does not support the ability to create "or" conditions. The default comparison operator if none is specified is `eq`. You can still specify it explicitly if you wish.
+
 {% sample lang="python" -%}
 ```python
+alice = Account.find_one(id=alice)
+alice = Account.find_one(id=alice.id)
+alice = Account.find_one(id__eq=alice)
+alice = Account.find_one(id__eq=alice.id)
 ```
 {% endmethod %}
 {% method -%}
+We can, of course, query on anything we wish and not just the ID. What happens when we try to load a record that does not exist, though?
+
 {% sample lang="python" -%}
 ```python
+eve = Account.find_one(username="eve")
+print(eve)  # None, no record was found.
 ```
 {% endmethod %}
-{% method -%}
-{% sample lang="python" -%}
-```python
-```
-{% endmethod %}
-{% method -%}
-{% sample lang="python" -%}
-```python
-```
-{% endmethod %}
+
+You can use standard Python comparison operators, bitwise operators, and several additional querying methods through class-level access to the defined fields. The result of one of these operations or method calls is a dictionary-like object that is the query, an instance of `Filter`. These may be combined through bitwise and (`&`) and bitwise or (`|`) operations. Due to Python's order of operations individual field comparisons must be wrapped in parenthesis if combining inline.
+
+It is entirely possible to save pre-constructed parts of queries for later use. It can save time (and visual clutter) to assign the document class to a short, single-character variable name to make repeated reference easier.
 
 
 ## Fields
@@ -229,7 +258,7 @@ Combining produces a new `Ops` instance; it is possible to use these to pre-cons
 Included with Marrow Mongo are field types covering all core types supported by MongoDB. A class model is used to define new field types, with a large amount of functionality provided by the base `Field` class itself.
 
 {% method -%}
-This base class is directly usable where the underlying field type is dynamic or not known prior to access, i.e. "dynamic".
+This base class is directly usable where the underlying field type is dynamic or not known prior to access.
 
 The `Field` class is a subclass of Marrow Schema's `Attribute` and all field instances applicable to a given `Document` class or instance are accessible using the ordered dictionary `__fields__`.
 
@@ -248,9 +277,9 @@ assert 'name' in Sample.__fields__
 ### Name Mapping
 
 {% method -%}
-In general, basic fields accept one positional parameter: the name of the field to store data against within MongoDB. In the following example any attempt to read or write to the `field` attriute of a `MyDocument` instance will instead retrieve data from the backing document using the key `name`. If no name is specified explicitly the name of the attribute the field is assigned to is used by default.
+In general, basic fields accept one positional parameter: the name of the field to store data against within MongoDB. In the following example any attempt to read or write to the `field` attriute of a `MyDocument` instance will instead retrieve data from the backing document using the key `name`. If no name is specified explicitly the name of the attribute the field is assigned to is used by default. The most frequent use of this is in mapping the `_id` field from MongoDB to a less cumbersome property name.
 
-You can also pass this name using the `name` keyword argument. This is required (if overriding the default name) for complex field types described later.
+You can also pass this name using the `name` keyword argument. This may be required (if overriding the default name) for non-basic field types, and is required for complex types.
 
 {% sample lang="python" -%}
 ```python
@@ -444,3 +473,40 @@ Virtually identical to the read and write access permissions, the `sort` predica
 
 
 ## Plugin Namespaces
+
+
+
+
+
+
+{% method -%}
+{% sample lang="python" -%}
+```python
+```
+{% endmethod %}
+{% method -%}
+{% sample lang="python" -%}
+```python
+```
+{% endmethod %}
+{% method -%}
+{% sample lang="python" -%}
+```python
+```
+{% endmethod %}
+{% method -%}
+{% sample lang="python" -%}
+```python
+```
+{% endmethod %}
+{% method -%}
+{% sample lang="python" -%}
+```python
+```
+{% endmethod %}
+{% method -%}
+{% sample lang="python" -%}
+```python
+```
+{% endmethod %}
+
