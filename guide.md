@@ -2,9 +2,9 @@
 
 ## Introduction
 
-Documents are the records of [MongoDB](https://www.mongodb.com/), stored in an efficient binary form called [BSON](http://bsonspec.org/), allowing record manipulation that is cosmetically similar to [JSON](http://json.org/). In Python these are typically represented as [dictionaries](https://docs.python.org/3/library/stdtypes.html#mapping-types-dict), Python's native mapping type. Marrow Mongo provides a [`Document`](../api/document.md) mapping type that is directly compatible with and substitutable anywhere PyMongo uses dictionaries.
+Documents are the records of [MongoDB](https://www.mongodb.com/), stored in an efficient binary form called [BSON](http://bsonspec.org/), allowing record manipulation that is cosmetically similar to [JSON](http://json.org/). In Python these are typically represented as [dictionaries](https://docs.python.org/3/library/stdtypes.html#mapping-types-dict), Python's native mapping type. Marrow Mongo provides a [`Document`](reference/document.md) mapping type that is directly compatible with and substitutable anywhere PyMongo uses dictionaries.
 
-This package utilizes the [Marrow Schema](https://github.com/marrow/schema#readme) declarative schema toolkit and extends it to encompass MongoDB data storage concerns. Its documentation may assist you in understanding the processes involved in Marrow Mongo. At a fundamental level you define data models by importing classes describing the various components of a collection, such as ``Document``, ``ObjectId``, or ``String``, then compose them into a declarative class model whose attributes describe the data structure, constraints, etc.
+This package utilizes the [Marrow Schema](https://github.com/marrow/schema#readme) declarative schema toolkit and extends it to encompass MongoDB data storage concerns. Its documentation may assist you in understanding the processes involved in Marrow Mongo. At a fundamental level you define data models by importing classes describing the various components of a collection, such as `Document`, `ObjectId`, or `String`, then compose them into a declarative class model whose attributes describe the data structure, constraints, etc.
 
 `Field` types and `Document` mix-in classes (_traits_) meant for general use are registered using Python standard [_entry points_](http://setuptools.readthedocs.io/en/latest/setuptools.html#extensible-applications-and-frameworks) and are directly importable from the `marrow.mongo.field` and `marrow.mongo.trait` package namespaces respectively.
 
@@ -42,7 +42,8 @@ class Account(Queryable):
 ```
 {% endmethod %}
 {% method -%}
-Initially we populate metadata. The first defines the name of the collection to use when _binding_ the class to a database, and is optional; you can bind it to a class directly if you wish, or use it without binding at all. The second states that if the classmethod `create_collection()` is used to specify a default validation level and generate a validation document (schema and/or constraints).
+Initially we populate metadata. The first defines the name of the collection to use when _binding_ the class to a database, and is optional; you can bind it to a class directly if you wish, or use it without binding at all. The second is used to specify a default validation level and generate a validation document (schema and/or constraints).
+
 {% sample lang="python" -%}
 ```python
 	__collection__ = 'accounts'
@@ -51,7 +52,8 @@ Initially we populate metadata. The first defines the name of the collection to 
 ```
 {% endmethod %}
 {% method -%}
-Populate it with a few different types of field by assigning `Field` instances as class attributes. Most accounts represent people, who have names. A simple string, with no constraints or transformation options given. Because no default value was given, any attempt to retrieve this attribute on an instance of `Account` prior to assigning one will raise an `AttributeError`, as a value for the field would not exist at all.
+Populate the class with a few different types of field by assigning `Field` instances as class attributes. Most accounts represent people, who have names. A simple string, with no constraints or transformation options given. Because no default value was given, any attempt to retrieve this attribute on an instance of `Account` prior to assigning one will raise an `AttributeError`, as a value for the field would not exist at all.
+
 {% sample lang="python" -%}
 ```python
 	name = String()
@@ -59,6 +61,7 @@ Populate it with a few different types of field by assigning `Field` instances a
 {% endmethod %}
 {% method -%}
 Fields missing from the document might be A-OK in some circumstances, but not all. We can mark our acount's `username` as required, resulting in the addition of a constraint when generating the validation document.
+
 {% sample lang="python" -%}
 ```python
 	username = String(required=True)
@@ -66,6 +69,7 @@ Fields missing from the document might be A-OK in some circumstances, but not al
 {% endmethod %}
 {% method -%}
 When utilizing default values you may choose to have the default value written immediately into the document. By utilizing the `assign` option the default value will be assigned to the instance immediately upon instantiation, unless passed to the constructor, resulting in the default value being present in the database. This armors records against potential future changes in the default value, if you do not wish such changes to propagate.
+
 {% sample lang="python" -%}
 ```python
 	locale = String(default='en-CA', assign=True)
@@ -73,6 +77,7 @@ When utilizing default values you may choose to have the default value written i
 {% endmethod %}
 {% method -%}
 We technically allow storage of any numeric value, either integer or floating point, for our user's age. To prevent explosions if an age is not given we define a default, though this default will not waste storage space in the database by being assigned.
+
 {% sample lang="python" -%}
 ```python
 	age = Number(default=None)
@@ -80,6 +85,7 @@ We technically allow storage of any numeric value, either integer or floating po
 {% endmethod %}
 {% method -%}
 The last field we will define is an array of free-form string tags. This is a complex field whose first argument is the type of value it contains and defaults to an empty version of the complex type it represents if assignment is enabled to eliminate the need for boilerplate code.
+
 {% sample lang="python" -%}
 ```python
 	tag = Array(String(), assign=True)
@@ -87,6 +93,7 @@ The last field we will define is an array of free-form string tags. This is a co
 {% endmethod %}
 {% method -%}
 Lastly we define a unique index on the username to speed up any queries involving that field, and to enforce uniqueness. Because MongoDB's index capabilities are quite expressive, we do not define index features on fields themselves. It is generally a good idea to underscore-prefix non-field attributes. This helps keep fields distinct from non-fields in a visual way and implies they are "protected" or "private" as is customary in Python, though not enforced.
+
 {% sample lang="python" -%}
 ```python
 	
@@ -103,6 +110,7 @@ Now that we have a document defined we can move on to exploring how to interact 
 
 {% method -%}
 Before much can be done, it will be necessary to get a reference to a MongoDB connection or database object. Begin by importing the client object from the `pymongo` package.
+
 {% sample lang="python" -%}
 ```python
 from pymongo import MongoClient
@@ -110,6 +118,7 @@ from pymongo import MongoClient
 {% endmethod %}
 {% method -%}
 Then, open a connection to a MongoDB server, here, running locally. We can save some space by defining the database to utilize at the same time, and requesting a handle to the default database back without needing to refer to it by name a second time.
+
 {% sample lang="python" -%}
 ```python
 client = MongoClient('mongodb://localhost/test')
@@ -118,6 +127,7 @@ db = client.get_database()
 {% endmethod %}
 {% method -%}
 Binding our `Account` class to a database will automatically look up the collection name to use. Alternatively you could bind directly to a specific collection. Either way, binding will automatically apply the metadata options for data access and validation and enable the `get_collection` method to provide you the correct, configured object.
+
 {% sample lang="python" -%}
 ```python
 Account.bind(db)
@@ -125,12 +135,12 @@ Account.bind(db)
 {% endmethod %}
 {% method -%}
 Two class methods are provided for collection management requiring awareness of our metadata: `create_collection` and `create_indexes`. Creating the collection will create any declared indexes automatically by default. For other collection-level management operations it is recommended to utilize `get_collection` and issue calls to the PyMongo API directly.
+
 {% sample lang="python" -%}
 ```python
 Account.create_collection()
 ```
 {% endmethod %}
-{% method -%}
 
 
 ## Document Interaction
@@ -182,10 +192,6 @@ You can use standard Python comparison operators, bitwise operators, and several
 Combining produces a new `Ops` instance; it is possible to use these to pre-construct parts of queries for later use. It can save time (and visual clutter) to assign the document class to a short, single-character variable name to make repeated reference easier.
 
 
-{% sample lang="python" -%}
-```python
-```
-{% endmethod %}
 {% method -%}
 {% sample lang="python" -%}
 ```python
@@ -212,6 +218,10 @@ Combining produces a new `Ops` instance; it is possible to use these to pre-cons
 ```
 {% endmethod %}
 {% method -%}
+{% sample lang="python" -%}
+```python
+```
+{% endmethod %}
 
 
 ## Fields
