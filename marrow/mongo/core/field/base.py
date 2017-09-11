@@ -262,9 +262,6 @@ class _CastingKind(Field):
 		
 		from marrow.mongo import Document
 		
-		if value is None:
-			return None
-		
 		kind = self._kind(obj if isclass(obj) else obj.__class__)
 		
 		if isinstance(value, Document):
