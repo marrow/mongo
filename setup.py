@@ -96,7 +96,8 @@ setup(
 			logger = ['tzlocal>=1.4'],  # Timezone support to store log times in UTC like a sane person.
 			markdown = ['misaka', 'pygments'],  # Markdown text storage.
 			scripting = ['javascripthon<1.0'],  # Allow map/reduce functions and "stored functions" to be Python.
-			timezone = ['pytz', 'tzlocal>=1.4'],  # Support for timezones.
+			tz = ['pytz', 'tzlocal>=1.4'],  # Support for timezones.
+			timezone = ['pytz', 'tzlocal>=1.4'],  # Alias for the above timezone support.
 		),
 	
 	tests_require = tests_require,

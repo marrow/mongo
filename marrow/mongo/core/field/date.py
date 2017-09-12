@@ -53,7 +53,7 @@ class Date(Field):
 	__foreign__ = 'date'
 	__disallowed_operators__ = {'#array'}
 	
-	naive = Attribute(default=utc)
+	naive = Attribute(default=utc)  # Timezone to interpret naive datetimes as.
 	tz = Attribute(default=None)  # Timezone to cast to when retrieving from the database.
 	
 	def _process_tz(self, dt, naive, tz):
@@ -91,11 +91,16 @@ class Date(Field):
 			else:
 				raise ValueError("Must install `pytz` package for timezone support.")
 		
-		if tz:
-			if hasattr(tz, 'normalize'):
-				dt = tz.normalize(dt.astimezone(tz))
-			else:
-				dt = dt.astimezone(tz)  # Warning: this might not always be entirely correct!
+		if not tz:
+			return dt
+		
+		if hasattr(tz, 'normalize'):
+			dt = tz.normalize(dt.astimezone(tz))
+		
+		elif tz == 'naive':
+			dt = dt.replace(tzinfo=None)
+		else:
+			dt = dt.astimezone(tz)  # Warning: this might not always be entirely correct!
 		
 		return dt
 	
