@@ -119,7 +119,7 @@ class Date(Field):
 		elif isinstance(value, timedelta):
 			value = utcnow() + value
 		
-		assert isinstance(value, datetime), "Value must be a datetime, ObjectId, or identified document, not: " + \
-				repr(value)
+		if not isinstance(value, datetime):
+			raise ValueError("Value must be a datetime, ObjectId, or identified document, not: " + repr(value))
 		
 		return self._process_tz(value, self.naive, utc)

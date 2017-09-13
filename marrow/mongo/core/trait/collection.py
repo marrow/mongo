@@ -93,7 +93,9 @@ class Collection(Identified):
 		"""
 		
 		if target is None:
-			assert cls.__bound__ is not None, "Target required when document class not bound."
+			if cls.__bound__ is None:
+				raise TypeError("Target required when document class not bound.")
+			
 			return cls.__bound__
 		
 		if isinstance(target, PyMongoCollection):
@@ -114,7 +116,9 @@ class Collection(Identified):
 		"""
 		
 		if target is None:
-			assert cls.__bound__ is not None, "Target required when document class not bound."
+			if cls.__bound__ is None:
+				raise TypeError("Target required when document class not bound.")
+			
 			target = cls.__bound__
 		
 		if isinstance(target, PyMongoCollection):
@@ -253,7 +257,7 @@ class Collection(Identified):
 			update &= U(D, **kw)
 		
 		if not update:
-			raise ValueError("Must provide an update operation.")
+			raise TypeError("Must provide an update operation.")
 		
 		return collection.update_one(D.id == self, update, bypass_document_validation=not validate)
 	
