@@ -147,7 +147,7 @@ class Lockable(Queryable):
 			if document.Queue.__collection__:
 				document.Queue(document, 'prolonged').insert_one()
 			
-			if __debug__:
+			if __debug__:  # pragma: no cover
 				expires = self.expires
 				reference = DBRef(document.__collection__, document.id)
 				log.debug("Prolonged lock held on {!r} until {}.".format(document, expires.isoformat()), extra={
@@ -159,7 +159,7 @@ class Lockable(Queryable):
 			if document.Queue.__collection__:
 				document.Queue(document, 'released').insert_one()
 			
-			if __debug__:
+			if __debug__:  # pragma: no cover
 				reference = DBRef(document.__collection__, document.id)
 				log.debug("Released lock held on {!r}.".format(document), extra={
 					'agent': self.instance, 'mutex': reference, 'forced': forced})
@@ -170,7 +170,7 @@ class Lockable(Queryable):
 			if document.Queue.__collection__:
 				document.Queue(document, 'expired').insert_one()
 			
-			if __debug__:
+			if __debug__:  # pragma: no cover
 				expires = self.expires
 				reference = DBRef(document.__collection__, document.id)
 				log.debug("Expired stale lock on {!r}.".format(document, expires.isoformat()), extra={
