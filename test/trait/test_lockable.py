@@ -133,6 +133,7 @@ class TestSimpleLockable(object):
 		with pytest.raises(NotImplementedError):
 			sample.acquire(10)
 	
+	@skip_slow
 	def test_prolong_ours(self, sample):
 		with sample as lock:
 			sleep(2)
