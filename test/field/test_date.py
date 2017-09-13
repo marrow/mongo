@@ -42,6 +42,11 @@ class TestDateField(FieldExam):
 		
 		assert instance['field'].tzinfo == utc
 		assert instance.field.tzinfo == utc
+	
+	def test_non_date_store(self, Sample):
+		instance = Sample.from_mongo({'field': 27})
+		
+		assert instance.field == 27  # Pass-through unknown values.
 
 
 class TestDateFieldExplicitNaive(FieldExam):
