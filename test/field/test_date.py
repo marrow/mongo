@@ -114,6 +114,9 @@ class TestDateFieldBasicTzinfo(FieldExam):
 		
 		def tzname(self, dt):
 			return 'Canada/Pacific'
+		
+		def dst(self, dt):
+			return _td()
 	
 	__field__ = Date
 	__kwargs__ = {'tz': TZ()}
@@ -122,4 +125,4 @@ class TestDateFieldBasicTzinfo(FieldExam):
 		now = _dt(1902, 4, 24)
 		instance = Sample(now)
 		
-		assert instance.field.tzinfo.tzname(instance.field) == 'PST'
+		assert instance.field.tzinfo.tzname(instance.field) == 'Canada/Pacific'
