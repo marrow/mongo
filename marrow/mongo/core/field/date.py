@@ -60,8 +60,8 @@ class Date(Field):
 		"""Process timezone casting and conversion."""
 		
 		def _tz(t):
-			if t is None:
-				return
+			if t in (None, 'naive'):
+				return t
 			
 			if t == 'local':
 				if __debug__ and not localtz:
@@ -96,7 +96,6 @@ class Date(Field):
 		
 		if hasattr(tz, 'normalize'):
 			dt = tz.normalize(dt.astimezone(tz))
-		
 		elif tz == 'naive':
 			dt = dt.replace(tzinfo=None)
 		else:

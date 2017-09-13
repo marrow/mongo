@@ -3,6 +3,8 @@
 from __future__ import unicode_literals
 
 from datetime import datetime as _dt
+from datetime import timedelta as _td
+from datetime import tzinfo as _tzinfo
 
 import pytest
 from bson import ObjectId
@@ -47,6 +49,18 @@ class TestDateField(FieldExam):
 		instance = Sample.from_mongo({'field': 27})
 		
 		assert instance.field == 27  # Pass-through unknown values.
+	
+	def test_timedelta_assignment(self, Sample):
+		fuzz = _td(seconds=5)
+		delta = _td(days=2, hours=12)
+		now = _dt.utcnow()
+		instance = Sample(delta)
+		assert abs(instance.field.replace(tzinfo=None) - (now + delta)) < fuzz
+	
+	def test_document_assignment(self, Sample):
+		now = _dt.utcnow().replace(microsecond=0)
+		instance = Sample({'_id': ObjectId.from_datetime(now)})
+		assert instance.field.replace(tzinfo=None) == now
 
 
 class TestDateFieldExplicitNaive(FieldExam):
@@ -81,3 +95,31 @@ class TestDateFieldLocalNaive(FieldExam):
 	def test_naive_local_no_tzlocal(self, Sample):
 		with pytest.raises(ValueError):
 			Sample(_dt.now())
+
+
+class TestDateFieldNativeNaive(FieldExam):
+	__field__ = Date
+	__kwargs__ = {'tz': 'naive'}
+	
+	def test_naive_native_simple(self, Sample):
+		when = _dt.now()  # Wherever you go, there you are.
+		instance = Sample(when)
+		assert instance.field.tzinfo is None
+
+
+class TestDateFieldBasicTzinfo(FieldExam):
+	class TZ(_tzinfo):
+		def utcoffset(self, dt):
+			return _td(hours=-7)
+		
+		def tzname(self, dt):
+			return 'Canada/Pacific'
+	
+	__field__ = Date
+	__kwargs__ = {'tz': TZ()}
+	
+	def test_basic_tzinfo_use(self, Sample):
+		now = _dt(1902, 4, 24)
+		instance = Sample(now)
+		
+		assert instance.field.tzinfo.tzname(instance.field) == 'PST'
