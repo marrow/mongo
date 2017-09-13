@@ -4,7 +4,7 @@ from __future__ import unicode_literals
 
 from common import FieldExam
 from marrow.mongo import Document
-from marrow.mongo.field import Array
+from marrow.mongo.field import Array, Integer
 
 
 class TestSingularArrayField(FieldExam):
@@ -23,3 +23,14 @@ class TestSingularArrayField(FieldExam):
 		inst.field.append(Document.from_mongo({'rng': 7}))
 		assert isinstance(inst.field[0], Document)
 		assert inst.field[0]['rng'] == 7
+
+
+class TestArrayIssue43(FieldExam):
+	__field__ = Array
+	__args__ = (Integer(), )
+	__kwargs__ = {'assign': True}
+	
+	def test_issue_43(self, Sample):
+		filter = Sample.field != 1
+		
+		assert dict(filter) == {'field': {'$ne': 1}}

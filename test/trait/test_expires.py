@@ -24,18 +24,18 @@ class TestExpires(object):
 	
 	def test_integer_assignment(self):
 		now = utcnow()
-		inst = self.Sample(0)
+		inst = self.Sample(expires=0)
 		assert inst.expires - now < timedelta(seconds=1)
 		assert inst.is_expired
 	
 	def test_timedelta_assignment(self):
 		now = utcnow()
-		inst = self.Sample(timedelta(days=1))
+		inst = self.Sample(expires=timedelta(days=1))
 		assert timedelta(hours=23) < (inst.expires - now) < timedelta(hours=25)
 	
 	def test_explicit_date(self):
 		then = utcnow() - timedelta(days=1)
-		inst = self.Sample(then)
+		inst = self.Sample(expires=then)
 		assert inst.expires == then
 		assert inst.is_expired
 	

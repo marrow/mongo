@@ -54,7 +54,7 @@ class TestQueryable(object):  # TODO: Properly use pytest fixtures for this...
 	advanced = [
 			(Q.any, '$in', [1, 2, 3], {'field_name': {'$in': ['1', '2', '3']}}),
 			(Q.none, '$nin', [1, 2, 3], {'field_name': {'$nin': ['1', '2', '3']}}),
-			(Q.all, '$all', [1, 2, 3], {'field_name': {'$all': [1, 2, 3]}}),
+			(Q.all, '$all', [1, 2, 3], {'field_name': {'$all': [1, 2, 3]}}, Sample.array),
 			(Q.match, '$elemMatch', {'name': "Bob"}, {'field_name': {'$elemMatch': {'name': 'Bob'}}}),
 			(Q.size, '$size', 42, {'field_name': {'$size': 42}}),
 			(Q.of_type, '$type', "double", {'field_name': {'$type': 'double'}}),
@@ -101,6 +101,7 @@ class TestQueryable(object):  # TODO: Properly use pytest fixtures for this...
 	
 	def test_operator_any(self): self.do_operator(*self.advanced[0])
 	def test_operator_none(self): self.do_operator(*self.advanced[1])
+	def test_operator_all(self): self.do_operator(*self.advanced[2])
 	def test_operator_match(self): self.do_operator(*self.advanced[3])
 	def test_operator_type(self): self.do_operator(*self.advanced[5])
 	def test_operator_type_assumed(self): self.do_singleton(*self.singletons[2])
@@ -112,9 +113,6 @@ class TestQueryable(object):  # TODO: Properly use pytest fixtures for this...
 		assert op.as_query == odict({'field_name': dict([('$gte', '5'), ('$lt', '11')])})
 	
 	def test_op_failure(self):
-		with pytest.raises(NotImplementedError):
-			self.do_operator(*self.advanced[2], mock_queryable=Sample.array)
-		
 		with pytest.raises(NotImplementedError):
 			self.do_operator(*self.advanced[4])
 		
@@ -128,8 +126,8 @@ class TestQueryable(object):  # TODO: Properly use pytest fixtures for this...
 		assert unicode(Sample.generic) == ~Sample.generic == 'generic'
 	
 	def test_operator_re(self):
-		result = Sample.field.re(r'^', 'foo', r'\.')
-		assert result.as_query == {'field_name': {'$regex': r'^foo\.'}}
+		result = Sample.field.re(r'^', 'foo', r'.')
+		assert result.as_query == {'field_name': {'$regex': r'^foo.'}}
 	
 	def test_operator_size(self):
 		result = Sample.array.size(10)

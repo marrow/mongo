@@ -51,22 +51,29 @@ class TestQueryableCore(object):
 			Sample._prepare_find(cursor_type=CursorType.TAILABLE, tail=True)
 		
 		with pytest.raises(TypeError):
-			Sample._prepare_find(cursor_type=CursorType.TAILABLE, await=True)
+			Sample._prepare_find(cursor_type=CursorType.TAILABLE, wait=True)
 		
 		with pytest.raises(TypeError):
-			Sample._prepare_find(cursor_type=CursorType.TAILABLE, tail=True, await=True)
+			Sample._prepare_find(cursor_type=CursorType.TAILABLE, tail=True, wait=True)
 	
 	def test_prepare_find_cursor_type_tail(self, Sample):
 		cls, collection, query, options = Sample._prepare_find(tail=True)
 		assert options['cursor_type'] == CursorType.TAILABLE_AWAIT
 	
-	def test_prepare_find_cursor_type_tail_not_await(self, Sample):
-		cls, collection, query, options = Sample._prepare_find(tail=True, await=False)
+	def test_prepare_find_cursor_type_tail_not_wait(self, Sample):
+		cls, collection, query, options = Sample._prepare_find(tail=True, wait=False)
 		assert options['cursor_type'] == CursorType.TAILABLE
 	
-	def test_prepare_find_cursor_type_await_conflict(self, Sample):
+	def test_prepare_find_cursor_type_tail_wait_error(self, Sample):
 		with pytest.raises(TypeError):
-			Sample._prepare_find(await=False)
+			cls, collection, query, options = Sample._prepare_find(tail=False, wait=False)
+		
+		with pytest.raises(TypeError):
+			cls, collection, query, options = Sample._prepare_find(tail=True, await=False)
+	
+	def test_prepare_find_cursor_type_wait_conflict(self, Sample):
+		with pytest.raises(TypeError):
+			Sample._prepare_find(wait=False)
 	
 	def test_prepare_find_max_time_modifier(self, Sample):
 		cls, collection, query, options = Sample._prepare_find(max_time_ms=1000)
@@ -114,7 +121,7 @@ class TestQueryableTrait(object):
 	def test_reload_all(self, Sample):
 		doc = Sample.find_one(integer=42)
 		assert doc.string == 'baz'
-		Sample.get_collection().update(Sample.id == doc, U(Sample, integer=1337, string="hoi"))
+		Sample.get_collection().update_one(Sample.id == doc, U(Sample, integer=1337, string="hoi"))
 		assert doc.string == 'baz'
 		doc.reload()
 		assert doc.string == 'hoi'
@@ -123,7 +130,7 @@ class TestQueryableTrait(object):
 	def test_reload_specific(self, Sample):
 		doc = Sample.find_one(integer=42)
 		assert doc.string == 'baz'
-		Sample.get_collection().update(Sample.id == doc, U(Sample, integer=1337, string="hoi"))
+		Sample.get_collection().update_one(Sample.id == doc, U(Sample, integer=1337, string="hoi"))
 		assert doc.string == 'baz'
 		doc.reload('string')
 		assert doc.string == 'hoi'

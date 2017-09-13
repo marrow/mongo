@@ -65,7 +65,10 @@ class GeoJSONCoord(GeoJSON):
 		super(GeoJSONCoord, self).__delitem__(item)
 	
 	def __len__(self):
-		return len(self.coordinates)
+		try:
+			return len(self.coordinates)
+		except:
+			return 0
 
 
 MutableSequence.register(GeoJSONCoord)

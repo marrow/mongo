@@ -1,0 +1,4 @@
+[submodule "book"]
+	path = docs
+	url = https://github.com/marrow/mongo.git
+	branch = book

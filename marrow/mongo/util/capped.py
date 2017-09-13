@@ -35,6 +35,7 @@ def tail(collection, filter=None, projection=None, limit=0, timeout=None, aggreg
 		raise ValueError("Cowardly refusing to tail an empty collection.")
 	
 	cursor = collection.find(filter, projection, limit=limit, cursor_type=CursorType.TAILABLE_AWAIT)
+	cursor = cursor.hint([('$natural', 1)])
 	
 	if timeout:
 		if aggregate:  # Total query time not to exceed `timeout` seconds.

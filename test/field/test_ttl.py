@@ -16,11 +16,11 @@ class TestTTLField(FieldExam):
 	
 	def test_cast_timedelta(self, Sample):
 		v = timedelta(days=7)
-		r = (utcnow() + v).replace(microsecond=0)
+		r = (utcnow() + v)
 		inst = Sample(v)
 		
 		assert isinstance(inst.__data__['field'], datetime)
-		assert inst.field.replace(microsecond=0) == r
+		assert inst.field == r
 	
 	def test_cast_datetime(self, Sample):
 		v = utcnow()
@@ -31,11 +31,11 @@ class TestTTLField(FieldExam):
 	
 	def test_cast_integer(self, Sample):
 		v = timedelta(days=7)
-		r = (utcnow() + v).replace(microsecond=0)
+		r = (utcnow() + v)
 		inst = Sample(7)
 		
 		assert isinstance(inst.__data__['field'], datetime)
-		assert inst.field.replace(microsecond=0) == r
+		assert inst.field == r
 	
 	def test_cast_failure(self, Sample):
 		with pytest.raises(ValueError):

@@ -1,5 +1,5 @@
 -   repo: https://github.com/pre-commit/pre-commit-hooks.git
-    sha: 5bf6c09bfa1297d3692cadd621ef95f1284e33c0
+    sha: v0.9.2
     hooks:
     -   id: check-added-large-files
     -   id: check-ast
@@ -18,10 +18,14 @@
     sha: v1.1.0
     hooks:
     -   id: python-safety-dependencies-check
--   repo: https://github.com/Lucas-C/pre-commit-hooks-bandit
-    sha: v1.0.3
+-   repo: local
     hooks:
     -   id: python-bandit-vulnerability-check
+        name: bandit
+        entry: bandit
+        args: [-lll, --recursive, marrow, web, test]
+        language: system
+        files: ''
 -   repo: local
     hooks:
     -   id: py.test

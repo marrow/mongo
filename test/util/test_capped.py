@@ -15,7 +15,6 @@ from marrow.mongo.trait import Collection
 from marrow.mongo.util.capped import _patch, tail
 from marrow.schema.compat import pypy
 
-
 skip = int(os.environ.get('TEST_SKIP_CAPPED', 0)) or pypy
 
 pytestmark = pytest.mark.skipif(skip, reason="Slow tests skipped.")
@@ -33,7 +32,7 @@ class Capped(Collection):
 
 @pytest.fixture
 def uncapped(request, connection):
-	db = connection.get_default_database()
+	db = connection.get_database()
 	request.addfinalizer(partial(db.drop_collection, Uncapped.__collection__))
 	
 	return Uncapped.create_collection(db, True)
@@ -41,7 +40,7 @@ def uncapped(request, connection):
 
 @pytest.fixture(autouse=True)
 def capped(request, connection):
-	db = connection.get_default_database()
+	db = connection.get_database()
 	
 	if tuple((int(i) for i in connection.server_info()['version'].split('.')[:3])) < (3, 2):
 		pytest.xfail("Test expected to fail on MongoDB versions prior to 3.2.")
@@ -55,19 +54,19 @@ _PRIORITY = (-2, -1, 0, 1, 2)
 
 
 def gen_log_entries(collection, count=1000):
-	collection.insert({'message': 'first'})  # To avoid immediate exit of the tail.ddddd
+	collection.insert_one({'message': 'first'})  # To avoid immediate exit of the tail.
 	
 	for i in range(count-2):
 		sleep(3.0/count)  # If we go too fast, the test might not be able to keep up.
-		collection.insert({'message': 'test #' + str(i) + ' of ' + str(count), 'priority': choice(_PRIORITY)})
+		collection.insert_one({'message': 'test #' + str(i) + ' of ' + str(count), 'priority': choice(_PRIORITY)})
 	
-	collection.insert({'message': 'last'})
+	collection.insert_one({'message': 'last'})
 
 
 class TestCappedQueries(object):
 	def test_single(self, capped):
 		assert capped.count() == 0
-		result = capped.insert({'message': 'first'})
+		result = capped.insert_one({'message': 'first'}).inserted_id
 		assert capped.count() == 1
 		
 		first = next(tail(capped))
@@ -75,7 +74,7 @@ class TestCappedQueries(object):
 		assert first['_id'] == result
 	
 	def test_basic_timeout(self, capped):
-		capped.insert({'message': 'first'})
+		capped.insert_one({'message': 'first'})
 		
 		start = time()
 		
@@ -83,7 +82,7 @@ class TestCappedQueries(object):
 		
 		delta = time() - start
 		assert len(result) == capped.count()
-		assert 0.4 < delta < 0.6
+		assert 0.25 < delta < 0.75
 	
 	def test_capped_trap(self, uncapped):
 		with pytest.raises(TypeError):
@@ -96,7 +95,7 @@ class TestCappedQueries(object):
 	def test_patch(self, capped):
 		_patch()
 		
-		capped.insert({})
+		capped.insert_one({})
 		
 		assert len(list(capped.tail(timeout=0.25))) == 1
 	

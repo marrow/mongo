@@ -10,24 +10,35 @@ branches:
 
 python:
   - "2.7"
-  - "pypy-5.4.1"
+  - "pypy-5.7.1"
   - "3.3"
   - "3.4"
   - "3.5"
   - "3.6"
 
+env:
+  - MONGODB_VERSION=3.4.7
+
+matrix:
+  include:
+    - python: "3.5"
+      env: MONGODB_VERSION=3.4.4 NO_PYTZ=1
+    - python: "3.5"
+      env: MONGODB_VERSION=3.2.13
+
 before_install:
-  - wget http://fastdl.mongodb.org/linux/mongodb-linux-x86_64-3.4.1.tgz -O /tmp/mongodb.tgz
+  - wget http://fastdl.mongodb.org/linux/mongodb-linux-x86_64-${MONGODB_VERSION}.tgz -O /tmp/mongodb.tgz
   - tar -xvf /tmp/mongodb.tgz
   - mkdir /tmp/data
-  - ${PWD}/mongodb-linux-x86_64-3.4.1/bin/mongod --dbpath /tmp/data --bind_ip 127.0.0.1 --noauth &> /dev/null &
+  - ${PWD}/mongodb-linux-x86_64-${MONGODB_VERSION}/bin/mongod --dbpath /tmp/data --bind_ip 127.0.0.1 --noauth &> /dev/null &
 
 install:
-  - travis_retry pip install --upgrade setuptools pip pytest pytest-cov codecov 'setuptools_scm>=1.9' cffi
-  - pip install -e '.[development,logger]'
+  - 'travis_retry pip install --upgrade setuptools pip pytest pytest-cov codecov "setuptools_scm>=1.9" cffi'
+  - 'pip install -e ".[development]"'
+  - 'test -n "${NO_PYTZ}" && pip uninstall --yes pytz tzlocal || true'
 
 script:
-    python setup.py test
+    pytest
 
 after_script:
     bash <(curl -s https://codecov.io/bash)

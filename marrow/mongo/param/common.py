@@ -11,7 +11,8 @@ from ...schema.compat import odict
 def _deferred_method(name, _named=None, **kw):
 	def _deferred_method_inner(self, other):
 		if _named:
-			assert len(_named) == len(other), "Incorrect number of arguments."
+			if not len(_named) == len(other):
+				raise TypeError("Incorrect number of arguments.")
 			values = iter(other)
 			
 			for i in _named:

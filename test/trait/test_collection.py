@@ -74,7 +74,7 @@ class TestDocumentBinding(object):
 		assert Sample.bind(db).create_collection(drop=True, indexes=False).name == 'collection'
 	
 	def test_create_collection_failure(self, Sample):
-		with pytest.raises(AssertionError):
+		with pytest.raises(TypeError):
 			Sample.create_collection()
 		
 		with pytest.raises(TypeError):
@@ -84,7 +84,7 @@ class TestDocumentBinding(object):
 		assert Sample.create_collection(db.foo, True).name == 'foo'
 	
 	def test_get_collection_failure(self, Sample):
-		with pytest.raises(AssertionError):
+		with pytest.raises(TypeError):
 			Sample.get_collection(None)
 		
 		with pytest.raises(TypeError):
@@ -116,3 +116,9 @@ class TestDocumentBinding(object):
 				'ns': 'test.collection',
 				'sparse': False
 			}
+	
+	def test_update_empty(self, db, Sample):
+		Sample.bind(db).create_collection(drop=True)
+		
+		with pytest.raises(TypeError):
+			Sample().update_one()

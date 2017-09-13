@@ -22,7 +22,7 @@ class Identified(Document):
 	id = ObjectId('_id', assign=True, write=False, repr=False)
 	
 	def __eq__(self, other):
-		"""Equality comparison between the IDs of the respective documents."""
+		"""Equality comparison between the identifiers of the respective documents."""
 		
 		if isinstance(other, Document):
 			return self.id == other.id
@@ -32,7 +32,4 @@ class Identified(Document):
 	def __ne__(self, other):
 		"""Inverse equality comparison between the backing store and other value."""
 		
-		if isinstance(other, Document):
-			return self.id != other.id
-		
-		return self.id != other
+		return not self == other

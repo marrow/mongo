@@ -10,10 +10,10 @@ from ...util import utcnow
 
 
 class Published(Document):
-	created = Date(default=utcnow, assign=True, write=False)
-	modified = Date(default=None, write=False)
-	published = Date(default=None)
-	retracted = Date(default=None)
+	created = Date(default=utcnow, assign=True, write=False, positional=False)
+	modified = Date(default=None, write=False, positional=False)
+	published = Date(default=None, positional=False)
+	retracted = Date(default=None, positional=False)
 	
 	_availability = Index('published', 'retracted')
 	

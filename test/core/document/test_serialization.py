@@ -1,5 +1,7 @@
 # encoding: utf-8
 
+import pytest
+
 from marrow.mongo import Document
 from marrow.mongo.field import Number, String
 from marrow.mongo.trait import Derived, Identified
@@ -35,6 +37,11 @@ class DynamicRepr(Document):
 	def __repr__(self, *args, **kw):
 		kw['key'] = 27
 		return super(DynamicRepr, self).__repr__('pos', *args, **kw)
+
+
+class test_argument_clobber():
+	with pytest.raises(TypeError):
+		Sample("hi", string="yo")
 
 
 class TestProgrammersRepresentation(object):

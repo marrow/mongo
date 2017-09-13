@@ -5,10 +5,16 @@ from __future__ import unicode_literals
 from collections import OrderedDict
 from datetime import datetime, timedelta
 from operator import attrgetter
-from bson.tz_util import utc
 
 from marrow.schema.meta import ElementMeta
 from ...package.loader import load
+
+# Conditional dependencies.
+
+try:
+	from pytz import utc  # Richer, more capable implementation.
+except ImportError:
+	from bson.tz_util import utc  # Fallback on hard dependency.
 
 
 SENTINEL = object()  # Singleton value to detect unassigned values.
@@ -62,7 +68,7 @@ class Registry(object):
 
 def utcnow():
 	"""Return the current time in UTC, with timezone information applied."""
-	return datetime.utcnow().replace(tzinfo=utc)
+	return datetime.utcnow().replace(microsecond=0, tzinfo=utc)
 
 
 def datetime_period(base=None, hours=None, minutes=None, seconds=None):

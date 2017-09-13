@@ -7,4 +7,4 @@ class TestDatetimePeriod(object):
 	def test_assumed_base(self):
 		now = utcnow()
 		then = datetime_period(hours=1)
-		assert now.replace(minute=0, second=0, microsecond=0) == then
+		assert now.replace(minute=0, second=0) == then

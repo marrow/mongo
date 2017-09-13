@@ -115,6 +115,15 @@ class TestField(object):
 		
 		del inst.field
 		assert inst.__data__ == {}
+	
+	def test_adaption(self):
+		class Updated(Sample):
+			field = Sample.field.adapt(default=27)
+		
+		with pytest.raises(AttributeError):
+			Sample.field.default
+		
+		assert Updated.field.default == 27
 
 
 class TestFieldSecurity(object):

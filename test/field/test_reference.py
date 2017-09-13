@@ -7,10 +7,10 @@ import pytest
 from common import FieldExam
 from marrow.mongo import Document
 from marrow.mongo.field import Reference, String
-from marrow.mongo.trait import Derived
+from marrow.mongo.trait import Collection
 
 
-class Concrete(Derived, Document):
+class Concrete(Collection):
 	__collection__ = 'collection'
 	
 	foo = String()
@@ -41,3 +41,14 @@ class TestReferenceField(FieldExam):
 	def test_oid_failure(self, Sample):
 		inst = Sample(field='z' * 24)
 		assert inst['field'] == 'z' * 24
+
+
+class TestConcreteReferenceField(FieldExam):
+	__field__ = Reference
+	__args__ = (Document, )
+	__kwargs__ = {'concrete': True}
+	
+	def test_concrete_reference(self, Sample):
+		inst = Sample(field=Concrete(foo="a", bar="b"))
+		
+		assert inst.__data__['field'].collection == 'collection'

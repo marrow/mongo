@@ -33,6 +33,8 @@ tests_require = [
 		'pytest-catchlog',  # log capture
 		'pytest-isort',  # import ordering
 		'misaka', 'pygments',  # Markdown field support
+		'futures; python_version < "3.4"',  # futures support
+		'pytz', 'tzlocal>=1.4',  # timezone support, logger support
 	]
 
 
@@ -81,6 +83,7 @@ setup(
 		] if {'pytest', 'test', 'ptr'}.intersection(sys.argv) else [],
 	
 	install_requires = [
+			'uri>=2.0.0,<3.0.0',  # Generic URI datastructure.
 			'marrow.schema>=1.2.0,<2.0.0',  # Declarative schema support.
 			'marrow.package>=1.1.0,<2.0.0',  # Plugin discovery and loading.
 			'pymongo>=3.2',  # We require modern API.
@@ -89,10 +92,12 @@ setup(
 	
 	extras_require = dict(
 			decimal = ['pymongo>=3.4'],  # More modern version required for Decimal128 support.
-			development = tests_require + ['pre-commit'],  # Development-time dependencies.
-			scripting = ['javascripthon<1.0'],  # Allow map/reduce functions and "stored functions" to be Python.
-			logger = ['tzlocal'],  # Timezone support to store log times in UTC like a sane person.
+			development = tests_require + ['pre-commit', 'bandit'],  # Development-time dependencies.
+			logger = ['tzlocal>=1.4'],  # Timezone support to store log times in UTC like a sane person.
 			markdown = ['misaka', 'pygments'],  # Markdown text storage.
+			scripting = ['javascripthon<1.0'],  # Allow map/reduce functions and "stored functions" to be Python.
+			tz = ['pytz', 'tzlocal>=1.4'],  # Support for timezones.
+			timezone = ['pytz', 'tzlocal>=1.4'],  # Alias for the above timezone support.
 		),
 	
 	tests_require = tests_require,
@@ -103,67 +108,53 @@ setup(
 				# ### Marrow Mongo Lookups
 				'marrow.mongo.document': [  # Document classes registered by name.
 						'Document = marrow.mongo.core.document:Document',
-						
 						'GeoJSON = marrow.mongo.geo:GeoJSON',
 						'GeoJSONCoord = marrow.mongo.geo:GeoJSONCoord',
-						'Point = marrow.mongo.geo:Point',
-						'LineString = marrow.mongo.geo:LineString',
-						'Polygon = marrow.mongo.geo:Polygon',
-						'MultiPoint = marrow.mongo.geo:MultiPoint',
-						'MultiLineString = marrow.mongo.geo:MultiLineString',
-						'MultiPolygon = marrow.mongo.geo:MultiPolygon',
 						'GeometryCollection = marrow.mongo.geo:GeometryCollection',
+						'LineString = marrow.mongo.geo:LineString',
+						'MultiLineString = marrow.mongo.geo:MultiLineString',
+						'MultiPoint = marrow.mongo.geo:MultiPoint',
+						'MultiPolygon = marrow.mongo.geo:MultiPolygon',
+						'Point = marrow.mongo.geo:Point',
+						'Polygon = marrow.mongo.geo:Polygon',
 					],
 				'marrow.mongo.field': [  # Field classes registered by (optionaly namespaced) name.
-						'Field = marrow.mongo.core.field:Field',
-						
-						'String = marrow.mongo.core.field.base:String',
-						'Binary = marrow.mongo.core.field.base:Binary',
-						'ObjectId = marrow.mongo.core.field.base:ObjectId',
-						'Boolean = marrow.mongo.core.field.base:Boolean',
-						'Date = marrow.mongo.core.field.base:Date',
-						'TTL = marrow.mongo.core.field.base:TTL',
-						'Period = marrow.mongo.core.field.base:Period',
-						'Regex = marrow.mongo.core.field.base:Regex',
-						'Timestamp = marrow.mongo.core.field.base:Timestamp',
-						
-						'Array = marrow.mongo.core.field.complex:Array',
-						'Embed = marrow.mongo.core.field.complex:Embed',
-						'Reference = marrow.mongo.core.field.complex:Reference',
-						'PluginReference = marrow.mongo.core.field.complex:PluginReference',
-						'Alias = marrow.mongo.core.field.complex:Alias',
-						
-						'Number = marrow.mongo.core.field.number:Number',
-						'Double = marrow.mongo.core.field.number:Double',
-						'Integer = marrow.mongo.core.field.number:Integer',
-						'Long = marrow.mongo.core.field.number:Long',
-						'Decimal = marrow.mongo.core.field.number:Decimal[decimal]',
-						
+						'Alias = marrow.mongo.core.field.alias:Alias',
+						'Array = marrow.mongo.core.field.array:Array',
+						'Binary = marrow.mongo.core.field.binary:Binary',
+						'Boolean = marrow.mongo.core.field.boolean:Boolean',
+						'Date = marrow.mongo.core.field.date:Date',
+						'Decimal = marrow.mongo.core.field.decimal_:Decimal[decimal]',
+						'Double = marrow.mongo.core.field.double:Double',
+						'Embed = marrow.mongo.core.field.embed:Embed',
+						'Field = marrow.mongo.core.field.base:Field',
+						'Integer = marrow.mongo.core.field.integer:Integer',
+						'Link = marrow.mongo.core.field.link:Link',
+						'Long = marrow.mongo.core.field.long_:Long',
 						'Markdown = marrow.mongo.core.field.md:Markdown[markdown]',
+						'Number = marrow.mongo.core.field.number:Number',
+						'ObjectId = marrow.mongo.core.field.oid:ObjectId',
 						'Path = marrow.mongo.core.field.path:Path',
+						'Period = marrow.mongo.core.field.period:Period',
+						'PluginReference = marrow.mongo.core.field.plugin:PluginReference',
+						'Reference = marrow.mongo.core.field.reference:Reference',
+						'Regex = marrow.mongo.core.field.regex:Regex',
+						'Set = marrow.mongo.core.field.set_:Set',
+						'String = marrow.mongo.core.field.string:String',
+						'TTL = marrow.mongo.core.field.ttl:TTL',
+						'Timestamp = marrow.mongo.core.field.timestamp:Timestamp',
 						'Translated = marrow.mongo.core.trait.localized:Translated',
+						'Mapping = marrow.mongo.core.field.mapping:Mapping',
 					],
 				'marrow.mongo.trait': [  # Document traits for use as mix-ins.
-						# Active Collection Traits
 						'Collection = marrow.mongo.core.trait.collection:Collection',
-						'Queryable = marrow.mongo.core.trait.queryable:Queryable',
-						
-						# Behavioural Traits
 						'Derived = marrow.mongo.core.trait.derived:Derived',
 						'Expires = marrow.mongo.core.trait.expires:Expires',
 						'Identified = marrow.mongo.core.trait.identified:Identified',
 						'Localized = marrow.mongo.core.trait.localized:Localized',
 						'Published = marrow.mongo.core.trait.published:Published',
-						# 'Stateful = marrow.mongo.core.trait.stateful:Stateful',
-						
-						# Taxonomic Traits
-						#'Heirarchical = marrow.mongo.core.trait.heir:Heirarchical',
-						#'HChildren = marrow.mongo.core.trait.heir:HChildren',
-						#'HParent = marrow.mongo.core.trait.heir:HParent',
-						#'HAncestors = marrow.mongo.core.trait.heir:HAncestors',
-						#'HPath = marrow.mongo.core.trait.heir:HPath',
-						#'HNested = marrow.mongo.core.trait.heir:HNested',
-						#'Taxonomy = marrow.mongo.core.trait.heir:Taxonomy',
+						'Queryable = marrow.mongo.core.trait.queryable:Queryable',
+						'Lockable = marrow.mongo.core.trait.lockable:Lockable',
 					],
 				# ### WebCore Extensions
 				'web.session': [  # Session Engine
