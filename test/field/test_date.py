@@ -125,4 +125,4 @@ class TestDateFieldBasicTzinfo(FieldExam):
 		now = _dt(1902, 4, 24)
 		instance = Sample(now)
 		
-		assert instance.field.tzinfo.tzname(instance.field) == 'Canada/Pacific'
+		assert instance.field.tzinfo.tzname(instance.field) in ('PST', 'Canada/Pacific')
