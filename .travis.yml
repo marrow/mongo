@@ -25,8 +25,6 @@ matrix:
       env: MONGODB_VERSION=3.4.4 NO_PYTZ=1
     - python: "3.5"
       env: MONGODB_VERSION=3.2.13
-    - python: "3.5"
-      env: MONGODB_VERSION=3.4.7 PYTHONOPTIMIZE=1
 
 before_install:
   - wget http://fastdl.mongodb.org/linux/mongodb-linux-x86_64-${MONGODB_VERSION}.tgz -O /tmp/mongodb.tgz
