@@ -61,6 +61,11 @@ class TestDateField(FieldExam):
 		now = _dt.utcnow().replace(microsecond=0)
 		instance = Sample({'_id': ObjectId.from_datetime(now)})
 		assert instance.field.replace(tzinfo=None) == now
+	
+	def test_invalid_assignment(self, Sample):
+		instance = Sample()
+		with pytest.raises(ValueError):
+			instance.field = "Have you ever danced with the devil in the pale moonlight?"
 
 
 class TestDateFieldExplicitNaive(FieldExam):

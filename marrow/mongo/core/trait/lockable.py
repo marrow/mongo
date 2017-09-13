@@ -135,7 +135,7 @@ class Lockable(Queryable):
 			if document.Queue.__collection__:
 				document.Queue(document, 'acquired').insert_one()
 			
-			if __debug__:
+			if __debug__:  # pragma: no cover
 				expires = self.expires
 				reference = DBRef(document.__collection__, document.id)
 				log.debug("Acquired new lock on {!r} expiring {}.".format(document, expires.isoformat()), extra={
