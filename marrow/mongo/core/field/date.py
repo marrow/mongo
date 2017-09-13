@@ -86,10 +86,8 @@ class Date(Field):
 		if not dt.tzinfo and naive:
 			if hasattr(naive, 'localize'):
 				dt = naive.localize(dt)
-			elif naive == utc:
-				dt = dt.replace(tzinfo=naive)
 			else:
-				raise ValueError("Must install `pytz` package for timezone support.")
+				dt = dt.replace(tzinfo=naive)
 		
 		if not tz:
 			return dt
