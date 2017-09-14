@@ -1,15 +1,27 @@
 # Alias
 
+{% method -%}
 An **Alias** is a proxy to another field, potentially nested, within the same document.
 
 Utilizing an Alias allows class-level querying and instance-level read access, write access under most conditions, as well as optional deprecation warning generation.
 
 <dl>
-	<dt><h5>Import</h5></dt><dd><code>from marrow.mongo.field import Alias</code></dd>
-	<dt><h5>Inherits</h5></dt><dd><code>marrow.schema:<strong>Attribute</strong></code></dd>
-	<dt><h5>Added</h5></dt><dd><code>1.1.0</code> Oranir</dd>
-	<dt><h5></h5></dt><dd><code></code></dd>
+	<dt><h5>Import</h5></dt><dd><p><code>from marrow.mongo.field import Alias</code></p></dd>
+	<dt><h5>Inherits</h5></dt><dd><p><code>marrow.schema:<strong>Attribute</strong></code></p></dd>
+	<dt><h5>Added</h5></dt><dd><p><code>1.1.0</code> [Oranir](https://github.com/marrow/mongo/releases/tag/1.1.0)</p></dd>
+	<dt><h5></h5></dt><dd><p><code></code></p></dd>
 </dl>
+
+{%common -%}
+
+#### Table of Contents
+
+1. [Attributes](#attributes)
+2. [Usage](#usage)
+3. [Example](#example)
+4. [See Also](#see-also)
+
+{% endmethod %}
 
 
 ## Attributes
