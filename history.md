@@ -2,6 +2,46 @@
 
 <!-- timeline -->
 
+## 1.1.2 [_Enhancement Release_](https://github.com/marrow/mongo/releases/tag/1.1.2)
+
+`2017-09-13` **Noaphiel**
+
+General corrections and changes:
+
+* Array field could not be filtered as not-equal. [#43](https://github.com/marrow/mongo/issues/43)
+* The new `Lockable` trait implements mutex lock behaviour at the document level. [#47](https://github.com/marrow/mongo/issues/47)
+* Package build and automated testing adjustments including expanded build matrixes, Bandit exclusions, and multiple MongoDB versions.
+* Dead code removal.
+* Adaption to future reserved word use; `await` will be reserved in Python 3.7+.
+* Corrections for certain edge cases involving casting of `None` values.
+
+Backwards incompatible changes:
+
+* Due to the reservedness of `await` mentioned above, its use will raise an error. Use `wait` instead.
+
+Field types now available:
+
+* `Link` for the storage of URI values such as HTTP URLs, `mailto:`, `tel:`, etc. [#45](https://github.com/marrow/mongo/issues/45) [#39](https://github.com/marrow/mongo/issues/39)
+
+* `Mapping` field to automatically perform read-only translation of a keyed list of embedded documents into a dictionary. [#46](https://github.com/marrow/mongo/issues/46)
+
+* `Set` field will utilize a true `set` instance Python-side.
+
+Field enhancements:
+
+* Fields may now be excluded from positional instantiation. [#28](https://github.com/marrow/mongo/issues/28)
+
+* Fields may now be adapted / mutated to specialize when inheriting without complete replacement. [#38](https://github.com/marrow/mongo/issues/38)
+
+* `Alias` fields may now trigger deprecation warnings if requested. [#48](https://github.com/marrow/mongo/issues/48)
+
+* `Date` fields are now timezone aware if `pytz` is installed, and able to intelligently utilize the server-local timezone if `tzlocal` is installed.  (Or just utilize Marrow Mongo's `tz` installation flag.) [#51](https://github.com/marrow/mongo/issues/51)
+
+* `PluginReference` can now perform simple search and replace in Python import references, allowing for mapping of old import paths to new ones during code refactoring. [#49](https://github.com/marrow/mongo/issues/49)
+
+<!-- /timeline -->
+<<!-- timeline -->
+
 ## 1.1.1 [_Refinement Release_](https://github.com/marrow/mongo/releases/tag/1.1.1)
 
 `2017-05-17` **Mirthra**
