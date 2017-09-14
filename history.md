@@ -40,7 +40,7 @@ Field enhancements:
 * `PluginReference` can now perform simple search and replace in Python import references, allowing for mapping of old import paths to new ones during code refactoring. [#49](https://github.com/marrow/mongo/issues/49)
 
 <!-- /timeline -->
-<<!-- timeline -->
+<!-- timeline -->
 
 ## 1.1.1 [_Refinement Release_](https://github.com/marrow/mongo/releases/tag/1.1.1)
 
