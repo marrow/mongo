@@ -75,3 +75,7 @@
 * [Colophon](colophon.md)
 * [License](license.md)
 * [History](history.md)
+
+---
+
+<p style="text-align: center;"><small>♡</small></p>
