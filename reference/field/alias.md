@@ -62,8 +62,11 @@ Accessing an Alias at the class level will resolve a Queryable for the target fi
 ### Simple Sibling Reference
 
 {% method -%}
+An example.
+
 {% sample lang="python" -%}
 ```python
+code
 ```
 {% endmethod %}
 
@@ -71,8 +74,11 @@ Accessing an Alias at the class level will resolve a Queryable for the target fi
 ### Descendant Attriute of a Sibling
 
 {% method -%}
+An example.
+
 {% sample lang="python" -%}
 ```python
+code
 ```
 {% endmethod %}
 
@@ -80,8 +86,11 @@ Accessing an Alias at the class level will resolve a Queryable for the target fi
 ### Numeric Array Index Reference
 
 {% method -%}
+An example.
+
 {% sample lang="python" -%}
 ```python
+code
 ```
 {% endmethod %}
 
@@ -89,12 +98,15 @@ Accessing an Alias at the class level will resolve a Queryable for the target fi
 ### Legacy Alternative Names / Deprecation
 
 {% method -%}
+An example.
+
 {% sample lang="python" -%}
 ```python
+code
 ```
 {% endmethod %}
 
 
 ## See Also
 
-* 
+* Also.
