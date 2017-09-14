@@ -8,13 +8,12 @@ Utilizing an Alias allows class-level querying and instance-level read access, w
 <dl>
 	<dt><h5>Import</h5></dt><dd><p><code>from marrow.mongo.field import Alias</code></p></dd>
 	<dt><h5>Inherits</h5></dt><dd><p><code>marrow.schema:<strong>Attribute</strong></code></p></dd>
-	<dt><h5>Added</h5></dt><dd><p><code>1.1.0</code> <a href="https://github.com/marrow/mongo/releases/tag/1.1.0">Oranir</a></p></dd>
-	<dt><h5></h5></dt><dd><p><code></code></p></dd>
+	<dt><h5>Version</h5></dt><dd><p><code>&gt;=1.1.0</code> <a href="https://github.com/marrow/mongo/releases/tag/1.1.0">Oranir</a></p></dd>
 </dl>
 
 {%common -%}
 
-#### Table of Contents
+#### Contents
 
 1. [Attributes](#attributes)
 2. [Usage](#usage)
@@ -35,7 +34,8 @@ This pseudo-field **does not** inherit other field attributes.
 	</dd><dt><h5><code>deprecate</code></h5></dt><dd>
 		<p>Used to determine if access should issue <code>DeprecationWarning</code> messages. If truthy, a warning will be raised, and if non-boolean the string value will be included in the message.</p>
 		<p><label>Default</label><code><code>False</code></code></p>
-	</dd><dt><h5><code></code></h5></dt><dd></dd>
+		<p><label>Added</label><code><code>&gt;=1.1.2</code></code></p>
+	</dd>
 </dl>
 
 
