@@ -55,3 +55,76 @@ Paths are strings comprised of dot-separated attribute names. The search beings 
 Attributes (and dictionary keys) prefixed with an underscore are protected and will not resolve.
 
 Accessing an Alias at the class level will resolve a Queryable for the target field, allowing filter document construction through comparison utilizing the alias name itself. On an instance access will retrieve or assign the value of the target field.
+
+
+## Example
+
+### Simple Sibling Reference
+
+{% method -%}
+An example.
+
+{% sample lang="python" -%}
+```python
+class User(Document):
+	id = String('_id')
+	username = Alias('id')
+```
+{% endmethod %}
+
+
+### Descendant Attriute of a Sibling
+
+{% method -%}
+An example.
+
+{% sample lang="python" -%}
+```python
+class Package(Document):
+	class Address(Document):
+		city = String()
+		region = String()
+	
+	address = Embed(Address, assign=True)
+	region = Alias('address.region')
+```
+{% endmethod %}
+
+
+### Numeric Array Index Reference
+
+{% method -%}
+An example.
+
+{% sample lang="python" -%}
+```python
+class Conversation(Document):
+	class Message(Document):
+		id = ObjectId('_id')
+		sender = Field()
+		message = Field()
+	
+	messages = Array(Embed(Message), assign=True)
+	latest = Alias('messages.0')
+```
+{% endmethod %}
+
+
+### Legacy Alternative Names / Deprecation
+
+{% method -%}
+An example.
+
+{% sample lang="python" -%}
+```python
+class User(Document):
+	id = String('_id')
+	username = Alias('id',
+		deprecate="Username is now primary key.")
+```
+{% endmethod %}
+
+
+## See Also
+
+* Also.
