@@ -8,7 +8,7 @@ Utilizing an Alias allows class-level querying and instance-level read access, w
 <dl>
 	<dt><h5>Import</h5></dt><dd><p><code>from marrow.mongo.field import Alias</code></p></dd>
 	<dt><h5>Inherits</h5></dt><dd><p><code>marrow.schema:<strong>Attribute</strong></code></p></dd>
-	<dt><h5>Added</h5></dt><dd><p><code>1.1.0</code> [Oranir](https://github.com/marrow/mongo/releases/tag/1.1.0)</p></dd>
+	<dt><h5>Added</h5></dt><dd><p><code>1.1.0</code> <a href="https://github.com/marrow/mongo/releases/tag/1.1.0">Oranir</a></p></dd>
 	<dt><h5></h5></dt><dd><p><code></code></p></dd>
 </dl>
 
