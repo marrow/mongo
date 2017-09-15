@@ -3,7 +3,7 @@
 {% method -%}
 An **Alias** is a proxy to another field, potentially nested, within the same document.
 
-Utilizing an Alias allows class-level querying and instance-level read access, write access under most conditions, as well as optional deprecation warning generation.
+Utilizing an `Alias` allows class-level querying and instance-level read access, write access under most conditions, as well as optional deprecation warning generation.
 
 <dl>
 	<dt><h5>Import</h5></dt><dd><p><code>from marrow.mongo.field import Alias</code></p></dd>
@@ -59,7 +59,7 @@ References to other fields may be:
 
 Paths are strings comprised of dot-separated attribute names. The search beings at the containing document, consuming path elements as we go. Each path element is first attempted as an attribute and, failing that, will attempt dictionary access. If the path element is numeric, it will be utilized as an array index.
 
-Accessing an Alias at the class level will resolve a Queryable for the target field, allowing filter document construction through comparison utilizing the alias name itself. On an instance access will retrieve or assign the value of the target field.
+Accessing an `Alias` at the class level will resolve a Queryable for the target field, allowing filter document construction through comparison utilizing the `alias` name itself. On an instance access will retrieve or assign the value of the target field.
 
 
 ## Examples
