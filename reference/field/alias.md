@@ -33,8 +33,8 @@ This pseudo-field **does not** inherit other field attributes.
 		<p><label>Required</label></p>
 	</dd><dt><h5><code>deprecate</code></h5></dt><dd>
 		<p>Used to determine if access should issue <code>DeprecationWarning</code> messages. If truthy, a warning will be raised, and if non-boolean the string value will be included in the message.</p>
-		<p><label>Default</label><code>False</code></code></p>
-		<p><label>Added</label><code>&gt;=1.1.2</code></code></p>
+		<p><label>Default</label><code>False</code></p>
+		<p><label>Added</label><code>&gt;=1.1.2</code></p>
 	</dd>
 </dl>
 
@@ -124,7 +124,7 @@ class Conversation(Document):
 {% method -%}
 Data modelling requirements change over time and there can be a lot of code referencing a given document attribute. Help identify where that access is coming from by marking old, deprecated attributes using `Alias` with an appropriate message.
 
-<label>Added</label><code>&gt;=1.1.2</code></code>
+<label>Added</label><code>&gt;=1.1.2</code>
 
 
 {% sample lang="python" -%}
