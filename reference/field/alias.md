@@ -81,7 +81,7 @@ User.find_many(username__startswith="a")
 {% endmethod %}
 
 
-#### Descendant Attriute of a Sibling
+#### Descendant Attribute of a Sibling
 
 {% method -%}
 There are situations where elevating an embedded value can be useful to, for example, shorten frequent queries or variable references in templates.
