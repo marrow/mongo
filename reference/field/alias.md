@@ -45,27 +45,26 @@ Instantiate and assign an instance of this class during construction of a new `D
 
 References to other fields may be:
 
-* The string name of a sibling attribute. 
+* The string name of a sibling attribute.  
   <label>Example</label><code>'id'</code>
 
-* The path to a descendant attribute of a sibling. 
+* The path to a descendant attribute of a sibling.  
   <label>Example</label><code>'address.city'</code>
 
-* Or involving numeric array indexes.
+* Or involving numeric array indexes.  
   <label>Example</label><code>'some_array.0'</code>
 
-* Or involving dictionary key references.
+* Or involving dictionary key references.  
   <label>Example</label><code>'locale.en'</code>
 
 Paths are strings comprised of dot-separated attribute names. The search beings at the containing document, consuming path elements as we go. Each path element is first attempted as an attribute and, failing that, will attempt dictionary access. If the path element is numeric, it will be utilized as an array index.
-
 
 Accessing an Alias at the class level will resolve a Queryable for the target field, allowing filter document construction through comparison utilizing the alias name itself. On an instance access will retrieve or assign the value of the target field.
 
 
 ## Examples
 
-### Sibling Reference
+#### Sibling Reference
 
 {% method -%}
 As it might not be natural to refer to the user's username everywhere as `id`, especially if dereferenced from a variable, you can use an `Alias` to provide a more contextual name for the identifier.
@@ -82,7 +81,7 @@ User.find_many(username__startswith="a")
 {% endmethod %}
 
 
-### Descendant Attriute of a Sibling
+#### Descendant Attriute of a Sibling
 
 {% method -%}
 There are situations where elevating an embedded value can be useful to, for example, shorten frequent queries or variable references in templates.
@@ -100,7 +99,7 @@ class Package(Document):
 {% endmethod %}
 
 
-### Numeric Array Index Reference
+#### Numeric Array Index Reference
 
 {% method -%}
 If you're savvy and always insert the most recent message at the beginning of the unread messages array, you can easily and semantically access the latest message using an `Alias`.
@@ -119,7 +118,7 @@ class Conversation(Document):
 {% endmethod %}
 
 
-### Legacy Alternative Names / Deprecation
+#### Legacy Alternative Names / Deprecation
 
 {% method -%}
 Data modelling requirements change over time and there can be a lot of code referencing a given document attribute. Help identify where that access is coming from by marking old, deprecated attributes using `Alias` with an appropriate message.
