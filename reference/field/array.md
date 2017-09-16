@@ -26,7 +26,7 @@ This field type inherits all [`Field` attributes](field.md#attributes). As a com
 
 <dl>
 	<dt><h5><code>kind</code></h5></dt><dd>
-		<p>A `Field` subclass instance, or an instance of `Field` itself if the type is dynamic.</p>
+		<p>A <code>Field</code> subclass instance, or an instance of <code>Field</code> itself if the type is dynamic.</p>
 		<p><label>Required</label></p>
 	</dd>
 </dl>
