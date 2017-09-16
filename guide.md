@@ -158,7 +158,7 @@ With the class bound you can now more easily interact with your documents in the
 Binding the class is not strictly needed in order to interact with them. You can instantiate, manipulate, and utilize as a mapping without it. Binding does, however, allow you to easily save the result and fetch records back out.
 
 
-### Record Creation
+#### Record Creation
 
 {% method -%}
 When constructing an instance you may pass field values positionally as well as by name. Fields will be filled, positionally, in the order they were defined, skipping fields whose `positional` predicate is falsy.
@@ -400,7 +400,7 @@ class AwesomeField(Field):
 {% endmethod %}
 
 
-### Data Validation
+#### Data Validation
 
 {% method -%}
 By default no data validation is performed beyond the errors that may be raised during datatype transformation for a given `Field` subclass. Any field-level configuration for validation-like features effect the generation of the MongoDB-side validation document. You can make use of custom client-side valiation within your own models by utilizing Marrow Schema validation objects.
@@ -415,11 +415,6 @@ class MyDocument(Document):
 	id = Field('_id', validator=username)
 ```
 {% endmethod %}
-
-
-### Predicates
-
-There are several predicates that apply to all fields. These are callbacks, callable objects, or evaluated as ACL trinary booleans (`is None` vs. `bool()`) if not otherwise callable, allowing for simple "always" and "never" static values.
 
 
 #### Projection
