@@ -26,7 +26,7 @@ A `Field` represents a data types storable within MongoDB and the associated mac
 <dl>
 	<dt><h5><code>name</code></h5></dt><dd>
 		<p>The database-side name of the field, stored internally as the metadata property <code>__name__</code>.</p>
-		<p>Default calculated when assigned as a class attribute from the name given to the `Field` instance during class construction.</p>
+		<p>Default calculated when assigned as a class attribute from the name given to the <code>Field</code> instance during class construction.</p>
 	</dd><dt><h5><code>default</code></h5></dt><dd>
 		<p>The default value to utilize if the field is missing from the backing store. You may assign a callback routine returning a value to utilize instead.</p>
 	</dd><dt><h5><code>choices</code></h5></dt><dd>

@@ -42,7 +42,7 @@ class Account(Queryable):
 ```
 {% endmethod %}
 {% method -%}
-Initially we populate metadata. The first defines the name of the collection to use when _binding_ the class to a database, and is optional; you can bind it to a class directly if you wish, or use it without binding at all. The second is used to specify a default validation level and generate a validation document (schema and/or constraints).
+Initially we populate metadata. The first defines the name of the collection to use when _binding_ the class to a database, and is optional; you can bind it to a collection directly if you wish, or use it without binding at all. The second is used to specify a default validation level and generate a validation document (schema and/or constraints).
 
 {% sample lang="python" -%}
 ```python
@@ -92,11 +92,11 @@ Now we define an array of free-form strings to utilize as tags. This is a comple
 ```
 {% endmethod %}
 {% method -%}
-Even though `Account` inherits `Identified`, we don't want to gum up construction of new instances by allowing the ID to be defined positionally, so we redefine it. Redefined fields maintain their original order/position.
+Even though `Account` inherits `Identified`, we don't want to gum up construction of new instances by allowing the ID to be defined positionally, so we adapt it. Adapted and redefined fields maintain their original order/position.
 
 {% sample lang="python" -%}
 ```python
-	id = ObjectId('_id', assign=True, positional=False)
+	id = Queryable.id.adapt(positional=False)
 ```
 {% endmethod %}
 {% method -%}
@@ -191,7 +191,7 @@ assert result.inserted_id == alice.id
 Using an assertion in this way, this validation will not be run in production code executed with the `-O` option passed (or `PYTHONOPTIMIZE` environment variable set) in the invocation to Python.
 
 
-### Record Retrieval
+#### Record Retrieval
 
 With a record stored in the database we can now issue queries and expect some form of result.
 
@@ -274,7 +274,7 @@ assert 'name' in Sample.__fields__
 {% endmethod %}
 
 
-### Name Mapping
+#### Name Mapping
 
 {% method -%}
 In general, basic fields accept one positional parameter: the name of the field to store data against within MongoDB. In the following example any attempt to read or write to the `field` attriute of a `MyDocument` instance will instead retrieve data from the backing document using the key `name`. If no name is specified explicitly the name of the attribute the field is assigned to is used by default. The most frequent use of this is in mapping the `_id` field from MongoDB to a less cumbersome property name.
@@ -291,7 +291,7 @@ class MyDocument(Document):
 {% endmethod %}
 
 
-### Default Values
+#### Default Values
 
 There are a few attributes of a field that determine what happens when an attempt is made to access a value that currently does not exist in the backing document. If no default is provided and there is no value in the backing store for the field, any attempt to read the value of the field through attribute access will result in an `AttributeError` exception.
 
@@ -339,14 +339,14 @@ There are a few attributes of a field that determine what happens when an attemp
 </dl>
 
 
-### Limiting Choice
+#### Limiting Choice
 
 Passing either an iterable of values, or a callback producing an iterable of values, as the `choices` argument allows you to restrict the acceptable values for the field. If static, this list will be included in the validation document. In this way you can emulate an enum or a set if applied to a field encapsulated in an `Array`.
 
 The ability to restrict acceptable values this way is available to all types of field. Some, such as `Number` and its more specific subclasses, provide additional methods to restrict allowable values, such as ranges or minimums and maximums.
 
 
-### Field Exclusivity
+#### Field Exclusivity
 
 {% method -%}
 Occasionally it may be useful to have two distinct fields where it is acceptable to have a value assigned to only one. We model this dependency through exclusion. By passing a `set` of field names as the `exclusive` argument you can define the fields that must not be set for the current field to be assignable.
@@ -362,12 +362,9 @@ class MyDocument(Document):
 {% endmethod %}
 
 
-### Data Transformation
+#### Data Transformation
 
 As we rely on Marrow Schema we make use of its transformation and validation APIs (and objects) to allow for customization of both data ingress and egress. By default Marrow Mongo attempts to ensure the value stored behind-the-scenes matches MongoDB and BSON datatype expectations to allow for conversion-free final use.
-
-
-#### Overriding Transformation
 
 {% method -%}
 If one wanted to store Python `Decimal` objects within the database and wasn't running the latest MongoDB version which has direct support for this type, you could store them safely as strings. An easy way to accomplish this is to use Marrow Schema's `Decimal` transformer.
@@ -382,6 +379,7 @@ class MyDocument(Document):
 	field = Field(transformer=decimal)
 ```
 {% endmethod %}
+
 
 #### Transformation in Field Subclasses
 
