@@ -26,7 +26,7 @@ A `Field` represents a data types storable within MongoDB and the associated mac
 <dl>
 	<dt><h5><code>name</code></h5></dt><dd>
 		<p>The database-side name of the field, stored internally as the metadata property <code>__name__</code>.</p>
-		<p><label>Default</label>Calculated when assigned as a class attribute, during class construction.</p>
+		<p>Default calculated when assigned as a class attribute from the name given to the `Field` instance during class construction.</p>
 	</dd><dt><h5><code>default</code></h5></dt><dd>
 		<p>The default value to utilize if the field is missing from the backing store. You may assign a callback routine returning a value to utilize instead.</p>
 	</dd><dt><h5><code>choices</code></h5></dt><dd>
@@ -36,7 +36,7 @@ A `Field` represents a data types storable within MongoDB and the associated mac
 		<p>Must have a value assigned. <code>None</code>, an empty string, and other falsy values are acceptable.</p>
 		<p><label>Default</label><code>False</code></p>
 	</dd><dt><h5><code>nullable</code></h5></dt><dd>
-		<p>If <code>True<code>, will store <code>None<code>. If <code>False<code>, will store any non-<code>None<code> default, or remove the field from the backing store.</p>
+		<p>If <code>True</code>, will store <code>None</code>. If <code>False</code>, will store any non-<code>None</code> default, or remove the field from the backing store.</p>
 		<p><label>Default</label><code>False</code></p>
 	</dd><dt><h5><code>exclusive</code></h5></dt><dd>
 		<p>The set of other fields that must <strong>not</strong> be set for this field to be writeable.</p>
@@ -51,12 +51,10 @@ Define how Python-side code interacts with the stored MongoDB data values.
 
 <dl>
 	<dt><h5><code>transformer</code></h5></dt><dd>
-		<p>A Marrow Schema <code>Transformer<code> class to use when loading or storing values.</p>
-		<p><label>Required</label></p>
+		<p>A Marrow Schema <code>Transformer</code> class to use when loading or storing values.</p>
 		<p><label>Default</label><code>FieldTransform()</code></p>
 	</dd><dt><h5><code>validator</code></h5></dt><dd>
-		<p>A Marrow Schema <code>Validator<code> class to use when validating values during assignment.</p>
-		<p><label>Required</label></p>
+		<p>A Marrow Schema <code>Validator</code> class to use when validating values during assignment.</p>
 		<p><label>Default</label><code>Validator()</code></p>
 	</dd><dt><h5><code>assign</code></h5></dt><dd>
 		<p>Automatically assign the default value to the backing store when constructing a new instance or the value is found to be missing on access.</p>
@@ -78,24 +76,30 @@ These are either argumentless callback routines returning, or simply the constan
 * `True` (or truthy)  
   Explicitly allow or include.
 
+These are used to restrict or define security-like behaviours.
+
 <dl>
 	<dt><h5><code>positional</code></h5></dt><dd>
 		<p>Permit this field to be populated through positional assignment during instantiation of its containing class.</p>
 		<p><label>Default</label><code>True</code></p>
 	</dd><dt><h5><code>repr</code></h5></dt><dd>
-		<p>Include this field in the programmers' representation, primarily utilized for REPL shells, logging, tracebacks, and other diagnostic purposes. <em>Protect sensitive fields from accidental exposure by assigning False.</em></p>
+		<p>Include this field in the programmers' representation, primarily utilized for REPL shells, logging, tracebacks, and other diagnostic purposes.</p>
+		<p><em>Protect sensitive fields from accidental exposure by assigning <code>False</code>.</em></p>
 		<p><label>Default</label><code>True</code></p>
 	</dd><dt><h5><code>project</code></h5></dt><dd>
 		<p>Inlcude (or exclude) this field from the default projection.</p>
 		<p><label>Default</label><code>None</code></p>
 	</dd><dt><h5><code>read</code></h5></dt><dd>
-		<p>Permission to read values from this field. <em>Not internally enforced.</em></p>
+		<p>Permission to read values from this field.</p>
+		<p><em>Not internally enforced.</em></p>
 		<p><label>Default</label><code>True</code></p>
 	</dd><dt><h5><code>write</code></h5></dt><dd>
-		<p>Permission to assign values to this field. <em>Not internally enforced.</em></p>
+		<p>Permission to assign values to this field.</p>
+		<p><em>Not internally enforced.</em></p>
 		<p><label>Default</label><code>True</code></p>
 	</dd><dt><h5><code>sort</code></h5></dt><dd>
-		<p>Allow sorting/ordering on this field. <em>Not internally enforced.</em></p>
+		<p>Allow sorting/ordering on this field.</p>
+		<p><em>Not internally enforced.</em></p>
 		<p><label>Default</label><code>True</code></p>
 	</dd>
 </dl>
