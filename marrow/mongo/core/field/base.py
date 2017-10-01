@@ -54,15 +54,15 @@ class Field(Attribute):
 	nullable = Attribute(default=False)  # If True, will store None.  If False, will store non-None default, or not store.
 	exclusive = Attribute(default=None)  # The set of other fields that must not be set for this field to be settable.
 	
-	# Data Lifespan Properties
+	# Local Manipulation
 	
 	transformer = Attribute(default=FieldTransform())  # A Transformer class to use when loading/saving values.
 	validator = Attribute(default=Validator())  # The Validator class to use when validating values.
-	positional = Attribute(default=True)  # If True, will be accepted positionally.
 	assign = Attribute(default=False)  # If truthy attempt to access and store resulting variable when instantiated.
 	
-	# Security Properties
+	# Predicates
 	
+	positional = Attribute(default=True)  # If True, will be accepted positionally.
 	repr = Attribute(default=True)  # Should this field be included in the programmers' representation?
 	project = Attribute(default=None)  # Predicate to indicate inclusion in the default projection.
 	read = Attribute(default=True)  # Read predicate, either a boolean, callable, or web.security ACL predicate.
@@ -162,7 +162,7 @@ class Field(Attribute):
 		return self.transformer.native(result, (self, obj))
 	
 	def __set__(self, obj, value):
-		"""Executed when assigning a value to a DataAttribute instance attribute."""
+		"""Executed when assigning a value to a Field instance attribute."""
 		
 		if self.exclusive:
 			for other in self.exclusive:
@@ -180,7 +180,7 @@ class Field(Attribute):
 		super(Field, self).__set__(obj, value)
 	
 	def __delete__(self, obj):
-		"""Executed via the `del` statement with a DataAttribute instance attribute as the argument."""
+		"""Executed via the `del` statement with a Field instance attribute as the argument."""
 		
 		# Delete the data completely from the warehouse.
 		del obj.__data__[self.__name__]
