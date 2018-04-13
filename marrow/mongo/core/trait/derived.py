@@ -27,10 +27,10 @@ class Derived(Document):
 	
 	@classmethod
 	def __attributed__(cls):
-		"""Record the construction of a subclass.
+		"""Record the construction of a subclass."""
 		
-		QA: Should these be a weakref dict? Probably.
-		"""
+		if cls.__name__ == 'Derived':
+			return
 		
 		if not hasattr(cls, '__subclasses__'):
 			cls.__dict__['__subclasses__'] = WeakValueDictionary()
