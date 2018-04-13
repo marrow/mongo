@@ -7,7 +7,8 @@ from ...field import PluginReference
 class Derived(Document):
 	"""Access and store the class reference to a particular Document subclass.
 	
-	This allows for easy access to the magical `_cls` key as the `cls` attribute.
+	This allows for easy access to the magical `_cls` key as the `cls` attribute. This value will be populated
+	automatically.  It also allows for easier access to and automatic tracking of subclasses, via the `__subclasses__` mapping attribute.
 	"""
 	
 	__type_store__ = '_cls'  # The pseudo-field to store embedded document class references as.
@@ -19,6 +20,20 @@ class Derived(Document):
 	def __init__(self, *args, **kw):
 		"""Automatically derive and store the class path or plugin reference name."""
 		
+		kw.setdefault('cls', self.__class__)
 		super(Derived, self).__init__(*args, **kw)
+	
+	@classmethod
+	def __attributed__(cls):
+		"""Record the construction of a subclass.
 		
-		self.cls = self.__class__
+		QA: Should these be a weakref dict? Probably.
+		"""
+		
+		super(Derived, self).__attributed__()
+		
+		if not hasattr(cls, '__subclasses__'):
+			cls.__dict__['__subclasses__'] = {}
+			return
+		
+		cls.__subclasses__[cls.__name__] = cls
