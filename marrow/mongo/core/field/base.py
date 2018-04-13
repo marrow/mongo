@@ -2,6 +2,7 @@
 
 from __future__ import unicode_literals
 
+from collections import namedtuple
 from inspect import isclass
 from weakref import proxy
 
@@ -12,6 +13,9 @@ from ....schema.validate import Validator
 from ....schema.compat import str, unicode, py3
 from ...query import Q
 from ...util import adjust_attribute_sequence, SENTINEL
+
+
+FieldContext = namedtuple('FieldContext', 'field,document')
 
 
 class FieldTransform(BaseTransform):
@@ -54,15 +58,15 @@ class Field(Attribute):
 	nullable = Attribute(default=False)  # If True, will store None.  If False, will store non-None default, or not store.
 	exclusive = Attribute(default=None)  # The set of other fields that must not be set for this field to be settable.
 	
-	# Data Lifespan Properties
+	# Local Manipulation
 	
 	transformer = Attribute(default=FieldTransform())  # A Transformer class to use when loading/saving values.
 	validator = Attribute(default=Validator())  # The Validator class to use when validating values.
-	positional = Attribute(default=True)  # If True, will be accepted positionally.
 	assign = Attribute(default=False)  # If truthy attempt to access and store resulting variable when instantiated.
 	
-	# Security Properties
+	# Predicates
 	
+	positional = Attribute(default=True)  # If True, will be accepted positionally.
 	repr = Attribute(default=True)  # Should this field be included in the programmers' representation?
 	project = Attribute(default=None)  # Predicate to indicate inclusion in the default projection.
 	read = Attribute(default=True)  # Read predicate, either a boolean, callable, or web.security ACL predicate.
@@ -112,23 +116,23 @@ class Field(Attribute):
 	
 	# Security Predicate Handling
 	
-	def is_readable(self, context=None):
-		if callable(self.read):
+	def _predicate(self, predicate, context=None):
+		if callable(predicate):
 			if context:
-				return self.read(context, self)
+				return predicate(context, self)
 			else:
-				return self.read(self)
+				return predicate(self)
 		
-		return bool(self.read)
+		return bool(predicate)
+	
+	def is_readable(self, context=None):
+		return self._predicate('read', context)
 	
 	def is_writeable(self, context=None):
-		if callable(self.write):
-			if context:
-				return self.write(context, self)
-			else:
-				return self.write(self)
-		
-		return bool(self.write)
+		return self._predicate('write', context)
+	
+	def is_sortable(self, context=None):
+		return self._predicate('sort', context)
 
 	# Marrow Schema Interfaces
 	
@@ -159,10 +163,10 @@ class Field(Attribute):
 		if result is None:  # Discussion: pass through to the transformer?
 			return None
 		
-		return self.transformer.native(result, (self, obj))
+		return self.transformer.native(result, FieldContext(self, obj))
 	
 	def __set__(self, obj, value):
-		"""Executed when assigning a value to a DataAttribute instance attribute."""
+		"""Executed when assigning a value to a Field instance attribute."""
 		
 		if self.exclusive:
 			for other in self.exclusive:
@@ -175,12 +179,13 @@ class Field(Attribute):
 					raise AttributeError("Can not assign to " + self.__name__ + " if " + other + " has a value.")
 		
 		if value is not None:
-			value = self.transformer.foreign(value, (self, obj))
+			self.validator.validate(value, FieldContext(self, obj))
+			value = self.transformer.foreign(value, FieldContext(self, obj))
 		
 		super(Field, self).__set__(obj, value)
 	
 	def __delete__(self, obj):
-		"""Executed via the `del` statement with a DataAttribute instance attribute as the argument."""
+		"""Executed via the `del` statement with a Field instance attribute as the argument."""
 		
 		# Delete the data completely from the warehouse.
 		del obj.__data__[self.__name__]
@@ -271,7 +276,8 @@ class _CastingKind(Field):
 			return value
 		
 		if isinstance(kind, Field):
-			return kind.transformer.foreign(value, (kind, obj))
+			kind.validator.validate(value, FieldContext(kind, obj))
+			return kind.transformer.foreign(value, FieldContext(kind, obj))
 		
 		if kind:
 			value = kind(**value)
