@@ -2,6 +2,7 @@
 
 from __future__ import unicode_literals
 
+from collections import namedtuple
 from inspect import isclass
 from weakref import proxy
 
@@ -12,6 +13,9 @@ from ....schema.validate import Validator
 from ....schema.compat import str, unicode, py3
 from ...query import Q
 from ...util import adjust_attribute_sequence, SENTINEL
+
+
+FieldContext = namedtuple('FieldContext', 'field,document')
 
 
 class FieldTransform(BaseTransform):
@@ -112,23 +116,23 @@ class Field(Attribute):
 	
 	# Security Predicate Handling
 	
-	def is_readable(self, context=None):
-		if callable(self.read):
+	def _predicate(self, predicate, context=None):
+		if callable(predicate):
 			if context:
-				return self.read(context, self)
+				return predicate(context, self)
 			else:
-				return self.read(self)
+				return predicate(self)
 		
-		return bool(self.read)
+		return bool(predicate)
+	
+	def is_readable(self, context=None):
+		return self._predicate('read', context)
 	
 	def is_writeable(self, context=None):
-		if callable(self.write):
-			if context:
-				return self.write(context, self)
-			else:
-				return self.write(self)
-		
-		return bool(self.write)
+		return self._predicate('write', context)
+	
+	def is_sortable(self, context=None):
+		return self._predicate('sort', context)
 
 	# Marrow Schema Interfaces
 	
@@ -159,7 +163,7 @@ class Field(Attribute):
 		if result is None:  # Discussion: pass through to the transformer?
 			return None
 		
-		return self.transformer.native(result, (self, obj))
+		return self.transformer.native(result, FieldContext(self, obj))
 	
 	def __set__(self, obj, value):
 		"""Executed when assigning a value to a Field instance attribute."""
@@ -175,7 +179,8 @@ class Field(Attribute):
 					raise AttributeError("Can not assign to " + self.__name__ + " if " + other + " has a value.")
 		
 		if value is not None:
-			value = self.transformer.foreign(value, (self, obj))
+			self.validator.validate(value, FieldContext(self, obj))
+			value = self.transformer.foreign(value, FieldContext(self, obj))
 		
 		super(Field, self).__set__(obj, value)
 	
@@ -271,7 +276,8 @@ class _CastingKind(Field):
 			return value
 		
 		if isinstance(kind, Field):
-			return kind.transformer.foreign(value, (kind, obj))
+			kind.validator.validate(value, FieldContext(kind, obj))
+			return kind.transformer.foreign(value, FieldContext(kind, obj))
 		
 		if kind:
 			value = kind(**value)
