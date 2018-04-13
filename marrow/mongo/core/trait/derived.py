@@ -1,5 +1,7 @@
 # encoding: utf-8
 
+from weakref import WeakValueDictionary
+
 from ... import Document, Index
 from ...field import PluginReference
 
@@ -30,10 +32,8 @@ class Derived(Document):
 		QA: Should these be a weakref dict? Probably.
 		"""
 		
-		super(Derived, self).__attributed__()
-		
 		if not hasattr(cls, '__subclasses__'):
-			cls.__dict__['__subclasses__'] = {}
+			cls.__dict__['__subclasses__'] = WeakValueDictionary()
 			return
 		
 		cls.__subclasses__[cls.__name__] = cls
