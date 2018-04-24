@@ -10,8 +10,7 @@ from time import sleep, time
 
 import pytest
 
-from marrow.mongo.core.trait.lockable import TimeoutError
-from marrow.mongo.core.trait.lockable import _identifier as us
+from marrow.mongo.core.trait.lockable import TimeoutError, _identifier
 from marrow.mongo.trait import Lockable
 from marrow.mongo.util import utcnow
 from marrow.schema.compat import pypy
@@ -86,7 +85,7 @@ class TestSimpleLockable(object):
 		
 		sample.reload('lock')
 		
-		assert lock.instance == us()
+		assert lock.instance == _identifier()
 		assert sample.lock == lock
 	
 	def test_acquire_removed(self, sample):
@@ -105,7 +104,7 @@ class TestSimpleLockable(object):
 		sample.acquire()
 		sample.reload('lock')
 		
-		assert sample.lock.instance == us()
+		assert sample.lock.instance == _identifier()
 		assert sample.did_expire
 	
 	def test_acquire_twice(self, sample):
@@ -140,11 +139,11 @@ class TestSimpleLockable(object):
 			lock2 = sample.prolong()
 		
 		assert lock.time < lock2.time
-		assert lock.instance == lock2.instance == us()
+		assert lock.instance == lock2.instance == _identifier()
 	
 	def test_prolong_expired(self, sample):
 		then = utcnow() - timedelta(days=30)
-		lock = sample.Lock(then, us)
+		lock = sample.Lock(then, _identifier)
 		sample.update_one(set__lock=lock)
 		
 		try:
@@ -273,14 +272,14 @@ class TestAwaitableLockable(TestSimpleLockable):
 			sleep(0.5)
 			
 			sample.reload('lock')
-			assert sample.lock.instance != us()
+			assert sample.lock.instance != _identifier()
 			
 			lock = sample.acquire(10)
 			
 			end = time()
 			delta = end - start
 			
-			assert lock.instance == us()
+			assert lock.instance == _identifier()
 			assert 2.5 < delta < 7.5
 	
 	def test_acquire_timeout(self, sample):

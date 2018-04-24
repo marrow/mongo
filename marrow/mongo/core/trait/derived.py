@@ -32,6 +32,7 @@ class Derived(Document):
 		if not issubclass(cls, self.__class__):
 			raise TypeError("Must promote to a subclass of " + self.__class__.__name__)
 		
+		self.cls = cls
 		return cls.from_mongo(self.__data__)
 	
 	def demote(self, cls, preserve=True):
@@ -40,4 +41,5 @@ class Derived(Document):
 		if not issubclass(self.__class__, cls):
 			raise TypeError("Must demote to a superclass of " + self.__class__.__name__)
 		
+		self.cls = cls
 		return cls.from_mongo(self.__data__)
