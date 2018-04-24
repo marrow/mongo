@@ -3,8 +3,8 @@
 from __future__ import unicode_literals
 
 import pytest
-from bson import ObjectId as oid
 from bson import DBRef
+from bson import ObjectId as oid
 
 from common import FieldExam
 from marrow.mongo import Document

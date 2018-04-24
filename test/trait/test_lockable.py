@@ -10,8 +10,8 @@ from time import sleep, time
 
 import pytest
 
-from marrow.mongo.core.trait.lockable import _identifier as us
 from marrow.mongo.core.trait.lockable import TimeoutError
+from marrow.mongo.core.trait.lockable import _identifier as us
 from marrow.mongo.trait import Lockable
 from marrow.mongo.util import utcnow
 from marrow.schema.compat import pypy
