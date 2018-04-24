@@ -10,7 +10,8 @@ class Derived(Document):
 	"""Access and store the class reference to a particular Document subclass.
 	
 	This allows for easy access to the magical `_cls` key as the `cls` attribute. This value will be populated
-	automatically.  It also allows for easier access to and automatic tracking of subclasses, via the `__subclasses__` mapping attribute.
+	automatically.  This also allows for transformation (promotion/demotion) to a more specialized subclass or more
+	general parent class respectively.
 	"""
 	
 	__type_store__ = '_cls'  # The pseudo-field to store embedded document class references as.
@@ -25,15 +26,18 @@ class Derived(Document):
 		kw.setdefault('cls', self.__class__)
 		super(Derived, self).__init__(*args, **kw)
 	
-	@classmethod
-	def __attributed__(cls):
-		"""Record the construction of a subclass.
+	def promote(self, cls, preserve=True):
+		"""Transform this record into an instance of a more specialized subclass."""
 		
-		QA: Should these be a weakref dict? Probably.
-		"""
+		if not issubclass(cls, self.__class__):
+			raise TypeError("Must promote to a subclass of " + self.__class__.__name__)
 		
-		if not hasattr(cls, '__subclasses__'):
-			cls.__dict__['__subclasses__'] = WeakValueDictionary()
-			return
+		return cls.from_mongo(self.__data__)
+	
+	def demote(self, cls, preserve=True):
+		"""Transform this record into an instance of a more generalized parent class."""
 		
-		cls.__subclasses__[cls.__name__] = cls
+		if not issubclass(self.__class__, cls):
+			raise TypeError("Must demote to a superclass of " + self.__class__.__name__)
+		
+		return cls.from_mongo(self.__data__)
