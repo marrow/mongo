@@ -26,20 +26,28 @@ class Derived(Document):
 		kw.setdefault('cls', self.__class__)
 		super(Derived, self).__init__(*args, **kw)
 	
-	def promote(self, cls, preserve=True):
+	def _as(self, cls, update=False, preserve=True):
+		self.cls = cls
+		
+		# if update:  TODO: Optionally actually update the record.
+		
+		return cls.from_mongo(self.__data__)
+	
+	def promote(self, cls, update=False, preserve=True):
 		"""Transform this record into an instance of a more specialized subclass."""
 		
 		if not issubclass(cls, self.__class__):
 			raise TypeError("Must promote to a subclass of " + self.__class__.__name__)
 		
-		self.cls = cls
-		return cls.from_mongo(self.__data__)
+		return self._as(cls, update, preserve)
 	
-	def demote(self, cls, preserve=True):
-		"""Transform this record into an instance of a more generalized parent class."""
+	def demote(self, cls=None, update=False, preserve=True):
+		"""Transform this record into an instance of a more generalized parent class.
+		
+		Defaults to the immediate parent class, if unambiguous (singular).
+		"""
 		
 		if not issubclass(self.__class__, cls):
 			raise TypeError("Must demote to a superclass of " + self.__class__.__name__)
 		
-		self.cls = cls
-		return cls.from_mongo(self.__data__)
+		return self._as(cls, update, preserve)
