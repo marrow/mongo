@@ -126,13 +126,13 @@ class Field(Attribute):
 		return bool(predicate)
 	
 	def is_readable(self, context=None):
-		return self._predicate('read', context)
+		return self._predicate(self.read, context)
 	
 	def is_writeable(self, context=None):
-		return self._predicate('write', context)
+		return self._predicate(self.write, context)
 	
 	def is_sortable(self, context=None):
-		return self._predicate('sort', context)
+		return self._predicate(self.sort, context)
 
 	# Marrow Schema Interfaces
 	
