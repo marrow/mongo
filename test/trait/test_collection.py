@@ -96,12 +96,12 @@ class TestDocumentBinding(object):
 		
 		Sample.__validate__ = 'strict'
 		Sample.__validator__ = {'field': {'$gt': 27}}
-		c = Sample.create_collection(db, True, indexes=False)
+		Sample.create_collection(db, True, indexes=False)
 		
-		c.insert_one(Sample(42))
+		Sample(42).insert(source=db)
 		
 		with pytest.raises(WriteError):
-			c.insert_one(Sample(12))
+			Sample(12).insert(source=db)
 	
 	def test_index_construction(self, db, Sample):
 		c = Sample.create_collection(db, True, indexes=False)

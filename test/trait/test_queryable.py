@@ -136,8 +136,8 @@ class TestQueryableTrait(object):
 		assert doc.string == 'hoi'
 		assert doc.integer == 42
 	
-	def test_insert_one(self, Sample):
+	def test_insert(self, Sample):
 		doc = Sample(string='diz', integer=2029)
 		assert doc.id
-		doc.insert_one()
+		doc.insert()
 		assert Sample.get_collection().count() == 5

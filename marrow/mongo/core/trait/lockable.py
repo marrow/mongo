@@ -133,7 +133,7 @@ class Lockable(Queryable):
 			"""A callback triggered in the event this mutex is acquired."""
 			
 			if document.Queue.__collection__:
-				document.Queue(document, 'acquired').insert_one()
+				document.Queue(document, 'acquired').insert()
 			
 			if __debug__:  # pragma: no cover
 				expires = self.expires
@@ -145,7 +145,7 @@ class Lockable(Queryable):
 			"""A callback triggered in the event this this mutex is prolonged."""
 			
 			if document.Queue.__collection__:
-				document.Queue(document, 'prolonged').insert_one()
+				document.Queue(document, 'prolonged').insert()
 			
 			if __debug__:  # pragma: no cover
 				expires = self.expires
@@ -157,7 +157,7 @@ class Lockable(Queryable):
 			"""A callback triggered in the event this mutex is released."""
 			
 			if document.Queue.__collection__:
-				document.Queue(document, 'released').insert_one()
+				document.Queue(document, 'released').insert()
 			
 			if __debug__:  # pragma: no cover
 				reference = DBRef(document.__collection__, document.id)
@@ -168,7 +168,7 @@ class Lockable(Queryable):
 			"""A callback triggered in the event this record's lock has been expired."""
 			
 			if document.Queue.__collection__:
-				document.Queue(document, 'expired').insert_one()
+				document.Queue(document, 'expired').insert()
 			
 			if __debug__:  # pragma: no cover
 				expires = self.expires

@@ -73,12 +73,12 @@ class TestSimpleLockable(object):
 		try:
 			if Sample.Queue.__collection__:
 				Sample.Queue.bind(db).create_collection()
-				Sample.Queue().insert_one()
+				Sample.Queue().insert()
 		except:
 			pass
 		
 		instance = Sample()
-		instance.insert_one()
+		instance.insert()
 		return instance
 	
 	def test_acquire(self, sample):

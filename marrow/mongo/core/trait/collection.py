@@ -225,7 +225,7 @@ class Collection(Identified):
 		
 		return {field: True for field in projected}
 	
-	def insert_one(self, validate=True):
+	def insert(self, validate=True, **kw):
 		"""Insert this document.
 		
 		The `validate` argument translates to the inverse of the `bypass_document_validation` PyMongo option.
@@ -233,11 +233,19 @@ class Collection(Identified):
 		https://api.mongodb.com/python/current/api/pymongo/collection.html#pymongo.collection.Collection.insert_one
 		"""
 		
-		kw = {}
-		kw['bypass_document_validation'] = not validate
+		kw.setdefault('bypass_document_validation', not validate)
 		
 		collection = self.get_collection(kw.pop('source', None))
 		return collection.insert_one(self, **kw)
+	
+	@classmethod
+	def insert_one(self, document, validate=True, **kw):
+		"""Insert the specified document into this collection."""
+		
+		kw.setdefault('bypass_document_validation', not validate)
+		
+		collection = self.get_collection(kw.pop('source', None))
+		return collection.insert_one(document, **kw)
 	
 	def update_one(self, update=None, validate=True, **kw):
 		"""Update this document in the database. Local representations will not be affected.
@@ -260,6 +268,9 @@ class Collection(Identified):
 			raise TypeError("Must provide an update operation.")
 		
 		return collection.update_one(D.id == self, update, bypass_document_validation=not validate)
+	
+	def update_many(self, filter, update=None, validate=True, **kw):
+		pass
 	
 	def delete_one(self, source=None, **kw):
 		"""Remove this document from the database, passing additional arguments through to PyMongo.
