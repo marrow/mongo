@@ -6,14 +6,14 @@
 
 ## Guide
 
-* [Introduction](guide.md#introduction)
-* [Modelling](guide.md#document-modelling)
-* [Management](guide.md#collection-management)
-* [Interaction](guide.md#document-interaction)
-* [Fields](guide.md#fields)
-* [Indexes](guide.md#indexes)
-* [Trait Mix-Ins](guide.md#trait-mix-ins)
-* [Plugin Namespaces](guide.md#plugin-namespaces)
+* [Introduction](guide/introduction.md)
+* [Modelling](guide/modelling.md)
+* [Management](guide/management.md)
+* [Interaction](guide/interaction.md)
+* [Fields](guide/fields.md)
+* [Indexes](guide/indexes.md)
+* [Trait Mix-Ins](guide/traits.md)
+* [Plugin Namespaces](guide/namespaces.md)
 
 ## Reference
 
