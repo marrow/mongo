@@ -1,6 +1,4 @@
-# Guide
-
-## Document Interaction
+# Document Interaction
 
 Binding the class is not strictly needed in order to interact with them. You can instantiate, manipulate, and utilize as a mapping without it. Binding does, however, allow you to easily save the result and fetch records back out.
 

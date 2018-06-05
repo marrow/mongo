@@ -1,3 +1,1 @@
-# Guide
-
-## Trait Mix-Ins
+# Trait Mix-Ins

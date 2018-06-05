@@ -1,6 +1,4 @@
-# Guide
-
-## Fields
+# Fields
 
 Included with Marrow Mongo are field types covering all core types supported by MongoDB. A class model is used to define new field types, with a large amount of functionality provided by the base `Field` class itself.
 
