@@ -115,3 +115,26 @@ def datetime_period(base=None, hours=None, minutes=None, seconds=None):
 		)
 	
 	return base
+
+
+class UniversalMethod(object):
+	def __init__(self, fn):
+		self.instance_method = fn
+		self.class_method = fn
+	
+	def __get__(self, obj, cls=None):
+		if obj is None:
+			if cls:
+				return classmethod(self.class_method).__get__(obj, cls)
+			
+			return self.class_method.__get__(obj, cls)
+		
+		return self.instance_method.__get__(obj, cls)
+	
+	def classmethod(self, fn):
+		self.class_method = fn
+		return self
+	
+	def instancemethod(self, fn):
+		self.instance_method = fn
+		return self
