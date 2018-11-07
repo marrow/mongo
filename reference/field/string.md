@@ -28,11 +28,11 @@ or perform case normalization, e.g. automatic execution of `str.upper()`, `str.l
 
 <dl>
 	<dt><h5><code>strip</code></h5></dt><dd>
-		<p>Either the boolean literal `True` or a string representing the argument to `str.strip`, that is, the characters to strip.</p>
+		<p>Either the boolean literal <code>True</code> or a string representing the argument to <code>str.strip</code>, that is, the characters to strip.</p>
 		<p><label>Default</label><code>False</code></p>
 		<p><label>Added</label><code>&gt;=1.1.1</code></p>
 	</dd><dt><h5><code>case</code></h5></dt><dd>
-		<p>Truthy values (or the string literal `"u"` or `"upper"`) will request uppercase normalization, falsy values (or the literals `"l"` or `"lower"`) request lowercase normalization, or the literal `"title"` can be used to request title case.</p>
+		<p>Truthy values (or the string literal <code>"u"</code> or <code>"upper"</code>) will request uppercase normalization, falsy values (or the literals <code>"l"</code> or <code>"lower"</code>) request lowercase normalization, or the literal <code>"title"</code> can be used to request title case.</p>
 		<p><label>Default</label><code>None</code></p>
 		<p><label>Added</label><code>&gt;=1.1.1</code></p>
 	</dd>
