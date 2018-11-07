@@ -1,3 +1,1 @@
-# Guide
-
-## Indexes
+# Indexes

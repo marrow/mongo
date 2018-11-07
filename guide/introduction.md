@@ -1,6 +1,4 @@
-# Guide
-
-## Introduction
+# Introduction
 
 Documents are the records of [MongoDB](https://www.mongodb.com/), stored in an efficient binary form called [BSON](http://bsonspec.org/), allowing record manipulation that is cosmetically similar to [JSON](http://json.org/). In Python these are typically represented as [dictionaries](https://docs.python.org/3/library/stdtypes.html#mapping-types-dict), Python's native mapping type. Marrow Mongo provides a [`Document`](reference/document.md) mapping type that is directly compatible with and substitutable anywhere PyMongo uses dictionaries.
 

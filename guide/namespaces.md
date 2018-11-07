@@ -1,3 +1,1 @@
-# Guide
-
-## Plugin Namespaces
+# Plugin Namespaces
