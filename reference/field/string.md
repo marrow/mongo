@@ -1,4 +1,4 @@
-# Binary
+# String
 
 {% method -%}
 String fields store Unicode text, utilizing the native Unicode representation for your version of Python.  (On Python 2: `unicode`, on Python 3: `str`.)
