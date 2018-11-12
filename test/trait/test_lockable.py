@@ -269,7 +269,7 @@ class TestAwaitableLockable(TestSimpleLockable):
 		with ProcessPoolExecutor() as executor:
 			executor.submit(worker, self.Sample, sample.id)
 			start = time()
-			sleep(0.5)
+			sleep(2)
 			
 			sample.reload('lock')
 			assert sample.lock.instance != _identifier()
