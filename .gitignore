@@ -8,6 +8,7 @@
 *.egg-info
 .eggs
 .packaging
+third-party
 
 # Virtual Environment Pseudo-Chroot
 .venv
@@ -24,6 +25,7 @@ var
 .cagoule.db
 .coverage
 .tox
+.pytest_cache
 coverage.xml
 htmlcov
 
