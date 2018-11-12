@@ -6,7 +6,7 @@ Date fields store `datetime` values.  Times are always stored in UTC, though wit
 <dl>
 	<dt><h5>Import</h5></dt><dd><p><code>from marrow.mongo.field import Date</code></p></dd>
 	<dt><h5>Inherits</h5></dt><dd><p><code>marrow.mongo:<strong>Field</strong></code></p></dd>
-		<p><label>Available</label><code>&gt;=1.1.2</code></p>
+	<dt><h5>Available</h5></dt><dd><code>&gt;=1.1.2</code></dd>
 </dl>
 
 {%common -%}
