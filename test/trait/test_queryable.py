@@ -67,9 +67,6 @@ class TestQueryableCore(object):
 	def test_prepare_find_cursor_type_tail_wait_error(self, Sample):
 		with pytest.raises(TypeError):
 			cls, collection, query, options = Sample._prepare_find(tail=False, wait=False)
-		
-		with pytest.raises(TypeError):
-			cls, collection, query, options = Sample._prepare_find(tail=True, await=False)
 	
 	def test_prepare_find_cursor_type_wait_conflict(self, Sample):
 		with pytest.raises(TypeError):
