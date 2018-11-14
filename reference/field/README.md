@@ -1,24 +1,11 @@
 # Field
 
-{% method -%}
 A `Field` represents a data types storable within MongoDB and the associated machinery for access, querying, and manipulation. It is the common base class for almost all field types and can be used standalone to represent a "dynamic" field.
 
 <dl>
 	<dt><h5>Import</h5></dt><dd><p><code>from marrow.mongo import Field</code></p></dd>
 	<dt><h5>Inherits</h5></dt><dd><p><code>marrow.schema:<strong>Attribute</strong></code></p></dd>
 </dl>
-
-{%common -%}
-
-#### Contents
-
-1. [Attributes](#attributes)
-2. [Metadata](#metadata)
-2. [Usage](#usage)
-3. [Examples](#examples)
-4. [See Also](#see-also)
-
-{% endmethod %}
 
 
 ## Attributes

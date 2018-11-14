@@ -1,6 +1,5 @@
 # Date
 
-{% method -%}
 Date fields store `datetime` values.  Times are always stored in UTC, though with appropriate support packages installed (`pytz` and/or `tzlocal`) this can include timezone support.
 
 <dl>
@@ -8,16 +7,6 @@ Date fields store `datetime` values.  Times are always stored in UTC, though wit
 	<dt><h5>Inherits</h5></dt><dd><p><code>marrow.mongo:<strong>Field</strong></code></p></dd>
 	<dt><h5>Available</h5></dt><dd><code>&gt;=1.1.2</code></dd>
 </dl>
-
-{%common -%}
-
-#### Contents
-
-1. [Attributes](#attributes)
-2. [Usage](#usage)
-3. [Examples](#examples)
-
-{% endmethod %}
 
 
 ## Attributes

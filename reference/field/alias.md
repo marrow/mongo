@@ -1,7 +1,6 @@
 # Alias
 
-{% method -%}
-An **Alias** is a proxy to another field, potentially nested, within the same document.
+An `Alias` is a proxy to another field, potentially nested, within the same document.
 
 Utilizing an `Alias` allows class-level querying and instance-level read access, write access under most conditions, as well as optional deprecation warning generation.
 
@@ -10,17 +9,6 @@ Utilizing an `Alias` allows class-level querying and instance-level read access,
 	<dt><h5>Inherits</h5></dt><dd><p><code>marrow.schema:<strong>Attribute</strong></code></p></dd>
 	<dt><h5>Added</h5></dt><dd><p><code>&gt;=1.1.0</code> <a href="https://github.com/marrow/mongo/releases/tag/1.1.0">Oranir</a></p></dd>
 </dl>
-
-{%common -%}
-
-#### Contents
-
-1. [Attributes](#attributes)
-2. [Usage](#usage)
-3. [Examples](#examples)
-4. [See Also](#see-also)
-
-{% endmethod %}
 
 
 ## Attributes

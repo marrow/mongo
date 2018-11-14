@@ -1,23 +1,11 @@
 # String
 
-{% method -%}
 String fields store Unicode text, utilizing the native Unicode representation for your version of Python.  (On Python 2: `unicode`, on Python 3: `str`.)
 
 <dl>
 	<dt><h5>Import</h5></dt><dd><p><code>from marrow.mongo.field import String</code></p></dd>
 	<dt><h5>Inherits</h5></dt><dd><p><code>marrow.mongo:<strong>Field</strong></code></p></dd>
 </dl>
-
-{%common -%}
-
-#### Contents
-
-1. [Attributes](#attributes)
-2. [Usage](#usage)
-3. [Examples](#examples)
-4. [See Also](#see-also)
-
-{% endmethod %}
 
 
 ## Attributes

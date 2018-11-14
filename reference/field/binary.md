@@ -1,6 +1,5 @@
 # Binary
 
-{% method -%}
 Binary fields store, as the name implies, raw binary data. This is the rough equivalent to a BLOB field in relational
 databases. The amount of storage space [**is
 limited**](https://docs.mongodb.com/manual/reference/limits/#bson-documents) to 16MB per document. For storage of
@@ -10,17 +9,6 @@ binray data beyond this limit please utilize [GridFS](https://docs.mongodb.com/m
 	<dt><h5>Import</h5></dt><dd><p><code>from marrow.mongo.field import Binary</code></p></dd>
 	<dt><h5>Inherits</h5></dt><dd><p><code>marrow.mongo:<strong>Field</strong></code></p></dd>
 </dl>
-
-{%common -%}
-
-#### Contents
-
-1. [Attributes](#attributes)
-2. [Usage](#usage)
-3. [Examples](#examples)
-4. [See Also](#see-also)
-
-{% endmethod %}
 
 
 ## Attributes

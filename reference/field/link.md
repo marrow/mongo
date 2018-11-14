@@ -1,23 +1,11 @@
 # Link
 
-{% method -%}
-
 A Link field type is provided to offer a way to store and retrieve well-formed URI (URL) while optionally restricting the allowable schemes, or protocols.  Internally these values are stored as strings after normalization through the `URI` datatype, and on access provide that URI instance.
 
 <dl>
 	<dt><h5>Import</h5></dt><dd><p><code>from marrow.mongo.field import Link</code></p></dd>
 	<dt><h5>Inherits</h5></dt><dd><p><code>marrow.mongo.field:<strong>String</strong></code></p></dd>
 </dl>
-
-{%common -%}
-
-#### Contents
-
-1. [Attributes](#attributes)
-2. [Usage](#usage)
-3. [Examples](#examples)
-
-{% endmethod %}
 
 
 ## Attributes

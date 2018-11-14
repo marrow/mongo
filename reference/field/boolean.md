@@ -1,22 +1,11 @@
 # Boolean
 
-{% method -%}
 Boolean fields store boolean values, as expected.  It also provides convienence for accepting _truthy_ or _falsy_ values. See the usage section for more details.
 
 <dl>
 	<dt><h5>Import</h5></dt><dd><p><code>from marrow.mongo.field import Boolean</code></p></dd>
 	<dt><h5>Inherits</h5></dt><dd><p><code>marrow.mongo:<strong>Field</strong></code></p></dd>
 </dl>
-
-{%common -%}
-
-#### Contents
-
-1. [Attributes](#attributes)
-2. [Usage](#usage)
-3. [Examples](#examples)
-
-{% endmethod %}
 
 
 ## Attributes

@@ -1,23 +1,11 @@
 # Array
 
-{% method -%}
-An **Array** is used to contain zero or more other values (representable using fields) in the form of a numerically indexed list.
+An `Array` is used to contain zero or more other values (representable using fields) in the form of a numerically indexed list.
 
 <dl>
 	<dt><h5>Import</h5></dt><dd><p><code>from marrow.mongo.field import Array</code></p></dd>
 	<dt><h5>Inherits</h5></dt><dd><p><code>marrow.mongo:<strong>Field</strong></code></p></dd>
 </dl>
-
-{%common -%}
-
-#### Contents
-
-1. [Attributes](#attributes)
-2. [Usage](#usage)
-3. [Examples](#examples)
-4. [See Also](#see-also)
-
-{% endmethod %}
 
 
 ## Attributes
