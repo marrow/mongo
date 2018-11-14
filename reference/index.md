@@ -116,6 +116,6 @@ WikiPage.create_collection()
 
 ## Methods
 
-* `adapt(*args, **kw)` — create a new copy of this index with adjustments applied. Takes the same arguments as the constructor, with any new fields declared being added to the existing set.
+* `adapt(*args, **kw)` — create a new copy of this index with adjustments applied. Takes the same arguments as the constructor, with any new fields declared being added to the existing set. Predominantly useful for extending (and overriding) indexes declared by mix-in traits.
 * `create(collection, **kw)` — instruct MongoDB to construct and persist the index. If the index is not configured for `background` construction, this will block other operations on the database until complete. Additional arguments are passed through to the eventual PyMongo `collection.create_index` call. Also available via the PyMongo standard method name, `create_index`.
 * `drop(collection)` — instruct MongoDB to deconstruct and remove the index from the collection metadata. Also available via the PyMongo standard method name, `drop_index`.
