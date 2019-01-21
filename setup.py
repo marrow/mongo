@@ -76,7 +76,7 @@ setup(
 		] if {'pytest', 'test', 'ptr'}.intersection(sys.argv) else [],
 	
 	install_requires = [
-			'marrow.schema>=1.2.0,<2.0.0',  # Declarative schema support.
+			'marrow.schema>=2.0,<2.1',  # Declarative schema support.
 			'marrow.package>=1.1.0,<2.0.0',  # Plugin discovery and loading.
 			'pymongo>=3.2',  # We require modern API.
 			'pytz',  # Timezone support.
