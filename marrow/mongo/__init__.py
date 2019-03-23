@@ -1,7 +1,3 @@
-# encoding: utf-8
-
-from __future__ import unicode_literals
-
 import sys
 
 from .core import Document, Field, Index, __version__  # noqa
@@ -15,17 +11,9 @@ trait = sys.modules['marrow.mongo.trait'] = Registry('marrow.mongo.trait')
 
 
 __all__ = [
-	'Document',
-	'F',
-	'Field',
-	'Filter',
-	'Index',
-	'Ops',
-	'P',
-	'Q',
-	'S',
-	'U',
-	'Update',
-	'document',
-	'field',
+	'Document', 'Field', 'Index',  # Basic / core base classes.
+	'Q', 'Ops', 'Filter', 'Update',  # Filter qurey document, update document, and inline query operations.
+	'F', 'P', 'S', 'U',  # Parametric hepers.
+	'utcnow',  # Utility helper, e.g. to use as a default.
+	'document', 'field', 'trait',  # Entry point (plugin) registries / namespace modules.
 ]
