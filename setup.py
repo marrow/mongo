@@ -9,7 +9,7 @@ if python_version < (3, 5):
 	raise SystemExit("Python 3.5 or later is required.")
 
 here = Path(__file__).resolve().parent
-exec((here / "marrow" / "mongo" / "release.py").read_text('utf-8'))
+exec((here / "marrow" / "mongo" / "core"[] / "release.py").read_text('utf-8'))
 
 tests_require = [
 		'pytest',  # test collector and extensible runner
