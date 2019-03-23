@@ -1,14 +1,10 @@
-#!/usr/bin/env python
-# encoding: utf-8
+#!/usr/bin/env python3
 
 import os
 import sys
 import codecs
 
-try:
-	from setuptools.core import setup, find_packages
-except ImportError:
-	from setuptools import setup, find_packages
+from setuptools import setup, find_packages
 
 
 if sys.version_info < (2, 7):
