@@ -1,26 +1,15 @@
 #!/usr/bin/env python3
 
-import os
-import sys
-import codecs
-
-from setuptools import setup, find_packages
+from setuptools import setup
+from sys import argv, version_info as python_version
+from pathlib import Path
 
 
-if sys.version_info < (2, 7):
-	raise SystemExit("Python 2.7 or later is required.")
-elif sys.version_info > (3, 0) and sys.version_info < (3, 2):
-	raise SystemExit("Python 3.2 or later is required.")
+if python_version < (3, 5):
+	raise SystemExit("Python 3.5 or later is required.")
 
-version = description = url = author = ''  # Actually loaded on the next line; be quiet, linter.
-exec(open(os.path.join("marrow", "mongo", "core", "release.py")).read())
-
-here = os.path.abspath(os.path.dirname(__file__))
-
-py2 = sys.version_info < (3,)
-py26 = sys.version_info < (2, 7)
-py32 = sys.version_info > (3,) and sys.version_info < (3, 3)
-pypy = hasattr(sys, 'pypy_version_info')
+here = Path(__file__).resolve().parent
+exec((here / "marrow" / "mongo" / "release.py").read_text('utf-8'))
 
 tests_require = [
 		'pytest',  # test collector and extensible runner
@@ -28,50 +17,45 @@ tests_require = [
 		'pytest-flakes',  # syntax validation
 		'pytest-isort',  # import ordering
 		'misaka', 'pygments',  # Markdown field support
-		'futures; python_version < "3.4"',  # futures support
 		'pytz', 'tzlocal>=1.4',  # timezone support, logger support
 	]
 
 
-# # Entry Point
-
 setup(
 	name = "marrow.mongo",
 	version = version,
+	
 	description = description,
-	long_description = codecs.open(os.path.join(here, 'README.rst'), 'r', 'utf8').read(),
+	long_description = (here / 'README.rst').read_text('utf-8'),
 	url = url,
+	
 	author = author.name,
 	author_email = author.email,
+	
 	license = 'MIT',
-	keywords = ['mongodb', 'GeoJSON', 'geospatial', 'full text', 'facted', 'orm', 'odm', 'document mapper',
-			'declarative', 'marrow'],
+	keywords = ('mongodb', 'GeoJSON', 'geospatial', 'full text', 'facted', 'orm', 'odm', 'document mapper',
+			'declarative', 'marrow'),
 	classifiers = [
 			"Development Status :: 5 - Production/Stable",
 			"Intended Audience :: Developers",
 			"License :: OSI Approved :: MIT License",
 			"Operating System :: OS Independent",
 			"Programming Language :: Python",
-			"Programming Language :: Python :: 2",
-			"Programming Language :: Python :: 2.7",
 			"Programming Language :: Python :: 3",
-			"Programming Language :: Python :: 3.2",
-			"Programming Language :: Python :: 3.3",
-			"Programming Language :: Python :: 3.4",
 			"Programming Language :: Python :: 3.5",
+			"Programming Language :: Python :: 3.6",
+			"Programming Language :: Python :: 3.7",
+			"Programming Language :: Python :: 3.8",
 			"Programming Language :: Python :: Implementation :: CPython",
 			"Programming Language :: Python :: Implementation :: PyPy",
 			"Topic :: Software Development :: Libraries :: Python Modules",
 			"Topic :: Utilities"
 		],
 	
-	packages = find_packages(exclude=['test', 'example', 'benchmark', 'htmlcov']),
+	packages = ('marrow.mongo', 'web.session'),
 	include_package_data = True,
 	package_data = {'': ['README.rst', 'LICENSE.txt']},
-	namespace_packages = ['marrow', 'web', 'web.session'],
 	zip_safe = False,
-	
-	# ## Dependency Declaration
 	
 	setup_requires = [
 			'pytest-runner',
@@ -82,7 +66,6 @@ setup(
 			'marrow.schema>=1.2.0,<2.0.0',  # Declarative schema support.
 			'marrow.package>=1.1.0,<2.0.0',  # Plugin discovery and loading.
 			'pymongo>=3.2',  # We require modern API.
-			'pathlib2; python_version < "3.4"',  # Path manipulation utility.
 		],
 	
 	extras_require = dict(
@@ -96,8 +79,6 @@ setup(
 		),
 	
 	tests_require = tests_require,
-	
-	# ## Plugin Registration
 	
 	entry_points = {
 				# ### Marrow Mongo Lookups
