@@ -5,4 +5,4 @@ from .index import Index
 from .document import Document
 
 
-__all__ = ['__version__', 'Field', 'Index', 'Document']
+__all__ = ['Field', 'Index', 'Document']
