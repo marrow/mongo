@@ -3,6 +3,8 @@ from datetime import datetime, timedelta
 from operator import attrgetter
 from pkg_resources import iter_entry_points, DistributionNotFound
 
+from typeguard import check_argument_types
+
 from ...schema.meta import ElementMeta
 from ...package.loader import load
 
@@ -88,11 +90,13 @@ def utcnow():
 	return datetime.utcnow().replace(microsecond=0, tzinfo=utc)
 
 
-def datetime_period(base=None, hours=None, minutes=None, seconds=None):
+def datetime_period(base:datetime=None, **, hours:int=None, minutes:int=None, seconds:int=None) -> datetime:
 	"""Round a datetime object down to the start of a defined period.
 	
 	The `base` argument may be used to find the period start for an arbitrary datetime, defaults to `utcnow()`.
 	"""
+	
+	assert check_argument_types()
 	
 	if base is None:
 		base = utcnow()
