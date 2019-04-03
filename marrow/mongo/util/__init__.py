@@ -52,8 +52,10 @@ def adjust_attribute_sequence(*fields):
 	return adjust_inner
 
 
-	def __init__(self, namespace):
 class Registry:
+	def __init__(self, namespace: str):
+		assert check_argument_types()
+		
 		self._namespace = namespace
 		self.__path__ = []
 	
@@ -71,21 +73,21 @@ class Registry:
 		
 		return names
 	
-	def __getattr__(self, name):
+	def __getattr__(self, name:str):
 		if name[0] == '_':
 			raise AttributeError()
 		
 		self.__dict__[name] = load(name, self._namespace)
 		return self.__dict__[name]
 	
-	def __getitem__(self, name):
+	def __getitem__(self, name:str):
 		return load(name, self._namespace)
 	
 	def __dir__(self):
 		return super(Registry, self).__dir__() + self.__all__
 
 
-def utcnow():
+def utcnow() -> datetime:
 	"""Return the current time in UTC, with timezone information applied."""
 	return datetime.utcnow().replace(microsecond=0, tzinfo=utc)
 
