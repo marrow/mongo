@@ -9,6 +9,7 @@ if python_version < (3, 6):
 	raise SystemExit("Python 3.6 or later is required.")
 
 here = Path(__file__).resolve().parent
+version = description = url = author = None  # Populated by the next line.
 exec((here / "marrow" / "mongo" / "core" / "release.py").read_text('utf-8'))
 
 tests_require = [
@@ -33,8 +34,18 @@ setup(
 	author_email = author.email,
 	
 	license = 'MIT',
-	keywords = ('mongodb', 'GeoJSON', 'geospatial', 'full text', 'facted', 'orm', 'odm', 'document mapper',
-			'declarative', 'marrow'),
+	keywords = (
+			'mongodb',
+			'GeoJSON',
+			'geospatial',
+			'full text',
+			'facted',
+			'orm',
+			'odm',
+			'document mapper',
+			'declarative',
+			'marrow',
+		),
 	classifiers = [
 			"Development Status :: 5 - Production/Stable",
 			"Intended Audience :: Developers",
@@ -48,7 +59,7 @@ setup(
 			"Programming Language :: Python :: Implementation :: CPython",
 			"Programming Language :: Python :: Implementation :: PyPy",
 			"Topic :: Software Development :: Libraries :: Python Modules",
-			"Topic :: Utilities"
+			"Topic :: Utilities",
 		],
 	
 	packages = ('marrow.mongo', 'web.session'),
