@@ -1,8 +1,4 @@
-# encoding: utf-8
-
 """GeoJSON support for Marrow Mongo."""
-
-from __future__ import unicode_literals
 
 from collections import MutableSequence
 from numbers import Number as NumberABC

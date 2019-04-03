@@ -1,5 +1,3 @@
-# encoding: utf-8
-
 """Parameterized support akin to Django's ORM or MongoEngine."""
 
 from .filter import F

@@ -1,5 +1,3 @@
-# encoding: utf-8
-
 from weakref import WeakValueDictionary
 
 from ... import Document, Index

@@ -1,13 +1,8 @@
-# encoding: utf-8
-
-from __future__ import unicode_literals
-
 from collections import OrderedDict
 from datetime import datetime, timedelta
 from operator import attrgetter
 from pkg_resources import iter_entry_points, DistributionNotFound
 
-from ...schema.compat import py3
 from ...schema.meta import ElementMeta
 from ...package.loader import load
 
@@ -55,8 +50,8 @@ def adjust_attribute_sequence(*fields):
 	return adjust_inner
 
 
-class Registry(object):
 	def __init__(self, namespace):
+class Registry:
 		self._namespace = namespace
 		self.__path__ = []
 	
@@ -84,13 +79,8 @@ class Registry(object):
 	def __getitem__(self, name):
 		return load(name, self._namespace)
 	
-	if py3:
-		def __dir__(self):
-			return super(Registry, self).__dir__() + self.__all__
-	
-	else:
-		def __dir__(self):
-			return dir(self.__class__) + ['_namespace', '__path__'] + self.__all__
+	def __dir__(self):
+		return super(Registry, self).__dir__() + self.__all__
 
 
 def utcnow():

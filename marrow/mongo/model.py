@@ -1,4 +1,3 @@
-# encoding: utf-8
 # pragma: no cover
 
 """Note: experimental thingamabob."""

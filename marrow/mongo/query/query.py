@@ -1,12 +1,9 @@
-# encoding: utf-8
 # pylint:disable=too-many-arguments
 
 """A comparison proxy and Ops factory to help build nested inquiries.
 
 For internal construction only.
 """
-
-from __future__ import unicode_literals
 
 from copy import copy
 from collections import Iterable

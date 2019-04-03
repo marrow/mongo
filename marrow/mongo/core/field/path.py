@@ -1,7 +1,3 @@
-# encoding: utf-8
-
-from __future__ import unicode_literals
-
 from .string import String
 from ....schema.compat import unicode, py3
 

@@ -1,7 +1,3 @@
-# encoding: utf-8
-
-from __future__ import unicode_literals
-
 from bson.binary import STANDARD
 from bson.codec_options import CodecOptions
 from bson.tz_util import utc

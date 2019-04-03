@@ -1,7 +1,3 @@
-# encoding: utf-8
-
-from __future__ import unicode_literals
-
 from binascii import hexlify
 from bson import ObjectId as OID, DBRef
 from datetime import timedelta

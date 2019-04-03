@@ -1,7 +1,3 @@
-# encoding: utf-8
-
-from __future__ import unicode_literals
-
 from .base import Field
 from ....schema import Attribute
 from ....schema.compat import unicode

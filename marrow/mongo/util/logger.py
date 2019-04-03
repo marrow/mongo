@@ -1,4 +1,3 @@
-# encoding: utf-8
 # pragma: no cover
 
 """Experimental Python standard logging support features.
@@ -38,8 +37,6 @@ Example logging "dictconfig":
 }
 """
 
-from __future__ import unicode_literals
-
 import datetime
 import logging
 
@@ -48,7 +45,6 @@ from bson.tz_util import utc
 from pymongo import MongoClient
 from tzlocal import get_localzone
 
-from ...schema.compat import unicode
 
 try:
 	from pygments import highlight as _highlight
@@ -90,7 +86,7 @@ class JSONFormatter(logging.Formatter):
 			return value.decode('utf-8')
 		
 		try:
-			return unicode(value)
+			return str(value)
 		except:  # pylint:disable=bare-except
 			try:
 				return repr(value)

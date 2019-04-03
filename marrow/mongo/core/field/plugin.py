@@ -1,7 +1,3 @@
-# encoding: utf-8
-
-from __future__ import unicode_literals
-
 from pkg_resources import iter_entry_points
 
 from ....package.canonical import name as canon

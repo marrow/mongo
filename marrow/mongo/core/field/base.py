@@ -1,7 +1,3 @@
-# encoding: utf-8
-
-from __future__ import unicode_literals
-
 from collections import namedtuple
 from inspect import isclass
 from weakref import proxy

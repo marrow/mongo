@@ -1,5 +1,3 @@
-# encoding: utf-8
-
 """Data model trait mix-in for tracking record publication and retraction."""
 
 from datetime import timedelta
