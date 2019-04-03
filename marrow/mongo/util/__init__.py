@@ -92,7 +92,7 @@ def utcnow() -> datetime:
 	return datetime.utcnow().replace(microsecond=0, tzinfo=utc)
 
 
-def datetime_period(base:datetime=None, **, hours:int=None, minutes:int=None, seconds:int=None) -> datetime:
+def datetime_period(base:datetime=None, *, hours:int=None, minutes:int=None, seconds:int=None) -> datetime:
 	"""Round a datetime object down to the start of a defined period.
 	
 	The `base` argument may be used to find the period start for an arbitrary datetime, defaults to `utcnow()`.
