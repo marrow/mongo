@@ -168,7 +168,7 @@ class Document(Container):
 		else:
 			cls = self.__class__.__name__
 		
-		return "{0}({1})".format(cls, ", ".join(parts))
+		return f"{cls!s}({', '.join(parts)})"
 	
 	# Mapping Protocol
 	

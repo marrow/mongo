@@ -99,7 +99,7 @@ class Date(Field):
 	
 	def to_native(self, obj, name, value):
 		if not isinstance(value, datetime):
-			log.warning("Non-date stored in {}.{} field.".format(self.__class__.__name__, self.__name__),
+			log.warning(f"Non-date stored in {self.__class__.__name__}.{self.__name__} field.",
 					extra={'document': obj, 'field': self.__name__, 'value': value})
 			return value
 		

@@ -97,18 +97,14 @@ class Field(Attribute):
 				fields.append((field.__name__, value))
 		
 		if fields:
-			fields = ", ".join("{}={!r}".format(field, value) for field, value in fields)
+			fields = ', '.join(f"{field}={value!r}" for field, value in fields)
 			fields = ', ' + fields
 		else:
-			fields = ""
+			fields = ''
 		
 		name = getattr(self, '__name__', '<anonymous>')
 		
-		return "{self.__class__.__name__}('{name}'{fields})".format(
-				self = self,
-				name = name,
-				fields = fields
-			)
+		return f"{self.__class__.__name__}('{name}'{fields})"
 	
 	# Security Predicate Handling
 	

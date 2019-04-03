@@ -66,7 +66,7 @@ class Q(object):
 	def __repr__(self):
 		"""Programmers' representation for Q instances."""
 		
-		return "Q({self._document.__name__}, '{self}', {self._field!r})".format(self=self)
+		return f"Q({self._document.__name__}, '{self}', {self._field!r})"
 	
 	def __getattr__(self, name):
 		"""Access field attributes, or, for complex fields (Array, Embed, Reference, etc.) nested fields."""
@@ -159,7 +159,7 @@ class Q(object):
 		
 		# Optimize this away in production; diagnosic aide.
 		if __debug__ and _complex_safety_check(f, {operation} | set(allowed)):  # pragma: no cover
-			raise NotImplementedError("{self!r} does not allow {op} comparison.".format(self=self, op=operation))
+			raise NotImplementedError(f"{self!r} does not allow {operation} comparison.")
 		
 		if other is not None:
 			other = f.transformer.foreign(other, (f, self._document))
@@ -180,8 +180,7 @@ class Q(object):
 		
 		# Optimize this away in production; diagnosic aide.
 		if __debug__ and _complex_safety_check(f, {operation} | set(allowed)):  # pragma: no cover
-			raise NotImplementedError("{self!r} does not allow {op} comparison.".format(
-					self=self, op=operation))
+			raise NotImplementedError(f"{self!r} does not allow {operation} comparison.")
 		
 		def _t(o):
 			for value in o:
@@ -228,7 +227,7 @@ class Q(object):
 		
 		# Optimize this away in production; diagnosic aide.
 		if __debug__ and _simple_safety_check(self._field, '$eq'):  # pragma: no cover
-			raise NotImplementedError("{self!r} does not allow $eq comparison.".format(self=self))
+			raise NotImplementedError(f"{self!r} does not allow $eq comparison.")
 		
 		return Filter({self._name: None if other is None else f.transformer.foreign(other, (f, self._document))})
 	
@@ -423,7 +422,7 @@ class Q(object):
 		
 		# Optimize this away in production; diagnosic aide.
 		if __debug__ and _complex_safety_check(self._field, {'$elemMatch', '#document'}):  # pragma: no cover
-			raise NotImplementedError("{self!r} does not allow $elemMatch comparison.".format(self=self))
+			raise NotImplementedError(f"{self!r} does not allow $elemMatch comparison.")
 		
 		if hasattr(q, 'as_query'):
 			q = q.as_query
@@ -446,7 +445,7 @@ class Q(object):
 		
 		# Optimize this away in production; diagnosic aide.
 		if __debug__ and _simple_safety_check(self._field, '$eq'):  # pragma: no cover
-			raise NotImplementedError("{self!r} does not allow range comparison.".format(self=self))
+			raise NotImplementedError(f"{self!r} does not allow range comparison.")
 		
 		return (self >= gte) & (self < lt)
 	
@@ -464,7 +463,7 @@ class Q(object):
 		
 		# Optimize this away in production; diagnosic aide.
 		if __debug__ and _complex_safety_check(self._field, {'$size', '#array'}):  # pragma: no cover
-			raise NotImplementedError("{self!r} does not allow $size comparison.".format(self=self))
+			raise NotImplementedError(f"{self!r} does not allow $size comparison.")
 		
 		return Filter({self._name: {'$size': int(value)}})
 	

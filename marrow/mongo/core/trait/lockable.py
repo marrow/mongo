@@ -22,10 +22,7 @@ except:
 
 # We default to the same algorithm PyMongo uses to generate hardware and process ID portions of ObjectIds.
 def _identifier():
-	return getenv('INSTANCE_ID', '{:06x}{:04x}'.format(
-			int(hexlify(OID._machine_bytes), 16),
-			getpid() % 0xFFFF,
-		))
+	return getenv('INSTANCE_ID', f'{int(hexlify(OID._machine_bytes), 16):06x}{getpid() % 0xFFFF:04x}')
 
 
 class Lockable(Queryable):
@@ -134,7 +131,7 @@ class Lockable(Queryable):
 			if __debug__:  # pragma: no cover
 				expires = self.expires
 				reference = DBRef(document.__collection__, document.id)
-				log.debug("Acquired new lock on {!r} expiring {}.".format(document, expires.isoformat()), extra={
+				log.debug(f"Acquired new lock on {document!r} expiring {expires.isoformat()}.", extra={
 					'agent': self.instance, 'expires': expires, 'mutex': reference, 'forced': forced})
 		
 		def prolonged(self, document):
@@ -146,7 +143,7 @@ class Lockable(Queryable):
 			if __debug__:  # pragma: no cover
 				expires = self.expires
 				reference = DBRef(document.__collection__, document.id)
-				log.debug("Prolonged lock held on {!r} until {}.".format(document, expires.isoformat()), extra={
+				log.debug(f"Prolonged lock held on {document!r} until {expires.isoformat()}.", extra={
 					'agent': self.instance, 'expires': expires, 'mutex': reference})
 		
 		def released(self, document, forced=False):
@@ -157,7 +154,7 @@ class Lockable(Queryable):
 			
 			if __debug__:  # pragma: no cover
 				reference = DBRef(document.__collection__, document.id)
-				log.debug("Released lock held on {!r}.".format(document), extra={
+				log.debug(f"Released lock held on {document!r}.", extra={
 					'agent': self.instance, 'mutex': reference, 'forced': forced})
 		
 		def expired(self, document):
@@ -169,7 +166,7 @@ class Lockable(Queryable):
 			if __debug__:  # pragma: no cover
 				expires = self.expires
 				reference = DBRef(document.__collection__, document.id)
-				log.debug("Expired stale lock on {!r}.".format(document, expires.isoformat()), extra={
+				log.debug(f"Expired stale lock on {document!r} from {expires.isoformat()}.", extra={
 					'agent': self.instance, 'expires': expires, 'mutex': reference})
 	
 	def wait(self, timeout):
