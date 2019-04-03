@@ -5,8 +5,8 @@ from sys import argv, version_info as python_version
 from pathlib import Path
 
 
-if python_version < (3, 5):
-	raise SystemExit("Python 3.5 or later is required.")
+if python_version < (3, 6):
+	raise SystemExit("Python 3.6 or later is required.")
 
 here = Path(__file__).resolve().parent
 exec((here / "marrow" / "mongo" / "core" / "release.py").read_text('utf-8'))
@@ -42,7 +42,6 @@ setup(
 			"Operating System :: OS Independent",
 			"Programming Language :: Python",
 			"Programming Language :: Python :: 3",
-			"Programming Language :: Python :: 3.5",
 			"Programming Language :: Python :: 3.6",
 			"Programming Language :: Python :: 3.7",
 			"Programming Language :: Python :: 3.8",
