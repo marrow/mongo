@@ -21,7 +21,7 @@ class Array(_HasKind, _CastingKind, Field):
 		
 		super(Array, self).__init__(*args, **kw)
 	
-	def to_native(self, obj, name, value):
+	def to_native(self, obj, name, value) -> list:
 		"""Transform the MongoDB value into a Marrow Mongo value."""
 		
 		if isinstance(value, self.List):
@@ -32,7 +32,7 @@ class Array(_HasKind, _CastingKind, Field):
 		
 		return result
 	
-	def to_foreign(self, obj, name, value):
+	def to_foreign(self, obj, name, value) -> list:
 		"""Transform to a MongoDB-safe value."""
 		
 		if isinstance(value, Iterable) and not isinstance(value, Mapping):

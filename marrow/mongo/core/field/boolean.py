@@ -9,11 +9,11 @@ class Boolean(Field):
 	truthy = Attribute(default=('true', 't', 'yes', 'y', 'on', '1', True))
 	falsy = Attribute(default=('false', 'f', 'no', 'n', 'off', '0', False))
 	
-	def to_foreign(self, obj, name, value):  # pylint:disable=unused-argument
+	def to_foreign(self, obj, name, value) -> bool:  # pylint:disable=unused-argument
 		try:
 			value = value.lower()
 		except AttributeError:
-			return bool(value)
+			pass
 		
 		if value in self.truthy:
 			return True
@@ -21,4 +21,4 @@ class Boolean(Field):
 		if value in self.falsy:
 			return False
 		
-		raise ValueError("Unknown or non-boolean value: " + value)
+		return bool(value)

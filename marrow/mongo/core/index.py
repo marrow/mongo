@@ -1,4 +1,8 @@
+from typing import Sequence, Mapping, List, Tuple
+
 from pymongo import ASCENDING, DESCENDING, GEO2D, GEOHAYSTACK, GEOSPHERE, HASHED, TEXT
+from pymongo.collection import Collection
+from typeguard import check_argument_types
 
 from ...package.loader import traverse
 from ...schema import Attribute
@@ -53,8 +57,10 @@ class Index(Attribute):
 		
 		return instance
 	
-	def process_fields(self, fields):
+	def process_fields(self, fields: Sequence[str]) -> List[Tuple[str, int]]:
 		"""Process a list of simple string field definitions and assign their order based on prefix."""
+		
+		assert check_argument_types()
 		
 		result = []
 		strip = ''.join(self.PREFIX_MAP)
@@ -70,11 +76,13 @@ class Index(Attribute):
 		
 		return result
 	
-	def create(self, collection, **kw):
+	def create(self, collection: Collection, **kw) -> str:
 		"""Create this index in the specified collection; keyword arguments are passed to PyMongo.
 		
 		http://api.mongodb.com/python/current/api/pymongo/collection.html#pymongo.collection.Collection.create_index
 		"""
+		
+		assert check_argument_types()
 		
 		options = dict(
 				name = self.__name__,
@@ -98,11 +106,13 @@ class Index(Attribute):
 	
 	create_index = create
 	
-	def drop(self, collection):
+	def drop(self, collection: Collection) -> None:
 		"""Drop this index from the specified collection.
 		
 		https://api.mongodb.com/python/current/api/pymongo/collection.html#pymongo.collection.Collection.drop_index
 		"""
+		
+		assert check_argument_types()
 		
 		collection.drop_index(self.__name__)
 	

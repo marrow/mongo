@@ -2,6 +2,8 @@
 
 from collections import Mapping
 from operator import __neg__
+from typing import Sequence, Mapping as Map, Optional
+from typeguard import check_argument_types
 
 from ...schema.compat import unicode
 from ..query import Update
@@ -10,20 +12,23 @@ from .common import _bit, _current_date, _process_arguments
 DEFAULT_UPDATE = 'set'  # If no prefix is found, this will be the default operation.
 
 
-def _push_each(value, field):
-	value = list(field.transformer.foreign(v, (field, field.__document__)) for v in value)
-	return {'$each': value}
+def _push_each(value: Sequence, field: str) -> Map[str, Sequence]:
+	assert check_argument_types()
+	return {'$each': [field.transformer.foreign(v, (field, field.__document__)) for v in value]}
 
 
-def _push_slice(value):
-	return {'$slice': int(value)}
+def _push_slice(value: int) -> Map[str, int]:
+	assert check_argument_types()
+	return {'$slice': value}
 
 
-def _push_sort(value):
+def _push_sort(value: str) -> Map[str, str]:
+	assert check_argument_types()
 	return {'$sort': value}
 
 
-def _push_position(value):
+def _push_position(value: int) -> Map[str, int]:
+	assert check_argument_types()
 	return {'$position': int(value)}
 
 
@@ -91,7 +96,7 @@ UPDATE_PASSTHROUGH = {
 	}
 
 
-def U(Document, __raw__=None, **update):
+def U(Document, __raw__:Optional[Map]=None, **update) -> Update:
 	"""Generate a MongoDB update document through paramater interpolation.
 	
 	Arguments passed by name have their name interpreted as an optional operation prefix (defaulting to `set`, e.g.
@@ -101,6 +106,7 @@ def U(Document, __raw__=None, **update):
 	Because this utility is likely going to be used frequently it has been given a single-character name.
 	"""
 	
+	assert check_argument_types()
 	ops = Update(__raw__)
 	args = _process_arguments(Document, UPDATE_ALIASES, {}, update, UPDATE_PASSTHROUGH)
 	

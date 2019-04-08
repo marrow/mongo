@@ -1,4 +1,5 @@
 from collections import Mapping
+from typing import Union
 
 from bson import ObjectId as OID
 from bson import DBRef
@@ -18,7 +19,7 @@ class Reference(_HasKind, Field):
 	cache = Attribute(default=None)  # Attributes to preserve from the referenced object at the reference level.
 	
 	@property
-	def __foreign__(self):
+	def __foreign__(self) -> str:
 		"""Advertise that we store a simple reference, or deep reference, or object, depending on configuration."""
 		
 		if self.cache:
@@ -29,7 +30,7 @@ class Reference(_HasKind, Field):
 		
 		return 'objectId'
 	
-	def _populate_cache(self, value):
+	def _populate_cache(self, value:Union[Document, Mapping, OID, str]) -> odict:
 		inst = odict()
 		
 		if isinstance(value, Document):
@@ -49,7 +50,7 @@ class Reference(_HasKind, Field):
 		elif isinstance(value, OID):
 			inst['_id'] = value
 		
-		elif isinstance(value, (str, unicode)) and len(value) == 24:
+		elif isinstance(value, str) and len(value) == 24:
 			try:
 				inst['_id'] = OID(value)
 			except InvalidId:
@@ -80,7 +81,7 @@ class Reference(_HasKind, Field):
 		
 		return inst
 	
-	def to_foreign(self, obj, name, value):  # pylint:disable=unused-argument
+	def to_foreign(self, obj, name, value:Union[Document, OID, str]):  # pylint:disable=unused-argument
 		"""Transform to a MongoDB-safe value."""
 		
 		if self.cache:
@@ -94,7 +95,7 @@ class Reference(_HasKind, Field):
 			if identifier is None:
 				raise ValueError("Can only store a reference to a saved Document instance with an `_id` stored.")
 		
-		elif isinstance(value, (str, unicode)) and len(value) == 24:
+		elif isinstance(value, str) and len(value) == 24:
 			try:
 				identifier = OID(value)
 			except InvalidId:

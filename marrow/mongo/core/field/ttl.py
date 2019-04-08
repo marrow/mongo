@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta
 from numbers import Number
+from typing import Union
 
 from .date import Date
 from ...util import utcnow
@@ -11,7 +12,7 @@ class TTL(Date):
 	__foreign__ = 'date'
 	__disallowed_operators__ = {'#array'}
 	
-	def to_foreign(self, obj, name, value):
+	def to_foreign(self, obj, name, value:Union[timedelta,datetime,Number]) -> datetime:
 		if isinstance(value, timedelta):
 			value = utcnow() + value
 		elif isinstance(value, datetime):
