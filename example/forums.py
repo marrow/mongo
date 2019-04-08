@@ -11,19 +11,24 @@ account for it by providing "continuation" markers to point at the next thread r
 """
 
 from marrow.mongo import Document, Index, utcnow
-from marrow.mongo.field import String, Integer, Array, Embed, Boolean
-from marrow.mongo.trait import Identified, Queryable
+from marrow.mongo.field import Array, Boolean, Embed, Integer, Markdown, Set, String
+from marrow.mongo.trait import Derived, Identified, Queryable
 
 
 class Statistics(Document):
-	comments = Integer()
-	uploads = Integer()
-	votes = Integer()
-	views = Integer()
+	"""General discussion statistics.
+	
+	These are replicated within each tier of record to represent aggregated statistics.
+	"""
+	
+	comments = Integer(default=0, assign=True)
+	uploads = Integer(default=0, assign=True)
+	votes = Integer(default=0, assign=True)
+	views = Integer(default=0, assign=True)
 
 
-class Reply(Document):
-	pass
+class Reply(Derived, Identified):
+	...  # Subclasses define relevant additioanl attributes; treat this as an ABC.
 
 
 class Person(Queryable):
@@ -37,16 +42,17 @@ class Forum(Queryable):
 	__collection__ = 'forums'
 	
 	id = String('_id')  # Redefine the primary key as a string slug.
-	name = String()
-	summary = String()
+	title = String()  # The human-readable name.
+	summary = Markdown()  # A formatted description of the forum.
 	
-	# Permission tagsefer
-	read = String()
-	write = String()
-	moderate = String()
+	# Permission Tags
+	read = Set(String(), assign=True)  # User must have one of these tags to be able to read this forum.
+	write = Set(String(), assign=True)  # As above, to be able to post or reply.
+	moderate = Set(String(), assign=True)  # As above, but to access moderator privelages such as locking and trnasfer.
 	
-	stat = Embed(Statistics)
+	stat = Embed(Statistics, assign=True)  # We pre-allocate zeroes to prevent record resizing and movement later.
 	
+	created = Date(assign=True)  # As we're not using ObjectIds, we need to track this ourselves.
 	modified = Date()
 
 
@@ -54,33 +60,32 @@ class Thread(Queryable):
 	__collection__ = 'threads'
 	
 	class Flags(Document):
-		locked = Boolean()
-		sticky = Boolean()
-		hidden = Boolean()
-		uploads = Boolean()
+		locked = Boolean(default=False)
+		sticky = Boolean(default=False)
+		hidden = Boolean(default=False)
+		uploads = Boolean(default=False)
 	
-	class Comment(Identified, Reply):
+	class Comment(Reply):
 		class Votes(Document):
-			count = Integer()
+			count = Integer(default=0, assign=True)
 			who = Array(ObjectId())
 		
-		id = ObjectId('_id')
-		message = String()
-		vote = Embed(Votes)
-		creator = ObjectId()
+		message = Markdown()
+		vote = Array(Embed(Votes), assign=True)
+		creator = Reference(Person, cache={'name'})
 		updated = Date(default=utcnow, assign=True)
 		uploads = Array(ObjectId())  # GridFS file references.
 	
 	class Continuation(Reply):
-		continued = Reference()
+		continued = Reference(Thread)
 	
 	title = String()
-	forum = Reference()
+	forum = Reference(Forum)
 	
 	replies = Array(Embed(Reply))
 	
-	flag = Embed(Flags)
-	stat = Embed(Statistics)
+	flag = Embed(Flags, assign=True)
+	stat = Embed(Statistics, assign=True)
 	
 	subscribers = Array(ObjectId())
-	updated = Date(default=utcnow, assign=True)
+	modified = Date(default=utcnow, assign=True)

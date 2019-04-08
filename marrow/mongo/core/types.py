@@ -15,4 +15,3 @@ Sort = Sequence[Tuple[str, int]]
 
 # Parametric sort order is more permissive.
 FieldOrder = Sequence[Union[str, Tuple[str, int]]]
-
