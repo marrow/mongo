@@ -1,9 +1,6 @@
-# encoding: utf-8
-
-
 from pprint import pprint
 
-from marrow.mongo.document import Document
+from marrow.mongo import Document
 from marrow.mongo.field import Embed, ObjectId, String
 
 

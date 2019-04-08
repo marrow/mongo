@@ -1,9 +1,6 @@
-# encoding: utf-8
-
 from pymongo import MongoClient
 
-from marrow.mongo import Document
-from marrow.mongo.field import Field
+from marrow.mongo import Document, Field
 from marrow.mongo.query.parameterized import F
 
 

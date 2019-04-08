@@ -1,4 +1,14 @@
-# encoding: utf-8
+"""Example discussion forums representation.
+
+We attempt to make use of the best of both (relational and document) worlds. We track forums as distinct records, and
+threads within those forums separately. The replies to a thread are then stored within the threads themselves. Various
+statistics can be gathered.
+
+You may be thinking to yourself that MongoDB records have a limited size, and you'd be right. 16MiB is the largest
+record size as of this writing. Consider how much text that represents, though! It's around 500 novel chapters. While
+this is not entirely reasonable for even a very large and active group to compose within a single thread, we can still
+account for it by providing "continuation" markers to point at the next thread record to continue using from there.
+"""
 
 from marrow.mongo import Document, Index, utcnow
 from marrow.mongo.field import String, Integer, Array, Embed, Boolean

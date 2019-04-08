@@ -1,5 +1,3 @@
-# encoding: utf-8
-
 from marrow.mongo.field import String
 from web.core import Application
 from web.db.mongo import MongoDBConnection
