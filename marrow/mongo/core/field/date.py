@@ -11,6 +11,7 @@ from collections import MutableMapping
 from datetime import datetime, timedelta
 
 from .base import Field
+from ..types import Union
 from ...util import utc, utcnow
 from ....schema import Attribute
 
@@ -97,7 +98,7 @@ class Date(Field):
 		
 		return dt
 	
-	def to_native(self, obj, name, value):
+	def to_native(self, obj, name:str, value:datetime) -> datetime:
 		if not isinstance(value, datetime):
 			log.warning(f"Non-date stored in {self.__class__.__name__}.{self.__name__} field.",
 					extra={'document': obj, 'field': self.__name__, 'value': value})
@@ -105,7 +106,7 @@ class Date(Field):
 		
 		return self._process_tz(value, self.naive, self.tz)
 	
-	def to_foreign(self, obj, name, value):  # pylint:disable=unused-argument
+	def to_foreign(self, obj, name:str, value:Union[MutableMapping, OID, timedelta, datetime]) -> datetime:  # pylint:disable=unused-argument
 		if isinstance(value, MutableMapping) and '_id' in value:
 			value = value['_id']
 		

@@ -1,17 +1,33 @@
 """Formalized types for use as annotations, e.g. with typeguard."""
 
-from typing import Sequence
-from typing import Tuple
-from typing import Union
+from collections import namedtuple
+
+from typing import Any, Callable, Iterable, List, Mapping, Optional, Sequence, Tuple, Type, Union, Mapping
 
 from typeguard import check_argument_types
 
 
-__all__ = ['check_argument_types', 'Sort', 'FieldOrder']
+__all__ = [
+		'Callable',
+		'Iterable',
+		'List',
+		'Mapping',
+		'OperationMap',
+		'OperationalCandidate',
+		'Optional',
+		'Projection',
+		'Sequence',
+		'Sort',
+		'Tuple',
+		'Type',
+		'Union',
+		'check_argument_types',
+		'namedtuple',
+	]
 
 
-# Representing the definition of sort order according to PyMongo.
-Sort = Sequence[Tuple[str, int]]
+Projection = Mapping[str, bool]
+Sort = Sequence[Union[str, Tuple[str, int]]]
 
-# Parametric sort order is more permissive.
-FieldOrder = Sequence[Union[str, Tuple[str, int]]]
+
+OperationMap = Mapping[str, Callable]

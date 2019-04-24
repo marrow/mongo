@@ -2,7 +2,9 @@
 
 import operator
 
+from .. import Document
 from ..query import Filter
+from ..core.types import Optional, Mapping, Type
 from .common import _deferred_method, _operator_choice, _process_arguments
 
 DEFAULT_FILTER = operator.eq
@@ -60,7 +62,7 @@ FILTER_OPERATION_MAP = {
 	}
 
 
-def F(Document, __raw__=None, **filters):
+def F(Document:Type[Document], __raw__:Optional[Mapping]=None, **filters) -> Filter:
 	"""Generate a MongoDB filter document through parameter interpolation.
 	
 	Arguments passed by name have their name interpreted as an optional prefix (currently only `not`), a double-
@@ -69,7 +71,7 @@ def F(Document, __raw__=None, **filters):
 	Because this utility is likely going to be used frequently it has been given a single-character name.
 	"""
 	
-	ops = Filter(__raw__)
+	ops:Filter = Filter(__raw__)
 	args = _process_arguments(Document, FILTER_PREFIX_MAP, FILTER_OPERATION_MAP, filters)
 	
 	for prefix, suffix, field, value in args:

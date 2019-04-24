@@ -3,19 +3,19 @@
 from pymongo import ASCENDING, DESCENDING
 
 from ...package.loader import traverse
-from ..core.types import check_argument_types, Sort, FieldOrder
+from ..core.types import check_argument_types, Sort, List
 
 
-def S(Document, *fields:FieldOrder) -> Sort:
+
+def S(Document, *fields:Sort) -> Sort:
 	"""Generate a MongoDB sort order list using the Django ORM style."""
 	
 	assert check_argument_types()
-	result = []
+	result:Sort = []
 	
 	for field in fields:
 		if isinstance(field, tuple):  # Unpack existing tuple.
-			field, direction = field
-			result.append((field, direction))
+			result.append(field)
 			continue
 		
 		direction = ASCENDING

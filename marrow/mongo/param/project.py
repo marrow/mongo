@@ -1,12 +1,14 @@
 """Parameterized support akin to Django's ORM or MongoEngine."""
 
 from ...package.loader import traverse
+from .. import Document
+from ..core.types import Projection, Optional, Mapping, Type
 
 
-def P(Document, *fields, **kw):
+def P(Document:Type[Document], *fields:str, __always__=None, **kw) -> Projection:
 	"""Generate a MongoDB projection dictionary using the Django ORM style."""
 	
-	__always__ = kw.pop('__always__', set())
+	__always__ = __always__ or set()
 	projected = set()
 	omitted = set()
 	
