@@ -1,7 +1,6 @@
 """Parameterized support akin to Django's ORM or MongoEngine."""
 
 from ...package.loader import traverse
-from ...schema.compat import unicode
 
 
 def P(Document, *fields, **kw):
@@ -21,11 +20,11 @@ def P(Document, *fields, **kw):
 	
 	if not projected:  # We only have exclusions from the default projection.
 		names = set(getattr(Document, '__projection__', Document.__fields__) or Document.__fields__)
-		projected = {name for name in (names - omitted)}
+		projected = set(names - omitted)
 	
 	projected |= __always__
 	
 	if not projected:
 		projected = {'_id'}
 	
-	return {unicode(traverse(Document, name, name)): True for name in projected}
+	return {str(traverse(Document, name, name)): True for name in projected}

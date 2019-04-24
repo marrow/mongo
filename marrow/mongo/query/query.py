@@ -10,7 +10,6 @@ from collections import Iterable
 from functools import reduce
 from operator import __and__, __or__, __xor__
 
-from ...schema.compat import py3, str, unicode
 from .ops import Filter
 
 if __debug__:
@@ -60,7 +59,7 @@ class Q(object):
 		
 		self._document = document
 		self._field = field
-		self._name = None if isinstance(field, list) else ((path or '') + unicode(field))
+		self._name = None if isinstance(field, list) else ((path or '') + str(field))
 		self._combining = combining
 	
 	def __repr__(self):
@@ -131,20 +130,17 @@ class Q(object):
 		
 		if isinstance(field, Field):  # Bare simple values.
 			field = copy(field)
-			field.__name__ = self._name + '.' + unicode(name)
+			field.__name__ = self._name + '.' + str(name)
 		
 		else:  # Embedded documents.
-			field = Embed(field, name=self._name + '.' + unicode(name))
+			field = Embed(field, name=self._name + '.' + str(name))
 		
 		return self.__class__(self._document, field)
 	
-	def __unicode__(self):
+	def __str__(self):
 		"""Return the name of the field, or combining operation."""
 		
 		return {__and__: '$and', __or__: '$or', __xor__: '$$xor'}[self._combining] if self._combining else self._name
-	
-	if py3:
-		__str__ = __unicode__
 	
 	# Operation Building Blocks
 	

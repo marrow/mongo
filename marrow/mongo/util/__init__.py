@@ -1,4 +1,4 @@
-from collections import OrderedDict
+from collections import OrderedDict as odict
 from datetime import datetime, timedelta
 from operator import attrgetter
 from pkg_resources import iter_entry_points, DistributionNotFound
@@ -41,7 +41,7 @@ def adjust_attribute_sequence(*fields):
 				cls.__dict__[field].__sequence__ += amount  # Add the given amount.
 		
 		# Update the attribute collection.
-		cls.__attributes__ = OrderedDict(
+		cls.__attributes__ = odict(
 					(k, v) for k, v in \
 					sorted(cls.__attributes__.items(),
 						key=lambda i: i[1].__sequence__)

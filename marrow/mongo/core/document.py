@@ -6,8 +6,7 @@ from bson.json_util import dumps, loads
 from ...package.loader import load
 from ...package.canonical import name as named
 from ...schema import Attributes, Container
-from ...schema.compat import odict
-from ..util import SENTINEL
+from ..util import SENTINEL, odict
 from .field import Field
 from .field.alias import Alias
 from .index import Index
