@@ -6,6 +6,7 @@ from bson import DBRef
 from bson.errors import InvalidId
 
 from .. import Document, Field
+from ...util import odict
 from ....package.canonical import name as canon
 from ....package.loader import traverse
 from ....schema import Attribute

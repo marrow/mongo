@@ -1,8 +1,7 @@
 import pytest
 
 from marrow.mongo import Document, Field
-from marrow.mongo.util import SENTINEL
-from marrow.schema.compat import odict
+from marrow.mongo.util import SENTINEL, odict
 
 
 class Person(Document):

@@ -6,7 +6,7 @@ These encapsulate the functionality of creating combinable mappings
 from collections.abc import Mapping, MutableMapping
 from copy import deepcopy
 
-from ..util import SENTINEL
+from ..util import SENTINEL, odict
 
 
 class Ops(MutableMapping):

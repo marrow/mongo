@@ -6,7 +6,7 @@ from pymongo.cursor import CursorType
 
 from ... import F, Filter, P, S
 from ...trait import Collection
-from ....schema.compat import odict
+from ...util import odict
 from ....package.loader import traverse
 
 

@@ -5,7 +5,7 @@ from common import FieldExam
 from marrow.mongo import Document
 from marrow.mongo.field import Reference, String
 from marrow.mongo.trait import Derived
-from marrow.schema.compat import odict
+from marrow.mongo.util import odict
 
 
 class Concrete(Derived, Document):

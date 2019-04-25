@@ -4,7 +4,6 @@ import pytest
 
 from marrow.mongo.field import Integer, String
 from marrow.mongo.trait import Derived, Queryable
-from marrow.schema.compat import pypy
 
 
 class TestDerived(object):
