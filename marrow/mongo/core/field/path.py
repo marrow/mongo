@@ -1,5 +1,4 @@
 from .string import String
-from ....schema.compat import unicode, py3
 
 try:
 	from pathlib import PurePosixPath as _Path

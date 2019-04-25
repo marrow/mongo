@@ -1,7 +1,3 @@
-# encoding: utf-8
-
-from __future__ import unicode_literals
-
 from common import FieldExam
 from marrow.mongo import Document
 from marrow.mongo.field import PluginReference

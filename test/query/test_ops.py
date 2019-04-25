@@ -1,7 +1,3 @@
-# encoding: utf-8
-
-from __future__ import unicode_literals
-
 import operator
 
 import pytest
@@ -34,20 +30,13 @@ class TestOpsMapping(object):
 	def test_setitem(self, empty_ops):
 		assert repr(empty_ops) == "Filter([])"
 		empty_ops['meaning'] = 42
-		
-		if py3:
-			assert repr(empty_ops) == "Filter([('meaning', 42)])"
-		else:
-			assert repr(empty_ops) == "Filter([(u'meaning', 42)])"
+		assert repr(empty_ops) == "Filter([('meaning', 42)])"
 	
 	def test_delitem(self, empty_ops, single_ops):
 		with pytest.raises(KeyError):
 			del empty_ops['roll']
 		
-		if py3:
-			assert repr(single_ops) == "Filter([('roll', 27)])"
-		else:
-			assert repr(single_ops) == "Filter([(u'roll', 27)])"
+		assert repr(single_ops) == "Filter([('roll', 27)])"
 		
 		del single_ops['roll']
 		assert repr(single_ops) == "Filter([])"
@@ -113,25 +102,16 @@ class TestOpsMapping(object):
 		empty_ops.update(name="Bob Dole")
 		assert len(empty_ops.operations) == 1
 		
-		if py3:
-			assert repr(empty_ops) == "Filter([('name', 'Bob Dole')])"
-		else:
-			assert repr(empty_ops) == "Filter([('name', u'Bob Dole')])"
+		assert repr(empty_ops) == "Filter([('name', 'Bob Dole')])"
 		
 		assert len(single_ops.operations) == 1
 		
-		if py3:
-			assert repr(single_ops) == "Filter([('roll', 27)])"
-		else:
-			assert repr(single_ops) == "Filter([(u'roll', 27)])"
+		assert repr(single_ops) == "Filter([('roll', 27)])"
 		
 		single_ops.update([('name', "Bob Dole")])
 		assert len(single_ops.operations) == 2
 		
-		if py3:
-			assert repr(single_ops) in ("Filter([('roll', 27), ('name', 'Bob Dole')])", "Filter([('name', 'Bob Dole'), ('roll', 27)])")
-		else:
-			assert repr(single_ops) in ("Filter([(u'roll', 27), (u'name', u'Bob Dole')])", "Filter([(u'name', u'Bob Dole'), (u'roll', 27)])")
+		assert repr(single_ops) in ("Filter([('roll', 27), ('name', 'Bob Dole')])", "Filter([('name', 'Bob Dole'), ('roll', 27)])")
 	
 	def test_setdefault(self, empty_ops):
 		assert len(empty_ops.operations) == 0

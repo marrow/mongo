@@ -3,7 +3,6 @@ from misaka import HTML_ESCAPE, HTML_HARD_WRAP
 from misaka import EXT_FENCED_CODE, EXT_NO_INTRA_EMPHASIS, EXT_AUTOLINK, EXT_SPACE_HEADERS, EXT_STRIKETHROUGH, EXT_SUPERSCRIPT
 
 from .string import String
-from ....schema.compat import unicode, py3
 
 
 md = Markdown(
@@ -17,7 +16,7 @@ md = Markdown(
 	)
 
 
-class MarkdownString(unicode):
+class MarkdownString(str):
 	def __html__(self):
 		return md(self)
 

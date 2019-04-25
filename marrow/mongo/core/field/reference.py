@@ -9,7 +9,6 @@ from .. import Document, Field
 from ....package.canonical import name as canon
 from ....package.loader import traverse
 from ....schema import Attribute
-from ....schema.compat import odict, str, unicode
 
 from .base import _HasKind, Field
 

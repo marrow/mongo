@@ -1,7 +1,3 @@
-# encoding: utf-8
-
-from __future__ import unicode_literals
-
 from marrow.mongo.field import Array, String
 from marrow.mongo.trait import Collection
 

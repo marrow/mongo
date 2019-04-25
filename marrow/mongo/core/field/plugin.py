@@ -3,7 +3,6 @@ from pkg_resources import iter_entry_points
 from ....package.canonical import name as canon
 from ....package.loader import load
 from ....schema import Attribute
-from ....schema.compat import str, unicode
 
 from .base import Field
 
@@ -48,7 +47,7 @@ class PluginReference(Field):
 		except AttributeError:
 			explicit = not namespace
 		
-		if not isinstance(value, (str, unicode)):
+		if not isinstance(value, str):
 			value = canon(value)
 		
 		if namespace and ':' in value:  # Try to reduce to a known plugin short name.

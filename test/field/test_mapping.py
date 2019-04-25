@@ -1,7 +1,3 @@
-# encoding: utf-8
-
-from __future__ import unicode_literals
-
 from collections import MutableMapping, OrderedDict
 
 from common import FieldExam

@@ -1,7 +1,3 @@
-# encoding: utf-8
-
-from __future__ import unicode_literals
-
 from datetime import datetime as _dt
 from datetime import timedelta as _td
 from datetime import tzinfo as _tzinfo
