@@ -1,4 +1,4 @@
-from collections import Iterable, Mapping
+from collections.abc import Iterable, Mapping
 
 from ... import Field
 from .base import _HasKind, _CastingKind

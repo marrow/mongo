@@ -7,7 +7,7 @@ Commentary on high-level management of timezone casting:
 
 from datetime import datetime, timedelta, tzinfo
 from bson import ObjectId as OID
-from collections import MutableMapping
+from collections.abc import MutableMapping
 from datetime import datetime, timedelta
 
 from .base import Field

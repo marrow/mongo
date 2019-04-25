@@ -1,4 +1,4 @@
-from collections import MutableMapping
+from collections.abc import MutableMapping
 
 from bson import ObjectId
 from bson.json_util import dumps, loads
