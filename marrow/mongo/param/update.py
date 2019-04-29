@@ -5,13 +5,15 @@ from operator import __neg__
 from typing import Sequence, Mapping as Map, Optional
 from typeguard import check_argument_types
 
+from .. import Q
+from ..core.types import Order, PushOrder
 from ..query import Update
 from .common import _bit, _current_date, _process_arguments
 
 DEFAULT_UPDATE = 'set'  # If no prefix is found, this will be the default operation.
 
 
-def _push_each(value: Sequence, field: str) -> Map[str, Sequence]:
+def _push_each(value: Sequence, field: Q) -> Map[str, Sequence]:
 	assert check_argument_types()
 	return {'$each': [field.transformer.foreign(v, (field, field.__document__)) for v in value]}
 
@@ -21,7 +23,7 @@ def _push_slice(value: int) -> Map[str, int]:
 	return {'$slice': value}
 
 
-def _push_sort(value: str) -> Map[str, str]:
+def _push_sort(value: PushOrder) -> Map[str, Order]:
 	assert check_argument_types()
 	return {'$sort': value}
 

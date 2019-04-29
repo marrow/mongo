@@ -3,11 +3,11 @@
 from pymongo import ASCENDING, DESCENDING
 
 from ...package.loader import traverse
-from ..core.types import check_argument_types, Sort, List
+from ..core.types import check_argument_types, Sort, List, Order
 
 
 
-def S(Document, *fields:Sort) -> Sort:
+def S(Document, *fields:Order) -> Sort:
 	"""Generate a MongoDB sort order list using the Django ORM style."""
 	
 	assert check_argument_types()

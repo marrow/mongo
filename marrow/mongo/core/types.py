@@ -15,6 +15,7 @@ __all__ = [
 		'OperationMap',
 		'OperationalCandidate',
 		'Optional',
+		'Order',
 		'Projection',
 		'Sequence',
 		'Sort',
@@ -27,7 +28,9 @@ __all__ = [
 
 
 Projection = Mapping[str, bool]
-Sort = Sequence[Union[str, Tuple[str, int]]]
+Sort = Sequence[Tuple[str, int]]
+Order = Union[str, Tuple[str, int]]
+PushOrder = Union[int, Mapping[str, int]]
 
 
 OperationMap = Mapping[str, Callable]
