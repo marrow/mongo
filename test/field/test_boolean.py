@@ -29,6 +29,9 @@ class TestBooleanField(FieldExam):
 		inst = Sample(1)
 		assert inst.field is True
 	
-	def test_cast_failure(self, Sample):
-		with pytest.raises(ValueError):
-			Sample('hehehe')
+	def test_cast_ultimate(self, Sample):
+		inst = Sample('hehehe')
+		assert inst.field is True
+		
+		inst = Sample('') is False
+		inst = Sample(None) is False
