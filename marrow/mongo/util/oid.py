@@ -1,6 +1,6 @@
-"""An ObjectID implementation independtent from the bson package bundled with PyMongo.
+"""An ObjectID implementation independent from the `bson` package bundled with PyMongo.
 
-Within this module are implementeations of all known `ObjectId` generation methods and interpretations. This is
+Within this module are implementations of all known `ObjectId` generation methods and interpretations. This is
 provided primarily as a mechanism to utilize or transition older IDs on modern systems, as well as to provide an
 option if you prefer the guarantees and information provided by older versions, moving forwards.
 
@@ -13,7 +13,7 @@ Notably, `ObjectId` was originally[1] defined (< MongoDB 3.3) as a combination o
 
 The server itself never had a complex interpretation, treating the data after the timestamp as an "arbitrary node
 identifier" followed by counter. The documentation and client drivers were brought more in-line with this intended
-lack of strucure[2] replacing the hardware and process identifiers with literal random data initialized on process
+lack of structure[2] replacing the hardware and process identifiers with literal random data initialized on process
 startup. As such, the modern structure is comprised of:
 
 * 4-byte UNIX timestamp.
@@ -23,7 +23,7 @@ startup. As such, the modern structure is comprised of:
 Additionally, the mechanism used to determine the hardware identifier has changed in the past. Initially it used a
 substring segment of the hex encoded result of hashing the value returned by `gethostname()`. For FIPS compliance use
 of MD5 was eliminated and a custom FNV implementation added. We avoid embedding yet another hashing implementation in
-our own code and simply utilize the `fnv` package, if installed. (This will be automatially installed if your own
+our own code and simply utilize the `fnv` package, if installed. (This will be automatically installed if your own
 application depends upon `marrow.mongo[fips]`.)
 
 To determine which approach is used for generation, specify the `hwid` argument to the ObjectId constructor.
@@ -73,7 +73,7 @@ from typeguard import check_argument_types
 
 _hostname = gethostname().encode()  # Utilized by the legacy HWID generation approaches.
 HWID = {'random': urandom(5)}  # A mapping of abstract alias to hardware identification value, defaulting to random.
-HWID['modern'] = HWID['random']  # Convienent alias as an antonym of "legacy".
+HWID['modern'] = HWID['random']  # Convenient alias as an antonym of "legacy".
 
 try:  # This uses the old (<3.7) MD5 approach, which is not FIPS-safe despite having no cryptographic requirements.
 	from hashlib import md5
