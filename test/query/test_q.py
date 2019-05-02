@@ -31,7 +31,7 @@ def S():
 	
 	return Stringy
 
-class TestQueryable(object):  # TODO: Properly use pytest fixtures for this...
+class TestQueryable:  # TODO: Properly use pytest fixtures for this...
 	operators = [
 			(operator.lt, '$lt', 27, {'field_name': {'$lt': '27'}}),
 			(operator.le, '$lte', 27, {'field_name': {'$lte': '27'}}),

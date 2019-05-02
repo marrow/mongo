@@ -76,7 +76,7 @@ setup(
 			'marrow.schema>=2.0.0,<2.2.0',  # Declarative schema support.
 			'marrow.package>=2.0.0,<2.2.0',  # Plugin discovery and loading.
 			'pymongo>=3.2',  # We require modern API.
-			'typeguard>=2.3.0,<3.0',  # Strict validation of annotation hints.
+			'typeguard>=2.3.0,<4.0',  # Strict validation of annotation hints.
 		],
 	
 	extras_require = dict(
