@@ -7,12 +7,14 @@ from .string import String
 
 md = Markdown(
 		HtmlRenderer(flags=HTML_ESCAPE | HTML_HARD_WRAP),
-		extensions = EXT_FENCED_CODE | \
-				EXT_NO_INTRA_EMPHASIS | \
-				EXT_AUTOLINK | \
-				EXT_SPACE_HEADERS | \
-				EXT_STRIKETHROUGH | \
-				EXT_SUPERSCRIPT
+		extensions = (
+				'fenced-code',
+				'no-intra-emphasis',
+				'autolink',
+				'space-headers',
+				'strikethrough',
+				'superscript',
+			)
 	)
 
 
