@@ -124,7 +124,7 @@ class Field(Attribute):
 	
 	def is_sortable(self, context=None):
 		return self._predicate(self.sort, context)
-
+	
 	# Marrow Schema Interfaces
 	
 	def __init__(self, *args, **kw):

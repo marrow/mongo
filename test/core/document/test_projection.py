@@ -1,5 +1,3 @@
-# encoding: utf-8
-
 from marrow.mongo import Document, Field
 from marrow.mongo.trait import Collection
 

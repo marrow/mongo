@@ -37,7 +37,6 @@ class TestOpsMapping(object):
 			del empty_ops['roll']
 		
 		assert repr(single_ops) == "Filter([('roll', 27)])"
-		
 		del single_ops['roll']
 		assert repr(single_ops) == "Filter([])"
 	
@@ -99,18 +98,15 @@ class TestOpsMapping(object):
 	
 	def test_update(self, empty_ops, single_ops):
 		assert len(empty_ops.operations) == 0
+		
 		empty_ops.update(name="Bob Dole")
 		assert len(empty_ops.operations) == 1
-		
 		assert repr(empty_ops) == "Filter([('name', 'Bob Dole')])"
-		
 		assert len(single_ops.operations) == 1
-		
 		assert repr(single_ops) == "Filter([('roll', 27)])"
 		
 		single_ops.update([('name', "Bob Dole")])
 		assert len(single_ops.operations) == 2
-		
 		assert repr(single_ops) in ("Filter([('roll', 27), ('name', 'Bob Dole')])", "Filter([('name', 'Bob Dole'), ('roll', 27)])")
 	
 	def test_setdefault(self, empty_ops):
