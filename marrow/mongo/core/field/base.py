@@ -220,9 +220,6 @@ class _HasKind(Field):
 			if kind.startswith('.'):
 				# This allows the reference to be dynamic.
 				kind = traverse(document or self.__document__, kind[1:])
-				
-				if not isinstance(kind, str):
-					return kind
 			else:
 				kind = load(kind, 'marrow.mongo.document')
 		
