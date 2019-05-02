@@ -2,7 +2,7 @@
 
 from collections import namedtuple
 
-from typing import Any, Callable, Iterable, List, Mapping, Optional, Sequence, Tuple, Type, Union, Mapping
+from typing import Any, Callable, Iterable, List, Mapping, Optional, Sequence, Tuple, Type, Union
 
 from typeguard import check_argument_types
 
@@ -15,7 +15,6 @@ __all__ = [
 		'OperationMap',
 		'OperationalCandidate',
 		'Optional',
-		'Order',
 		'Projection',
 		'Sequence',
 		'Sort',
@@ -24,13 +23,13 @@ __all__ = [
 		'Union',
 		'check_argument_types',
 		'namedtuple',
+		'Any',
 	]
 
 
 Projection = Mapping[str, bool]
-Sort = Sequence[Tuple[str, int]]
+Sort = Sequence[Union[str, Tuple[str, int]]]
 Order = Union[str, Tuple[str, int]]
-PushOrder = Union[int, Mapping[str, int]]
 
 
 OperationMap = Mapping[str, Callable]

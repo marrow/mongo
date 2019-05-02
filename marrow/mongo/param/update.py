@@ -6,7 +6,7 @@ from typing import Sequence, Mapping as Map, Optional
 from typeguard import check_argument_types
 
 from .. import Q
-from ..core.types import Order, PushOrder
+from ..core.types import Order
 from ..query import Update
 from .common import _bit, _current_date, _process_arguments
 
@@ -23,7 +23,7 @@ def _push_slice(value: int) -> Map[str, int]:
 	return {'$slice': value}
 
 
-def _push_sort(value: PushOrder) -> Map[str, Order]:
+def _push_sort(value: Order) -> Map[str, Order]:
 	assert check_argument_types()
 	return {'$sort': value}
 
