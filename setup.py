@@ -81,6 +81,7 @@ setup(
 	
 	extras_require = dict(
 			decimal = ['pymongo>=3.4'],  # More modern version required for Decimal128 support.
+			fips = ['fnv'],  # FIPS restrict the use of MD5 hashes; this is the alternative used for HWIDs.
 			development = tests_require + ['pre-commit', 'bandit'],  # Development-time dependencies.
 			logger = ['tzlocal>=1.4'],  # Timezone support to store log times in UTC like a sane person.
 			markdown = ['misaka', 'pygments'],  # Markdown text storage.
