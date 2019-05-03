@@ -18,6 +18,7 @@ __all__ = [
 		'Projection',
 		'Sequence',
 		'Sort',
+		'PushSort',
 		'Tuple',
 		'Type',
 		'Union',
@@ -29,6 +30,7 @@ __all__ = [
 
 Projection = Mapping[str, bool]
 Sort = Sequence[Union[str, Tuple[str, int]]]
+PushSort = Union[int, Mapping[str, int]]
 Order = Union[str, Tuple[str, int]]
 
 
