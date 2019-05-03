@@ -1,34 +1,33 @@
 """Parameterized support akin to Django's ORM or MongoEngine."""
 
-from collections import Mapping
+from collections.abc import Mapping as Map
 from operator import __neg__
-from typing import Sequence, Mapping as Map, Optional
-from typeguard import check_argument_types
 
 from .. import Q
-from ..core.types import Order
+from ..core.types import Order, Sequence, Mapping, Optional, PushSort, check_argument_types
 from ..query import Update
 from .common import _bit, _current_date, _process_arguments
+
 
 DEFAULT_UPDATE = 'set'  # If no prefix is found, this will be the default operation.
 
 
-def _push_each(value: Sequence, field: Q) -> Map[str, Sequence]:
+def _push_each(value: Sequence, field: Q) -> Mapping[str, Sequence]:
 	assert check_argument_types()
 	return {'$each': [field.transformer.foreign(v, (field, field.__document__)) for v in value]}
 
 
-def _push_slice(value: int) -> Map[str, int]:
+def _push_slice(value: int) -> Mapping[str, int]:
 	assert check_argument_types()
 	return {'$slice': value}
 
 
-def _push_sort(value: Order) -> Map[str, Order]:
+def _push_sort(value: PushSort) -> Mapping[str, Order]:
 	assert check_argument_types()
 	return {'$sort': value}
 
 
-def _push_position(value: int) -> Map[str, int]:
+def _push_position(value: int) -> Mapping[str, int]:
 	assert check_argument_types()
 	return {'$position': int(value)}
 
@@ -122,7 +121,7 @@ def U(Document, __raw__:Optional[Map]=None, **update) -> Update:
 			else:
 				value = cast(value)
 			
-			if operation in ops and ~field in ops[operation] and isinstance(value, Mapping):
+			if operation in ops and ~field in ops[operation] and isinstance(value, Map):
 				ops[operation][~field].update(value)
 				continue
 		
