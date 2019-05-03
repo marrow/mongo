@@ -7,6 +7,7 @@ from ....package.canonical import name
 from ... import Document, Index, utcnow
 from ...field import Date, String, Embed, Reference, Integer, ObjectId
 from ...trait import Queryable
+from ...util import oid
 from ...util.capped import tail
 
 
@@ -22,7 +23,7 @@ except:
 
 # We default to the same algorithm PyMongo uses to generate hardware and process ID portions of ObjectIds.
 def _identifier():
-	return getenv('INSTANCE_ID', f'{int(hexlify(OID._machine_bytes), 16):06x}{getpid() % 0xFFFF:04x}')
+	return getenv('INSTANCE_ID', f'{int(hexlify(oid.HWID["modern"]), 16):06x}{getpid() % 0xFFFF:04x}')
 
 
 class Lockable(Queryable):
