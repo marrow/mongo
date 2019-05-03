@@ -54,9 +54,9 @@ Additional points of reference:
 """
 
 from binascii import unhexlify
-from datetime import datetime, timestamp
-from os import getpid
-from random import randint, urandom
+from datetime import datetime
+from os import getpid, urandom
+from random import randint
 from socket import gethostname
 from struct import pack
 from threading import RLock
@@ -178,7 +178,7 @@ class ObjectID:
 	def generation_time(self, value:datetime):
 		"""Assign/replace the generation time of this ObjectId."""
 		assert check_argument_types()
-		self.time = timestamp(value)
+		self.time = datetime.timestamp(value)
 	
 	def __bytes__(self):
 		return b"{self.time:04s}{self.machine:03s}{self.process:02s}{self.counter:03s}".format(self=self)
