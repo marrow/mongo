@@ -231,6 +231,17 @@ class ObjectID(_OID):
 		
 		return ObjectID(oid)
 	
+	@classmethod
+	def is_valid(ObjectID, oid):
+		"""Identify if the given identifier will parse successfully as an ObjectID."""
+		
+		try:
+			ObjectID(oid)
+		except (TypeError, ValueError):
+			return False
+		
+		return True
+	
 	def parse(self, value):
 		self.time = int(value[:8], 16)
 		self.machine = int(value[8:14], 16)
