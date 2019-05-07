@@ -75,7 +75,7 @@ setup(
 			'uri>=2.0.0,<3.0.0',  # Generic URI datastructure.
 			'marrow.schema>=2.0.0,<2.2.0',  # Declarative schema support.
 			'marrow.package>=2.0.0,<2.2.0',  # Plugin discovery and loading.
-			'pymongo>=3.2',  # We require modern API.
+			'pymongo>=3.7',  # We require very modern API w/ count_documents.
 			'typeguard>=2.3.0,<4.0',  # Strict validation of annotation hints.
 		],
 	

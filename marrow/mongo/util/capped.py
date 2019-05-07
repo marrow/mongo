@@ -28,7 +28,7 @@ def tail(collection, filter=None, projection=None, limit=0, timeout=None, aggreg
 		raise TypeError("Can only tail capped collections.")
 	
 	# Similarly, verify that the collection isn't empty.  Empty is bad.  (Busy loop.)
-	if not collection.count():
+	if not collection.count_documents({}):
 		raise ValueError("Cowardly refusing to tail an empty collection.")
 	
 	cursor = collection.find(filter, projection, limit=limit, cursor_type=CursorType.TAILABLE_AWAIT)

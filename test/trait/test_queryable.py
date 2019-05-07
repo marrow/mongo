@@ -133,4 +133,4 @@ class TestQueryableTrait(object):
 		doc = Sample(string='diz', integer=2029)
 		assert doc.id
 		doc.insert_one()
-		assert Sample.get_collection().count() == 5
+		assert Sample.get_collection().count_documents({}) == 5

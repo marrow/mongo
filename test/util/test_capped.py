@@ -60,9 +60,9 @@ def gen_log_entries(collection, count=1000):
 
 class TestCappedQueries(object):
 	def test_single(self, capped):
-		assert capped.count() == 0
+		assert capped.count_documents({}) == 0
 		result = capped.insert_one({'message': 'first'}).inserted_id
-		assert capped.count() == 1
+		assert capped.count_documents({}) == 1
 		
 		first = next(tail(capped))
 		assert first['message'] == 'first'
@@ -76,7 +76,7 @@ class TestCappedQueries(object):
 		result = list(tail(capped, timeout=0.5))
 		
 		delta = time() - start
-		assert len(result) == capped.count()
+		assert len(result) == capped.count_documents({})
 		assert 0.25 < delta < 0.75
 	
 	def test_capped_trap(self, uncapped):
@@ -95,7 +95,7 @@ class TestCappedQueries(object):
 		assert len(list(capped.tail(timeout=0.25))) == 1
 	
 	def test_long_iteration(self, capped):
-		assert not capped.count()
+		assert not capped.count_documents({})
 		
 		# Start generating entries.
 		t = Thread(target=gen_log_entries, args=(capped, ))
@@ -107,7 +107,7 @@ class TestCappedQueries(object):
 			if record['message'] == 'last': break
 		
 		# Note that the collection only allows 100 entries...
-		assert capped.count() == 100
+		assert capped.count_documents({}) == 100
 		
 		# But we successfully saw all 1000 generated records.  :)
 		assert count == 1000
@@ -115,7 +115,7 @@ class TestCappedQueries(object):
 		t.join()
 	
 	def test_intermittent_iteration(self, capped):
-		assert not capped.count()
+		assert not capped.count_documents({})
 		
 		# Start generating entries.
 		t = Thread(target=gen_log_entries, args=(capped, ))
@@ -126,7 +126,7 @@ class TestCappedQueries(object):
 		for record in tail(capped, timeout=2, aggregate=True):
 			if count == 50:
 				# Records are pooled in batches, so even after the query is timed out-i.e. we take
-				# too long to do something in one of our iterations-we may still recieve additional
+				# too long to do something in one of our iterations-we may still receive additional
 				# records before the pool drains and the cursor needs to pull more data from the
 				# server.  To avoid weird test failures, we break early here.  Symptoms show up as
 				# this test failing with "<semi-random large int> == 200" in the final count.
@@ -142,5 +142,5 @@ class TestCappedQueries(object):
 		
 		t.join()
 		
-		assert capped.count() == 100
+		assert capped.count_documents({}) == 100
 		assert count == 1000
