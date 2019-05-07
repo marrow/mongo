@@ -276,19 +276,6 @@ class ObjectID(_OID):
 		"""Return a value suitable for picle serialization."""
 		return self.binary
 	
-	@hwid.setter
-	def hwid(self, value: Union[str, bytes]):
-		if isinstance(value, str):
-			if len(value) != 10:
-				raise ValueError("Hardware identifier must be a 5-byte binary value or 10-character hexadecimal string.")
-			
-			value = unhexlify(value)
-		
-		else:
-			value = bytes(value)
-		
-		if len(value) != 5:
-			raise ValueError("Hardware identifier must be a 5-byte binary value or 10-character hexadecimal string.")
 	def __setstate__(self, value):
 		"""Restore state after pickle deserialization."""
 		self.binary = value
