@@ -272,9 +272,9 @@ class ObjectID(_OID):
 		# 3 bytes incremental counter, random IV on process start
 		self.counter = next(_counter)
 	
-	@property
-	def hwid(self):
-		return self.machine + self.process
+	def __getstate__(self):
+		"""Return a value suitable for picle serialization."""
+		return self.binary
 	
 	@hwid.setter
 	def hwid(self, value: Union[str, bytes]):
