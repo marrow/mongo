@@ -120,7 +120,74 @@ class _Counter:
 _counter = _Counter()
 
 
-class ObjectID:
+
+class _Component:
+	"""An object representing a component part of the larger binary ObjectID structure.
+	
+	This allows the defintiion of a range of bytes from the binary representation, with automatic extraction from the
+	compound value on get, and replacement of the relevant portion of the compound value on set. Deletion will null;
+	replace with zeroes.
+	"""
+	
+	__slots__ = ('_slice', )
+	
+	def __getitem__(self, item):
+		self._slice = item
+		return self
+	
+	def __get__(self, instance, owner):
+		return instance.binary[self._slice]
+	
+	def __set__(self, instance, value):
+		if isinstance(value, str):
+			value = unhexlify(value)
+		
+		value = bytearray(instance.binary)
+		value[self._slice] = value
+		instance.binary = bytes(value)
+	
+	def __delete__(self, instance):
+		value = bytearray(instance.binary)
+		value[self._slice] = '\0' * len(range(*self._slice.indices(12)))
+
+
+class _Numeric(_Component):
+	__slots__ = ('struct', )
+	
+	def __init__(self, struct='>I'):
+		self.struct = struct
+	
+	def __get__(self, instance, owner) -> int:
+		value = super().__get__(instance, owner)
+		return unpack(self.struct, value)[0]
+	
+	def __set__(self, instance, value: int):
+		assert check_argument_types()
+		
+		value = pack(self.struct, value)
+		super().__set__(instance, value)
+
+
+class _Timestamp(_Numeric):
+	def __get__(self, instance, owner) -> datetime:
+		value = super().__get__(instance, owner)
+		return datetime.fromtimestamp(value).replace(tzinfo=utc)
+	
+	def __set__(self, instance, value:Union[int,datetime,timedelta]):
+		assert check_argument_types()
+		
+		if not isinstance(value, int):
+			if isinstance(value, timedelta):
+				value = datetime.utcnow() + value
+			
+			value = datetime.timestamp(value)
+		
+		super().__set__(instance, value)
+
+
+class ObjectID(_OID):
+	__slots__ = ('binary', )
+	
 	_type_marker = 0x07  # BSON ObjectId
 	
 	def __init__(self, value=None, hwid='random'):
