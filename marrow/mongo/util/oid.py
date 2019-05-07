@@ -141,13 +141,20 @@ class _Component:
 		if isinstance(value, str):
 			value = unhexlify(value)
 		
-		value = bytearray(instance.binary)
-		value[self._slice] = value
-		instance.binary = bytes(value)
+		start, stop, skip = self._slice.indices(12)
+		l = stop - start
+		
+		if len(value) > l:  # Trim over-large values
+			# We encode a 3-byte value as a 4-byte integer, thus need to trim it for storage.
+			value = value[len(value) - l:]
+		
+		binary = bytearray(instance.binary)
+		binary[self._slice] = value
+		instance.binary = bytes(binary)
 	
 	def __delete__(self, instance):
 		value = bytearray(instance.binary)
-		value[self._slice] = '\0' * len(range(*self._slice.indices(12)))
+		value[self._slice] = '\0' * len(range(start, stop, skip))
 
 
 class _Numeric(_Component):
@@ -189,10 +196,10 @@ class ObjectID(_OID):
 	
 	_type_marker = 0x07  # BSON ObjectId
 	
-	time = generation_time = _Timestamp()[:4]
+	time = generation_time = _Timestamp('!L')[:4]
 	machine = _Component()[4:7]
-	process = _Numeric('>D')[7:9]
-	counter = _Numeric()[9:12]
+	process = _Numeric('!H')[7:9]
+	counter = _Numeric('!I')[9:]
 	
 	hwid = _Component()[4:9]  # Compound of machine + process, used esp. in later versions as random.
 	
