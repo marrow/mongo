@@ -207,6 +207,30 @@ class ObjectID(_OID):
 		else:
 			self.generate(hwid)
 	
+	@classmethod
+	def from_datetime(ObjectID, when:Union[datetime,timedelta]):
+		"""Construct a mock ObjectID whose only populated field is a specific generation time.
+		
+		This is useful for performing range queries (e.g. records constructed after X `datetime`). To enhance such use
+		this reimplementation allows you to pass an explicit datetime instance, or a timedelta relative to now.
+		
+		All dates will be stored in UTC.
+		"""
+		
+		assert check_argument_types()
+		
+		if isinstance(when, timedelta):  # If provided a relative moment, assume it's relative to now.
+			when = datetime.utcnow() + when
+		
+		if when.utcoffset() is not None:  # Normalize to UTC.
+			when = when - when.utcoffset()
+		
+		ts = datetime.timestamp(when)
+		packed = pack('>I', ts)
+		oid = b"{packed}\0\0\0\0\0\0\0\0"
+		
+		return ObjectID(oid)
+	
 	def parse(self, value):
 		self.time = int(value[:8], 16)
 		self.machine = int(value[8:14], 16)
