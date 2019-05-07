@@ -53,18 +53,19 @@ Additional points of reference:
 [2] https://docs.mongodb.com/v3.4/reference/method/ObjectId/
 """
 
-from binascii import unhexlify
-from datetime import datetime
+from binascii import hexlify, unhexlify
+from datetime import datetime, timedelta
 from os import getpid, urandom
 from random import randint
 from socket import gethostname
-from struct import pack
+from struct import pack, unpack
 from threading import RLock
 from time import time
-from typing import Union
 
+from bson import ObjectId as _OID
 from bson.tz_util import utc
-from typeguard import check_argument_types
+
+from ..core.types import Union, Optional, check_argument_types
 
 
 # HWID calculation. This happens once, the first time this module is imported. Availability of choices depend on the
