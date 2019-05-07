@@ -48,9 +48,7 @@ class TestPyMongoObjectID(ValidationTest):
 	
 	def test_identity(self):
 		a = ObjectID()
-		print(str(a), repr(a))
 		b = ObjectID(a)
-		print(str(b), repr(b))
 		assert a == b
 	
 	
