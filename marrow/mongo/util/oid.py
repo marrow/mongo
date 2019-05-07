@@ -190,7 +190,18 @@ class ObjectID(_OID):
 	
 	_type_marker = 0x07  # BSON ObjectId
 	
-	def __init__(self, value=None, hwid='random'):
+	time = generation_time = _Timestamp()[:4]
+	machine = _Component()[4:7]
+	process = _Numeric('>D')[7:9]
+	counter = _Numeric()[9:12]
+	
+	hwid = _Component()[4:9]  # Compound of machine + process, used esp. in later versions as random.
+	
+	def __init__(self, value:Optional[Union[str,bytes,_OID,datetime,timedelta]]=None, hwid='random'):
+		assert check_argument_types()
+		
+		self.binary = b'\x00' * 12
+		
 		if value:
 			self.parse(value)
 		else:
