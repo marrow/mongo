@@ -260,9 +260,9 @@ class ObjectID(_OID):
 		self.binary = unhexlify(value)
 	
 	def generate(self, hwid='random'):
-		self.time = int(time())  # 4 bytes
+		self.time = int(time())  # 4 byte timestamp.
 		
-		if hwid in ('legacy', 'fips'):  # machine + process identification
+		if hwid in ('legacy', 'fips'):  # Machine + process identification.
 			self.machine = HWID[hwid]
 			self.process = getpid() % 0xFFFF  # Can't be precomputed and included in HWID as Python may fork().
 		
@@ -272,10 +272,10 @@ class ObjectID(_OID):
 			
 			self.hwid = hwid
 		
-		else:  # 5-byte identifier from catalog
+		else:  # 5-byte identifier from catalog.
 			self.hwid = HWID[hwid]
 		
-		# 3 bytes incremental counter, random IV on process start
+		# 3 bytes incremental counter, random IV on process start.
 		self.counter = next(_counter)
 	
 	def __getstate__(self):
