@@ -120,11 +120,10 @@ class _Counter:
 _counter = _Counter()
 
 
-
 class _Component:
 	"""An object representing a component part of the larger binary ObjectID structure.
 	
-	This allows the defintiion of a range of bytes from the binary representation, with automatic extraction from the
+	This allows the definition of a range of bytes from the binary representation, with automatic extraction from the
 	compound value on get, and replacement of the relevant portion of the compound value on set. Deletion will null;
 	replace with zeroes.
 	"""
