@@ -169,26 +169,67 @@ class ObjectID:
 		
 		if len(value) != 5:
 			raise ValueError("Hardware identifier must be a 5-byte binary value or 10-character hexadecimal string.")
-		
-		self.machine = value[:3]
-		self.process = value[3:]
-	
-	@property
-	def generation_time(self):
-		"""Retrieve the generation time as a native datetime object in UTC."""
-		return datetime.fromtimestamp(self.time).replace(tzinfo=utc)
-	
-	@generation_time.setter
-	def generation_time(self, value:datetime):
-		"""Assign/replace the generation time of this ObjectId."""
-		assert check_argument_types()
-		self.time = datetime.timestamp(value)
-	
-	def __bytes__(self):
-		return b"{self.time:04s}{self.machine:03s}{self.process:02s}{self.counter:03s}".format(self=self)
+	def __setstate__(self, value):
+		"""Restore state after pickle deserialization."""
+		self.binary = value
 	
 	def __str__(self):
-		return "{self.time:08x}{self.machine:06x}{self.process:04x}{self.counter:06x}".format(self=self)
+		return hexlify(self.binary).decode()
+	
+	def __bytes__(self):
+		return self.binary
 	
 	def __repr__(self):
-		return "{self.__class__.__name__}('{self}', generated='{when}')".format(self=self, when=self.generation_time.isoformat())
+		return f"{self.__class__.__name__}('{self}', generated='{self.generation_time.isoformat()}')"
+	
+	def __eq__(self, other):
+		try:
+			other = ObjectID(other)
+		except (TypeError, ValueError):
+			return NotImplemented
+		
+		return self.binary == other.binary
+	
+	def __ne__(self, other):
+		try:
+			other = ObjectID(other)
+		except (TypeError, ValueError):
+			return NotImplemented
+		
+		return self.binary != other.binary
+	
+	def __lt__(self, other):
+		try:
+			other = ObjectID(other)
+		except (TypeError, ValueError):
+			return NotImplemented
+		
+		return self.binary < other.binary
+	
+	def __le__(self, other):
+		try:
+			other = ObjectID(other)
+		except (TypeError, ValueError):
+			return NotImplemented
+		
+		return self.binary <= other.binary
+	
+	def __gt__(self, other):
+		try:
+			other = ObjectID(other)
+		except (TypeError, ValueError):
+			return NotImplemented
+		
+		return self.binary > other.binary
+
+	def __ge__(self, other):
+		try:
+			other = ObjectID(other)
+		except (TypeError, ValueError):
+			return NotImplemented
+		
+		return self.binary >= other.binary
+	
+	def __hash__(self):
+		"""Get a hash value for this :class:`ObjectId`."""
+		return hash(self.binary)
