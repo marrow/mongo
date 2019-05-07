@@ -1,7 +1,7 @@
 from marrow.mongo.util import datetime_period, utcnow
 
 
-class TestDatetimePeriod(object):
+class TestDatetimePeriod:
 	def test_assumed_base(self):
 		now = utcnow()
 		then = datetime_period(hours=1)
