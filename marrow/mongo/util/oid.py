@@ -254,21 +254,23 @@ class ObjectID(_OID):
 		self.binary = unhexlify(value)
 	
 	def generate(self, hwid='random'):
-		self.time = int(time())
-		self.counter = next(_counter)
+		self.time = int(time())  # 4 bytes
 		
-		if hwid in ('legacy', 'fips'):
+		if hwid in ('legacy', 'fips'):  # machine + process identification
 			self.machine = HWID[hwid]
 			self.process = getpid() % 0xFFFF  # Can't be precomputed and included in HWID as Python may fork().
 		
-		elif isinstance(hwid, bytes):
+		elif isinstance(hwid, bytes):  # 5-byte explicit value
 			if len(hwid) != 5:
 				raise ValueError("Binary hardware ID must have exact length: 5 bytes, not {}.".format(len(hwid)))
 			
 			self.hwid = hwid
 		
-		else:
+		else:  # 5-byte identifier from catalog
 			self.hwid = HWID[hwid]
+		
+		# 3 bytes incremental counter, random IV on process start
+		self.counter = next(_counter)
 	
 	@property
 	def hwid(self):
