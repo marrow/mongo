@@ -243,10 +243,15 @@ class ObjectID(_OID):
 		return True
 	
 	def parse(self, value):
-		self.time = int(value[:8], 16)
-		self.machine = int(value[8:14], 16)
-		self.process = int(value[14:18], 16)
-		self.counter = int(value[18:24], 16)
+		if isinstance(value, bytes):
+			value = hexlify(value).decode()
+		
+		value = str(value)  # Casts bson.ObjectId as well.
+		
+		if len(value) != 24:
+			raise ValueError("ObjectID must be a 12-byte binary value or 24-character hexidecimal string.")
+		
+		self.binary = unhexlify(value)
 	
 	def generate(self, hwid='random'):
 		self.time = int(time())
