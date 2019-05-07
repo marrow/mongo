@@ -95,8 +95,11 @@ class _Counter:
 	"""A thread-safe atomically incrementing counter.
 	
 	That itertools.count is thread-safe is a byproduct of the GIL on CPython, not an intentional design decision. As a
-	side-effect it can not be relied upon, thus we implement our own with proper locking.
+	result it can not be relied upon, thus we implement our own with proper locking.
 	"""
+	
+	value: int
+	lock: RLock
 	
 	def __init__(self):
 		self.value = randint(0, 2**24)
