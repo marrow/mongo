@@ -278,8 +278,20 @@ class ObjectID(_OID):
 		# 3 bytes incremental counter, random IV on process start.
 		self.counter = next(_counter)
 	
+	@property
+	def _ObjectId__id(self):
+		"""Provide a PyMongo BSON ObjectId-specific "private" (mangled) attribute.
+		
+		We have to include this, since the BSON C code explicitly pulls from the private interface instead of using
+		public ones such as string- or bytes-casting. It's understandable, if unfortunate extremely tight coupling.
+		
+		Ref: `case 7` of `_write_element_to_buffer` from:
+			https://github.com/mongodb/mongo-python-driver/blob/master/bson/_cbsonmodule.c
+		"""
+		return self.binary
+	
 	def __getstate__(self):
-		"""Return a value suitable for picle serialization."""
+		"""Return a value suitable for pickle serialization."""
 		return self.binary
 	
 	def __setstate__(self, value):
