@@ -84,7 +84,7 @@ class TestQueryableCore(object):
 class TestQueryableTrait(object):
 	def test_find(self, Sample):
 		rs = Sample.find()
-		assert rs.count() == 4
+		assert Sample.get_collection().count_documents({}) == 4
 		assert [i['integer'] for i in rs] == [7, 27, 42, None]
 	
 	def test_find_first(self, Sample):
