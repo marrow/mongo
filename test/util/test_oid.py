@@ -54,5 +54,7 @@ class TestPyMongoObjectID(ValidationTest):
 		a = ObjectID()
 		b = ObjectID(a)
 		assert a == b
+		assert a == str(b)
+		assert a == bytes(b)
 	
 	
