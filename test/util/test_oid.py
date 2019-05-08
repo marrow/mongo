@@ -37,6 +37,9 @@ class TestPyMongoObjectID(ValidationTest):
 			('12345678901', ValueError),  # Too short.
 			('1234567890123', ValueError),  # Too long.
 			('abcdefghijkl', ValueError),  # It's a string, but not hex.
+			(b"123456789012345678901234", ValueError),  # Don't do this.
+			('123456789012123456789G12', ValueError),
+			(b'123456789012123456789G12', ValueError),
 		)
 	
 	def test_invalid_values(self, invalid):
