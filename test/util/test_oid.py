@@ -43,6 +43,7 @@ class TestPyMongoObjectID(ValidationTest):
 		)
 	
 	def test_invalid_values(self, invalid):
+		# Overridden because in our case, we also vary on exception class.
 		with pytest.raises(invalid[1]):
 			self.validator(invalid[0])
 	
