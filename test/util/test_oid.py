@@ -57,4 +57,20 @@ class TestPyMongoObjectID(ValidationTest):
 		assert a == str(b)
 		assert a == bytes(b)
 	
-	
+	def test_repr(self):
+		oid = ObjectID('5cd33f61f761ee5819f110a5')
+		assert repr(oid) == "ObjectID('5cd33f61f761ee5819f110a5', generated='2019-05-08T16:43:13+00:00')"
+		
+		oid = ObjectID('1234567890abcdef12345678')
+		assert repr(oid) == "ObjectID('1234567890abcdef12345678', generated='1979-09-05T18:51:36+00:00')"
+		
+		oid = ObjectID(b'123456789012')
+		assert repr(oid) == "ObjectID('313233343536373839303132', generated='1996-02-26T17:24:52+00:00')"
+		
+		oid = ObjectID('1234567890abcdef12345678')
+		assert oid.binary == b'\x124Vx\x90\xab\xcd\xef\x124Vx'
+		assert repr(oid) == "ObjectID('1234567890abcdef12345678', generated='1979-09-05T18:51:36+00:00')"
+		
+		oid = ObjectID(b'\x124Vx\x90\xab\xcd\xef\x124Vx')
+		assert str(oid) == '1234567890abcdef12345678'
+		assert repr(oid) == "ObjectID('1234567890abcdef12345678', generated='1979-09-05T18:51:36+00:00')"
