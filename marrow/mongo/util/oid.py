@@ -1,10 +1,15 @@
-"""An ObjectID implementation independent from the `bson` package bundled with PyMongo.
+"""Coordination-Free Unique Identifier Generation
+
 
 Within this module are implementations of all known `ObjectId` generation methods and interpretations. This is
 provided primarily as a mechanism to utilize or transition older IDs on modern systems, as well as to provide an
 option if you prefer the guarantees and information provided by older versions, moving forwards.
 
-Notably, `ObjectId` was originally[1] defined (< MongoDB 3.3) as a combination of:
+Ours being Python 3 specific is more strict about the type of string being passed. Where PyMongo's `bson.ObjectId`
+permits hex-encoded binary strings, our ObjectID is strict: binary values will only be interpreted as a raw binary
+ObjectID; no transformations will be applied to bytes objects.
+
+`ObjectId` was originally[1] defined (< MongoDB 3.3) as a combination of:
 
 * 4-byte UNIX timestamp.
 * 3-byte machine identifier.
@@ -18,28 +23,31 @@ startup. As such, the modern structure is comprised of:
 
 * 4-byte UNIX timestamp.
 * 5-byte random process identifier. ("Random value" in the docs.)
-* 3-byte counter with random IV on process start.
+* 3-byte counter with random IV ("initialization vector", or starting point) on process start.
 
 Additionally, the mechanism used to determine the hardware identifier has changed in the past. Initially it used a
-substring segment of the hex encoded result of hashing the value returned by `gethostname()`. For FIPS compliance use
-of MD5 was eliminated and a custom FNV implementation added. We avoid embedding yet another hashing implementation in
-our own code and simply utilize the `fnv` package, if installed. (This will be automatically installed if your own
-application depends upon `marrow.mongo[fips]`.)
+substring segment of the hex-encoded result of hashing the value returned by `gethostname()`. For Federal Information
+Processing Standard (FIPS) [3] compliance, use of MD5 was eliminated and a custom FNV implementation added. We avoid
+embedding yet another hashing implementation in our own code and simply utilize the `fnv` package, if installed.
+(This will be automatically installed if your own application depends upon `marrow.mongo[fips]`.) Without the library
+installed, the `fips` choice will not be available.
 
-To determine which approach is used for generation, specify the `hwid` argument to the ObjectId constructor.
-Possibilities include:
+To determine which approach is used for generation, specify the `hwid` keyword argument to the `ObjectID()`
+constructor. Possibilities include:
 
 * The string `legacy`: use the host name MD5 substring value and process ID. _Note if FIPS compliance is enabled, the
-  md5 hash will literally be unavailable for use, resulting in the inability to utilize this choice._
-* The string `fips`: use the FIPS-compliant FNV hash of the host name, and process ID.
-* The string `random`: pure random bytes, the default, aliased as "modern".
+  `md5` hash will literally be unavailable for use, resulting in the inability to utilize this choice._
+* The string `fips`: use the FIPS-compliant FNV hash of the host name, in combination with the current process ID.
+  Requires the `fnv` package be installed.
+* The string `random`: pure random bytes, the default, aliased as `modern`.
 * Any 5-byte bytes value: use the given HWID explicitly.
 
 You are permitted to add additional entries to this mapping within your own application, if desired.
 
-Unlike the PyMongo-supplied ObjectId implementation, this does not use a custom `Exception` class to represent invalid
-values. TypeError will be raised if passed a value not able to be stringified, ValueError if the resulting string is
-not 12 binary bytes or 24 hexadecimal digits. _**Warning:** any 12-byte `bytes` value will be accepted as-is._
+Unlike the PyMongo-supplied `ObjectId` implementation, this does not use a custom `Exception` class to represent
+invalid values. `TypeError` will be raised if passed a value not able to be stringified, `ValueError` if the
+resulting string is not 12 binary bytes or 24 hexadecimal digits. _**Warning:** any 12-byte `bytes` value will be
+accepted as-is._
 
 Additional points of reference:
 
@@ -49,8 +57,11 @@ Additional points of reference:
 * [ObjectID documentation should replace Process and Machine ID with 5-byte random value](https://jira.mongodb.org/browse/DOCS-11844)
 * [ObjectId MachineId uses network interface names instead of mac address or something more unique](https://jira.mongodb.org/browse/JAVA-586)
 
-[1] https://docs.mongodb.com/v3.2/reference/method/ObjectId/
-[2] https://docs.mongodb.com/v3.4/reference/method/ObjectId/
+### Footnotes
+
+1. https://docs.mongodb.com/v3.2/reference/method/ObjectId/
+2. https://docs.mongodb.com/v3.4/reference/method/ObjectId/
+3. https://en.wikipedia.org/wiki/Federal_Information_Processing_Standards
 """
 
 from binascii import hexlify, unhexlify
