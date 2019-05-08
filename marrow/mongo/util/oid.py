@@ -1,9 +1,10 @@
 """Coordination-Free Unique Identifier Generation
 
-
-Within this module are implementations of all known `ObjectId` generation methods and interpretations. This is
-provided primarily as a mechanism to utilize or transition older IDs on modern systems, as well as to provide an
-option if you prefer the guarantees and information provided by older versions, moving forwards.
+This module contains an ObjectID implementation independent from the `bson` package bundled with PyMongo, developed
+in "clean-room" isolation based on publicly available end-use documentation. Additionally, it implements all of the
+known generation algorithms, as the specification has changed over time. This is provided primarily as a mechanism
+to utilize or transition older IDs on modern systems, as well as to provide an option if you prefer the guarantees
+and information provided by older versions, moving forwards.
 
 Ours being Python 3 specific is more strict about the type of string being passed. Where PyMongo's `bson.ObjectId`
 permits hex-encoded binary strings, our ObjectID is strict: binary values will only be interpreted as a raw binary
