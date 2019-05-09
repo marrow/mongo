@@ -1,13 +1,25 @@
 """General tests, and conformance tests for our ObjectID reimplementation."""
 
 from datetime import datetime, timedelta
+from os import getpid
 from pickle import dumps, loads
 
 from bson.tz_util import utc
-from pytest import mark, raises
+from pytest import mark, param, raises
 
 from marrow.mongo import ObjectID
+from marrow.mongo.util.oid import HWID
 from marrow.schema.testing import ValidationTest, pytest_generate_tests
+
+try:
+	from hashlib import md5
+except ImportError:
+	md5 = None
+
+try:
+	import fnv
+except ImportError:
+	fnv = None
 
 
 class AnyObjectID:
