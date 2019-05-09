@@ -1,6 +1,9 @@
 """General tests, and conformance tests for our ObjectID reimplementation."""
 
-import pytest
+from datetime import datetime, timedelta
+
+from bson.tz_util import utc
+from pytest import raises
 
 from marrow.mongo import ObjectID
 from marrow.schema.testing import ValidationTest, pytest_generate_tests
@@ -44,7 +47,7 @@ class TestPyMongoObjectID(ValidationTest):
 	
 	def test_invalid_values(self, invalid):
 		# Overridden because in our case, we also vary on exception class.
-		with pytest.raises(invalid[1]):
+		with raises(invalid[1]):
 			self.validator(invalid[0])
 	
 	def test_coss_string_equality(self):
