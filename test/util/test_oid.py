@@ -228,6 +228,10 @@ class TestObjectID(ValidationTest):
 	
 	def test_hashability(self):
 		# Important tha these are permitted for use as dictionary keys.
+		
+		hash(ObjectID())  # Ensure this does not explode.
+		
+		# Actual use.
 		d = {ObjectID(): "bob"}
 		assert len(d) == 1
 		k = next(iter(d))
