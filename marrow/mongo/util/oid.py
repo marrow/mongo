@@ -369,5 +369,5 @@ class ObjectID(_OID):
 		return self.binary >= other.binary
 	
 	def __hash__(self):
-		"""Get a hash value for this :class:`ObjectId`."""
+		"""Retrieve a hash value for this identifier to allow it to be used as a key in mappings."""
 		return hash(self.binary)
