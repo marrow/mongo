@@ -193,7 +193,7 @@ class _Timestamp(_Numeric):
 			if isinstance(value, timedelta):
 				value = datetime.utcnow() + value
 			
-			value = datetime.timestamp(value)
+			value = int(datetime.timestamp(value))
 		
 		super().__set__(instance, value)
 
