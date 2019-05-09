@@ -143,7 +143,7 @@ class TestObjectID(ValidationTest):
 			'modern',
 			param('legacy', marks=[mark.xfail(reason='FIPS mode enabled')] if md5 is None else []),
 			param('fips', marks=[mark.xfail(reason='FIPS mode not enabled')] if fnv is None else []),
-			param('unknown', marks=[mark.xfail(reason='unknown HWID')]),
+			param('unknown', marks=[mark.xfail()]),
 			'custom',
 			b'12345',
 		])
