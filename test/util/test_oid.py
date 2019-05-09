@@ -81,7 +81,7 @@ class TestObjectID(ValidationTest):
 	def test_coss_string_equality(self):
 		assert ObjectID("123456789012123456789012") == ObjectID(b"\x12\x34\x56\x78\x90\x12\x12\x34\x56\x78\x90\x12")
 	
-	def test_identity_and_equality(self):
+	def test_identity_equality_comparisons(self):
 		assert ObjectID(b"123456789012") == ObjectID(b"123456789012")
 		
 		a = ObjectID()
@@ -98,6 +98,25 @@ class TestObjectID(ValidationTest):
 		assert not (a != b)  # Explicit inequality comparison.
 		
 		assert a == a.binary == ObjectID(a.binary)
+		assert a != 27
+		
+		with raises(TypeError):
+			assert a < 27
+		
+		with raises(TypeError):
+			assert a > 27
+		
+		with raises(TypeError):
+			assert a <= 27
+		
+		with raises(TypeError):
+			assert a >= 27
+		
+		assert ObjectID() > a
+		assert a < ObjectID()
+		
+		assert ObjectID() >= a
+		assert a <= ObjectID()
 	
 	def test_repr(self):
 		oid = ObjectID('5cd33f61f761ee5819f110a5')
