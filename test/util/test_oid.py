@@ -11,6 +11,7 @@ from pytest import mark, param, raises
 from marrow.mongo import ObjectID
 from marrow.mongo.util.oid import HWID
 from marrow.schema.testing import ValidationTest, pytest_generate_tests
+from test_date import with_timezones
 
 try:
 	from hashlib import md5
@@ -21,6 +22,11 @@ try:
 	import fnv
 except ImportError:
 	fnv = None
+
+try:
+	from pytz import timezone
+except ImportError:
+	pass
 
 
 class AnyObjectID:
@@ -227,3 +233,11 @@ class TestObjectID(ValidationTest):
 		k = next(iter(d))
 		assert isinstance(k, ObjectID)
 		assert k == next(iter(d))
+	
+	@with_timezones
+	def test_from_tz_aware(self):
+		tz = timezone('Japan')
+		when = datetime(1992, 1, 12, 12, 0, 0).replace(tzinfo=tz)
+		oid = ObjectID(when)
+		assert str(oid) == '296f27b80000000000000000'
+		assert repr(oid) == "ObjectID('296f27b80000000000000000', generated='1992-01-11T17:22:00+00:00')"
