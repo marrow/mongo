@@ -111,4 +111,9 @@ class TestPyMongoObjectID(ValidationTest):
 		assert (dt - now).total_seconds() < 1
 		assert (ts - now).total_seconds() < 1
 		assert 4 < (ft - now).total_seconds() < 6
-
+	
+	@mark.parametrize("protocol", [0, 1, 2, -1])
+	def test_pickling(self, protocol):
+		oid = ObjectID()
+		pickle = dumps(oid, protocol=protocol)
+		assert oid == loads(pickle)
