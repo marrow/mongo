@@ -90,7 +90,7 @@ HWID['modern'] = HWID['random']  # Convenient alias as an antonym of "legacy".
 
 try:  # This uses the old (<3.7) MD5 approach, which is not FIPS-safe despite having no cryptographic requirements.
 	from hashlib import md5
-	HWID['legacy'] = int(md5(_hostname).hexdigest()[:6], 16)
+	HWID['legacy'] = unhexlify(md5(_hostname).hexdigest()[:6])
 except ImportError:
 	pass
 
