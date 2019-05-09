@@ -42,10 +42,11 @@ class TestPyMongoObjectID(ValidationTest):
 			
 			# XXX: Differs from bson.ObjectId: an empty string value is treated as None.
 			# ('', ValueError),  # It's a string, but not a useful one.
+			('hello', ValueError),  # Not even close.
 			('12345678901', ValueError),  # Too short.
 			('1234567890123', ValueError),  # Too long.
 			('abcdefghijkl', ValueError),  # It's a string, but not hex.
-			(b"123456789012345678901234", ValueError),  # Don't do this.
+			(b"123456789012345678901234", ValueError),  # XXX: Differs from bson.ObjectId!
 			('123456789012123456789G12', ValueError),
 			(b'123456789012123456789G12', ValueError),
 		)
