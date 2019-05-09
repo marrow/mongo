@@ -64,8 +64,16 @@ class TestObjectID(ValidationTest):
 			(b'123456789012123456789G12', ValueError),
 		)
 	
+	def test_valid_values(self, valid):
+		# Overridden to include is_valid testing.
+		ValidationTest.test_valid_values(self, valid)
+		
+		assert self.validator.is_valid(valid[0] if isinstance(valid, tuple) else valid)
+	
 	def test_invalid_values(self, invalid):
 		# Overridden because in our case, we also vary on exception class.
+		assert not self.validator.is_valid(invalid[0])
+		
 		with raises(invalid[1]):
 			self.validator(invalid[0])
 	
