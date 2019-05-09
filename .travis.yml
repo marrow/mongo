@@ -35,8 +35,8 @@ before_install:
 install:
   - 'travis_retry pip install --upgrade setuptools pip pytest pytest-cov codecov "setuptools_scm>=1.9" cffi'
   - 'pip install -e ".[development]"'
-  - 'test -z "${FIPS}" && pip install -e ".[development]"'
-  - 'test -n "${FIPS}" && pip install -e ".[development,fips]"'
+  - 'test -z "${FIPS}" && pip install -e ".[development]" || true'
+  - 'test -n "${FIPS}" && pip install -e ".[development,fips]" || true'
   - 'test -n "${NO_PYTZ}" && pip uninstall --yes pytz tzlocal || true'
 
 script:
