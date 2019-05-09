@@ -161,7 +161,8 @@ class _Component:
 	
 	def __delete__(self, instance):
 		value = bytearray(instance.binary)
-		value[self._slice] = '\0' * len(range(start, stop, skip))
+		value[self._slice] = b'\0' * len(range(*self._slice.indices(12)))
+		instance.binary = bytes(value)
 
 
 class _Numeric(_Component):
