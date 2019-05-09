@@ -203,10 +203,10 @@ class ObjectID(_OID):
 	
 	_type_marker = 0x07  # BSON ObjectId
 	
-	time = generation_time = _Timestamp('!L')[:4]
+	time = generation_time = _Timestamp('!L')[:4]  # "time" short-hand alias provided.
 	machine = _Component()[4:7]
 	process = _Numeric('!H')[7:9]
-	counter = _Numeric('!I')[9:]
+	counter = sequence = _Numeric('!I')[9:]  # "sequence" alias provided.
 	
 	hwid = _Component()[4:9]  # Compound of machine + process, used esp. in later versions as random.
 	
