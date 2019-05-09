@@ -21,6 +21,8 @@ matrix:
       env: MONGODB_VERSION=3.4.4 NO_PYTZ=1
     - python: "3.6"
       env: MONGODB_VERSION=3.2.22
+    - python: "3.6"
+      env: MONGODB_VERSION=4.0.8 FIPS=1
     - python: "3.7"
       dist: xenial
 
@@ -33,6 +35,8 @@ before_install:
 install:
   - 'travis_retry pip install --upgrade setuptools pip pytest pytest-cov codecov "setuptools_scm>=1.9" cffi'
   - 'pip install -e ".[development]"'
+  - 'test -z "${FIPS}" && pip install -e ".[development]"'
+  - 'test -n "${FIPS}" && pip install -e ".[development,fips]"'
   - 'test -n "${NO_PYTZ}" && pip uninstall --yes pytz tzlocal || true'
 
 script:
