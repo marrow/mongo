@@ -26,6 +26,7 @@ class TestPyMongoObjectID(ValidationTest):
 			(None, anyoid),
 			('', anyoid),
 			"123456789012345678901234",  # Textual hex-encoded string.
+			# XXX: The following two differ from bson.ObjectId by permitting comparison between ObjectID and bytes.
 			b"\x12\x34\x56\x78\x90\x12" * 2,  # Binary string.
 			b"123456789012",  # This is also a valid binary string.
 		)
@@ -36,6 +37,7 @@ class TestPyMongoObjectID(ValidationTest):
 			({"test": 27}, TypeError),  # Dictionary is a nope.
 			(["gesundheit"], TypeError),  # Lists are right out.
 			
+			# XXX: Differs from bson.ObjectId: an empty string value is treated as None.
 			# ('', ValueError),  # It's a string, but not a useful one.
 			('12345678901', ValueError),  # Too short.
 			('1234567890123', ValueError),  # Too long.
