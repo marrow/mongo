@@ -220,8 +220,12 @@ class ObjectID(_OID):
 		
 		self.binary = b'\x00' * 12
 		
-		if value:
+		if isinstance(value, (datetime, timedelta)):
+			self.binary = self.from_datetime(value).binary
+		
+		elif value:
 			self.parse(value)
+		
 		else:
 			self.generate(hwid)
 	
