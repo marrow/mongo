@@ -36,6 +36,7 @@ class TestPyMongoObjectID(ValidationTest):
 			(42.0, TypeError),  # Floats doubly so.  (See what I did there?)
 			({"test": 27}, TypeError),  # Dictionary is a nope.
 			(["gesundheit"], TypeError),  # Lists are right out.
+			({"wat"}, TypeError),  # This set is bereft of life.
 			
 			# XXX: Differs from bson.ObjectId: an empty string value is treated as None.
 			# ('', ValueError),  # It's a string, but not a useful one.
