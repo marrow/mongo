@@ -244,7 +244,10 @@ class ObjectID(_OID):
 		if isinstance(when, timedelta):  # If provided a relative moment, assume it's relative to now.
 			when = datetime.utcnow() + when
 		
-		if when.utcoffset() is not None:  # Normalize to UTC.
+		if not when.tzinfo:
+			when = when.replace(tzinfo=utc)
+		
+		if when.utcoffset():  # Normalize to UTC.
 			when = when - when.utcoffset()
 		
 		ts = datetime.timestamp(when)
