@@ -234,9 +234,9 @@ class ObjectID(_OID):
 		"""Construct a mock ObjectID whose only populated field is a specific generation time.
 		
 		This is useful for performing range queries (e.g. records constructed after X `datetime`). To enhance such use
-		this reimplementation allows you to pass an explicit datetime instance, or a timedelta relative to now.
+		this reimplementation allows you to pass an explicit `datetime` instance, or a `timedelta` relative to now.
 		
-		All dates will be stored in UTC.
+		All dates are normalized to UTC and are only second accurate.
 		"""
 		
 		assert check_argument_types()
