@@ -250,9 +250,8 @@ class ObjectID(_OID):
 		if when.utcoffset():  # Normalize to UTC.
 			when = when - when.utcoffset()
 		
-		ts = datetime.timestamp(when)
-		packed = pack('>I', ts)
-		oid = b"{packed}\0\0\0\0\0\0\0\0"
+		ts = int(datetime.timestamp(when))  # Throw away microseconds - the decimal component of the float.
+		oid = pack('>I', ts) + b"\0\0\0\0\0\0\0\0"
 		
 		return ObjectID(oid)
 	
