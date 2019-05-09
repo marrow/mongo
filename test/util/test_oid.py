@@ -29,7 +29,7 @@ class AnyObjectID:
 anyoid = AnyObjectID()
 
 
-class TestPyMongoObjectID(ValidationTest):
+class TestObjectID(ValidationTest):
 	"""Tests inspired by / borrowed from PyMongo itself to ensure conformance."""
 	
 	validator = ObjectID
