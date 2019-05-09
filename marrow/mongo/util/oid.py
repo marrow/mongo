@@ -117,17 +117,12 @@ class _Counter:
 		self.value = randint(0, 2**24)
 		self.lock = RLock()
 	
-	def __iter__(self):
-		return self
-	
 	def __next__(self):
 		with self.lock:
 			self.value = (self.value + 1) % 0xFFFFFF
 			value = self.value
 		
 		return value
-	
-	next = __next__
 
 _counter = _Counter()
 
