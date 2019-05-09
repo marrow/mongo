@@ -4,6 +4,7 @@ from datetime import datetime, timedelta
 from os import getpid
 from pickle import dumps, loads
 
+from bson import BSON
 from bson.tz_util import utc
 from pytest import mark, param, raises
 
@@ -164,3 +165,9 @@ class TestObjectID(ValidationTest):
 		
 		else:
 			assert oid.hwid == b'12345'
+	
+	def test_bson_encoding(self):
+		oid = ObjectID(b"\0" * 12)
+		result = BSON.encode({'test': oid})
+		assert result == b'\x17\x00\x00\x00\x07test\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00'
+		# Above binary structure: mapping, ObjectID attribute, "test" key name, literal ObjectID.
