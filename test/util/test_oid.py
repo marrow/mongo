@@ -59,12 +59,23 @@ class TestPyMongoObjectID(ValidationTest):
 	def test_coss_string_equality(self):
 		assert ObjectID("123456789012123456789012") == ObjectID(b"\x12\x34\x56\x78\x90\x12\x12\x34\x56\x78\x90\x12")
 	
-	def test_identity(self):
+	def test_identity_and_equality(self):
+		assert ObjectID(b"123456789012") == ObjectID(b"123456789012")
+		
 		a = ObjectID()
 		b = ObjectID(a)
+		
+		assert a is not b
 		assert a == b
 		assert a == str(b)
-		assert a == bytes(b)
+		assert a == bytes(b)  # XXX: Differs from bson.ObjectId!
+		# In the above case, we treat ObjectID as a transparent binary value, equivalent to its binary encoded form.
+		
+		assert ObjectID() != ObjectID()
+		assert not (ObjectID(b"123456789012") != ObjectID("313233343536373839303132"))
+		assert not (a != b)  # Explicit inequality comparison.
+		
+		assert a == a.binary == ObjectID(a.binary)
 	
 	def test_repr(self):
 		oid = ObjectID('5cd33f61f761ee5819f110a5')
