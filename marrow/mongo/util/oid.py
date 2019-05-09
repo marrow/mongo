@@ -91,7 +91,7 @@ HWID['modern'] = HWID['random']  # Convenient alias as an antonym of "legacy".
 try:  # This uses the old (<3.7) MD5 approach, which is not FIPS-safe despite having no cryptographic requirements.
 	from hashlib import md5
 	HWID['legacy'] = unhexlify(md5(_hostname).hexdigest()[:6])
-except ImportError:
+except ImportError:  # pragma: no cover
 	pass
 
 try:  # A HWID variant matching MongoDB >=3.7 use of FNV-1a for FIPS compliance.
@@ -99,7 +99,7 @@ try:  # A HWID variant matching MongoDB >=3.7 use of FNV-1a for FIPS compliance.
 	_fnv = fnv.hash(_hostname, fnv.fnv_1a, bits=32)
 	_fnv = (_fnv >> 24) ^ (_fnv & 0xffffff)  # XOR-fold to 24 bits.
 	HWID['fips'] = pack('<I', _fnv)[:3]
-except ImportError:
+except ImportError:  # pragma: no cover
 	pass
 
 
