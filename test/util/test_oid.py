@@ -1,9 +1,10 @@
 """General tests, and conformance tests for our ObjectID reimplementation."""
 
 from datetime import datetime, timedelta
+from pickle import dumps, loads
 
 from bson.tz_util import utc
-from pytest import raises
+from pytest import mark, raises
 
 from marrow.mongo import ObjectID
 from marrow.schema.testing import ValidationTest, pytest_generate_tests
