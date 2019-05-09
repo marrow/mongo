@@ -209,6 +209,11 @@ class TestObjectID(ValidationTest):
 		oid.time = timedelta(days=1)
 		result = str(oid).rstrip('0')
 		assert 24 - len(result) == 16
+	
+	def test_bad_hwid(self):
+		with raises(ValueError):
+			ObjectID(hwid=b"123456")
+	
 	def test_bson_encoding(self):
 		oid = ObjectID(b"\0" * 12)
 		result = BSON.encode({'test': oid})
