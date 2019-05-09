@@ -185,6 +185,30 @@ class TestObjectID(ValidationTest):
 		else:
 			assert oid.hwid == b'12345'
 	
+	def test_hex_assignment(self):
+		oid = ObjectID()
+		oid.hwid = '4341464645'
+		assert oid.hwid == b'CAFFE'
+	
+	def test_component_removal(self):
+		oid = ObjectID(hwid=b"CAFFE")
+		
+		# Deleteing these two, with the custom HWID, leaves only the HWID.
+		del oid.time
+		del oid.sequence
+		
+		assert str(oid) == '000000004341464645000000'
+	
+	def test_date_assignment(self):
+		oid = ObjectID(b"\0" * 12)
+		assert str(oid) == '000000000000000000000000'
+		
+		oid.time = datetime(2018, 1, 1, tzinfo=utc)
+		assert str(oid) == '5a497a000000000000000000'
+		
+		oid.time = timedelta(days=1)
+		result = str(oid).rstrip('0')
+		assert 24 - len(result) == 16
 	def test_bson_encoding(self):
 		oid = ObjectID(b"\0" * 12)
 		result = BSON.encode({'test': oid})
