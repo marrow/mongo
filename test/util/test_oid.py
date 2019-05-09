@@ -29,6 +29,8 @@ class TestPyMongoObjectID(ValidationTest):
 			# XXX: The following two differ from bson.ObjectId by permitting comparison between ObjectID and bytes.
 			b"\x12\x34\x56\x78\x90\x12" * 2,  # Binary string.
 			b"123456789012",  # This is also a valid binary string.
+			(datetime(2017, 1, 1), "586846800000000000000000"),
+			(datetime(2017, 1, 1, tzinfo=utc), "586846800000000000000000"),
 		)
 	
 	invalid = (
@@ -80,3 +82,20 @@ class TestPyMongoObjectID(ValidationTest):
 		oid = ObjectID(b'\x124Vx\x90\xab\xcd\xef\x124Vx')
 		assert str(oid) == '1234567890abcdef12345678'
 		assert repr(oid) == "ObjectID('1234567890abcdef12345678', generated='1979-09-05T22:51:36+00:00')"
+	
+	def test_times(self):
+		# Note, compared to PyMongo's generation time tests, we don't need to worry about stripping tzinfo.
+		# We do timezone support properly; it's all UTC.
+		# Incidentally, the repr tests cover timestamp interpretation, too.
+		
+		now = datetime.utcnow().replace(tzinfo=utc)
+		
+		dt = ObjectID().generation_time
+		ts = ObjectID().time
+		ft = ObjectID(timedelta(seconds=5)).time
+		
+		assert dt == ts  # These must be synonyms for each-other.
+		assert (dt - now).total_seconds() < 1
+		assert (ts - now).total_seconds() < 1
+		assert 4 < (ft - now).total_seconds() < 6
+
