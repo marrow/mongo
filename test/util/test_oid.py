@@ -190,3 +190,11 @@ class TestObjectID(ValidationTest):
 		result = BSON.encode({'test': oid})
 		assert result == b'\x17\x00\x00\x00\x07test\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00'
 		# Above binary structure: mapping, ObjectID attribute, "test" key name, literal ObjectID.
+	
+	def test_hashability(self):
+		# Important tha these are permitted for use as dictionary keys.
+		d = {ObjectID(): "bob"}
+		assert len(d) == 1
+		k = next(iter(d))
+		assert isinstance(k, ObjectID)
+		assert k == next(iter(d))
