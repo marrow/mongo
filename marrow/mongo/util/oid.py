@@ -189,7 +189,7 @@ class _Numeric(_Component):
 class _Timestamp(_Numeric):
 	def __get__(self, instance, owner) -> datetime:
 		value = super().__get__(instance, owner)
-		return datetime.fromtimestamp(value).replace(tzinfo=utc)
+		return datetime.utcfromtimestamp(value).replace(tzinfo=utc)
 	
 	def __set__(self, instance, value:Union[int,datetime,timedelta]):
 		assert check_argument_types()
