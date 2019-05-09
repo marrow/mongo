@@ -360,7 +360,7 @@ class ObjectID(_OID):
 			return NotImplemented
 		
 		return self.binary > other.binary
-
+	
 	def __ge__(self, other):
 		try:
 			other = ObjectID(other)

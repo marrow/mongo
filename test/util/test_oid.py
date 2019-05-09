@@ -214,7 +214,14 @@ class TestObjectID(ValidationTest):
 		
 		oid.time = timedelta(days=1)
 		result = str(oid).rstrip('0')
-		assert 24 - len(result) == 16
+		
+		try:
+			assert 24 - len(result) == 16
+		except AssertionError:
+			# Edge case / race condition with timestamps ending in zero.
+			oid.time = timedelta(days=1)
+			result = str(oid).rstrip('0')
+			assert 24 - len(result) == 16
 	
 	def test_bad_hwid(self):
 		with raises(ValueError):
