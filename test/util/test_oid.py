@@ -129,3 +129,30 @@ class TestPyMongoObjectID(ValidationTest):
 		oid = ObjectID()
 		pickle = dumps(oid, protocol=protocol)
 		assert oid == loads(pickle)
+	
+	@mark.parametrize("scheme", [
+			'random',
+			'modern',
+			param('legacy', marks=[mark.xfail(reason='FIPS mode enabled')] if md5 is None else []),
+			param('fips', marks=[mark.xfail(reason='FIPS mode not enabled')] if fnv is None else []),
+			param('unknown', marks=[mark.xfail(reason='unknown HWID')]),
+			'custom',
+			b'12345',
+		])
+	def test_hwid(self, scheme):
+		HWID['custom'] = b'CAFFE'
+		
+		oid = ObjectID(hwid=scheme)
+		
+		if scheme in ('random', 'modern', 'custom'):
+			assert oid.hwid in HWID.values()
+		
+		elif scheme in ('legacy', 'fips'):
+			assert oid.hwid[:3] in HWID.values()
+			
+			# Technically PIDs can exceed our available integer width.
+			# So we allow the number to overflow and "wrap around".
+			assert oid.process == getpid() % 0xFFFF
+		
+		else:
+			assert oid.hwid == b'12345'
