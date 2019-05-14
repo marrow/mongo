@@ -128,7 +128,7 @@ class Field(Attribute):
 	# Marrow Schema Interfaces
 	
 	def __init__(self, *args, **kw):
-		super(Field, self).__init__(*args, **kw)
+		super().__init__(*args, **kw)
 		
 		if self.nullable:  # If no default is specified, but the field is nullable, set the default to None.
 			try:
@@ -149,7 +149,7 @@ class Field(Attribute):
 		if obj is None:
 			return Q(cls, self)
 		
-		result = super(Field, self).__get__(obj, cls)
+		result = super().__get__(obj, cls)
 		
 		if result is None:  # Discussion: pass through to the transformer?
 			return None
@@ -173,7 +173,7 @@ class Field(Attribute):
 			self.validator.validate(value, FieldContext(self, obj))
 			value = self.transformer.foreign(value, FieldContext(self, obj))
 		
-		super(Field, self).__set__(obj, value)
+		super().__set__(obj, value)
 	
 	def __delete__(self, obj):
 		"""Executed via the `del` statement with a Field instance attribute as the argument."""
@@ -198,10 +198,10 @@ class _HasKind(Field):
 		if args:
 			kw['kind'], args = args[0], args[1:]
 		
-		super(_HasKind, self).__init__(*args, **kw)
+		super().__init__(*args, **kw)
 	
 	def __fixup__(self, document):
-		super(_HasKind, self).__fixup__(document)
+		super().__fixup__(document)
 		
 		kind = self.kind
 		

@@ -3,6 +3,7 @@ from weakref import proxy
 
 from ....package.loader import traverse
 from ....schema import Attribute
+from ..types import check_argument_types
 
 
 class Alias(Attribute):
@@ -24,11 +25,12 @@ class Alias(Attribute):
 	the field will raise a DeprecationWarning, and if non-boolean, the string value will be added to the message.
 	"""
 	
-	path = Attribute()
-	deprecate = Attribute(default=False)
+	path: str = Attribute()
+	deprecate: bool = Attribute(default=False)
 	
-	def __init__(self, path, **kw):
-		super(Alias, self).__init__(path=path, **kw)
+	def __init__(self, path:str, **kw):
+		assert check_argument_types()
+		super().__init__(path=path, **kw)
 	
 	def __fixup__(self, document):
 		"""Called after an instance of our Field class is assigned to a Document."""

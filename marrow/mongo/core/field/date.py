@@ -8,10 +8,10 @@ Commentary on high-level management of timezone casting:
 from datetime import datetime, timedelta, tzinfo
 from bson import ObjectId as OID
 from collections.abc import MutableMapping
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, tzinfo
 
 from .base import Field
-from ..types import Union
+from ..types import Union, Optional, check_argument_types
 from ...util import utc, utcnow
 from ....schema import Attribute
 
@@ -29,6 +29,9 @@ except ImportError:
 
 
 log = __import__('logging').getLogger(__name__)
+Timezone = Union[str,tzinfo]
+TimezoneSetting = Optional[Union[str,tzinfo,Callable[None,Timezone]]]
+TimeLike = Union[MutableMapping, OID, timedelta, datetime]
 
 
 class Date(Field):
@@ -50,13 +53,14 @@ class Date(Field):
 	__foreign__ = 'date'
 	__disallowed_operators__ = {'#array'}
 	
-	naive = Attribute(default=utc)  # Timezone to interpret naive datetimes as.
-	tz = Attribute(default=None)  # Timezone to cast to when retrieving from the database.
+	naive: TimezoneSetting = Attribute(default=utc)  # Timezone to interpret naive datetimes as.
+	tz: TimezoneSetting = Attribute(default=None)  # Timezone to cast to when retrieving from the database.
 	
-	def _process_tz(self, dt, naive, tz):
+	def _process_tz(self, dt:datetime, naive:Timezone, tz:Timezone) -> datetime:
 		"""Process timezone casting and conversion."""
+		assert check_argument_types()
 		
-		def _tz(t):
+		def _tz(t:Timezone) -> Optional[tzinfo]:
 			if t in (None, 'naive'):
 				return t
 			
@@ -77,8 +81,8 @@ class Date(Field):
 			
 			return t
 		
-		naive = _tz(naive)
-		tz = _tz(tz)
+		naive: Optional[tzinfo] = _tz(naive)
+		tz: Optional[tzinfo] = _tz(tz)
 		
 		if not dt.tzinfo and naive:
 			if hasattr(naive, 'localize'):
@@ -106,7 +110,7 @@ class Date(Field):
 		
 		return self._process_tz(value, self.naive, self.tz)
 	
-	def to_foreign(self, obj, name:str, value:Union[MutableMapping, OID, timedelta, datetime]) -> datetime:  # pylint:disable=unused-argument
+	def to_foreign(self, obj, name:str, value:TimeLike) -> datetime:  # pylint:disable=unused-argument
 		if isinstance(value, MutableMapping) and '_id' in value:
 			value = value['_id']
 		

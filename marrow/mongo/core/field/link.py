@@ -26,7 +26,7 @@ class Link(String):
 	absolute = Attribute(default=False)  # Only allow absolute addressing.
 	protocols = Attribute(default=None)  # Only allow the given protocols, e.g. {'http', 'https', 'mailto'}.
 	
-	def to_foreign(self, obj, name, value):  # pylint:disable=unused-argument
+	def to_foreign(self, obj, name:str, value) -> str:  # pylint:disable=unused-argument
 		value = self.URI(value)
 		
 		if self.protocols and str(value.scheme) not in self.protocols:
@@ -37,5 +37,5 @@ class Link(String):
 		
 		return str(value)
 	
-	def to_native(self, obj, name, value):  # pylint:disable=unused-argument
+	def to_native(self, obj, name:str, value) -> URI:  # pylint:disable=unused-argument
 		return self.URI(value)

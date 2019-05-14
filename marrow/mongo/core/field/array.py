@@ -1,6 +1,7 @@
 from collections.abc import Iterable, Mapping
 
 from ... import Field
+from ..types import check_argument_types
 from .base import _HasKind, _CastingKind
 
 
@@ -21,21 +22,21 @@ class Array(_HasKind, _CastingKind, Field):
 		
 		super(Array, self).__init__(*args, **kw)
 	
-	def to_native(self, obj, name, value) -> list:
+	def to_native(self, obj, name:str, value:Iterable) -> list:
 		"""Transform the MongoDB value into a Marrow Mongo value."""
 		
 		if isinstance(value, self.List):
 			return value
 		
-		result = self.List(super(Array, self).to_native(obj, name, i) for i in value)
+		result = self.List(super().to_native(obj, name, i) for i in value)
 		obj.__data__[self.__name__] = result
 		
 		return result
 	
-	def to_foreign(self, obj, name, value) -> list:
+	def to_foreign(self, obj, name:str, value) -> list:
 		"""Transform to a MongoDB-safe value."""
 		
 		if isinstance(value, Iterable) and not isinstance(value, Mapping):
-			return self.List(super(Array, self).to_foreign(obj, name, i) for i in value)
+			return self.List(super().to_foreign(obj, name, i) for i in value)
 		
-		return super(Array, self).to_foreign(obj, name, value)
+		return super().to_foreign(obj, name, value)
