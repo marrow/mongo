@@ -22,7 +22,7 @@ matrix:
     - python: "3.6"
       env: MONGODB_VERSION=3.2.22
     - python: "3.6"
-      env: MONGODB_VERSION=4.0.8 FIPS=1
+      env: MONGODB_VERSION=4.0.8 FIPS=1 OPENSSL_FIPS=1
     - python: "3.7"
       dist: xenial
 
