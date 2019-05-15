@@ -1,3 +1,5 @@
+from typing import Optional, Union
+
 from .base import Field
 from ....schema import Attribute
 
@@ -6,8 +8,8 @@ class String(Field):
 	__foreign__ = 'string'
 	__disallowed_operators__ = {'#array'}
 	
-	strip = Attribute(default=False)
-	case = Attribute(default=None)
+	strip: Optional[Union[str,bool]] = Attribute(default=False)
+	case: Optional[str] = Attribute(default=None)
 	
 	def to_foreign(self, obj, name, value):  # pylint:disable=unused-argument
 		value = str(value)

@@ -1,3 +1,5 @@
+from typing import Optional, Sequence
+
 from uri import URI
 
 from .string import String
@@ -23,8 +25,9 @@ class Link(String):
 	
 	URI = URI
 	
-	absolute = Attribute(default=False)  # Only allow absolute addressing.
-	protocols = Attribute(default=None)  # Only allow the given protocols, e.g. {'http', 'https', 'mailto'}.
+	absolute: bool = Attribute(default=False)  # Only allow absolute addressing.
+	protocols: Optional[Sequence[str]] = Attribute(default=None)  # Only allow the given protocols,
+			# e.g. {'http', 'https', 'mailto'}.
 	
 	def to_foreign(self, obj, name:str, value) -> str:  # pylint:disable=unused-argument
 		value = self.URI(value)

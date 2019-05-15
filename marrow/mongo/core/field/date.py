@@ -11,7 +11,7 @@ from collections.abc import MutableMapping
 from datetime import datetime, timedelta, tzinfo
 
 from .base import Field
-from ..types import Union, Optional, check_argument_types
+from ..types import Callable, Union, Optional, check_argument_types
 from ...util import utc, utcnow
 from ....schema import Attribute
 
@@ -30,7 +30,7 @@ except ImportError:
 
 log = __import__('logging').getLogger(__name__)
 Timezone = Union[str,tzinfo]
-TimezoneSetting = Optional[Union[str,tzinfo,Callable[None,Timezone]]]
+TimezoneSetting = Optional[Union[str,tzinfo,Callable[[],Timezone]]]
 TimeLike = Union[MutableMapping, OID, timedelta, datetime]
 
 

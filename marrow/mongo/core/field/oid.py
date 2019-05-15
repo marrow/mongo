@@ -1,3 +1,5 @@
+from typing import Union
+
 from bson import ObjectId as OID
 from collections.abc import MutableMapping
 from datetime import datetime, timedelta
@@ -6,11 +8,14 @@ from .base import Field
 from ....schema import Attribute
 
 
+SuitableIdentifier = Union[OID,datetime,timedelta,MutableMapping,str,bytes]
+
+
 class ObjectId(Field):
 	__foreign__ = 'objectId'
 	__disallowed_operators__ = {'#array'}
 	
-	default = Attribute()
+	default: SuitableIdentifier = Attribute()
 	
 	def __fixup__(self, document):
 		super(ObjectId, self).__fixup__(document)

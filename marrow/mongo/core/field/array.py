@@ -1,13 +1,13 @@
 from collections.abc import Iterable, Mapping
 
 from ... import Field
-from ..types import check_argument_types
+from ..types import check_argument_types, Set
 from .base import _HasKind, _CastingKind
 
 
 class Array(_HasKind, _CastingKind, Field):
-	__foreign__ = 'array'
-	__allowed_operators__ = {'#array', '$elemMatch', '#rel', '$eq'}
+	__foreign__: str = 'array'
+	__allowed_operators__: Set[str] = {'#array', '$elemMatch', '#rel', '$eq'}
 	
 	class List(list):
 		"""Placeholder list shadow class to identify already-cast arrays."""

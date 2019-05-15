@@ -2,29 +2,30 @@
 
 from collections import namedtuple
 
-from typing import Any, Callable, Iterable, List, Mapping, Optional, Sequence, Tuple, Type, Union
+from typing import Any, Callable, Iterable, List, Mapping, Optional, Sequence, Tuple, Type, Union, Set
 
 from typeguard import check_argument_types
 
 
 __all__ = [
+		'Any',
 		'Callable',
 		'Iterable',
 		'List',
 		'Mapping',
 		'OperationMap',
-		'OperationalCandidate',
 		'Optional',
+		'Order',
 		'Projection',
-		'Sequence',
-		'Sort',
 		'PushSort',
+		'Sequence',
+		'Set',
+		'Sort',
 		'Tuple',
 		'Type',
 		'Union',
 		'check_argument_types',
 		'namedtuple',
-		'Any',
 	]
 
 

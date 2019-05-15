@@ -1,4 +1,5 @@
-from datetime import timedelta
+from datetime import datetime, timedelta
+from typing import Optional
 
 from .date import Date
 from ...util import utcnow, datetime_period
@@ -8,9 +9,9 @@ from ....schema import Attribute
 class Period(Date):
 	"""A specialized Date field used to store dates rounded down to the start of a given period."""
 	
-	hours = Attribute(default=None)
-	minutes = Attribute(default=None)
-	seconds = Attribute(default=None)
+	hours: Optional[int] = Attribute(default=None)
+	minutes: Optional[int] = Attribute(default=None)
+	seconds: Optional[int] = Attribute(default=None)
 	
 	@property
 	def delta(self):

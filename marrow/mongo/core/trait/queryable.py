@@ -2,8 +2,10 @@ from collections import Mapping
 from functools import reduce
 from operator import and_
 
-from pymongo.cursor import CursorType
+from pymongo.cursor import Cursor, CursorType
+from pymongo.collection import Collection as PyMongoCollection
 
+from ..types import Optional, Set, Mapping, Tuple
 from ... import F, Filter, P, S
 from ...trait import Collection
 from ...util import odict
@@ -13,7 +15,7 @@ from ....package.loader import traverse
 class Queryable(Collection):
 	"""EXPERIMENTAL: Extend active collection behaviours to include querying."""
 	
-	UNIVERSAL_OPTIONS = {
+	UNIVERSAL_OPTIONS: Set[str] = {
 			'collation',
 			'limit',
 			'projection',
@@ -21,7 +23,7 @@ class Queryable(Collection):
 			'sort',
 		}
 	
-	FIND_OPTIONS = UNIVERSAL_OPTIONS | {
+	FIND_OPTIONS : Set[str] = UNIVERSAL_OPTIONS | {
 			'allow_partial_results',
 			'await',
 			'batch_size',
@@ -35,7 +37,7 @@ class Queryable(Collection):
 			'await',  # Reserved in Python 3.7+
 		}
 	
-	FIND_MAPPING = {
+	FIND_MAPPING : Mapping[str,str] = {
 			'allowPartialResults': 'allow_partial_results',
 			'batchSize': 'batch_size',
 			'cursorType': 'cursor_type',
@@ -45,14 +47,14 @@ class Queryable(Collection):
 			'oplogReplay': 'oplog_replay',
 		}
 	
-	AGGREGATE_OPTIONS = UNIVERSAL_OPTIONS | {
+	AGGREGATE_OPTIONS: Set[str] = UNIVERSAL_OPTIONS | {
 			'allowDiskUse',
 			'batchSize',
 			'maxTimeMS',
 			'useCursor',
 		}
 	
-	AGGREGATE_MAPPING = {
+	AGGREGATE_MAPPING: Mapping[str,str] = {
 			'allow_disk_use': 'allowDiskUse',
 			'batch_size': 'batchSize',
 			'maxTimeMs': 'maxTimeMS',  # Common typo.

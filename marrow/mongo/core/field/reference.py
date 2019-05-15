@@ -1,5 +1,5 @@
 from collections import Mapping
-from typing import Union
+from typing import Union, Optional, Iterable, Mapping
 
 from bson import ObjectId as OID
 from bson import DBRef
@@ -15,8 +15,8 @@ from .base import _HasKind, Field
 
 
 class Reference(_HasKind, Field):
-	concrete = Attribute(default=False)  # If truthy, will store a DBRef instead of ObjectId.
-	cache = Attribute(default=None)  # Attributes to preserve from the referenced object at the reference level.
+	concrete: bool = Attribute(default=False)  # If truthy, will store a DBRef instead of ObjectId.
+	cache: Optional[Iterable[str]] = Attribute(default=None)  # Attributes to preserve from the referenced object at the reference level.
 	
 	@property
 	def __foreign__(self) -> str:

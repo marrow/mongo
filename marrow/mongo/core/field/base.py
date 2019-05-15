@@ -1,6 +1,7 @@
 from collections import namedtuple
 from inspect import isclass
 from weakref import proxy
+from typing import Sequence, Optional, Mapping, Iterable, Set, TypeVar
 
 from ....package.loader import traverse, load
 from ....schema import Attribute
@@ -11,6 +12,7 @@ from ...util import adjust_attribute_sequence, SENTINEL
 
 
 FieldContext = namedtuple('FieldContext', 'field,document')
+FieldType = TypeVar("Fieldtype", bound="Field")
 
 
 class FieldTransform(BaseTransform):
@@ -38,8 +40,8 @@ class Field(Attribute):
 	#  * #array -- allow/prevent all array-related compraison such as $all, $size, etc.
 	#  * #document -- allow/prevent all document-related comparison such as $elemMatch.
 	#  * #geo -- allow/prevent geographic query operators
-	__allowed_operators__ = set()
-	__disallowed_operators__ = set()
+	__allowed_operators__: Set[str] = set()
+	__disallowed_operators__: Set[str] = set()
 	__document__ = None  # The Document subclass the field originates from.
 	__foreign__ = {}
 	__acl__ = []  # Overall document access control list.
@@ -48,25 +50,25 @@ class Field(Attribute):
 	# name - The database-side name of the field, stored as __name__, defaulting to the attribute name assigned to.
 	# default - No default is provided by default; access will raise AttributeError.
 	
-	choices = Attribute(default=None)  # The permitted set of values; may be static or a dynamic callback.
-	required = Attribute(default=False)  # Must have value assigned; None and an empty string are values.
-	nullable = Attribute(default=False)  # If True, will store None.  If False, will store non-None default, or not store.
-	exclusive = Attribute(default=None)  # The set of other fields that must not be set for this field to be settable.
+	choices: Iterable = Attribute(default=None)  # The permitted set of values; may be static or a dynamic callback.
+	required: bool = Attribute(default=False)  # Must have value assigned; None and an empty string are values.
+	nullable: bool = Attribute(default=False)  # If True, will store None.  If False, will store non-None default, or not store.
+	exclusive: Optional[bool] = Attribute(default=None)  # The set of other fields that must not be set for this field to be settable.
 	
 	# Local Manipulation
 	
 	transformer = Attribute(default=FieldTransform())  # A Transformer class to use when loading/saving values.
 	validator = Attribute(default=Validator())  # The Validator class to use when validating values.
-	assign = Attribute(default=False)  # If truthy attempt to access and store resulting variable when instantiated.
+	assign: bool = Attribute(default=False)  # If truthy attempt to access and store resulting variable when instantiated.
 	
 	# Predicates
 	
-	positional = Attribute(default=True)  # If True, will be accepted positionally.
-	repr = Attribute(default=True)  # Should this field be included in the programmers' representation?
-	project = Attribute(default=None)  # Predicate to indicate inclusion in the default projection.
-	read = Attribute(default=True)  # Read predicate, either a boolean, callable, or web.security ACL predicate.
-	write = Attribute(default=True)  # Write predicate, either a boolean, callable, or web.security ACL predicate.
-	sort = Attribute(default=True)  # Sort predicate, either a boolean, callable, or web.security ACL predicate.
+	positional: bool = Attribute(default=True)  # If True, will be accepted positionally.
+	repr: bool = Attribute(default=True)  # Should this field be included in the programmers' representation?
+	project: Optional[bool] = Attribute(default=None)  # Predicate to indicate inclusion in the default projection.
+	read: bool = Attribute(default=True)  # Read predicate, either a boolean, callable, or web.security ACL predicate.
+	write: bool = Attribute(default=True)  # Write predicate, either a boolean, callable, or web.security ACL predicate.
+	sort: bool = Attribute(default=True)  # Sort predicate, either a boolean, callable, or web.security ACL predicate.
 	
 	def adapt(self, **kw):
 		instance = self.__class__()

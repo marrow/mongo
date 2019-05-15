@@ -1,4 +1,5 @@
 from pkg_resources import iter_entry_points
+from typing import Union, Optional, Mapping
 
 from ....package.canonical import name as canon
 from ....package.loader import load
@@ -15,9 +16,9 @@ class PluginReference(Field):
 	defined) object assignments and literal paths will be allowed.
 	"""
 	
-	namespace = Attribute(default=None)  # The plugin namespace to use when loading.
-	explicit = Attribute()  # Allow explicit, non-plugin references.
-	mapping = Attribute(default=None)  # To ease support for legacy records, textual replacements.
+	namespace: Optional[str] = Attribute(default=None)  # The plugin namespace to use when loading.
+	explicit: Optional[bool] = Attribute()  # Allow explicit, non-plugin references.
+	mapping: Optional[Mapping[str,str]] = Attribute(default=None)  # To ease support for legacy records, textual replacements.
 	
 	__foreign__ = {'string'}
 	

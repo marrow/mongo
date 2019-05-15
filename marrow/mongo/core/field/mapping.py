@@ -5,7 +5,7 @@ from .array import Array
 
 
 class Mapping(Array):
-	key = Attribute(default='name')
+	key: str = Attribute(default='name')
 	
 	def to_native(self, obj, name:str, value:list) -> OrderedDict:
 		kind = self._kind(obj.__class__)
