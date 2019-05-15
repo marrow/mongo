@@ -28,7 +28,10 @@ class Markdown(String):
 		if hasattr(value, '__markdown__'):
 			return value.__markdown__()
 		
-		if hasattr(value, 'as_markdown'):
+		elif hasattr(value, 'to_markdown'):
+			return value.to_markdown()
+		
+		elif hasattr(value, 'as_markdown'):
 			return value.as_markdown
 		
 		return super(Markdown, self).to_foreign(obj, name, value)

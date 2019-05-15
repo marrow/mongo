@@ -19,11 +19,14 @@ else:
 			if hasattr(value, 'to_decimal'):
 				return value.to_decimal()
 			
-			if not isinstance(value, dec):
-				with localcontext(self.DECIMAL_CONTEXT) as ctx:
-					value = ctx.create_decimal(value)
+			if hasattr(value, 'as_decimal'):
+				return value.as_decimal
 			
-			return value
+			if isinstance(value, dec):
+				return value
+			
+			with localcontext(self.DECIMAL_CONTEXT) as ctx:
+				return ctx.create_decimal(value)
 		
 		def to_foreign(self, obj, name:str, value:Union[str,dec]) -> Decimal128:  # pylint:disable=unused-argument
 			if not isinstance(value, dec):
