@@ -70,7 +70,7 @@ class Field(Attribute):
 	write: bool = Attribute(default=True)  # Write predicate, either a boolean, callable, or web.security ACL predicate.
 	sort: bool = Attribute(default=True)  # Sort predicate, either a boolean, callable, or web.security ACL predicate.
 	
-	def adapt(self, **kw):
+	def adapt(self, **kw) -> FieldType:
 		instance = self.__class__()
 		instance.__data__ = self.__data__.copy()
 		
@@ -79,7 +79,7 @@ class Field(Attribute):
 		
 		return instance
 	
-	def __repr__(self):
+	def __repr__(self) -> str:
 		fields = []
 		
 		for field in self.__attributes__.values():
@@ -109,7 +109,7 @@ class Field(Attribute):
 	
 	# Security Predicate Handling
 	
-	def _predicate(self, predicate, context=None):
+	def _predicate(self, predicate, context=None) -> bool:
 		if callable(predicate):
 			if context:
 				return predicate(context, self)
@@ -118,13 +118,13 @@ class Field(Attribute):
 		
 		return bool(predicate)
 	
-	def is_readable(self, context=None):
+	def is_readable(self, context=None) -> bool:
 		return self._predicate(self.read, context)
 	
-	def is_writeable(self, context=None):
+	def is_writeable(self, context=None) -> bool:
 		return self._predicate(self.write, context)
 	
-	def is_sortable(self, context=None):
+	def is_sortable(self, context=None) -> bool:
 		return self._predicate(self.sort, context)
 	
 	# Marrow Schema Interfaces
@@ -185,10 +185,8 @@ class Field(Attribute):
 	
 	# Other Python Protocols
 	
-	def __str__(self):
+	def __str__(self) -> str:
 		return self.__name__
-
-
 
 
 class _HasKind(Field):

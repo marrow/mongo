@@ -4,7 +4,7 @@ from .array import Array
 class Set(Array):
 	List = list
 	
-	def to_native(self, obj, name, value):  # pylint:disable=unused-argument
+	def to_native(self, obj, name:str, value) -> set:  # pylint:disable=unused-argument
 		result = super(Set, self).to_native(obj, name, value)
 		
 		if result is not None:

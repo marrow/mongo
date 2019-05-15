@@ -19,12 +19,12 @@ md = Markdown(
 
 
 class MarkdownString(str):
-	def __html__(self):
+	def __html__(self) -> str:
 		return md(self)
 
 
 class Markdown(String):
-	def to_foreign(self, obj, name, value):  # pylint:disable=unused-argument
+	def to_foreign(self, obj, name, value) -> str:  # pylint:disable=unused-argument
 		if hasattr(value, '__markdown__'):
 			return value.__markdown__()
 		
@@ -33,5 +33,5 @@ class Markdown(String):
 		
 		return super(Markdown, self).to_foreign(obj, name, value)
 	
-	def to_native(self, obj, name, value):  # pylint:disable=unused-argument
+	def to_native(self, obj, name, value) -> MarkdownString:  # pylint:disable=unused-argument
 		return MarkdownString(value)

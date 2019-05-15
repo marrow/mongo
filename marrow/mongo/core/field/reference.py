@@ -81,7 +81,7 @@ class Reference(_HasKind, Field):
 		
 		return inst
 	
-	def to_foreign(self, obj, name, value:Union[Document, OID, str]):  # pylint:disable=unused-argument
+	def to_foreign(self, obj, name, value:Union[Document, OID, str]) -> Union[OID, DBRef, Mapping]:  # pylint:disable=unused-argument
 		"""Transform to a MongoDB-safe value."""
 		
 		if self.cache:

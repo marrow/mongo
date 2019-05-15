@@ -14,10 +14,10 @@ class Period(Date):
 	seconds: Optional[int] = Attribute(default=None)
 	
 	@property
-	def delta(self):
+	def delta(self) -> timedelta:
 		return timedelta(hours=self.hours or 0, minutes=self.minutes or 0, seconds=self.seconds or 0)
 	
-	def to_foreign(self, obj, name, value):
+	def to_foreign(self, obj, name: str, value) -> datetime:
 		value = super(Period, self).to_foreign(obj, name, value)
 		
 		return datetime_period(value, hours=self.hours, minutes=self.minutes, seconds=self.seconds)

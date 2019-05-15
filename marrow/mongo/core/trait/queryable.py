@@ -63,7 +63,7 @@ class Queryable(Collection):
 		}
 	
 	@classmethod
-	def _prepare_query(cls, mapping, valid, *args, **kw):
+	def _prepare_query(cls, mapping:Mapping[str,str], valid, *args, **kw) -> Tuple[Collection, PyMongoCollection, Filter, dict]:
 		"""Process arguments to query methods. For internal use only.
 		
 		Positional arguments are treated as query components, combined using boolean AND reduction.
@@ -108,7 +108,7 @@ class Queryable(Collection):
 		return cls, collection, query, options
 	
 	@classmethod
-	def _prepare_find(cls, *args, **kw):
+	def _prepare_find(cls, *args, **kw) -> Tuple[Collection, PyMongoCollection, Filter, dict]:
 		"""Execute a find and return the resulting queryset using combined plain and parametric query generation.
 		
 		Additionally, performs argument case normalization, refer to the `_prepare_query` method's docstring.
@@ -144,7 +144,7 @@ class Queryable(Collection):
 		return cls, collection, query, options
 	
 	@classmethod
-	def _prepare_aggregate(cls, *args, **kw):
+	def _prepare_aggregate(cls, *args, **kw) -> Tuple[Collection, PyMongoCollection, list, dict]:
 		"""Generate and execute an aggregate query pipline using combined plain and parametric query generation.
 		
 		Additionally, performs argument case normalization, refer to the `_prepare_query` method's docstring.
@@ -190,7 +190,7 @@ class Queryable(Collection):
 		return cls, collection, stages, options
 	
 	@classmethod
-	def find(cls, *args, **kw):
+	def find(cls, *args, **kw) -> Cursor:
 		"""Query the collection this class is bound to.
 		
 		Additional arguments are processed according to `_prepare_find` prior to passing to PyMongo, where positional

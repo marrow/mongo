@@ -11,7 +11,7 @@ class String(Field):
 	strip: Optional[Union[str,bool]] = Attribute(default=False)
 	case: Optional[str] = Attribute(default=None)
 	
-	def to_foreign(self, obj, name, value):  # pylint:disable=unused-argument
+	def to_foreign(self, obj, name:str, value) -> str:  # pylint:disable=unused-argument
 		value = str(value)
 		
 		if self.strip is True:

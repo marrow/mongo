@@ -5,7 +5,7 @@ import pytest
 
 
 @pytest.fixture(scope="module", autouse=True)
-def connection(request):
+def connection(request) -> pymongo.MongoClient:
 	"""Automatically connect before testing and discard data after testing."""
 	connection = pymongo.MongoClient('mongodb://localhost/test')
 	

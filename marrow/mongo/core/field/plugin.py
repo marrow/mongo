@@ -38,7 +38,7 @@ class PluginReference(Field):
 		
 		return load(value, self.namespace)
 	
-	def to_foreign(self, obj, name, value):  # pylint:disable=unused-argument
+	def to_foreign(self, obj, name:str, value) -> str:  # pylint:disable=unused-argument
 		"""Transform to a MongoDB-safe value."""
 		
 		namespace = self.namespace
