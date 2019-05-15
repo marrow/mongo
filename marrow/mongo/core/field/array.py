@@ -28,15 +28,17 @@ class Array(_HasKind, _CastingKind, Field):
 		if isinstance(value, self.List):
 			return value
 		
-		result = self.List(super().to_native(obj, name, i) for i in value)
+		cast = super().to_native
+		result = self.List(cast(obj, name, i) for i in value)
 		obj.__data__[self.__name__] = result
 		
 		return result
 	
 	def to_foreign(self, obj, name:str, value) -> list:
 		"""Transform to a MongoDB-safe value."""
+		cast = super().to_foreign
 		
 		if isinstance(value, Iterable) and not isinstance(value, Mapping):
-			return self.List(super().to_foreign(obj, name, i) for i in value)
+			return self.List(cast(obj, name, i) for i in value)
 		
 		return super().to_foreign(obj, name, value)
