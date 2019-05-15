@@ -282,7 +282,7 @@ class ObjectID(_OID):
 		
 		elif isinstance(hwid, bytes):  # 5-byte explicit value
 			if len(hwid) != 5:
-				raise ValueError("Binary hardware ID must have exact length: 5 bytes, not {}.".format(len(hwid)))
+				raise ValueError(f"Binary hardware ID must have exact length: 5 bytes, not {len(hwid)}.")
 			
 			self.hwid = hwid
 		

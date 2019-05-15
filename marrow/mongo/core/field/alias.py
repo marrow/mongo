@@ -39,10 +39,10 @@ class Alias(Attribute):
 	
 	def __get__(self, obj, cls=None):
 		if self.deprecate:
-			message = "Retrieval of " + self.path + " via " + self.__name__ + ") is deprecated."
+			message = f'Retrieval of "{self.path}" via "{self.__name__}" is deprecated.'
 			
 			if not isinstance(self.deprecate, bool):
-				message += "\n" + str(self.deprecate)
+				message += f"\n{self.deprecate!s}"
 			
 			warn(message, DeprecationWarning, stacklevel=2)
 		
@@ -53,10 +53,10 @@ class Alias(Attribute):
 	
 	def __set__(self, obj, value):
 		if self.deprecate:
-			message = "Assignment of " + self.path + " via " + self.__name__ + " is deprecated."
+			message = f'Assignment of "{self.path}" via "{self.__name__}" is deprecated.'
 			
 			if not isinstance(self.deprecate, bool):
-				message += "\n" + str(self.deprecate)
+				message += f"\n{self.deprecate!s}"
 			
 			warn(message, DeprecationWarning, stacklevel=2)
 		
