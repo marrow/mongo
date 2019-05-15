@@ -150,3 +150,15 @@ class TestFieldSecurity:
 	def test_readable_predicate_contextual(self):
 		f = Field(read=lambda c, f: c['v'])
 		assert f.is_readable({'v': False}) is False
+	
+	def test_sortable_predicate_simple(self):
+		f = Field(sort=1)
+		assert f.is_sortable() is True
+	
+	def test_sortable_predicate_simple_callback(self):
+		f = Field(sort=lambda f: True)
+		assert f.is_sortable() is True
+	
+	def test_sortable_predicate_contextual(self):
+		f = Field(sort=lambda c, f: c['v'])
+		assert f.is_sortable({'v': False}) is False
