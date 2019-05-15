@@ -30,7 +30,7 @@ def Sample(request):
 	return Sample
 
 
-class TestDocumentBinding(object):
+class TestDocumentBinding:
 	def test_bind_fail(self, Sample):
 		with pytest.raises(TypeError):
 			Sample.bind()

@@ -13,7 +13,7 @@ def Sample(request):
 	return Sample
 
 
-class TestIdentifiedTrait(object):
+class TestIdentifiedTrait:
 	def test_document_comparison(self, Sample):
 		id = ObjectId()
 		a = Sample(id)

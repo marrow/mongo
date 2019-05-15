@@ -3,7 +3,7 @@ import pytest
 from marrow.mongo import Document
 
 
-class FieldExam(object):
+class FieldExam:
 	__args__ = tuple()
 	__kwargs__ = dict()
 	

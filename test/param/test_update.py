@@ -4,7 +4,7 @@ from marrow.mongo import Document, Field, U, Update
 from marrow.mongo.field import Array, Number, String
 
 
-class TestParametricUpdateConstructor(object):
+class TestParametricUpdateConstructor:
 	@pytest.fixture()
 	def D(self):
 		class Sample(Document):

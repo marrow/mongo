@@ -6,7 +6,7 @@ from marrow.mongo.field import Integer, String
 from marrow.mongo.trait import Derived, Queryable
 
 
-class TestDerived(object):
+class TestDerived:
 	class Sample(Derived):
 		pass
 	
@@ -51,7 +51,7 @@ class Article(TextSource):
 #   /      |        \
 # Book  Journal  Article
 
-class TestPromotionDemotion(object):
+class TestPromotionDemotion:
 	def test_specialize(self):
 		a = Source()
 		b = a.promote(Journal)
@@ -92,7 +92,7 @@ class Gallery(Folder):
 	view = Folder.view.adapt(default='grid')
 
 
-class TestAssetPromotion(object):
+class TestAssetPromotion:
 	# From original ticket description.
 	
 	def test_folder_gallery(self):

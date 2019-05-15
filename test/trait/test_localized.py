@@ -4,7 +4,7 @@ from marrow.mongo.field import String, Translated
 from marrow.mongo.trait import Localized
 
 
-class TestTranslated(object):
+class TestTranslated:
 	class Sample(Localized):
 		class Locale(Localized.Locale):
 			word = String()
@@ -30,7 +30,7 @@ class TestTranslated(object):
 		assert q == {'locale.word': 'bonjour'}
 
 
-class TestLocalized(object):
+class TestLocalized:
 	class Sample(Localized):
 		class Locale(Localized.Locale):
 			word = String()

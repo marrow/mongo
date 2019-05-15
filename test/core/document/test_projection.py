@@ -19,12 +19,12 @@ class RejectOnly(Collection):
 	never = Field(project=False)
 
 
-class TestDocumentProjection(object):
+class TestDocumentProjection:
 	def test_no_projection(self):
 		assert NoProjection.__projection__ is None
 	
 	def test_sample_projection(self):
 		assert OnlyProjected.__projection__ == {'always': True}
 	
-	def test_reject_only_policy(object):
+	def test_reject_only_policy(self):
 		assert RejectOnly.__projection__ == {'default': True}

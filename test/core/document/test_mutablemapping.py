@@ -14,7 +14,7 @@ def doc(request):
 	return Person("Alice", 27)
 
 
-class TestDocumentMutableMapping(object):
+class TestDocumentMutableMapping:
 	def test_getitem(self, doc):
 		"""Allow dictionary-style write access to stored data."""
 		

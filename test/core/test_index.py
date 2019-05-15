@@ -15,7 +15,7 @@ class Sample(Document):
 	_inverse = Index('-field', background=False)
 
 
-class TestIndex(object):
+class TestIndex:
 	def test_ordering(self):
 		assert Sample._field.fields == [('field_name', 1)]
 		assert Sample._inverse.fields == [('field_name', -1)]

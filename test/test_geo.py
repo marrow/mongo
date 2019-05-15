@@ -6,7 +6,7 @@ from marrow.mongo.document import (
 from marrow.mongo.field import Embed
 
 
-class TestPointField(object):
+class TestPointField:
 	D = Point
 	
 	@pytest.fixture
@@ -79,7 +79,7 @@ class TestPointField(object):
 			S.field.within()
 
 
-class TestLineStringField(object):
+class TestLineStringField:
 	D = LineString
 	
 	@pytest.fixture
@@ -123,7 +123,7 @@ class TestLineStringField(object):
 			del ls['foo']
 
 
-class TestPolygonField(object):
+class TestPolygonField:
 	D = Polygon
 	
 	@pytest.fixture
@@ -139,7 +139,7 @@ class TestPolygonField(object):
 		assert p[0].coordinates == [[0 , 0] , [3 , 6] , [6 , 1] , [0 , 0]]
 
 
-class TestMultiPointField(object):
+class TestMultiPointField:
 	D = MultiPoint
 	
 	@pytest.fixture
@@ -156,7 +156,7 @@ class TestMultiPointField(object):
 		assert mp[0].coordinates == [-73.9580, 40.8003]
 
 
-class TestMultiLineStringField(object):
+class TestMultiLineStringField:
 	D = MultiLineString
 	
 	@pytest.fixture
@@ -175,7 +175,7 @@ class TestMultiLineStringField(object):
 		assert mls[0].coordinates == [[-73.96943, 40.78519], [-73.96082, 40.78095]]
 
 
-class TestMultiPolygonField(object):
+class TestMultiPolygonField:
 	D = MultiPolygon
 	
 	@pytest.fixture
@@ -198,7 +198,7 @@ class TestMultiPolygonField(object):
 		assert mp[1].coordinates == [[[-73.958, 40.8003], [-73.9498, 40.7968], [-73.9737, 40.7648], [-73.958, 40.8003]]]
 
 
-class TestGeometryCollectionField(object):
+class TestGeometryCollectionField:
 	D = GeometryCollection
 	
 	@pytest.fixture

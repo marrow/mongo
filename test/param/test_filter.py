@@ -4,7 +4,7 @@ from marrow.mongo import Document, F, Field, Filter
 from marrow.mongo.field import Array, Number
 
 
-class TestParametricFilterConstructor(object):
+class TestParametricFilterConstructor:
 	@pytest.fixture()
 	def D(self):
 		class Sample(Document):

@@ -5,7 +5,7 @@ from marrow.mongo.field import Array, Number
 from marrow.mongo.trait import Collection
 
 
-class TestParametricProjectionConstructor(object):
+class TestParametricProjectionConstructor:
 	@pytest.fixture()
 	def D(self):
 		class Sample(Collection):

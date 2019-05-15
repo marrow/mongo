@@ -9,7 +9,7 @@ def test_utcnow():
 	assert now.tzinfo
 
 
-class TestSequenceAdjustment(object):
+class TestSequenceAdjustment:
 	def test_default_punt(self):
 		@adjust_attribute_sequence('last')
 		class Inner(Document):

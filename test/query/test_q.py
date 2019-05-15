@@ -142,7 +142,7 @@ class TestQueryable:  # TODO: Properly use pytest fixtures for this...
 			Sample.array['bar']
 
 
-class TestQueryableQueryableQueryable(object):
+class TestQueryableQueryableQueryable:
 	def test_left_merge(self, S):
 		a = (S.foo & S.bar)
 		b = S.baz
@@ -169,7 +169,7 @@ class TestQueryableQueryableQueryable(object):
 			(S.foo & S.bar).xyzzy = 27
 
 
-class TestQueryableFieldCombinations(object):
+class TestQueryableFieldCombinations:
 	@pytest.fixture()
 	def T(self):
 		class Thread(Document):

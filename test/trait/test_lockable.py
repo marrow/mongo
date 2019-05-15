@@ -14,7 +14,7 @@ skip = int(os.environ.get('TEST_SKIP_CAPPED', 0))
 skip_slow = pytest.mark.skipif(skip, reason="Slow tests skipped.")
 
 
-class TestLockBehaviours(object):
+class TestLockBehaviours:
 	class Sample(Lockable):
 		class Lock(Lockable.Lock):
 			__period__ = timedelta(seconds=10)
@@ -42,7 +42,7 @@ class TestLockBehaviours(object):
 		assert inst.failures == 42
 
 
-class TestSimpleLockable(object):
+class TestSimpleLockable:
 	class Sample(Lockable):
 		__collection__ = 'lockable'
 		

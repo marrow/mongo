@@ -6,7 +6,7 @@ from marrow.mongo.trait import Expires
 from marrow.mongo.util import utcnow
 
 
-class TestExpires(object):
+class TestExpires:
 	class Sample(Expires):
 		pass
 	

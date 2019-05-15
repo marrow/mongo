@@ -42,7 +42,7 @@ class test_argument_clobber():
 		Sample("hi", string="yo")
 
 
-class TestProgrammersRepresentation(object):
+class TestProgrammersRepresentation:
 	def test_basic_sample(self):
 		record = Sample("a", 1)
 		assert repr(record).replace("u'", "'") == "Sample(string='a', number=1)"
@@ -64,7 +64,7 @@ class TestProgrammersRepresentation(object):
 		assert repr(record).replace("u'", "'") == "test_serialization:DynamicRepr(pos, key=27)"
 
 
-class TestMongoSerialization(object):
+class TestMongoSerialization:
 	def test_unnessicary_deserialization(self):
 		record = Sample("a", 1)
 		assert Sample.from_mongo(record) is record
@@ -89,7 +89,7 @@ class TestMongoSerialization(object):
 		assert record['foo'] == 'bar'
 
 
-class TestJsonSerialization(object):
+class TestJsonSerialization:
 	def test_json_deserialization(self):
 		record = Sample.from_json('{"string": "bar"}')
 		assert record.string == 'bar'

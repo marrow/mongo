@@ -37,7 +37,7 @@ def Sample(request, db):
 
 
 
-class TestQueryableCore(object):
+class TestQueryableCore:
 	def test_prepare_find_cursor_type_explicit(self, Sample):
 		cls, collection, query, options = Sample._prepare_find(cursor_type=CursorType.TAILABLE)
 		assert options['cursor_type'] == CursorType.TAILABLE
@@ -81,7 +81,7 @@ class TestQueryableCore(object):
 			]
 
 
-class TestQueryableTrait(object):
+class TestQueryableTrait:
 	def test_find(self, Sample):
 		rs = Sample.find()
 		assert Sample.get_collection().count_documents({}) == 4

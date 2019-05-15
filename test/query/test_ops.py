@@ -20,7 +20,7 @@ def test_ops_iteration(single_ops):
 	assert list(iter(single_ops)) == ['roll']
 
 
-class TestOpsMapping(object):
+class TestOpsMapping:
 	def test_getitem(self, empty_ops, single_ops):
 		with pytest.raises(KeyError):
 			empty_ops['roll']
@@ -122,7 +122,7 @@ class TestOpsMapping(object):
 		assert single_ops.operations == single_ops.copy().operations
 
 
-class TestOperationsCombination(object):
+class TestOperationsCombination:
 	def test_operations_and_clean_merge(self):
 		comb = Filter({'roll': 27}) & Filter({'foo': 42})
 		assert comb.as_query == {'roll': 27, 'foo': 42}

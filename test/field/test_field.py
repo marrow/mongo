@@ -30,7 +30,7 @@ class Sample(Document):
 	integer = IntegerizingField()
 
 
-class TestFieldTransform(object):
+class TestFieldTransform:
 	def test_foreign_passthrough(self):
 		assert FieldTransform().foreign(None, (Sample.field._field, Sample)) is None
 		
@@ -60,7 +60,7 @@ class TestFieldTransform(object):
 		assert inst.integer == 42
 
 
-class TestField(object):
+class TestField:
 	def test_repr_redefault(self):
 		assert repr(Field(choices=None)) == "Field('<anonymous>')"
 	
@@ -126,7 +126,7 @@ class TestField(object):
 		assert Updated.field.default == 27
 
 
-class TestFieldSecurity(object):
+class TestFieldSecurity:
 	def test_writeable_predicate_simple(self):
 		f = Field(write=None)
 		assert f.is_writeable() is False

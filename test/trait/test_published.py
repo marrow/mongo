@@ -6,7 +6,7 @@ from marrow.mongo.trait import Published
 from marrow.mongo.util import utcnow
 
 
-class TestPublished(object):
+class TestPublished:
 	class Sample(Published):
 		pass
 	

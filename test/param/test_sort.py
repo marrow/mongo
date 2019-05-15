@@ -4,7 +4,7 @@ from marrow.mongo import Document, Field, S
 from marrow.mongo.field import Array, Number
 
 
-class TestParametricSortConstructor(object):
+class TestParametricSortConstructor:
 	@pytest.fixture()
 	def D(self):
 		class Sample(Document):

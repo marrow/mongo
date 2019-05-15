@@ -6,7 +6,7 @@ from marrow.mongo import Document
 from marrow.mongo.field import Alias, Array, Embed, String
 
 
-class TestAliasDirect(object):
+class TestAliasDirect:
 	class Sample(Document):
 		field = String()
 		alias = Alias('field')
@@ -55,7 +55,7 @@ class TestAliasDirect(object):
 		assert inst.__data__ == {'field': 'bar'}
 
 
-class TestAliasArray(object):
+class TestAliasArray:
 	class Sample(Document):
 		field = Array(String())
 		alias = Alias('field.0')
@@ -75,7 +75,7 @@ class TestAliasArray(object):
 		assert inst.__data__ == {'field': ['bar']}
 
 
-class TestAliasEmbed(object):
+class TestAliasEmbed:
 	class Sample(Document):
 		class Embedded(Document):
 			field = String()
@@ -98,7 +98,7 @@ class TestAliasEmbed(object):
 		assert inst.__data__ == {'field': {'field': 'bar'}}
 
 
-class TestAliasArrayEmbed(object):
+class TestAliasArrayEmbed:
 	class Sample(Document):
 		class Embedded(Document):
 			field = String()

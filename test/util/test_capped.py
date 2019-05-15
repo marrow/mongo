@@ -58,7 +58,7 @@ def gen_log_entries(collection, count=1000):
 	collection.insert_one({'message': 'last'})
 
 
-class TestCappedQueries(object):
+class TestCappedQueries:
 	def test_single(self, capped):
 		assert capped.count_documents({}) == 0
 		result = capped.insert_one({'message': 'first'}).inserted_id
