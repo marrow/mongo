@@ -56,7 +56,7 @@ class Date(Field):
 	naive: TimezoneSetting = Attribute(default=utc)  # Timezone to interpret naive datetimes as.
 	tz: TimezoneSetting = Attribute(default=None)  # Timezone to cast to when retrieving from the database.
 	
-	def _process_tz(self, dt:datetime, naive:Timezone, tz:Timezone) -> datetime:
+	def _process_tz(self, dt:datetime, naive:Timezone, tz:Optional[Timezone]) -> datetime:
 		"""Process timezone casting and conversion."""
 		assert check_argument_types()
 		

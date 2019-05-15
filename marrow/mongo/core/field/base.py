@@ -227,7 +227,7 @@ class _HasKind(Field):
 
 
 class _CastingKind(Field):
-	def to_native(self, obj, name, value):  # pylint:disable=unused-argument
+	def to_native(self, obj, name:str, value):  # pylint:disable=unused-argument
 		"""Transform the MongoDB value into a Marrow Mongo value."""
 		
 		from marrow.mongo import Document
@@ -246,7 +246,7 @@ class _CastingKind(Field):
 		
 		return (kind or Derived).from_mongo(value)
 	
-	def to_foreign(self, obj, name, value):  # pylint:disable=unused-argument
+	def to_foreign(self, obj, name:str, value):  # pylint:disable=unused-argument
 		"""Transform to a MongoDB-safe value."""
 		
 		from marrow.mongo import Document

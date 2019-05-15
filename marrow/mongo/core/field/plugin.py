@@ -29,7 +29,7 @@ class PluginReference(Field):
 		
 		super(PluginReference, self).__init__(*args, **kw)
 	
-	def to_native(self, obj, name, value):  # pylint:disable=unused-argument
+	def to_native(self, obj, name:str, value:str):  # pylint:disable=unused-argument
 		"""Transform the MongoDB value into a Marrow Mongo value."""
 		
 		if self.mapping:

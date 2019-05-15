@@ -26,7 +26,7 @@ class ObjectId(Field):
 			if self.__name__ == '_id':  # But only if we're actually the primary key.
 				self.default = lambda: OID()  # pylint:disable=unnecessary-lambda
 	
-	def to_foreign(self, obj, name, value):  # pylint:disable=unused-argument
+	def to_foreign(self, obj, name:str, value:SuitableIdentifier) -> OID:  # pylint:disable=unused-argument
 		if isinstance(value, OID):
 			return value
 		

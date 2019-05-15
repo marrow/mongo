@@ -11,7 +11,7 @@ class Boolean(Field):
 	truthy: Sequence = Attribute(default=('true', 't', 'yes', 'y', 'on', '1', True))
 	falsy: Sequence = Attribute(default=('false', 'f', 'no', 'n', 'off', '0', False))
 	
-	def to_foreign(self, obj, name, value) -> bool:  # pylint:disable=unused-argument
+	def to_foreign(self, obj, name:str, value) -> bool:  # pylint:disable=unused-argument
 		try:
 			value = value.lower()
 		except AttributeError:
