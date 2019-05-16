@@ -39,6 +39,16 @@ class TestDecimalField(FieldExam):
 		assert isinstance(result['field'], dec)
 		assert result['field'] == dec('3.141592')
 	
+	def test_decimal_from_decimal128(self, Sample):  # Not entirely sure this is possible...
+		result = Sample(Decimal128('3.141592'))
+		assert isinstance(result['field'], Decimal128)
+		
+		# dec(result['field']) - Decimal128 does not support conversoin to Decimal.
+		# Additionally, Decimal128('1') != Decimal('1') as they are not even comparable, because reasons.
+		assert dec(str(result['field'])) == dec('3.141592')  # This is silly.
+		
+		assert isinstance(result.field, dec)  # Make sure we get back a Python-native decimal.Decimal instance!
+	
 	def test_decimal_upgrade_from_float(self, Sample):
 		result = Sample.from_mongo({'field': 27.4})
 		v = result.field
