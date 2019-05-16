@@ -33,9 +33,6 @@ else:
 			elif hasattr(value, 'as_decimal'):
 				value = value.as_decimal
 			
-			if isinstance(value, Decimal128):
-				value = str(value)
-			
 			if not isinstance(value, dec):
 				with localcontext(self.DECIMAL_CONTEXT) as ctx:
 					value = ctx.create_decimal(value)
