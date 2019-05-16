@@ -81,7 +81,13 @@ class Registry:
 		return self.__dict__[name]
 	
 	def __getitem__(self, name:str):
-		return load(name, self._namespace)
+		if name[0] == '_':
+			raise IndexError()
+		
+		if name not in self.__dict__:
+			self.__dict__[name] = load(name, self._namespace)
+		
+		return self.__dict__[name]
 	
 	def __dir__(self):
 		return super(Registry, self).__dir__() + self.__all__
