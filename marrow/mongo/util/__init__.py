@@ -91,6 +91,22 @@ class Registry:
 	
 	def __dir__(self):
 		return super(Registry, self).__dir__() + self.__all__
+	
+	def __contains__(self, name:str):
+		"""Identify if a plugin with the given short name exists."""
+		
+		if name[0] == '_':
+			raise IndexError()
+		
+		if name in self.__dict__:
+			return True
+		
+		try:
+			self.__getitem__(name)
+		except LookupError:
+			return False
+		
+		return True
 
 
 def utcnow() -> datetime:
