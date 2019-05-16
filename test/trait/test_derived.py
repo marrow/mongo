@@ -1,6 +1,6 @@
 import os
 
-import pytest
+from pytest import raises
 
 from marrow.mongo.field import Integer, String
 from marrow.mongo.trait import Derived, Queryable
@@ -63,13 +63,13 @@ class TestPromotionDemotion:
 	def test_specialize_fail_underived_uncle(self):
 		a = Source()
 		
-		with pytest.raises(TypeError):
+		with raises(TypeError):
 			a.promote(Queryable)
 	
 	def test_specialize_fail_derived_uncle(self):
 		b = Book()
 		
-		with pytest.raises(TypeError):
+		with raises(TypeError):
 			b.promote(Journal)
 
 
@@ -111,7 +111,7 @@ class TestAssetPromotion:
 	def test_folder_page(self):
 		inst = Folder('sample')
 		
-		with pytest.raises(TypeError):
+		with raises(TypeError):
 			inst.promote(Page)
 	
 	def test_folder_asset(self):
@@ -124,5 +124,5 @@ class TestAssetPromotion:
 		assert isinstance(inst, Asset)
 		assert inst.id == 'sample'
 		
-		with pytest.raises(AttributeError):
+		with raises(AttributeError):
 			inst.view
