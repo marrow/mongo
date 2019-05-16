@@ -18,6 +18,9 @@ else:
 		def to_native(self, obj, name:str, value:Union[str,dec,Decimal128,float]) -> dec:  # pylint:disable=unused-argument
 			assert check_argument_types()
 			
+			if isinstance(value, Decimal128):
+				return value.to_decimal()
+			
 			with localcontext(self.DECIMAL_CONTEXT) as ctx:
 				return ctx.create_decimal(str(value))
 		

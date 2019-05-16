@@ -43,7 +43,7 @@ class TestDecimalField(FieldExam):
 		result = Sample(Decimal128('3.141592'))
 		assert isinstance(result['field'], Decimal128)
 		
-		# dec(result['field']) - Decimal128 does not support conversoin to Decimal.
+		# dec(result['field']) - Decimal128 does not support conversion to Decimal.
 		# Additionally, Decimal128('1') != Decimal('1') as they are not even comparable, because reasons.
 		assert dec(str(result['field'])) == dec('3.141592')  # This is silly.
 		
