@@ -1,9 +1,6 @@
 from .string import String
 
-try:
-	from pathlib import PurePosixPath as _Path
-except ImportError:
-	from pathlib2 import PurePosixPath as _Path
+from pathlib import PurePosixPath as _Path
 
 
 class Path(String):
