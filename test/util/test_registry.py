@@ -1,3 +1,5 @@
+from pytest import raises
+
 from marrow.mongo import Document, document, field, trait
 
 
@@ -22,3 +24,12 @@ class TestRegistryBehaviour:
 		assert len(plugins) >= 1
 		assert 'Document' in plugins  # A plugin.
 		assert '__path__' in plugins  # Not a plugin, but a valid attribute.
+	
+	def test_protections(self):
+		assert '_protected' not in document
+		
+		with raises(AttributeError):
+			document._protected
+		
+		with raises(IndexError):
+			document['_protected']
