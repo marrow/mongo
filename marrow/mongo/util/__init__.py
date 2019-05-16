@@ -96,7 +96,7 @@ class Registry:
 		"""Identify if a plugin with the given short name exists."""
 		
 		if name[0] == '_':
-			raise IndexError()
+			return False
 		
 		if name in self.__dict__:
 			return True
