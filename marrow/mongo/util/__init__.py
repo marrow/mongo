@@ -85,7 +85,10 @@ class Registry:
 			raise IndexError()
 		
 		if name not in self.__dict__:
-			self.__dict__[name] = load(name, self._namespace)
+			try:
+				self.__dict__[name] = load(name, self._namespace)
+			except DistributionNotFound:
+				raise IndexError()
 		
 		return self.__dict__[name]
 	
