@@ -126,3 +126,9 @@ class TestAssetPromotion:
 		
 		with raises(AttributeError):
 			inst.view
+	
+	def test_cross_demotion(self):
+		inst = Folder('sample')
+		
+		with raises(TypeError):
+			inst.demote(Page)
