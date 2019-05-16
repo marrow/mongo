@@ -25,7 +25,6 @@ class Queryable(Collection):
 	
 	FIND_OPTIONS : Set[str] = UNIVERSAL_OPTIONS | {
 			'allow_partial_results',
-			'await',
 			'batch_size',
 			'cursor_type',
 			'max_time_ms',  # translated -> modifiers['$maxTimeMS']
@@ -34,7 +33,6 @@ class Queryable(Collection):
 			'oplog_replay',
 			'tail',
 			'wait',
-			'await',  # Reserved in Python 3.7+
 		}
 	
 	FIND_MAPPING : Mapping[str,str] = {
@@ -120,9 +118,6 @@ class Queryable(Collection):
 				*args,
 				**kw
 			)
-		
-		if 'await' in options:
-			raise TypeError("Await is hard-deprecated as reserved keyword in Python 3.7, use wait instead.")
 		
 		if 'cursor_type' in options and {'tail', 'wait'} & set(options):
 			raise TypeError("Can not combine cursor_type and tail/wait arguments.")
