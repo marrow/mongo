@@ -88,6 +88,9 @@ setup(
 			scripting = ['javascripthon<1.0'],  # Allow map/reduce functions and "stored functions" to be Python.
 			tz = ['pytz', 'tzlocal>=1.4'],  # Support for timezones.
 			timezone = ['pytz', 'tzlocal>=1.4'],  # Alias for the above timezone support.
+			
+			# For testing purposes.
+			impossibru = ['not-a-package'],
 		),
 	
 	tests_require = tests_require,
@@ -143,6 +146,7 @@ setup(
 						'Published = marrow.mongo.core.trait.published:Published',
 						'Queryable = marrow.mongo.core.trait.queryable:Queryable',
 						'Lockable = marrow.mongo.core.trait.lockable:Lockable',
+						'Impossibru = builtins:str[impossibru]',
 					],
 				# ### WebCore Extensions
 				'web.session': [  # Session Engine

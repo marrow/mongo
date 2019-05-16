@@ -24,6 +24,7 @@ class TestRegistryBehaviour:
 		assert len(plugins) >= 1
 		assert 'Document' in plugins  # A plugin.
 		assert '__path__' in plugins  # Not a plugin, but a valid attribute.
+		assert 'Impossibru' not in trait
 	
 	def test_protections(self):
 		assert '_protected' not in document
