@@ -1,11 +1,11 @@
-import pytest
+from pytest import fixture, raises
 
 from marrow.mongo import Document, F, Field, Filter
 from marrow.mongo.field import Array, Number
 
 
 class TestParametricFilterConstructor:
-	@pytest.fixture()
+	@fixture()
 	def D(self):
 		class Sample(Document):
 			field = Field()
@@ -43,3 +43,7 @@ class TestParametricFilterConstructor:
 		q = F(D, field__exists=True)
 		assert isinstance(q, Filter)
 		assert q == {'field': {'$exists': True}}
+	
+	def test_argument_count_violation(self, D):
+		with raises(TypeError):
+			F(D, field__within_box=(1, 2, 3))
