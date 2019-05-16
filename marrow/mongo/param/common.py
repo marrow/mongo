@@ -14,9 +14,6 @@ def _deferred_method(name:str, _named:Optional[Iterable[str]]=None, **kw) -> Cal
 		if not _named:
 			return getattr(self, name)(other, **kw)
 		
-		if len(_named) != len(other):
-			raise TypeError("Incorrect number of arguments.")
-		
 		values = iter(other)
 		
 		for i in _named:
