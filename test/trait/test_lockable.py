@@ -6,7 +6,7 @@ from time import sleep, time
 
 import pytest
 
-from marrow.mongo.core.trait.lockable import TimeoutError, _identifier
+from marrow.mongo.core.trait.lockable import _identifier
 from marrow.mongo.trait import Lockable
 from marrow.mongo.util import utcnow
 
