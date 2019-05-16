@@ -22,6 +22,14 @@ class TestMarkdownField(FieldExam):
 		inst = Sample(Inner())
 		assert inst.field == 'Some Markdown text.'
 	
+	def test_explicit_cast_method(self, Sample):
+		class Inner(object):
+			def to_markdown(self):
+				return "Another protocol."
+		
+		inst = Sample(Inner())
+		assert inst.field == 'Another protocol.'
+	
 	def test_cast_protocol_property(self, Sample):
 		class Inner(object):
 			@property
