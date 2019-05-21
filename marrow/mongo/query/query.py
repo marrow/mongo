@@ -20,7 +20,7 @@ if __debug__:
 
 
 class Q(object):
-	"""A comparison proxy and Ops factory to help build nested inquiries. For internal construction only.
+	"""A comparison proxy and Ops factory to help build nested queries. For internal construction only.
 	
 	Bound instances of Q are returned when accessing the fields of a Document subclass through class attribute access.
 	
@@ -33,13 +33,14 @@ class Q(object):
 	
 		Q(Person, '_id', ObjectId('_id', assign=True))
 	
-	If you reference a nested field (embed or array of embeds) via something like `Foo.bar.baz` you would get back a Q
-	like the following:
+	This "programmers representation" or REPR refers to the document class the Q originated from, the MongoDB-side
+	field name, and the Field instance's REPR. You may reference nested fields (embeded or array of embeds) via the
+	syntax `Foo.bar.baz`, which might return a Q like the following:
 	
 		Q(Foo, 'bar.baz', String('baz'))
 	
-	Due to the presence of several methods on this proxy, it becomes impossible to reference nested fields with any of
-	the following names:
+	Due to the presence of several methods on this proxy to support operations not represented by Python's native
+	comparisons, it becomes impossible to reference nested fields with any of the following names:
 	
 	* S
 	* all
