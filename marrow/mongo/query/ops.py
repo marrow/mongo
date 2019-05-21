@@ -5,6 +5,10 @@ These encapsulate the functionality of creating combinable mappings
 
 from collections.abc import Mapping, MutableMapping
 from copy import deepcopy
+from typing import Union
+
+from pymongo.cursor import Cursor
+from pymongo.collection import Collection
 
 from ..util import SENTINEL, odict
 
@@ -97,7 +101,7 @@ class Filter(Ops):
 	
 	# Binary Operator Protocols
 	
-	def __and__(self, other):
+	def __and__(self, other:Union[Mapping,set]) -> Ops:
 		"""Boolean AND joining of filter operations."""
 		operations = deepcopy(self.operations)
 		other = other.as_query if hasattr(other, 'as_query') else other
@@ -131,7 +135,7 @@ class Filter(Ops):
 		
 		return self.__class__(operations=operations, collection=self.collection, document=self.document)
 	
-	def __or__(self, other):
+	def __or__(self, other:Union[Mapping,Ops,set]) -> Ops:
 		operations = deepcopy(self.operations)
 		
 		other = other.as_query if hasattr(other, 'as_query') else other

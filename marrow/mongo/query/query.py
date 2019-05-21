@@ -161,7 +161,7 @@ class Q(object):
 		if other is not None:
 			other = f.transformer.foreign(other, (f, self._document))
 		
-		return Filter({self._name: {operation: other}})
+		return Filter({self._name: {operation: other}}, getattr(self, '__bound__', None), self.__class__)
 	
 	def _iop(self, operation, other, *allowed):
 		"""An iterative operation operating on multiple values.
