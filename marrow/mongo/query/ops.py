@@ -159,13 +159,21 @@ class Filter(Ops):
 				document = self.document
 			)
 	
-	def __invert__(self):
+	def __invert__(self) -> Ops:
 		"""Return the boolean inversion of the current query.
 		
 		Equivalent to the MongoDB `$not` operator.
 		"""
 		operations = deepcopy(self.operations)
 		
+		if set(operations) == {'$not'}:  # Unwrap existing inversion.
+			return self.__class__(
+					operations = operations['$not'],
+					collection = self.collection,
+					document = self.document
+				)
+		
+		# Or wrap up a fresh new one.
 		return self.__class__(
 				operations = {'$not': operations},
 				collection = self.collection,
