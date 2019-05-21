@@ -104,7 +104,11 @@ class Filter(Ops):
 	def __and__(self, other:Union[Mapping,set]) -> Ops:
 		"""Boolean AND joining of filter operations."""
 		operations = deepcopy(self.operations)
-		other = other.as_query if hasattr(other, 'as_query') else other
+		
+		if isinstance(other, set):
+			other = odict({'$and', list(set)})
+		elif hasattr(other, 'as_query'):
+			other = other.as_query
 		
 		for k, v in other.items():
 			if k not in operations:
