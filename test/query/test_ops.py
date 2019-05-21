@@ -16,10 +16,6 @@ def single_ops(request):
 	return Filter({'roll': 27})
 
 
-def test_ops_iteration(single_ops):
-	assert list(iter(single_ops)) == ['roll']
-
-
 class TestOpsMapping:
 	def test_getitem(self, empty_ops, single_ops):
 		with pytest.raises(KeyError):
