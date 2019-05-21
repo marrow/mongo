@@ -203,7 +203,7 @@ class Lockable(Queryable):
 			query |= D.lock.time < (identity.time - identity.__period__)
 			query &= D.id == self
 		
-		previous = collection.find_one_and_update(query, {'$set': {~D.lock: identity}}, {~D.lock: True})
+		previous = collection.find_one_and_update(query.as_query, {'$set': {~D.lock: identity}}, {~D.lock: True})
 		
 		if previous is None:
 			if timeout:
