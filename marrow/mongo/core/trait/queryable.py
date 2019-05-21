@@ -1,6 +1,7 @@
 from collections import Mapping
 from functools import reduce
 from operator import and_
+from typing import Union, Set
 
 from pymongo.cursor import Cursor, CursorType
 from pymongo.collection import Collection as PyMongoCollection
@@ -10,6 +11,49 @@ from ... import F, Filter, P, S
 from ...trait import Collection
 from ...util import odict
 from ....package.loader import traverse
+
+
+class QueryableFilter(Filter):
+	"""Additional behaviour for queryable filters.
+	
+	This provides a simplified query syntax, free of nearly all boilerplate (repeated mandatory code).
+	
+	Additional semantics include:
+	
+	* Filters generated from Queryable collections may be iterated to issue the query and produce a PyMongo Cursor.
+	
+		for record in User.age > 27:
+			print(record)
+	
+	* Filters may be combined as before (using binary "&" and "|" operators), however this has been extended to support
+	  sets of additional criteria, and additional operators: addition and subtraction.  Where addition performs an "or"
+	  to include additional results, a subtraction performs an "and" of the inverse of the set contents, excluding
+	  results.
+	
+	The last offers a few powerful additions:
+	
+	* Examine the "contents" of a "room" record (an `@property` returning a `QueryableFilter`) and return only the
+	  siblings of the current record:
+	
+		siblings = self.room.contents - {self}
+	"""
+	
+	def __getitem__(self, item:Union[str,int,slice]):
+		"""Retrieve the value of the given string key, or apply skip/limit options."""
+		
+		if isinstance(item, str):
+			return super().__getitem__(item)
+		
+		return None
+	
+	def __iter__(self) -> Cursor:
+		if hasattr(self.document, 'find') and getattr(self.document, '__bound__', None):
+			return self.document.find(self)
+		
+		elif self.collection:
+			return self.collection.find(self)
+		
+		raise TypeError("Can not iterate an unbound Filter instance.")
 
 
 class Queryable(Collection):
@@ -59,6 +103,8 @@ class Queryable(Collection):
 			'max_time_ms': 'maxTimeMS',
 			'use_cursor': 'useCursor',
 		}
+	
+	# _Filter = QueryableFilter
 	
 	@classmethod
 	def _prepare_query(cls, mapping:Mapping[str,str], valid, *args, **kw) -> Tuple[Collection, PyMongoCollection, Filter, dict]:
