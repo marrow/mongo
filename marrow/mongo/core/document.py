@@ -25,6 +25,8 @@ class Document(Container):
 	Traits, Document sub-classes to be used as mix-ins, are provided to augment and specialize behaviour.
 	"""
 	
+	# _Filter = Filter  # We can't define this here (circular import), so we default to it later.
+	
 	# Note: These may be dynamic based on content; always access from an instance where possible.
 	__store__ = odict # For fields, this may be a bson type like Binary, or Code.
 	__foreign__ = {'object'}  # The representation for the database side of things, ref: $type
