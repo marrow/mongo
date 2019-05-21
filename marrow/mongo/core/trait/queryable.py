@@ -78,7 +78,7 @@ class Queryable(Collection):
 		"""
 		
 		collection = cls.get_collection(kw.pop('source', None))
-		query = Filter(document=cls, collection=collection)
+		query = getattr(cls, '_Filter', Filter)(document=cls, collection=collection)
 		options = {}
 		
 		if args:
