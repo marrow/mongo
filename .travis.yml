@@ -25,6 +25,9 @@ matrix:
       env: MONGODB_VERSION=4.0.8 FIPS=1 OPENSSL_FIPS=1
     - python: "3.7"
       dist: xenial
+    - python: "3.7"
+      dist: xenial
+      env: BENCHMARK=1
 
 before_install:
   - wget http://fastdl.mongodb.org/linux/mongodb-linux-x86_64-${MONGODB_VERSION}.tgz -O /tmp/mongodb.tgz
@@ -38,6 +41,7 @@ install:
   - 'test -z "${FIPS}" && pip install -e ".[development]" || true'
   - 'test -n "${FIPS}" && pip install -e ".[development,fips]" || true'
   - 'test -n "${NO_PYTZ}" && pip uninstall --yes pytz tzlocal || true'
+  - 'test -n "${BENCHMARK}" && pip install -U mongoengine pymodm || true'
 
 script:
     pytest
