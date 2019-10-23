@@ -83,9 +83,10 @@ from ..core.types import Union, Optional, Mapping, check_argument_types
 # HWID calculation. This happens once, the first time this module is imported. Availability of choices depend on the
 # ability to import the given hashing algorithm, e.g. `legacy` will be unavailable if `hashlib.md5` is unavailable.
 # Feel free to expand upon these choices within your own application by updating `marrow.mongo.util.oid.HWID`.
+# TODO: Also make this a "plugin registry", though the "plugins" are just static values or callables generating one.
 
-_hostname = gethostname().encode()  # Utilized by the legacy HWID generation approaches.
-HWID = {'random': urandom(5)}  # A mapping of abstract alias to hardware identification value, defaulting to random.
+_hostname: bytes = gethostname().encode()  # Utilized by the legacy HWID generation approaches.
+HWID: Mapping[str,bytes] = {'random': urandom(5)}  # A mapping of abstract alias to hardware identification value, defaulting to random.
 HWID['modern'] = HWID['random']  # Convenient alias as an antonym of "legacy".
 
 try:  # This uses the old (<3.7) MD5 approach, which is not FIPS-safe despite having no cryptographic requirements.
@@ -137,6 +138,8 @@ class _Component:
 	
 	__slots__ = ('_slice', )
 	
+	_slice: slice
+	
 	def __getitem__(self, item):
 		self._slice = item
 		return self
@@ -144,7 +147,7 @@ class _Component:
 	def __get__(self, instance, owner):
 		return instance.binary[self._slice]
 	
-	def __set__(self, instance, value):
+	def __set__(self, instance, value:Union[str,bytes]):
 		if isinstance(value, str):
 			value = unhexlify(value)
 		
@@ -168,6 +171,8 @@ class _Component:
 class _Numeric(_Component):
 	__slots__ = ('struct', )
 	
+	_struct: str
+	
 	def __init__(self, struct='>I'):
 		self.struct = struct
 	
@@ -183,6 +188,8 @@ class _Numeric(_Component):
 
 
 class _Timestamp(_Numeric):
+	__slots__ = ()
+	
 	def __get__(self, instance, owner) -> datetime:
 		value = super().__get__(instance, owner)
 		return datetime.utcfromtimestamp(value).replace(tzinfo=utc)
@@ -269,7 +276,7 @@ class ObjectID(_OID):
 		value = str(value)  # Casts bson.ObjectId as well.
 		
 		if len(value) != 24:
-			raise ValueError("ObjectID must be a 12-byte binary value or 24-character hexidecimal string.")
+			raise ValueError("ObjectID must be a 12-byte binary value or 24-character hexadecimal string.")
 		
 		self.binary = unhexlify(value)
 	
@@ -301,6 +308,8 @@ class ObjectID(_OID):
 		
 		Ref: `case 7` of `_write_element_to_buffer` from:
 			https://github.com/mongodb/mongo-python-driver/blob/master/bson/_cbsonmodule.c
+		
+		Ref: https://jira.mongodb.org/browse/PYTHON-1843
 		"""
 		return self.binary
 	
