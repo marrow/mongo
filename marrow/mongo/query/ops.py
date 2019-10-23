@@ -101,8 +101,36 @@ class Filter(Ops):
 	
 	# Binary Operator Protocols
 	
+	def __add__(self, other:set) -> Ops:
+		"""Set addition join of filter operations.
+		
+		Use this to "expand" the scope of the query to include additional results. Treated as a top-level OR. E.g.:
+		
+			query = User.age < 27
+			query += {amcgregor}
+		
+		The above will select all users whose age is `$lt` 27, while also including the record referenced by the
+		`amcgregor` variable, by ID.
+		"""
+		pass
+	
+	def __sub__(self, other:set) -> Ops:
+		"""Set subtraction join of filter operations.
+		
+		Use this to "filter" the scope of the query to exclude results.  Treated as a top-level AND of the `$not`
+		inverted version of the query deifned by the set. E.g.:
+		
+			query = User.age > 27
+			query -= {amcgregor}
+		
+		The above represents a search for all users older than 27 years, excluding the user referenced by the
+		`amcgregor` variable, by ID.
+		"""
+		pass
+	
 	def __and__(self, other:Union[Mapping,set]) -> Ops:
-		"""Boolean AND joining of filter operations."""
+		"""Boolean AND joining of filter operations translating directly to MongoDB `$and`."""
+		
 		operations = deepcopy(self.operations)
 		
 		if isinstance(other, set):
@@ -140,6 +168,8 @@ class Filter(Ops):
 		return self.__class__(operations=operations, collection=self.collection, document=self.document)
 	
 	def __or__(self, other:Union[Mapping,Ops,set]) -> Ops:
+		"""Boolean AND joining of filter operations translating directly to MongoDB `$and`."""
+		
 		operations = deepcopy(self.operations)
 		
 		other = other.as_query if hasattr(other, 'as_query') else other
