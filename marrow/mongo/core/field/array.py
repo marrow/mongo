@@ -1,7 +1,7 @@
 from collections.abc import Iterable, Mapping
 
 from ... import Field
-from ..types import check_argument_types, Set
+from ..types import check_argument_types, Set, List
 from .base import _HasKind, _CastingKind
 
 
@@ -21,6 +21,10 @@ class Array(_HasKind, _CastingKind, Field):
 			kw.setdefault('default', self.List.new)
 		
 		super(Array, self).__init__(*args, **kw)
+	
+	@property
+	def __annotation__(self):
+		return List[super().__annotation__]
 	
 	def to_native(self, obj, name:str, value:Iterable) -> list:
 		"""Transform the MongoDB value into a Marrow Mongo value."""
