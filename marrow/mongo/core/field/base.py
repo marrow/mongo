@@ -1,7 +1,6 @@
 from collections import namedtuple
 from inspect import isclass
 from weakref import proxy
-from typing import Sequence, Optional, Mapping, Iterable, Set, TypeVar
 
 from ....package.loader import traverse, load
 from ....schema import Attribute
@@ -9,6 +8,7 @@ from ....schema.transform import BaseTransform
 from ....schema.validate import Validator
 from ...query import Q
 from ...util import adjust_attribute_sequence, SENTINEL
+from ...types import Any, Sequence, Optional, Mapping, Iterable, Set, TypeVar
 
 
 FieldContext = namedtuple('FieldContext', 'field,document')

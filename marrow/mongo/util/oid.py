@@ -77,7 +77,7 @@ from time import time
 from bson import ObjectId as _OID
 from bson.tz_util import utc
 
-from ..core.types import Union, Optional, check_argument_types
+from ..core.types import Union, Optional, Mapping, check_argument_types
 
 
 # HWID calculation. This happens once, the first time this module is imported. Availability of choices depend on the

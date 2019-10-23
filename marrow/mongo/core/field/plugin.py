@@ -1,10 +1,9 @@
 from pkg_resources import iter_entry_points
-from typing import Union, Optional, Mapping
 
 from ....package.canonical import name as canon
 from ....package.loader import load
-from ....schema import Attribute
-
+from ... import Attribute
+from ...types import Any, Union, Optional, Mapping
 from .base import Field
 
 
