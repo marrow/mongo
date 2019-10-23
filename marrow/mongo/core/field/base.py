@@ -266,15 +266,15 @@ class _CastingKind(Field):
 		
 		kind = self._kind(obj if isclass(obj) else obj.__class__)
 		
+		if isinstance(kind, Field):
+			kind.validator.validate(value, FieldContext(kind, obj))
+			return kind.transformer.foreign(value, FieldContext(kind, obj))
+		
 		if isinstance(value, Document):
 			if __debug__ and kind and issubclass(kind, Document) and not isinstance(value, kind):
 				raise ValueError("Not an instance of " + kind.__name__ + " or a sub-class: " + repr(value))
 			
 			return value
-		
-		if isinstance(kind, Field):
-			kind.validator.validate(value, FieldContext(kind, obj))
-			return kind.transformer.foreign(value, FieldContext(kind, obj))
 		
 		if kind:
 			value = kind(**value)
