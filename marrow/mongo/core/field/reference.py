@@ -19,6 +19,18 @@ class Reference(_HasKind, Field):
 	cache: Optional[Iterable[str]] = Attribute(default=None)  # Attributes to preserve from the referenced object at the reference level.
 	
 	@property
+	def __annotation__(self):
+		"""The represented value differs based on field configuration."""
+		
+		if self.cache:
+			return Document
+		
+		if self.concrete:
+			return DBRef
+		
+		return OID
+	
+	@property
 	def __foreign__(self) -> str:
 		"""Advertise that we store a simple reference, or deep reference, or object, depending on configuration."""
 		
