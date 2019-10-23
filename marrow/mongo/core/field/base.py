@@ -1,4 +1,3 @@
-from collections import namedtuple
 from inspect import isclass
 from weakref import proxy
 
@@ -8,11 +7,7 @@ from ....schema.transform import BaseTransform
 from ....schema.validate import Validator
 from ...query import Q
 from ...util import adjust_attribute_sequence, SENTINEL
-from ...types import Any, Sequence, Optional, Mapping, Iterable, Set, TypeVar
-
-
-FieldContext = namedtuple('FieldContext', 'field,document')
-FieldType = TypeVar("FieldType", bound="Field")
+from ..types import Any, Sequence, Optional, Mapping, Iterable, Set, FieldContext, FieldType
 
 
 class FieldTransform(BaseTransform):
@@ -58,8 +53,8 @@ class Field(Attribute):
 	
 	# Local Manipulation
 	
-	transformer = Attribute(default=FieldTransform())  # A Transformer class to use when loading/saving values.
-	validator = Attribute(default=Validator())  # The Validator class to use when validating values.
+	transformer: BaseTransform = Attribute(default=FieldTransform())  # A Transformer class to use when loading/saving values.
+	validator: Validator = Attribute(default=Validator())  # The Validator class to use when validating values.
 	assign: bool = Attribute(default=False)  # If truthy attempt to access and store resulting variable when instantiated.
 	
 	# Predicates
