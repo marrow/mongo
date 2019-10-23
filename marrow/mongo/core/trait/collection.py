@@ -233,7 +233,10 @@ class Collection(Identified):
 		kw['bypass_document_validation'] = not validate
 		
 		collection = self.get_collection(kw.pop('source', None))
-		return collection.insert_one(self, **kw)
+		result = collection.insert_one(self, **kw)
+		self.id = result.inserted_id
+		
+		return result
 	
 	def update_one(self, update=None, validate=True, **kw):
 		"""Update this document in the database. Local representations will not be affected.
