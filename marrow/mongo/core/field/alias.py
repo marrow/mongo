@@ -32,6 +32,13 @@ class Alias(Attribute):
 		assert check_argument_types()
 		super().__init__(path=path, **kw)
 	
+	@property
+	def __annotation__(self):
+		"""As we represent a getter/setter proxy through to the real field, also proxy its type annotation."""
+		
+		field = traverse(self.__document__, self.path)
+		return field.__annotation__
+	
 	def __fixup__(self, document):
 		"""Called after an instance of our Field class is assigned to a Document."""
 		
