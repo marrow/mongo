@@ -7,6 +7,7 @@ from ....schema import Attribute
 class String(Field):
 	__foreign__ = 'string'
 	__disallowed_operators__ = {'#array'}
+	__annotation__ = str
 	
 	strip: Optional[Union[str,bool]] = Attribute(default=False)
 	case: Optional[str] = Attribute(default=None)

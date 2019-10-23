@@ -12,7 +12,7 @@ from ...types import Any, Sequence, Optional, Mapping, Iterable, Set, TypeVar
 
 
 FieldContext = namedtuple('FieldContext', 'field,document')
-FieldType = TypeVar("Fieldtype", bound="Field")
+FieldType = TypeVar("FieldType", bound="Field")
 
 
 class FieldTransform(BaseTransform):
@@ -45,6 +45,7 @@ class Field(Attribute):
 	__document__ = None  # The Document subclass the field originates from.
 	__foreign__ = {}
 	__acl__ = []  # Overall document access control list.
+	__annotation__ = Any
 	
 	# Inherits from Attribute: (name is usually, but not always the first positional parameter)
 	# name - The database-side name of the field, stored as __name__, defaulting to the attribute name assigned to.

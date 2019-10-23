@@ -24,6 +24,7 @@ class Link(String):
 	"""
 	
 	URI = URI
+	URI = __annotation__ = URI
 	
 	absolute: bool = Attribute(default=False)  # Only allow absolute addressing.
 	protocols: Optional[Sequence[str]] = Attribute(default=None)  # Only allow the given protocols,

@@ -14,6 +14,7 @@ SuitableIdentifier = Union[OID,datetime,timedelta,MutableMapping,str,bytes]
 class ObjectId(Field):
 	__foreign__ = 'objectId'
 	__disallowed_operators__ = {'#array'}
+	__annotation__ = OID
 	
 	default: SuitableIdentifier = Attribute()
 	

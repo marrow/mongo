@@ -7,6 +7,7 @@ from .base import Field
 class Number(Field):
 	__foreign__ = 'number'
 	__disallowed_operators__ = {'#array'}
+	__annotation__ = NumberABC
 	
 	def to_foreign(self, obj, name:str, value:Union[str,NumberABC]) -> NumberABC:  # pylint:disable=unused-argument
 		if isinstance(value, NumberABC):

@@ -7,6 +7,7 @@ from ....schema import Attribute
 class Boolean(Field):
 	__foreign__ = 'bool'
 	__disallowed_operators__ = {'#array'}
+	__annotation__ = bool
 	
 	truthy: Sequence = Attribute(default=('true', 't', 'yes', 'y', 'on', '1', True))
 	falsy: Sequence = Attribute(default=('false', 'f', 'no', 'n', 'off', '0', False))

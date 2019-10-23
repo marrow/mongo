@@ -12,6 +12,7 @@ except ImportError:  # pragma: no cover
 else:
 	class Decimal(Number):
 		__foreign__ = 'decimal'
+		__annotation__ = dec
 		
 		DECIMAL_CONTEXT = create_decimal128_context()
 		

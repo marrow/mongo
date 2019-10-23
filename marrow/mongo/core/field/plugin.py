@@ -20,6 +20,7 @@ class PluginReference(Field):
 	mapping: Optional[Mapping[str,str]] = Attribute(default=None)  # To ease support for legacy records, textual replacements.
 	
 	__foreign__ = {'string'}
+	__annotation__ = Any
 	
 	def __init__(self, *args, **kw):
 		if args:

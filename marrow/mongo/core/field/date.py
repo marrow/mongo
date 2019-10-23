@@ -52,6 +52,7 @@ class Date(Field):
 	
 	__foreign__ = 'date'
 	__disallowed_operators__ = {'#array'}
+	__annotation__ = datetime
 	
 	naive: TimezoneSetting = Attribute(default=utc)  # Timezone to interpret naive datetimes as.
 	tz: TimezoneSetting = Attribute(default=None)  # Timezone to cast to when retrieving from the database.
