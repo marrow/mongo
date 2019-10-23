@@ -23,7 +23,6 @@ class Link(String):
 	(schemes) by defining them as a set of schemes, e.g. `{'http', 'https', 'mailto'}`.
 	"""
 	
-	URI = URI
 	URI = __annotation__ = URI
 	
 	absolute: bool = Attribute(default=False)  # Only allow absolute addressing.
