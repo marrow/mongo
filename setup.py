@@ -19,6 +19,7 @@ tests_require = [
 		'pytest-isort',  # import ordering
 		'misaka', 'pygments',  # Markdown field support
 		'pytz', 'tzlocal>=1.4',  # timezone support, logger support
+		'pytest-benchmark',  # automated benchmarking tests
 	]
 
 
@@ -45,6 +46,8 @@ setup(
 			'document mapper',
 			'declarative',
 			'marrow',
+			'document storage',
+			'object storage',
 		),
 	classifiers = [
 			"Development Status :: 5 - Production/Stable",
