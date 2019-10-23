@@ -201,6 +201,18 @@ class _HasKind(Field):
 		
 		super().__init__(*args, **kw)
 	
+	@property
+	def __annotation__(self):
+		kind = self._kind()
+		
+		if not kind:
+			return Any
+		
+		if hasattr(kind, '__annotation__'):  # A Field...
+			return kind.__annotation__
+		
+		return kind
+	
 	def __fixup__(self, document):
 		super().__fixup__(document)
 		
