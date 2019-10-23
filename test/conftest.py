@@ -1,10 +1,10 @@
 from functools import partial
 
 import pymongo
-import pytest
+from pytest import fixture
 
 
-@pytest.fixture(scope="module", autouse=True)
+@fixture(scope='module', autouse=True)
 def connection(request) -> pymongo.MongoClient:
 	"""Automatically connect before testing and discard data after testing."""
 	connection = pymongo.MongoClient('mongodb://localhost/test')
