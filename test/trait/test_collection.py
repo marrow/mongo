@@ -19,7 +19,7 @@ def coll(request, db):
 def Sample(request):
 	class Sample(Collection):
 		__collection__ = 'collection'
-		__engine__ = {'mmapv1': {}}
+		__engine__ = {}  # {'mmapv1': {}}
 		
 		id = None  # Remove the default identifier.
 		field = Field()
