@@ -7,7 +7,7 @@ from pymongo.cursor import Cursor, CursorType
 from pymongo.collection import Collection as PyMongoCollection
 
 from ..types import Optional, Set, Mapping, Tuple
-from ... import F, Filter, P, S
+from ... import Document, F, Filter, P, S
 from ...trait import Collection
 from ...util import odict
 from ....package.loader import traverse
@@ -57,7 +57,12 @@ class QueryableFilter(Filter):
 
 
 class Queryable(Collection):
-	"""EXPERIMENTAL: Extend active collection behaviours to include querying."""
+	"""Extend active collection behaviours to include querying.
+	
+	A Queryable collection has additional metadata:
+	
+	``
+	"""
 	
 	UNIVERSAL_OPTIONS: Set[str] = {
 			'collation',
@@ -245,7 +250,7 @@ class Queryable(Collection):
 		return collection.find(query, **options)
 	
 	@classmethod
-	def find_one(cls, *args, **kw):
+	def find_one(cls, *args, **kw) -> Optional[Document]:
 		"""Get a single document from the collection this class is bound to.
 		
 		Additional arguments are processed according to `_prepare_find` prior to passing to PyMongo, where positional
