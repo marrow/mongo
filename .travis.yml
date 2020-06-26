@@ -9,11 +9,15 @@ branches:
 
 python:
   - "3.6"
+  - "3.7"
+  - "3.8"
+  - "pypy3.5-6.0"
 
 env:
-  - MONGODB_VERSION=4.0.8
-  - MONGODB_VERSION=3.6.11
-  - MONGODB_VERSION=3.4.7
+  - MONGODB_VERSION=4.2.8
+  - MONGODB_VERSION=4.0.19
+  - MONGODB_VERSION=3.6.18
+  - MONGODB_VERSION=3.4.24
 
 matrix:
   include:
