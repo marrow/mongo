@@ -277,7 +277,11 @@ class Queryable(Collection):
 		return result
 	
 	# Alias this to conform to Python-native "Collection" API: https://www.python.org/dev/peps/pep-0560/#class-getitem
-	__class_getitem__ = find_one  # Useful on Python 3.7 or above.
+	def __class_getitem__(cls, identifier):
+		try:
+			return cls.find_one(identifier)
+		except (AttributeError, TypeError, ValueError):
+			raise KeyError()
 	
 	# https://api.mongodb.com/python/current/api/pymongo/collection.html#pymongo.collection.Collection.find_one_and_delete
 	# https://api.mongodb.com/python/current/api/pymongo/collection.html#pymongo.collection.Collection.find_one_and_replace
