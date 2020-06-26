@@ -1,6 +1,7 @@
 from typing import Union
 
 from bson import ObjectId as OID
+from bson.errors import InvalidId
 from collections.abc import MutableMapping
 from datetime import datetime, timedelta
 
@@ -40,4 +41,9 @@ class ObjectId(Field):
 		if isinstance(value, MutableMapping) and '_id' in value:
 			return OID(value['_id'])
 		
-		return OID(value)
+		try:
+			return OID(value)
+		except InvalidId:
+			pass
+		
+		raise ValueError(f"Invalid ObjectID value: {value}")
