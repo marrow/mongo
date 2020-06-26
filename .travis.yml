@@ -14,7 +14,6 @@ python:
   - "pypy3"
 
 env:
-  - MONGODB_VERSION=4.2.8
   - MONGODB_VERSION=4.0.19
   - MONGODB_VERSION=3.6.18
   - MONGODB_VERSION=3.4.24
