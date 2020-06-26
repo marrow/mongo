@@ -213,9 +213,15 @@ class Queryable(Collection):
 		parameters are interpreted as query fragments, parametric keyword arguments combined, and other keyword
 		arguments passed along with minor transformation.
 		
-		Automatically calls `to_mongo` with the retrieved data.
+		Automatically calls `from_mongo` over the retrieved data to return an instance of the model.
+		
+		For simple "by ID" lookups, instead of calling `Model.find_one(identifier)` use the short-hand notation that
+		treats your model as a Python-native collection as of Python 3.7: (most familiar as used in type annotation)
+		
+			Model[identifier]
 		
 		https://api.mongodb.com/python/current/api/pymongo/collection.html#pymongo.collection.Collection.find_one
+		https://www.python.org/dev/peps/pep-0560/#class-getitem
 		"""
 		
 		if len(args) == 1 and not isinstance(args[0], Filter):
@@ -225,6 +231,9 @@ class Queryable(Collection):
 		result = Doc.from_mongo(collection.find_one(query, **options))
 		
 		return result
+	
+	# Alias this to conform to Python-native "Collection" API: https://www.python.org/dev/peps/pep-0560/#class-getitem
+	__class_getitem__ = find_one  # Useful on Python 3.7 or above.
 	
 	# https://api.mongodb.com/python/current/api/pymongo/collection.html#pymongo.collection.Collection.find_one_and_delete
 	# https://api.mongodb.com/python/current/api/pymongo/collection.html#pymongo.collection.Collection.find_one_and_replace
