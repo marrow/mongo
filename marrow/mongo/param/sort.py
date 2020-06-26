@@ -29,7 +29,10 @@ def S(Document, *fields:Order) -> Sort:
 		if field[0] in ('+', '-'):
 			field = field[1:]
 		
-		_field = traverse(Document, field, default=None)
+		try:
+			_field = traverse(Document, field, default=None)
+		except LookupError:
+			_field = field
 		
 		result.append(((~_field) if _field else field, direction))
 	
