@@ -40,6 +40,8 @@ constructor. Possibilities include:
   `md5` hash will literally be unavailable for use, resulting in the inability to utilize this choice._
 * The string `fips`: use the FIPS-compliant FNV hash of the host name, in combination with the current process ID.
   Requires the `fnv` package be installed.
+* The string `mac`: use the hardware MAC address of the default interface as the identifier. Because a MAC address is
+  one byte too large for the field, the final byte is used to XOR the prior ones.
 * The string `random`: pure random bytes, the default, aliased as `modern`.
 * Any 5-byte bytes value: use the given HWID explicitly.
 
@@ -73,6 +75,7 @@ from socket import gethostname
 from struct import pack, unpack
 from threading import RLock
 from time import time
+from uuid import getnode
 
 from bson import ObjectId as _OID
 from bson.tz_util import utc
@@ -88,6 +91,10 @@ from ..core.types import Union, Optional, Mapping, check_argument_types
 _hostname: bytes = gethostname().encode()  # Utilized by the legacy HWID generation approaches.
 HWID: Mapping[str,bytes] = {'random': urandom(5)}  # A mapping of abstract alias to hardware identification value, defaulting to random.
 HWID['modern'] = HWID['random']  # Convenient alias as an antonym of "legacy".
+
+mac = getnode()
+HWID['mac'] = b"".join(i^mac[-1] for i in mac[:-1])  # Identifier based on hardware MAc address.
+del mac
 
 try:  # This uses the old (<3.7) MD5 approach, which is not FIPS-safe despite having no cryptographic requirements.
 	from hashlib import md5
