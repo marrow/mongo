@@ -278,6 +278,15 @@ class Queryable(Collection):
 	
 	# Alias this to conform to Python-native "Collection" API: https://www.python.org/dev/peps/pep-0560/#class-getitem
 	def __class_getitem__(cls, identifier):
+		"""Support use of a Queryable Document Collection as a class-level collection organized by primary key.
+		
+		It is important to remember that no query configuration can be provided for these types of lookups; defaults
+		will always be utilized. It is equivalent to cls.find_one(identifier), with certain kinds of data exceptions
+		transformed into a KeyError.
+		
+		Ref: https://www.python.org/dev/peps/pep-0560/#class-getitem
+		"""
+		
 		try:
 			return cls.find_one(identifier)
 		except (AttributeError, TypeError, ValueError):
