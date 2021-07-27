@@ -93,7 +93,7 @@ HWID: Mapping[str,bytes] = {'random': urandom(5)}  # A mapping of abstract alias
 HWID['modern'] = HWID['random']  # Convenient alias as an antonym of "legacy".
 
 mac = getnode()
-HWID['mac'] = b"".join(i^mac[-1] for i in mac[:-1])  # Identifier based on hardware MAc address.
+HWID['mac'] = b"".join(i^mac[-1] for i in mac[:-1])  # Identifier based on hardware MAC address.
 del mac
 
 try:  # This uses the old (<3.7) MD5 approach, which is not FIPS-safe despite having no cryptographic requirements.
