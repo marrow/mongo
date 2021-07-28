@@ -67,6 +67,7 @@ Additional points of reference:
 3. https://en.wikipedia.org/wiki/Federal_Information_Processing_Standards
 """
 
+import json
 from binascii import hexlify, unhexlify
 from datetime import datetime, timedelta
 from os import getpid, urandom
@@ -81,6 +82,11 @@ from bson import ObjectId as _OID
 from bson.tz_util import utc
 
 from ..core.types import Union, Optional, Mapping, check_argument_types
+
+try:
+	from hhc import hhc, hhc_to_int
+except ImportError:
+	hhc = None
 
 
 # HWID calculation. This happens once, the first time this module is imported. Availability of choices depend on the
@@ -276,6 +282,8 @@ class ObjectID(_OID):
 		
 		return True
 	
+	# Parsing and Generation Population Processes
+	
 	def parse(self, value):
 		if isinstance(value, bytes):
 			value = hexlify(value).decode()
@@ -306,6 +314,44 @@ class ObjectID(_OID):
 		# 3 bytes incremental counter, random IV on process start.
 		self.counter = next(_counter)
 	
+	# Serialization Forms
+	
+	def to_dict(self):
+		return {"$oid": str(self)}
+	
+	@classmethod
+	def from_dict(ObjectID, value:dict):
+		assert len(value) == 1, "Dictionary representation of ObjectID must contain a single key."
+		assert '$oid' in value, "Dictionary representation of ObjectID does not contain '$oid' key."
+		return ObjectID(value['$oid'])
+	
+	as_dict = property(to_dict)
+	
+	def to_json(self):
+		return json.dumps(self.as_dict)
+	
+	@classmethod
+	def from_json(ObjectID, value:str):
+		return ObjectID.from_dict(json.loads(value))
+	
+	as_json = property(to_json)
+	
+	if hhc:  # Requires third-party optional dependency.
+		def to_hhc(self):
+			numeric = int(str(self), 16)
+			return hhc(numeric)
+		
+		@classmethod
+		def from_hhc(ObjectID, value):
+			now = datetime.utcnow()
+			numeric = hhc_to_int(value)
+			identifier = ObjectID(hex(numeric)[2:])
+			return identifier
+		
+		as_hhc = property(to_hhc)
+	
+	# PyMongo Internal "Private" Methods
+	
 	@property
 	def _ObjectId__id(self):
 		"""Provide a PyMongo BSON ObjectId-specific "private" (mangled) attribute.
@@ -319,6 +365,8 @@ class ObjectID(_OID):
 		Ref: https://jira.mongodb.org/browse/PYTHON-1843
 		"""
 		return self.binary
+	
+	# Python Object Protocols
 	
 	def __getstate__(self):
 		"""Return a value suitable for pickle serialization."""
