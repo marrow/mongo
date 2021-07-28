@@ -90,7 +90,7 @@ from ..core.types import Union, Optional, Mapping, check_argument_types
 
 _hostname: bytes = gethostname().encode()  # Utilized by the legacy HWID generation approaches.
 HWID: Mapping[str,bytes] = {'random': urandom(5)}  # A mapping of abstract alias to hardware identification value, defaulting to random.
-HWID['modern'] = HWID['random']  # Convenient alias as an antonym of "legacy".
+HWID['modern'] = HWID['default'] = HWID['random']  # Convenient alias as an antonym of "legacy", and define the default.
 
 mac = bytes.fromhex("%x" % (getnode(), ))
 HWID['mac'] = bytes.fromhex("".join("%x" % (i ^ mac[-1]) for i in mac[:-1]))  # Identifier based on hardware MAC address.
@@ -225,7 +225,7 @@ class ObjectID(_OID):
 	
 	hwid = _Component()[4:9]  # Compound of machine + process, used esp. in later versions as random.
 	
-	def __init__(self, value:Optional[Union[str,bytes,_OID,datetime,timedelta]]=None, hwid='random'):
+	def __init__(self, value:Optional[Union[str,bytes,_OID,datetime,timedelta]]=None, hwid='default'):
 		assert check_argument_types()
 		
 		self.binary = b'\x00' * 12
