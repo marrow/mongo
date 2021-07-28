@@ -75,7 +75,7 @@ setup(
 		] if {'pytest', 'test', 'ptr'}.intersection(argv) else [],
 	
 	install_requires = [
-			'uri>=2.0.0,<3.0.0',  # Generic URI datastructure.
+			'uri>=2.0.0,<3.0.0',  # Generic URI data structure.
 			'marrow.schema>=2.0.0,<2.2.0',  # Declarative schema support.
 			'marrow.package>=2.0.0,<2.2.0',  # Plugin discovery and loading.
 			'pymongo>=3.7',  # We require very modern API w/ count_documents.
@@ -91,6 +91,7 @@ setup(
 			scripting = ['javascripthon<1.0'],  # Allow map/reduce functions and "stored functions" to be Python.
 			tz = ['pytz', 'tzlocal>=1.4'],  # Support for timezones.
 			timezone = ['pytz', 'tzlocal>=1.4'],  # Alias for the above timezone support.
+			hhc = ['hhc'],  # Support HHC serialization of ObjectID values.
 			
 			# For testing purposes.
 			impossibru = ['not-a-package'],
