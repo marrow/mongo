@@ -170,6 +170,8 @@ class Queryable(Collection):
 				**kw
 			)
 		
+		options.setdefault('projection', cls.__projection__)
+		
 		if 'cursor_type' in options and {'tail', 'wait'} & set(options):
 			raise TypeError("Can not combine cursor_type and tail/wait arguments.")
 		
