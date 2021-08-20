@@ -3,15 +3,19 @@ from bson.codec_options import CodecOptions
 from bson.tz_util import utc
 from pymongo.collection import Collection as PyMongoCollection
 from pymongo.database import Database
-from pymongo.read_concern import ReadConcern
+from pymongo.read_concern import ReadConcern, DEFAULT_READ_CONCERN
 from pymongo.read_preferences import ReadPreference
 from pymongo.write_concern import WriteConcern
 
+from ....package.loader import traverse
 from ... import U, Update
 from ...trait import Identified
 
 
 __all__ = ['Collection']
+
+ReadConcern.DEFAULT = DEFAULT_READ_CONCERN  # Make consistent with read preferences.
+del DEFAULT_READ_CONCERN
 
 
 class Collection(Identified):
@@ -41,7 +45,7 @@ class Collection(Identified):
 	# Data Access Options
 	# TODO: Attribute declaration and name allowance.
 	__read_preference__ = ReadPreference.PRIMARY  # Default read preference to assign when binding.
-	__read_concern__ = ReadConcern()  # Default read concern.
+	__read_concern__ = ReadConcern.DEFAULT  # Default read concern.
 	__write_concern__ = WriteConcern(w=1)  # Default write concern.
 	
 	# Storage Options
@@ -66,7 +70,7 @@ class Collection(Identified):
 	def bind(cls, target):
 		"""Bind a copy of the collection to the class, modified per our class' settings.
 		
-		The given target (and eventual collection returned) must be safe within the context the document sublcass
+		The given target (and eventual collection returned) must be safe within the context the document subclass
 		being bound is constructed within. E.g. at the module scope this binding must be thread-safe.
 		"""
 		
@@ -102,6 +106,8 @@ class Collection(Identified):
 		
 		raise TypeError("Can not retrieve collection from: " + repr(target))
 	
+	# Life Cycle Management
+	
 	@classmethod
 	def create_collection(cls, target=None, drop=False, indexes=True):
 		"""Ensure the collection identified by this document class exists, creating it if not, also creating indexes.
@@ -126,7 +132,7 @@ class Collection(Identified):
 			raise TypeError("Can not retrieve database from: " + repr(target))
 		
 		if drop:
-			target.drop_collection(collection)  # TODO: If drop fails, try just emptying?
+			target.drop_collection(collection)
 		
 		collection = target.create_collection(collection, **cls._collection_configuration(True))
 		
@@ -219,7 +225,7 @@ class Collection(Identified):
 			# No positive inclusions given, but negative ones were.
 			projected = neutral
 		
-		return {field: True for field in projected}
+		return {~traverse(cls, field): True for field in projected}
 	
 	def insert_one(self, validate=True):
 		"""Insert this document.
