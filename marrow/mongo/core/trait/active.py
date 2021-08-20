@@ -126,8 +126,8 @@ class Active(Queryable):
 		
 		return Update(operations)
 	
-	def save(self):
+	def save(self, **kw):
 		if self._pending:
-			return self.update_one(self.as_update_document)
+			return self.update_one(self.as_update_document, **kw)
 		
-		return self.replace_one(True)
+		return self.replace_one(True, **kw)
