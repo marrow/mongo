@@ -176,8 +176,20 @@ class Field(Attribute):
 	def __delete__(self, obj):
 		"""Executed via the `del` statement with a Field instance attribute as the argument."""
 		
-		# Delete the data completely from the warehouse.
-		del obj.__data__[self.__name__]
+		del obj.__data__[self.__name__]  # Delete the data completely from the warehouse.
+		if not self.assign: return  # Do not store default values.
+		
+		# We have been instructed to store the default value, if present.
+		value = getattr(field, 'default', SENTINEL)
+		if value is SENTINEL and self.nullable:
+			value = None
+		elif callable(value):
+			value = value()
+		else:
+			return  # No assignable default could be determined.
+		
+		value = self.transformer.foreign(value, FieldContext(self, obj))
+		obj.__data__[self.__name__] = value
 	
 	# Other Python Protocols
 	
