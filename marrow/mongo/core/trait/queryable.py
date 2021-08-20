@@ -1,9 +1,8 @@
-from collections import Mapping
 from functools import reduce
 from operator import and_
 from typing import Union, Set
 
-from pymongo.cursor import Cursor, CursorType
+from pymongo.cursor import Cursor as PyMongoCursor
 from pymongo.collection import Collection as PyMongoCollection
 
 from ..types import Optional, Set, Mapping, Tuple
@@ -11,49 +10,6 @@ from ... import Document, F, Filter, P, S
 from ...trait import Collection
 from ...util import odict
 from ....package.loader import traverse
-
-
-class QueryableFilter(Filter):
-	"""Additional behaviour for queryable filters.
-	
-	This provides a simplified query syntax, free of nearly all boilerplate (repeated mandatory code).
-	
-	Additional semantics include:
-	
-	* Filters generated from Queryable collections may be iterated to issue the query and produce a PyMongo Cursor.
-	
-		for record in User.age > 27:
-			print(record)
-	
-	* Filters may be combined as before (using binary "&" and "|" operators), however this has been extended to support
-	  sets of additional criteria, and additional operators: addition and subtraction.  Where addition performs an "or"
-	  to include additional results, a subtraction performs an "and" of the inverse of the set contents, excluding
-	  results.
-	
-	The last offers a few powerful additions:
-	
-	* Examine the "contents" of a "room" record (an `@property` returning a `QueryableFilter`) and return only the
-	  siblings of the current record:
-	
-		siblings = self.room.contents - {self}
-	"""
-	
-	def __getitem__(self, item:Union[str,int,slice]):
-		"""Retrieve the value of the given string key, or apply skip/limit options."""
-		
-		if isinstance(item, str):
-			return super().__getitem__(item)
-		
-		return None
-	
-	def __iter__(self) -> Cursor:
-		if hasattr(self.document, 'find') and getattr(self.document, '__bound__', None):
-			return self.document.find(self)
-		
-		elif self.collection:
-			return self.collection.find(self)
-		
-		raise TypeError("Can not iterate an unbound Filter instance.")
 
 
 class Queryable(Collection):
@@ -109,7 +65,51 @@ class Queryable(Collection):
 			'use_cursor': 'useCursor',
 		}
 	
-	# _Filter = QueryableFilter
+	Filter = Filter
+	
+	class Cursor(PyMongoCursor):
+		def __init__(self, document_class, *args, **kw):
+			self._Document = document_class
+			super().__init__(*args, **kw)
+		
+		def __getitem__(self, index):
+			return self._Document.from_mongo(super().__getitem__(index))
+		
+		def first(self):
+			try:
+				return self.limit(-1).next()
+			except StopIteration:
+				return None
+		
+		def next(self):
+			return self._Document.from_mongo(super().__next__())
+		
+		__next__ = next
+	
+	__cursor_defaults__ = {
+			#projection=None,  # Apply a default projection.
+			#skip=0,  # Apply a default initial offset.
+			#limit=0,  # Apply a default integer record count.
+			#no_cursor_timeout=False,  # Disable cursor timeouts.
+			#cursor_type=CursorType.NON_TAILABLE, # Alter the default "type" of cursor requested.
+			#sort=None,  # Default sort order.
+			#allow_partial_results=False,
+			#oplog_replay=False,
+			#modifiers=None,
+			#batch_size=0,
+			#manipulate=True,
+			#collation=None,
+			#hint=None,
+			#max_scan=None,
+			#max_time_ms=None,
+			#max=None,
+			#min=None,
+			#return_key=False,
+			#show_record_id=False,
+			#snapshot=False,
+			#comment=None,
+			#session=None,
+		}
 	
 	@classmethod
 	def _prepare_query(cls, mapping:Mapping[str,str], valid, *args, **kw) -> Tuple[Collection, PyMongoCollection, Filter, dict]:
@@ -236,18 +236,25 @@ class Queryable(Collection):
 		return cls, collection, stages, options
 	
 	@classmethod
-	def find(cls, *args, **kw) -> Cursor:
+	def find(cls, *args, **kw) -> PyMongoCursor:
 		"""Query the collection this class is bound to.
 		
 		Additional arguments are processed according to `_prepare_find` prior to passing to PyMongo, where positional
 		parameters are interpreted as query fragments, parametric keyword arguments combined, and other keyword
 		arguments passed along with minor transformation.
 		
+		Defaults for values passed to `find_one` (the `Cursor` class) may be specified as a dictionary / mapping
+		attribute of your model named `__cursor_defaults__`.
+		
+		Documents returned by the resulting Cursor will be automatically encapsulated in their associated Document
+		subclass.
+		
 		https://api.mongodb.com/python/current/api/pymongo/collection.html#pymongo.collection.Collection.find
 		"""
 		
 		Doc, collection, query, options = cls._prepare_find(*args, **kw)
-		return collection.find(query, **options)
+		return cls.Cursor(cls, collection, query, **{**cls.__cursor_defaults__, **options})
+		# The above, somewhat odd ** expansion structure, avoids "multiple values for keyword" errors.
 	
 	@classmethod
 	def find_one(cls, *args, **kw) -> Optional[Document]:
