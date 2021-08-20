@@ -1,6 +1,6 @@
 from typing import Union
 
-from bson import ObjectId as OID
+from bson import ObjectId as OID, DBRef
 from bson.errors import InvalidId
 from collections.abc import MutableMapping
 from datetime import datetime, timedelta
@@ -31,6 +31,12 @@ class ObjectId(Field):
 	def to_foreign(self, obj, name:str, value:SuitableIdentifier) -> OID:  # pylint:disable=unused-argument
 		if isinstance(value, OID):
 			return value
+		
+		if isinstance(value, DBRef):
+			if value.collection != obj.__collection__:
+				raise ValueError(f"{value!r} does not reference our collection: {obj.__collection__}")
+			
+			return value.id
 		
 		if isinstance(value, datetime):
 			return OID.from_datetime(value)
