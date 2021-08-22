@@ -1,12 +1,43 @@
+import operator
 from inspect import isclass
 from typing import Any, Mapping
 
+from ....package.loader import traverse
 from ... import Document, F, Field, Filter, P, S
-from ..query import Update
+from ...util import utcnow
+from ...param.update import U, Update
 from .queryable import Queryable
 
 
 SENTINEL = object()
+
+
+SIMPLE_OPS = {
+		'add',
+		'bit_and',
+		'bit_or',
+		'bit_xor',
+		'currentDate',
+		'inc',
+		'now',
+		'set',
+	}
+
+UPDATE_OPS = {
+		'addToSet': set.add,
+		'and': operator.and_,
+		'currentDate': utcnow,
+		'inc': operator.add,
+		'now': utcnow,
+		'or': operator.or_,
+		'pullAll': lambda ov, uv: ov,
+		'push': lambda ov, uv: ov,
+		'pushAll': lambda ov, uv: ov,
+		'set': lambda ov, uv: uv,
+		'setOnInsert': lambda ov, uv: ov,
+		'xor': operator.xor,
+	}
+
 
 
 class _ActiveField(Field):
@@ -52,7 +83,8 @@ class CachedMixinFactory(dict):
 	trait, we need all fields assigned to documents using that trait to be "hot-swapped" for ones which are extended
 	to track alterations. Additionally, the fields themselves can be extended to expose update operations.
 	"""
-	def __missing__(self, cls:Field) -> _ActiveField:
+	
+	def __missing__(self, cls) -> _ActiveField:
 		if isinstance(cls, Field): cls = cls.__class__  # Permit retrieval from instances.
 		if isclass(cls):
 			if not issubclass(cls, Field):
@@ -85,7 +117,7 @@ class Active(Queryable):
 	_pending: PendingOperations  # A mapping of field-level operations to apply when saved.
 	
 	def __init__(self, *args, **kw):
-		"""Prepare an Active instance by constructing a mapping of pending operations, pass arguments through."""
+		"""Prepare an Active instance by constructing a mapping of pending operations, passing arguments through."""
 		
 		super().__init__(*args, **kw)
 		
@@ -97,8 +129,8 @@ class Active(Queryable):
 		
 		super().__attributed__()
 		
-		for name, field in self.__attributes__.items():
-			field.__class__ = self.__field_cache[field]
+		#for name, field in self.__attributes__.items():
+		#	field.__class__ = self.__field_cache[field]
 	
 	@property
 	def is_dirty(self):
@@ -126,8 +158,38 @@ class Active(Queryable):
 		
 		return Update(operations)
 	
+	def update(self, __raw__=None, /, **kw):
+		"""Perform updates to this document using MongoDB update syntax."""
+		
+		update = U(self.__class__, __raw__, **kw)
+		
+		for operation, data in update.items():
+			operation = operation.lstrip('$')
+			op = UPDATE_OPS[operation]
+			
+			for field, update in data.items():
+				container = self if field.count('.') == 0 else traverse(self.__data__, field.rpartition('.')[0])
+				ovalue = traverse(container, field.rpartition('.')[2], SENTINEL)
+				if operation in SIMPLE_OPS:
+					value = op(ovalue, update)
+					container[field] = value
+	
 	def save(self, **kw):
 		if self._pending:
 			return self.update_one(self.as_update_document, **kw)
 		
 		return self.replace_one(True, **kw)
+
+"""
+
+from marrow.mongo import Document, Field
+from marrow.mongo.trait import Active
+
+class Example(Active, Document):
+	name = Field()
+	age = Field()
+
+doc = Example(age=17)
+doc.update(set__name="Bob Dole", inc__age=1)
+
+"""
