@@ -12,18 +12,24 @@ from .queryable import Queryable
 SENTINEL = object()
 
 
-SIMPLE_OPS = {
+UNARY_OPERATIONS = {
+		'currentDate',
+		'now',
+	}
+
+BINARY_OPERATIONS = {
 		'add',
+		'and',
 		'bit_and',
 		'bit_or',
 		'bit_xor',
 		'currentDate',
 		'inc',
-		'now',
-		'set',
+		'or',
+		'xor',
 	}
 
-UPDATE_OPS = {
+UPDATE_OPERATIONS = {
 		'addToSet': set.add,
 		'and': operator.and_,
 		'currentDate': utcnow,
@@ -152,32 +158,44 @@ class Active(Queryable):
 		
 		operations = {}
 		
-		for field, (operation, value) in self._pending.items():
+		for field, operation in self._pending.items():
+			operation, value = list(operation.items())[0]
 			operations.setdefault(operation, {})
 			operations[operation][field] = value
 		
 		return Update(operations)
 	
 	def update(self, __raw__=None, /, **kw):
-		"""Perform updates to this document using MongoDB update syntax."""
+		"""Perform updates to this document using MongoDB update syntax and parametric updates."""
 		
 		update = U(self.__class__, __raw__, **kw)
 		
 		for operation, data in update.items():
 			operation = operation.lstrip('$')
-			op = UPDATE_OPS[operation]
+			op = UPDATE_OPERATIONS[operation]
 			
 			for field, update in data.items():
+				self._pending[field] = {f'${operation}': update}
+				
 				container = self if field.count('.') == 0 else traverse(self.__data__, field.rpartition('.')[0])
 				ovalue = traverse(container, field.rpartition('.')[2], SENTINEL)
-				if operation in SIMPLE_OPS:
+				
+				if operation == 'set':
+					value = update
+				elif operation in UNARY_OPERATIONS:
+					value = op()
+				elif operation in BINARY_OPERATIONS:
 					value = op(ovalue, update)
-					container[field] = value
+				
+				container[field] = value
 	
 	def save(self, **kw):
-		if self._pending:
+		"""Persist pending changes to the storage back-end."""
+		
+		if self._pending:  # If we have tracked, pending changes, commit them.
 			return self.update_one(self.as_update_document, **kw)
 		
+		# Otherwise, we have no choice but to issue a whole-record replacement.
 		return self.replace_one(True, **kw)
 
 """
@@ -188,8 +206,12 @@ from marrow.mongo.trait import Active
 class Example(Active, Document):
 	name = Field()
 	age = Field()
+	color = Field()
 
 doc = Example(age=17)
 doc.update(set__name="Bob Dole", inc__age=1)
+doc.color = "blue"
+
+__import__('pprint').pprint(doc._pending)
 
 """
