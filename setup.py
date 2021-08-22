@@ -142,6 +142,7 @@ setup(
 						'Mapping = marrow.mongo.core.field.mapping:Mapping',
 					],
 				'marrow.mongo.trait': [  # Document traits for use as mix-ins.
+						'Active = marrow.mongo.core.trait.active:Active',
 						'Collection = marrow.mongo.core.trait.collection:Collection',
 						'Derived = marrow.mongo.core.trait.derived:Derived',
 						'Expires = marrow.mongo.core.trait.expires:Expires',
