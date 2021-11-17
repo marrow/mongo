@@ -1,4 +1,4 @@
-# Summary
+# Table of contents
 
 * [Introduction](README.md)
 * [Installation](installation.md)
@@ -17,44 +17,42 @@
 
 ## Reference
 
-* [Document](reference/document.md)
+* [Decimal](reference/field/decimal.md)
 * [Field](reference/field/README.md)
 * [Index](reference/index.md)
-* ---
-* Fields
-  * [Alias](reference/field/alias.md) `Complicated`
-  * [Array](reference/field/array.md) `Complex`
-  * [Binary](reference/field/binary.md) `Simple`
-  * [Boolean](reference/field/boolean.md) `Simple`
-  * [Date](reference/field/date.md) `Simple`
-  * [Decimal](reference/field/decimal.md) `Simple`
-  * [Double](reference/field/double.md) `Simple`
-  * [Embed](reference/field/embed.md) `Complex`
-  * [Integer](reference/field/integer.md) `Simple`
-  * [Link](reference/field/link.md) `Complicated`
-  * [Long](reference/field/long.md) `Simple`
-  * [Mapping](reference/field/mapping.md) `Complex`
-  * [Markdown](reference/field/markdown.md) `Complicated`
-  * [Number](reference/field/number.md) `Simple`
-  * [ObjectId](reference/field/objectid.md) `Simple`
-  * [Path](reference/field/path.md) `Complicated`
-  * [Period](reference/field/period.md) `Complicated`
-  * [Plugin](reference/field/plugin.md) `Complicated`
-  * [Reference](reference/field/reference.md) `Complicated`
-  * [Regex](reference/field/regex.md) `Simple`
-  * [Set](reference/field/set.md) `Simple`
-  * [String](reference/field/string.md) `Simple`
-  * [TTL](reference/field/ttl.md) `Complicated`
-  * [Timestamp](reference/field/timestamp.md) `Simple`
-* Parametric
-  * [F \(Filter\)](reference/parametric.md#filtering)
-  * [P \(Project\)](reference/parametric.md#projection)
-  * [S \(Sort\)](reference/parametric.md#sorting)
-  * [U \(Update\)](reference/parametric.md#updates)
-* Query
+* [Fields](reference/fields/README.md)
+  * [Alias](reference/field/alias.md)
+  * [Array](reference/field/array.md)
+  * [Binary](reference/field/binary.md)
+  * [Boolean](reference/field/boolean.md)
+  * [Date](reference/field/date.md)
+  * [Double](reference/field/double.md)
+  * [Embed](reference/field/embed.md)
+  * [Integer](reference/field/integer.md)
+  * [Link](reference/field/link.md)
+  * [Long](reference/field/long.md)
+  * [Mapping](reference/field/mapping.md)
+  * [Markdown](reference/field/markdown.md)
+  * [Number](reference/field/number.md)
+  * [ObjectId](reference/field/objectid.md)
+  * [Path](reference/field/path.md)
+  * [Period](reference/field/period.md)
+  * [Plugin](reference/field/plugin.md)
+  * [Reference](reference/field/reference.md)
+  * [Regex](reference/field/regex.md)
+  * [Set](reference/field/set.md)
+  * [String](reference/field/string.md)
+  * [TTL](reference/field/ttl.md)
+  * [Timestamp](reference/field/timestamp.md)
+* [Parametric](reference/parametric/README.md)
+  * [F (Filter)](reference/parametric.md)
+  * [P (Project)](reference/parametric/p-project.md)
+  * [S (Sort)](reference/parametric/s-sort.md)
+  * [U (Update)](reference/parametric/u-update.md)
+* [Query](reference/query/README.md)
   * [Ops](reference/query/ops.md)
   * [Q](reference/query/q.md)
-* Traits
+* [Traits](reference/traits/README.md)
   * [Collection](reference/trait/collection.md)
   * [Derived](reference/trait/derived.md)
   * [Expires](reference/trait/expires.md)
@@ -65,7 +63,7 @@
   * [Published](reference/trait/published.md)
   * [Stateful](reference/trait/stateful.md)
   * [Queryable](reference/trait/queryable.md)
-* Utilities
+* [Utilities](reference/utilities/README.md)
   * [Capped Collections](reference/capped.md)
   * [Geospatial](reference/geospatial.md)
   * [Logging](reference/logging.md)
@@ -75,7 +73,3 @@
 * [Colophon](colophon.md)
 * [License](license.md)
 * [History](history.md)
-
----
-
-<p style="text-align: center;"><small>♡</small></p>
