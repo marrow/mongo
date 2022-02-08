@@ -98,9 +98,12 @@ _hostname: bytes = gethostname().encode()  # Utilized by the legacy HWID generat
 HWID: Mapping[str,bytes] = {'random': urandom(5)}  # A mapping of abstract alias to hardware identification value, defaulting to random.
 HWID['modern'] = HWID['default'] = HWID['random']  # Convenient alias as an antonym of "legacy", and define the default.
 
-mac = bytes.fromhex("%x" % (getnode(), ))
-HWID['mac'] = bytes.fromhex("".join("%x" % (i ^ mac[-1]) for i in mac[:-1]))  # Identifier based on hardware MAC address.
-del mac
+try:
+	mac = bytes.fromhex("%x" % (getnode(), ))
+	HWID['mac'] = bytes.fromhex("".join("%x" % (i ^ mac[-1]) for i in mac[:-1]))  # Identifier based on hardware MAC address.
+	del mac
+except:
+	pass
 
 try:  # This uses the old (<3.7) MD5 approach, which is not FIPS-safe despite having no cryptographic requirements.
 	from hashlib import md5
