@@ -2,7 +2,7 @@
 
 from __future__ import unicode_literals
 
-from pymongo import ASCENDING, DESCENDING, GEO2D, GEOHAYSTACK, GEOSPHERE, HASHED, TEXT
+from pymongo import ASCENDING, DESCENDING, GEO2D, GEOSPHERE, HASHED, TEXT
 
 from ...package.loader import traverse
 from ...schema import Attribute
@@ -15,7 +15,6 @@ class Index(Attribute):
 			'-': DESCENDING,
 			'+': ASCENDING,
 			'@': GEO2D,
-			'%': GEOHAYSTACK,
 			'*': GEOSPHERE,
 			'#': HASHED,
 			'$': TEXT,
