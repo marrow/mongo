@@ -186,13 +186,8 @@ class Field(Attribute):
 	
 	# Other Python Protocols
 	
-	def __unicode__(self):
+	def __str__(self):
 		return self.__name__
-	
-	if py3:
-		__str__ = __unicode__
-		del __unicode__
-
 
 
 
