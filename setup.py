@@ -70,10 +70,9 @@ setup(
 			"Topic :: Utilities"
 		],
 	
-	packages = find_packages(exclude=['test', 'example', 'benchmark', 'htmlcov']),
+	packages = ('marrow.mongo', 'web.session.mongo'),
 	include_package_data = True,
 	package_data = {'': ['README.rst', 'LICENSE.txt']},
-	namespace_packages = ['marrow', 'web', 'web.session'],
 	zip_safe = False,
 	
 	# ## Dependency Declaration
