@@ -1,12 +1,9 @@
-# encoding: utf-8
 # pylint:disable=too-many-arguments
 
 """A comparison proxy and Ops factory to help build nested inquiries.
 
 For internal construction only.
 """
-
-from __future__ import unicode_literals
 
 from copy import copy
 from collections import Iterable
@@ -136,7 +133,7 @@ class Q(object):
 			field.__name__ = self._name + '.' + str(name)
 		
 		else:  # Embedded documents.
-			field = Embed(field, name=self._name + '.' + unicode(name))
+			field = Embed(field, name=self._name + '.' + str(name))
 		
 		return self.__class__(self._document, field)
 	

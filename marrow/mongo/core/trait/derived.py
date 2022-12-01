@@ -1,5 +1,3 @@
-# encoding: utf-8
-
 from ... import Document, Index
 from ...field import PluginReference
 

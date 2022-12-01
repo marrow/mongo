@@ -1,4 +1,3 @@
-# encoding: utf-8
 # pragma: no cover
 
 """Experimental Python standard logging support features.
@@ -37,8 +36,6 @@ Example logging "dictconfig":
 		},
 }
 """
-
-from __future__ import unicode_literals
 
 import datetime
 import logging

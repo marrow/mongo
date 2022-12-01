@@ -1,8 +1,5 @@
-# encoding: utf-8
-
 """Parameterized support akin to Django's ORM or MongoEngine."""
 
-from __future__ import unicode_literals
 from collections import OrderedDict as odict
 
 from ...package.loader import traverse

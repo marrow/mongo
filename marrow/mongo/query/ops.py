@@ -1,11 +1,7 @@
-# encoding: utf-8
-
 """MongoDB filter, projection, and update operation helpers.
 
 These encapsulate the functionality of creating combinable mappings 
 """
-
-from __future__ import unicode_literals
 
 from collections import Mapping, MutableMapping, OrderedDict as odict
 from copy import deepcopy

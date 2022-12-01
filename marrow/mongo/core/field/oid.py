@@ -1,7 +1,3 @@
-# encoding: utf-8
-
-from __future__ import unicode_literals
-
 from bson import ObjectId as OID
 from collections import MutableMapping
 from datetime import datetime, timedelta

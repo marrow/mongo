@@ -1,6 +1,4 @@
-# encoding: utf-8
-
-from __future__ import unicode_literals
+from pathlib import PurePosixPath as _Path
 
 from .string import String
 

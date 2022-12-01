@@ -1,5 +1,3 @@
-# encoding: utf-8
-
 from ... import Document, Index, utcnow
 from ...field import TTL
 
