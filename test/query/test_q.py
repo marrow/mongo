@@ -3,6 +3,7 @@
 from __future__ import unicode_literals
 
 import operator
+from collections import OrderedDict as odict
 from datetime import datetime
 
 import pytest
@@ -10,7 +11,6 @@ from bson import ObjectId as oid
 
 from marrow.mongo import Document, Field, Filter, Q
 from marrow.mongo.field import Array, Embed, Number, ObjectId, String
-from marrow.schema.compat import odict, py3, str, unicode
 
 
 class Sample(Document):
@@ -74,10 +74,10 @@ class TestQueryable(object):  # TODO: Properly use pytest fixtures for this...
 		assert repr(mock_queryable) == "Q(Sample, 'field_name', String('field_name'))"
 	
 	def test_s(self):
-		assert unicode(Sample.array.S) == 'field_name.$'
+		assert str(Sample.array.S) == 'field_name.$'
 	
 	def test_embedded(self):
-		assert unicode(Sample.embed.name) == 'embed.name'
+		assert str(Sample.embed.name) == 'embed.name'
 	
 	def do_operator(self, operator, query, value, result, mock_queryable=mock_queryable):
 		op = operator(mock_queryable, value)
@@ -123,7 +123,7 @@ class TestQueryable(object):  # TODO: Properly use pytest fixtures for this...
 		assert Sample.generic.of_type().as_query == {}
 	
 	def test_operator_invert(self):
-		assert unicode(Sample.generic) == ~Sample.generic == 'generic'
+		assert str(Sample.generic) == ~Sample.generic == 'generic'
 	
 	def test_operator_re(self):
 		result = Sample.field.re(r'^', 'foo', r'.')

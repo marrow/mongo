@@ -6,7 +6,6 @@ from uri import URI
 
 from .string import String
 from ....schema import Attribute
-from ....schema.compat import unicode
 
 
 class Link(String):
@@ -34,13 +33,13 @@ class Link(String):
 	def to_foreign(self, obj, name, value):  # pylint:disable=unused-argument
 		value = self.URI(value)
 		
-		if self.protocols and unicode(value.scheme) not in self.protocols:
+		if self.protocols and str(value.scheme) not in self.protocols:
 			raise ValueError("Link utilizes invaid scheme: " + repr(value.scheme))
 		
 		if self.absolute and value.relative:
 			raise ValueError("Link must be absolute.")
 		
-		return unicode(value)
+		return str(value)
 	
 	def to_native(self, obj, name, value):  # pylint:disable=unused-argument
 		return self.URI(value)

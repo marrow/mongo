@@ -6,7 +6,6 @@ import pytest
 
 from common import FieldExam
 from marrow.mongo.field import Link
-from marrow.schema.compat import str, unicode
 
 
 class TestLinkField(FieldExam):

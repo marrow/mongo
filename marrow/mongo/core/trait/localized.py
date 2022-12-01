@@ -1,9 +1,9 @@
 # encoding: utf-8
+from collections import OrderedDict as odict
 
 from ... import Document
 from ...field import String, Mapping, Embed, Alias
 from ....package.loader import traverse
-from ....schema.compat import odict
 
 
 LANGUAGES = {'en', 'fr', 'it', 'de', 'es', 'pt', 'ru'}  # EFIGSPR, ISO 639-1

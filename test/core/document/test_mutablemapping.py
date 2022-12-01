@@ -1,10 +1,10 @@
 # encoding: utf-8
+from collections import OrderedDict as odict
 
 import pytest
 
 from marrow.mongo import Document, Field
 from marrow.mongo.util import SENTINEL
-from marrow.schema.compat import odict
 
 
 class Person(Document):

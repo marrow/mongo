@@ -14,9 +14,9 @@ from marrow.mongo.core.trait.lockable import _identifier as us
 from marrow.mongo.core.trait.lockable import TimeoutError
 from marrow.mongo.trait import Lockable
 from marrow.mongo.util import utcnow
-from marrow.schema.compat import pypy
 
-skip = int(os.environ.get('TEST_SKIP_CAPPED', 0)) or pypy
+
+skip = int(os.environ.get('TEST_SKIP_CAPPED', 0)) or hasattr(__import__('sys'), 'pypy_version_info')
 skip_slow = pytest.mark.skipif(skip, reason="Slow tests skipped.")
 
 

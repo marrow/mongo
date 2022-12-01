@@ -9,7 +9,6 @@ from ....package.loader import traverse, load
 from ....schema import Attribute
 from ....schema.transform import BaseTransform
 from ....schema.validate import Validator
-from ....schema.compat import str, unicode, py3
 from ...query import Q
 from ...util import adjust_attribute_sequence, SENTINEL
 
@@ -224,12 +223,12 @@ class _HasKind(Field):
 	def _kind(self, document=None):
 		kind = self.kind
 		
-		if isinstance(kind, (str, unicode)):
+		if isinstance(kind, str):
 			if kind.startswith('.'):
 				# This allows the reference to be dynamic.
 				kind = traverse(document or self.__document__, kind[1:])
 				
-				if not isinstance(kind, (str, unicode)):
+				if not isinstance(kind, str):
 					return kind
 			else:
 				kind = load(kind, 'marrow.mongo.document')

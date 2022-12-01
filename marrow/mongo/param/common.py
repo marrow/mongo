@@ -3,9 +3,9 @@
 """Parameterized support akin to Django's ORM or MongoEngine."""
 
 from __future__ import unicode_literals
+from collections import OrderedDict as odict
 
 from ...package.loader import traverse
-from ...schema.compat import odict
 
 
 def _deferred_method(name, _named=None, **kw):
