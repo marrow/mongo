@@ -70,7 +70,7 @@ setup(
 			"Topic :: Utilities"
 		],
 	
-	packages = ('marrow.mongo', 'web.session.mongo'),
+	packages = ('marrow.mongo', 'web.session'),
 	include_package_data = True,
 	package_data = {'': ['README.rst', 'LICENSE.txt']},
 	zip_safe = False,
