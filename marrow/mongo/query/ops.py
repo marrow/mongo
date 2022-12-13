@@ -3,7 +3,8 @@
 These encapsulate the functionality of creating combinable mappings 
 """
 
-from collections import Mapping, MutableMapping, OrderedDict as odict
+from typing import Mapping, MutableMapping
+from collections import OrderedDict as odict
 from copy import deepcopy
 
 from ..util import SENTINEL

@@ -1,7 +1,7 @@
 """Parameterized support akin to Django's ORM or MongoEngine."""
 
-from collections import Mapping
 from operator import __neg__
+from typing import Mapping
 
 from ..query import Update
 from .common import _bit, _current_date, _process_arguments

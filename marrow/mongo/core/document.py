@@ -1,4 +1,5 @@
-from collections import MutableMapping, OrderedDict as odict
+from collections import OrderedDict as odict
+from typing import MutableMapping
 
 from bson import ObjectId
 from bson.json_util import dumps, loads

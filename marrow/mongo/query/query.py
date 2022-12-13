@@ -6,7 +6,7 @@ For internal construction only.
 """
 
 from copy import copy
-from collections import Iterable
+from typing import Iterable
 from functools import reduce
 from operator import __and__, __or__, __xor__
 
