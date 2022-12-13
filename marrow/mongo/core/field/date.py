@@ -5,10 +5,10 @@ Commentary on high-level management of timezone casting:
 	https://groups.google.com/forum/#!topic/mongodb-user/GOMjTJON4cg
 """
 
-from datetime import datetime, timedelta, tzinfo
 from bson import ObjectId as OID
-from collections import MutableMapping
 from datetime import datetime, timedelta
+from datetime import datetime, timedelta, tzinfo
+from typing import MutableMapping
 
 from .base import Field
 from ...util import utc, utcnow

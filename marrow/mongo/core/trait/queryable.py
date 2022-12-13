@@ -1,6 +1,7 @@
-from collections import Mapping, OrderedDict as odict
+from collections import OrderedDict as odict
 from functools import reduce
 from operator import and_
+from typing import Mapping
 
 from pymongo.cursor import CursorType
 
