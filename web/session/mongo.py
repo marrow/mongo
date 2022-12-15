@@ -79,7 +79,7 @@ class MongoSession(object):
 		if not result:
 			result = {'_id': oid(str(session._id))}  # pylint:disable=protected-access
 		
-		result = session[self.name] = D.from_mongo(result, project.keys())
+		result = session[self.name] = D.from_mongo(result)  # TODO: Pass the projection through to conversion.
 		
 		return result
 	
