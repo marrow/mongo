@@ -1,7 +1,3 @@
-# encoding: utf-8
-
-from weakref import WeakValueDictionary
-
 from ... import Document, Index
 from ...field import PluginReference
 

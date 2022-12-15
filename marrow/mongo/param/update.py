@@ -1,13 +1,8 @@
-# encoding: utf-8
-
 """Parameterized support akin to Django's ORM or MongoEngine."""
 
-from __future__ import unicode_literals
-
-from collections import Mapping
 from operator import __neg__
+from typing import Mapping
 
-from ...schema.compat import unicode
 from ..query import Update
 from .common import _bit, _current_date, _process_arguments
 
@@ -56,7 +51,7 @@ UPDATE_ALIASES = {
 		'push_position': ('push', _push_position),  # The longer form: push at a specific index.
 		'push_slice': ('push', _push_slice),  # The longer form: limit number of elements.
 		'push_sort': ('push', _push_sort),  # The longer form: order the results after modification.
-		'rename': ('rename', unicode),  # Typecast to unicode.
+		'rename': ('rename', str),  # Typecast to a Unicode string.
 		'set_on_insert': 'setOnInsert',  # Underscore to camel case conversion.
 		'soi': 'setOnInsert',  # A shortcut for the longer form.
 		'sub': ('inc', __neg__),  # "Subtract"; invert the value and use $inc.

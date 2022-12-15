@@ -1,7 +1,3 @@
-# encoding: utf-8
-
-from __future__ import unicode_literals
-
 from bson.int64 import Int64
 
 from .number import Number

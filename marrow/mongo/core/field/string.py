@@ -1,10 +1,5 @@
-# encoding: utf-8
-
-from __future__ import unicode_literals
-
 from .base import Field
 from ....schema import Attribute
-from ....schema.compat import unicode
 
 
 class String(Field):
@@ -15,7 +10,7 @@ class String(Field):
 	case = Attribute(default=None)
 	
 	def to_foreign(self, obj, name, value):  # pylint:disable=unused-argument
-		value = unicode(value)
+		value = str(value)
 		
 		if self.strip is True:
 			value = value.strip()

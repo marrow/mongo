@@ -1,8 +1,4 @@
-# encoding: utf-8
-
-from __future__ import unicode_literals
-
-from collections import Mapping
+from collections import Mapping, OrderedDict as odict
 
 from bson import ObjectId as OID
 from bson import DBRef
@@ -12,7 +8,6 @@ from .. import Document, Field
 from ....package.canonical import name as canon
 from ....package.loader import traverse
 from ....schema import Attribute
-from ....schema.compat import odict, str, unicode
 
 from .base import _HasKind, Field
 
@@ -53,7 +48,7 @@ class Reference(_HasKind, Field):
 		elif isinstance(value, OID):
 			inst['_id'] = value
 		
-		elif isinstance(value, (str, unicode)) and len(value) == 24:
+		elif isinstance(value, (str, bytes)) and len(value) == 24:
 			try:
 				inst['_id'] = OID(value)
 			except InvalidId:
@@ -98,7 +93,7 @@ class Reference(_HasKind, Field):
 			if identifier is None:
 				raise ValueError("Can only store a reference to a saved Document instance with an `_id` stored.")
 		
-		elif isinstance(value, (str, unicode)) and len(value) == 24:
+		elif isinstance(value, (str, bytes)) and len(value) == 24:
 			try:
 				identifier = OID(value)
 			except InvalidId:

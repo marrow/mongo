@@ -1,12 +1,7 @@
-# encoding: utf-8
-
-from __future__ import unicode_literals
-
-from pymongo import ASCENDING, DESCENDING, GEO2D, GEOHAYSTACK, GEOSPHERE, HASHED, TEXT
+from pymongo import ASCENDING, DESCENDING, GEO2D, GEOSPHERE, HASHED, TEXT
 
 from ...package.loader import traverse
 from ...schema import Attribute
-from ...schema.compat import unicode
 
 
 class Index(Attribute):
@@ -15,7 +10,6 @@ class Index(Attribute):
 			'-': DESCENDING,
 			'+': ASCENDING,
 			'@': GEO2D,
-			'%': GEOHAYSTACK,
 			'*': GEOSPHERE,
 			'#': HASHED,
 			'$': TEXT,
@@ -41,7 +35,7 @@ class Index(Attribute):
 		"""Process the fact that we've been bound to a document; transform field references to DB field names."""
 		
 		self.fields = [(  # Transform field names.
-				unicode(traverse(document, i[0], i[0])),  # Get the MongoDB field name.
+				str(traverse(document, i[0], i[0])),  # Get the MongoDB field name.
 				i[1]  # Preserve the field order.
 			) for i in self.fields]
 	
