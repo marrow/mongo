@@ -1,9 +1,12 @@
 from collections import OrderedDict as odict
 from datetime import datetime, timedelta
 from operator import attrgetter
+from pkg_resources import iter_entry_points, DistributionNotFound
 
-from marrow.schema.meta import ElementMeta
+from ...schema.compat import py3
+from ...schema.meta import ElementMeta
 from ...package.loader import load
+
 
 # Conditional dependencies.
 
@@ -49,17 +52,41 @@ def adjust_attribute_sequence(*fields):
 
 
 class Registry(object):
-	__path__ = []
-	
 	def __init__(self, namespace):
 		self._namespace = namespace
+		self.__path__ = []
+	
+	@property
+	def __all__(self):
+		names = []
+		
+		for point in iter_entry_points(self._namespace):
+			try:
+				point.require()
+			except DistributionNotFound:
+				continue
+			else:
+				names.append(point.name)
+		
+		return names
 	
 	def __getattr__(self, name):
+		if name[0] == '_':
+			raise AttributeError()
+		
 		self.__dict__[name] = load(name, self._namespace)
 		return self.__dict__[name]
 	
 	def __getitem__(self, name):
 		return load(name, self._namespace)
+	
+	if py3:
+		def __dir__(self):
+			return super(Registry, self).__dir__() + self.__all__
+	
+	else:
+		def __dir__(self):
+			return dir(self.__class__) + ['_namespace', '__path__'] + self.__all__
 
 
 def utcnow():

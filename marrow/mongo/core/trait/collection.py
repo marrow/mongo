@@ -222,7 +222,7 @@ class Collection(Identified):
 		return {field: True for field in projected}
 	
 	def insert_one(self, validate=True):
-		"""Insert this document.
+		"""Insert this document, passing any additional arguments to PyMongo.
 		
 		The `validate` argument translates to the inverse of the `bypass_document_validation` PyMongo option.
 		
