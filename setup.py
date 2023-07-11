@@ -81,7 +81,7 @@ setup(
 		] if {'pytest', 'test', 'ptr'}.intersection(sys.argv) else [],
 	
 	install_requires = [
-			'uri>=2.0.0,<3.0.0',  # Generic URI datastructure.
+			'uri',  # Generic URI datastructure.
 			'marrow.schema>=2.0.0,<3.0.0',  # Declarative schema support.
 			'marrow.package>=2.0.0,<3.0.0',  # Plugin discovery and loading.
 			'pymongo>=3.2',  # We require modern API.
