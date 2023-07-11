@@ -9,6 +9,9 @@ from marrow.mongo import Index, utcnow
 from marrow.mongo.field import TTL, ObjectId
 from marrow.mongo.trait import Queryable
 
+from web.session.util import SignedSessionIdentifier
+
+
 log = __import__('logging').getLogger(__name__)
 
 
@@ -75,24 +78,32 @@ class MongoSession(object):
 	def __get__(self, session, type=None):
 		"""Retrieve the session upon first access and cache the result."""
 		
-		if session is None:
-			return self
+		if session is None: return self  # Class attribute access "early exit".
 		
 		D = self._Document
-		
-		result = D.find_one(session._id)  # pylint:disable=protected-access
+		identifier = oid(str(session._id))
+		result = D.find_one(identifier)
 		
 		if not result:
-			result = D(str(session._id))  # pylint:disable=protected-access
-		
-		result = session[self.name] = D.from_mongo(result)  # TODO: Pass the projection through to conversion.
+			session.__dict__['_new'] = True
+			result = session[self.name] = D()
+			
+			identifier = SignedSessionIdentifier.convert(str(result.id),
+					secret=session._ext.secret, expires=session._ext.expires)
+			
+			session.__dict__['_id'] = identifier
+		else:
+			result = session[self.name] = D.from_mongo(result)  # TODO: Pass the projection through to conversion.
 		
 		return result
 	
 	def persist(self, context):
-		"""Update or insert the session document into the configured collection"""
+		"""Update or insert the session document into the configured collection."""
 		
 		D = self._Document
 		document = context.session[self.name]
 		
-		D.get_collection().replace_one(D.id == document.id, document, True)
+		if context.session._new:
+			D.get_collection().insert_one(document)
+		else:
+			D.get_collection().replace_one(D.id == document.id, document, True)
