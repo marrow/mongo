@@ -2,6 +2,7 @@ from collections import OrderedDict as odict
 
 from ... import Document
 from ...field import String, Mapping, Embed, Alias
+from ....package import name
 from ....package.loader import traverse
 
 
@@ -53,6 +54,9 @@ class Localized(Document):
 		__pk__ = 'language'
 		
 		language = String(choices=LANGUAGES, default='en')
+		
+		def __repr__(self):
+			return f"{name(self.__class__)}('{self.language}': {', '.join(set(self.__fields__) - {'language'})})"
 	
 	locale = Mapping('.Locale', key='language', default=lambda: [], assign=True, repr=False, positional=False)
 	
