@@ -1,4 +1,5 @@
-from collections import OrderedDict, Mapping as _Mapping
+from collections import OrderedDict
+from collections.abc import Mapping as _Mapping
 
 from ....schema import Attribute
 from .array import Array
