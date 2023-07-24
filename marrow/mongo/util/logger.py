@@ -129,10 +129,11 @@ class JSONFormatter(logging.Formatter):
 			json = None
 		
 		if json:
+			json = json.strip()
 			if self.highlight:
-				return '\n'.join([formatted, _highlight(json, JsonLexer(tabsize=4), Terminal256Formatter(style='monokai')).strip()])
+				json = _highlight(json, JsonLexer(tabsize=4), Terminal256Formatter(style='monokai'))
 			
-			return '\n'.join([formatted, json]).strip()
+			return '\n'.join([formatted, "\n".join(json.split("\n")[1:-2])]).strip()
 		
 		return formatted
 
