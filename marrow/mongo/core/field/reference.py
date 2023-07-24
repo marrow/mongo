@@ -1,4 +1,5 @@
-from collections import Mapping, OrderedDict as odict
+from collections import OrderedDict as odict
+from collections.abc import Mapping
 
 from bson import ObjectId as OID
 from bson import DBRef
