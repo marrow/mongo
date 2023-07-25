@@ -3,8 +3,7 @@
 from __future__ import unicode_literals
 
 import pytest
-from bson import ObjectId as oid
-from bson import DBRef
+from bson import DBRef, ObjectId
 
 from common import FieldExam
 from marrow.mongo import Document
@@ -28,7 +27,7 @@ class TestConcreteReferenceField(FieldExam):
 	
 	def test_foreign_cast_document(self, Sample):
 		val = Concrete()
-		val['_id'] = oid('58329b3a927cc647e94153c9')
+		val['_id'] = ObjectId('58329b3a927cc647e94153c9')
 		inst = Sample(val)
 		assert isinstance(inst.field, DBRef)
 	

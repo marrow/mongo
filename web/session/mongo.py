@@ -5,17 +5,24 @@
 
 from bson import ObjectId as oid
 
-from marrow.mongo import Document, Index
+from marrow.mongo import Index, utcnow
 from marrow.mongo.field import TTL, ObjectId
+from marrow.mongo.trait import Queryable
+
+from web.session.util import SignedSessionIdentifier
+
 
 log = __import__('logging').getLogger(__name__)
 
 
-class MongoSessionStorage(Document):
-	id = ObjectId('_id', required=True, assign=False, default=None)
+class MongoSessionStorage(Queryable):
 	expires = TTL('expires', default=None)  # Override this field to specify an expiry time.
 	
 	_expires = Index('expires', expire=0)
+	
+	@property
+	def _expired(self):
+		return self.expires > utcnow()
 	
 	def __getattr__(self, name):
 		try:
@@ -38,57 +45,65 @@ class MongoSession(object):
 	def __init__(self, Document=MongoSessionStorage, collection=None, database=None):
 		""""""
 		
+		self._collection = collection or getattr(Document, '__collection__', None) or 'sessions'
+		self._database = database or getattr(Document, '__database__', None) or 'default'
+		
+		Document.__collection__ = self._collection
 		self._Document = Document
-		self._collection = collection or getattr(Document, '__collection__', 'sessions')
-		self._database = database or getattr(Document, '__database__', 'default')
+	
+	def start(self, context):
+		db = context.db[self._database]
+		self._Document.bind(db)
 	
 	def is_valid(self, context, sid):
-		""""""
+		"""Identify if the given session ID is currently valid.
 		
-		D = self._Document
-		db = context.db[self._database]
-		docs = db[self._collection]
-		result = docs.find(D.id == sid).count()
+		Return True if valid, False if explicitly invalid, None if unknown.
+		"""
 		
-		return bool(result)
+		record = self._Document.find_one(sid, project=('expires', ))
+		
+		if not record:
+			return
+		
+		return not record._expired
 	
 	def invalidate(self, context, sid):
-		""""""
+		"""Immediately expire a session from the backing store."""
 		
-		D = self._Document
-		db = context.db[self._database]
-		docs = db[self._collection]
-		result = docs.delete_one(D.id == sid)
+		result = self._Document.get_collection().delete_one({'_id': sid})
 		
 		return result.deleted_count == 1
 	
 	def __get__(self, session, type=None):
 		"""Retrieve the session upon first access and cache the result."""
 		
-		if session is None:
-			return self
+		if session is None: return self  # Class attribute access "early exit".
 		
-		ctx = session._ctx  # pylint:disable=protected-access
 		D = self._Document
-		db = ctx.db[self._database]
-		docs = db[self._collection]
-		project = D.__projection__
-		
-		result = docs.find_one(D.id == session._id, project)  # pylint:disable=protected-access
+		identifier = oid(str(session._id))
+		result = D.find_one(identifier)
 		
 		if not result:
-			result = {'_id': oid(str(session._id))}  # pylint:disable=protected-access
-		
-		result = session[self.name] = D.from_mongo(result, project.keys())
+			session.__dict__['_new'] = True
+			result = session[self.name] = D()
+			
+			identifier = SignedSessionIdentifier.convert(str(result.id),
+					secret=session._ext.secret, expires=session._ext.expires)
+			
+			session.__dict__['_id'] = identifier
+		else:
+			result = session[self.name] = D.from_mongo(result)  # TODO: Pass the projection through to conversion.
 		
 		return result
 	
 	def persist(self, context):
-		"""Update or insert the session document into the configured collection"""
+		"""Update or insert the session document into the configured collection."""
 		
 		D = self._Document
-		db = context.db[self._database]
-		docs = db[self._collection]
 		document = context.session[self.name]
 		
-		docs.replace_one(D.id == document.id, document, True)
+		if context.session._new:
+			D.get_collection().insert_one(document)
+		else:
+			D.get_collection().replace_one(D.id == document.id, document, True)

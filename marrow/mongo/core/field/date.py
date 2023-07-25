@@ -1,5 +1,3 @@
-# encoding: utf-8
-
 """Marrow Mongo Date field specialization.
 
 Commentary on high-level management of timezone casting:
@@ -7,11 +5,10 @@ Commentary on high-level management of timezone casting:
 	https://groups.google.com/forum/#!topic/mongodb-user/GOMjTJON4cg
 """
 
-from __future__ import unicode_literals
-
-from datetime import datetime, timedelta, tzinfo
 from bson import ObjectId as OID
 from datetime import datetime, timedelta
+from datetime import datetime, timedelta, tzinfo
+from typing import MutableMapping
 
 from typing import MutableMapping
 

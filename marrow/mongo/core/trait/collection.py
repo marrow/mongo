@@ -1,7 +1,3 @@
-# encoding: utf-8
-
-from __future__ import unicode_literals
-
 from bson.binary import STANDARD
 from bson.codec_options import CodecOptions
 from bson.tz_util import utc
@@ -226,7 +222,7 @@ class Collection(Identified):
 		return {field: True for field in projected}
 	
 	def insert_one(self, validate=True):
-		"""Insert this document.
+		"""Insert this document, passing any additional arguments to PyMongo.
 		
 		The `validate` argument translates to the inverse of the `bypass_document_validation` PyMongo option.
 		

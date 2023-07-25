@@ -1,7 +1,4 @@
-# encoding: utf-8
-
-from __future__ import unicode_literals
-
+from collections import OrderedDict as odict
 from typing import MutableMapping
 
 from bson import ObjectId
@@ -10,7 +7,6 @@ from bson.json_util import dumps, loads
 from ...package.loader import load
 from ...package.canonical import name as named
 from ...schema import Attributes, Container
-from ...schema.compat import str, unicode, odict
 from ..util import SENTINEL
 from .field import Field
 from .field.alias import Alias
@@ -137,8 +133,8 @@ class Document(Container):
 			pk = getattr(self, self.__pk__, None)
 			
 			if isinstance(pk, ObjectId):
-				pk = unicode(pk)
-			elif isinstance(pk, (str, unicode)):
+				pk = str(pk)
+			elif isinstance(pk, str):
 				pass
 			else:
 				pk = repr(pk)

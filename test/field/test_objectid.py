@@ -1,7 +1,3 @@
-# encoding: utf-8
-
-from __future__ import unicode_literals
-
 from datetime import timedelta
 
 from bson import ObjectId as oid
@@ -10,7 +6,6 @@ from common import FieldExam
 from marrow.mongo import Document
 from marrow.mongo.field import ObjectId
 from marrow.mongo.util import utcnow
-from marrow.schema.compat import unicode
 
 
 class TestObjectIdField(FieldExam):
@@ -26,7 +21,7 @@ class TestObjectIdField(FieldExam):
 		inst = Sample('5832223f927cc6c1a10609f7')
 		
 		assert isinstance(inst.__data__['field'], oid)
-		assert unicode(inst.field) == '5832223f927cc6c1a10609f7'
+		assert str(inst.field) == '5832223f927cc6c1a10609f7'
 	
 	def test_cast_oid(self, Sample):
 		v = oid()

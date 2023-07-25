@@ -1,6 +1,4 @@
-# encoding: utf-8
-
-from __future__ import unicode_literals
+from collections import OrderedDict as odict
 
 import pytest
 from bson import ObjectId as oid
@@ -9,7 +7,6 @@ from common import FieldExam
 from marrow.mongo import Document
 from marrow.mongo.field import Reference, String
 from marrow.mongo.trait import Derived
-from marrow.schema.compat import odict
 
 
 class Concrete(Derived, Document):

@@ -1,8 +1,4 @@
-# encoding: utf-8
-
 """Parameterized support akin to Django's ORM or MongoEngine."""
-
-from __future__ import unicode_literals
 
 from pymongo import ASCENDING, DESCENDING
 

@@ -1,16 +1,12 @@
-# encoding: utf-8
-
 """MongoDB filter, projection, and update operation helpers.
 
 These encapsulate the functionality of creating combinable mappings 
 """
 
-from __future__ import unicode_literals
-
-from collections import Mapping, MutableMapping
+from typing import Mapping, MutableMapping
+from collections import OrderedDict as odict
 from copy import deepcopy
 
-from ...schema.compat import odict, py3
 from ..util import SENTINEL
 
 
@@ -52,25 +48,14 @@ class Ops(MutableMapping):
 	def __len__(self):
 		return len(self.operations)
 	
-	if py3:
-		def keys(self):
-			return self.operations.keys()
-		
-		def items(self):
-			return self.operations.items()
-		
-		def values(self):
-			return self.operations.values()
+	def keys(self):
+		return self.operations.keys()
 	
-	else:
-		def keys(self):
-			return self.operations.iterkeys()
-		
-		def items(self):
-			return self.operations.iteritems()
-		
-		def values(self):
-			return self.operations.itervalues()
+	def items(self):
+		return self.operations.items()
+	
+	def values(self):
+		return self.operations.values()
 	
 	def __contains__(self, key):
 		return key in self.operations

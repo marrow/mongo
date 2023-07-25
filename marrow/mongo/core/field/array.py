@@ -1,8 +1,4 @@
-# encoding: utf-8
-
-from __future__ import unicode_literals
-
-from collections import Iterable, Mapping
+from typing import Iterable, Mapping
 
 from ... import Field
 from .base import _HasKind, _CastingKind

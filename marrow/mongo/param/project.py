@@ -1,11 +1,6 @@
-# encoding: utf-8
-
 """Parameterized support akin to Django's ORM or MongoEngine."""
 
-from __future__ import unicode_literals
-
 from ...package.loader import traverse
-from ...schema.compat import unicode
 
 
 def P(Document, *fields, **kw):
@@ -32,4 +27,4 @@ def P(Document, *fields, **kw):
 	if not projected:
 		projected = {'_id'}
 	
-	return {unicode(traverse(Document, name, name)): True for name in projected}
+	return {str(traverse(Document, name, name)): True for name in projected}

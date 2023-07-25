@@ -1,7 +1,3 @@
-# encoding: utf-8
-
-from __future__ import unicode_literals
-
 import os
 from functools import partial
 from random import choice
@@ -13,9 +9,9 @@ from pytest import fixture
 
 from marrow.mongo.trait import Collection
 from marrow.mongo.util.capped import _patch, tail
-from marrow.schema.compat import pypy
 
-skip = int(os.environ.get('TEST_SKIP_CAPPED', 0)) or pypy
+
+skip = int(os.environ.get('TEST_SKIP_CAPPED', 0)) or hasattr(__import__('sys'), 'pypy_version_info')
 
 pytestmark = pytest.mark.skipif(skip, reason="Slow tests skipped.")
 

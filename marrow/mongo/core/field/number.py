@@ -1,11 +1,6 @@
-# encoding: utf-8
-
-from __future__ import unicode_literals
-
 from numbers import Number as NumberABC
 
 from .base import Field
-from ....schema.compat import unicode
 
 
 class Number(Field):
@@ -16,7 +11,7 @@ class Number(Field):
 		if isinstance(value, NumberABC):
 			return value
 		
-		if isinstance(value, unicode):
+		if isinstance(value, str):
 			if value.isnumeric():
 				return int(value)
 			else:

@@ -30,7 +30,6 @@ tests_require = [
 		'pytest',  # test collector and extensible runner
 		'pytest-cov',  # coverage reporting
 		'pytest-flakes',  # syntax validation
-		'pytest-catchlog',  # log capture
 		'pytest-isort',  # import ordering
 		'misaka', 'pygments',  # Markdown field support
 		'futures; python_version < "3.4"',  # futures support
@@ -70,10 +69,9 @@ setup(
 			"Topic :: Utilities"
 		],
 	
-	packages = find_packages(exclude=['test', 'example', 'benchmark', 'htmlcov']),
+	packages = ('marrow.mongo', 'web.session'),
 	include_package_data = True,
 	package_data = {'': ['README.rst', 'LICENSE.txt']},
-	namespace_packages = ['marrow', 'web', 'web.session'],
 	zip_safe = False,
 	
 	# ## Dependency Declaration
@@ -83,9 +81,9 @@ setup(
 		] if {'pytest', 'test', 'ptr'}.intersection(sys.argv) else [],
 	
 	install_requires = [
-			'uri>=2.0.0,<3.0.0',  # Generic URI datastructure.
-			'marrow.schema>=1.2.0,<2.0.0',  # Declarative schema support.
-			'marrow.package>=1.1.0,<2.0.0',  # Plugin discovery and loading.
+			'uri',  # Generic URI datastructure.
+			'marrow.schema>=2.0.0,<3.0.0',  # Declarative schema support.
+			'marrow.package>=2.0.0,<3.0.0',  # Plugin discovery and loading.
 			'pymongo>=3.2',  # We require modern API.
 			'pathlib2; python_version < "3.4"',  # Path manipulation utility.
 		],

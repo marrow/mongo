@@ -1,14 +1,9 @@
-# encoding: utf-8
-
-from __future__ import unicode_literals
-
 from bson import ObjectId as OID
 from datetime import datetime, timedelta
 from typing import MutableMapping
 
 from .base import Field
 from ....schema import Attribute
-from ....schema.compat import unicode
 
 
 class ObjectId(Field):
@@ -39,4 +34,4 @@ class ObjectId(Field):
 		if isinstance(value, MutableMapping) and '_id' in value:
 			return OID(value['_id'])
 		
-		return OID(unicode(value))
+		return OID(str(value))

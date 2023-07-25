@@ -1,8 +1,5 @@
-# encoding: utf-8
-
-from __future__ import unicode_literals
-
-from collections import OrderedDict, Mapping as _Mapping
+from collections import OrderedDict
+from collections.abc import Mapping as _Mapping
 
 from ....schema import Attribute
 from .array import Array
