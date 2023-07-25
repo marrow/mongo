@@ -2,7 +2,7 @@
 
 from __future__ import unicode_literals
 
-from collections import MutableMapping, OrderedDict
+from typing import MutableMapping
 
 from common import FieldExam
 from marrow.mongo import Document

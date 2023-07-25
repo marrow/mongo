@@ -2,7 +2,7 @@
 
 from __future__ import unicode_literals
 
-from collections import MutableMapping
+from typing import MutableMapping
 
 from bson import ObjectId
 from bson.json_util import dumps, loads

@@ -3,8 +3,8 @@
 from __future__ import unicode_literals
 
 from bson import ObjectId as OID
-from collections import MutableMapping
 from datetime import datetime, timedelta
+from typing import MutableMapping
 
 from .base import Field
 from ....schema import Attribute
