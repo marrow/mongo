@@ -36,7 +36,7 @@ class Expires(Document):
 		
 		value = super(Expires, cls).from_mongo(data, **kw)
 		
-		if not expired and value.is_expired:
+		if value and value.is_expired and not expired:
 			return None
 		
 		return value
