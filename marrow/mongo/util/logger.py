@@ -140,8 +140,7 @@ class JSONFormatter(logging.Formatter):
 
 class MongoFormatter(logging.Formatter):
 	def format(self, record):
-		time = datetime.datetime.fromtimestamp(record.created)
-		time = LOCAL_TZ.localize(time).astimezone(utc)
+		time = datetime.datetime.fromtimestamp(record.created).replace(tzinfo=LOCAL_TZ).astimezone(utc)
 		
 		document = dict(
 				service = record.name,
