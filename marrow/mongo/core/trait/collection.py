@@ -66,7 +66,7 @@ class Collection(Identified):
 	def bind(cls, target):
 		"""Bind a copy of the collection to the class, modified per our class' settings.
 		
-		The given target (and eventual collection returned) must be safe within the context the document sublcass
+		The given target (and eventual collection returned) must be safe within the context the document subclass
 		being bound is constructed within. E.g. at the module scope this binding must be thread-safe.
 		"""
 		

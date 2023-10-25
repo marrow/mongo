@@ -100,7 +100,7 @@ class Date(Field):
 		return dt
 	
 	def to_native(self, obj, name, value):
-		if not isinstance(value, datetime):
+		if value is not None and not isinstance(value, datetime):
 			log.warning("Non-date stored in {}.{} field.".format(self.__class__.__name__, self.__name__),
 					extra={'document': obj, 'field': self.__name__, 'value': value})
 			return value
@@ -108,7 +108,10 @@ class Date(Field):
 		return self._process_tz(value, self.naive, self.tz)
 	
 	def to_foreign(self, obj, name, value):  # pylint:disable=unused-argument
-		if isinstance(value, MutableMapping) and '_id' in value:
+		if value in (None, True) and not self.required:
+			return None
+		
+		elif isinstance(value, MutableMapping) and '_id' in value:
 			value = value['_id']
 		
 		if isinstance(value, OID):
