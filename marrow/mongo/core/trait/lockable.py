@@ -8,6 +8,7 @@ from ... import Document, Index, utcnow
 from ...field import Date, String, Embed, Reference, Integer, ObjectId
 from ...trait import Queryable
 from ...util.capped import tail
+from ...util.oid import HWID, ObjectID as OID
 
 
 log = __import__('logging').getLogger(__name__)
@@ -23,7 +24,7 @@ except:
 # We default to the same algorithm PyMongo uses to generate hardware and process ID portions of ObjectIds.
 def _identifier():
 	return getenv('INSTANCE_ID', '{:06x}{:04x}'.format(
-			int(hexlify(OID._machine_bytes), 16),
+			int(hexlify(OID(hwid='mac').hwid), 16),
 			getpid() % 0xFFFF,
 		))
 
