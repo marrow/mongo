@@ -102,8 +102,8 @@ try:
 	mac = bytes.fromhex("%x" % (getnode(), ))
 	HWID['mac'] = bytes.fromhex("".join("%x" % (i ^ mac[-1]) for i in mac[:-1]))  # Identifier based on hardware MAC address.
 	del mac
-except ValueError:
-	print("⚠️  Unable to determine hardware MAC address from: {getnode()!r}")
+except ValueError as e:
+	print(f"⚠️  Unable to determine hardware MAC address from: {getnode()!r}\n{e}")
 
 try:  # This uses the old (<3.7) MD5 approach, which is not FIPS-safe despite having no cryptographic requirements.
 	from hashlib import md5
