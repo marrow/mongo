@@ -59,7 +59,7 @@ class Lockable(Queryable):
 			... # Failure scenario.
 	
 	General locking is accomplished through atomic compare-and-swap, also referred to as "update if not different". We
-	rely on the fact that MongoDB database operations are serilized in the operation log. If there is a dogpile on the
+	rely on the fact that MongoDB database operations are serialized in the operation log. If there is a dogpile on the
 	lock, the first operation reaching the log will "win" and the compare operations on the subsequent attempts will
 	prevent further modification.
 	
@@ -82,7 +82,7 @@ class Lockable(Queryable):
 	period expires, the lock will be automatically freed on the next attempt to acquire it.
 	"""
 	
-	lock = Embed('.Lock', default=None)
+	lock = Embed('.Lock', default=None, positional=False)
 	
 	class Locked(Exception):
 		"""An exception raised when unable to acquire a lock."""
