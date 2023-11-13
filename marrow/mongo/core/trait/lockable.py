@@ -24,7 +24,7 @@ except:
 # We default to the same algorithm PyMongo uses to generate hardware and process ID portions of ObjectIds.
 def _identifier():
 	return getenv('INSTANCE_ID', '{:06x}{:04x}'.format(
-			int(hexlify(OID(hwid='mac').hwid), 16),
+			int(hexlify(OID(hwid='legacy').hwid), 16),
 			getpid() % 0xFFFF,
 		))
 
